@@ -33,7 +33,7 @@ type SignUpForm struct {
 	RePassword string `json:"re_password" binding:"required,eqfield=Password"` //跨字段
 }
 //loginForm.user ->user
-func removeTopStruct(fields map[string]string)(map[string]string){
+func removeTopStruct(fields map[string]string) map[string]string {
 	rsp := make(map[string]string)
 	for field,errMsg := range fields{
 		rsp[field[strings.Index(field,".")+1:]] = errMsg
