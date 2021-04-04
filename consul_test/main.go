@@ -57,7 +57,7 @@ func AllService(address string)  {
 func FilterService(address,name string)  {
 	cfg := api.DefaultConfig()
 	cfg.Address = fmt.Sprintf("%s:8500",address)
-	fmt.Println(cfg)
+	fmt.Println(*cfg)
 	client,err := api.NewClient(cfg)
 	if err != nil{
 		panic(err.Error())
@@ -81,5 +81,6 @@ func main(){
 	//	fmt.Println(err.Error())
 	//}
 	//AllService("192.168.16.111")
-	FilterService("192.168.16.111","user_web")
+
+	FilterService("192.168.16.111","user-srv")
 }
