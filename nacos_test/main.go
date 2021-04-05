@@ -1,8 +1,11 @@
 package main
 
 import(
+	"encoding/json"
 	"fmt"
 	"time"
+
+	"go_test_project/nacos_test/config"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
@@ -40,19 +43,31 @@ func main()  {
 
 	// 获取具体配置信息
 	content ,err := clientCfg.GetConfig(vo.ConfigParam{
-		DataId: "user-web-dev.yaml",
+		//DataId: "user-web-dev.yaml",
+		DataId: "user-web-dev.json",
 		Group: "dev",
 
 	})
 	if err != nil{
 		panic(err)
 	}
-	fmt.Println(content)
+	fmt.Println(content) // yaml格式的字符串
+	// go语言本身直接json字符串反射成struct
 
+	// 映射成struct
+	srvCfg := config.ServerConfig{
+	}
+	//想要json字符串转换成struct，需要设置struct的tag
+	err = json.Unmarshal([]byte(content),&srvCfg)
+	if err != nil{
+		panic(err)
+	}
+	fmt.Println(srvCfg)
 
 	// 监听配置文件变化
 	if err = clientCfg.ListenConfig(vo.ConfigParam{
-		DataId: "user-web-dev.yaml",
+		//DataId: "user-web-dev.yaml",
+		DataId: "user-web-dev.json",
 		Group:  "dev",
 		OnChange: func(namespace, group, dataId, data string) {
 			fmt.Println("配置文件发生变化")
