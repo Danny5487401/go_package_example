@@ -13,6 +13,7 @@ require (
 	github.com/hashicorp/consul/api v1.3.0
 	github.com/jinzhu/gorm v1.9.16
 	github.com/mbobakov/grpc-consul-resolver v1.4.3
+	github.com/nacos-group/nacos-sdk-go v1.0.7
 	github.com/spf13/viper v1.7.1
 	go.uber.org/zap v1.16.0
 	google.golang.org/grpc v1.27.1
