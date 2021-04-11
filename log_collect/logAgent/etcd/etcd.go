@@ -13,10 +13,10 @@ var (
 	cli *clientv3.Client
 )
 
-// 返回信息条目
+// 返回需要收集的信息条目
 type LogEntries struct {
-	Path string `json:"path"`
-	Topic string `json:"topic"`
+	Path string `json:"path"`  //日志存放的路径
+	Topic string `json:"topic"`  //日志在kafka发送的topic
 }
 
 // 初始化etcd

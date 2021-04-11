@@ -24,21 +24,25 @@ func main()  {
 	defer cli.Close()
 
 	//put 操作
-	//ctx, cancel := context.WithTimeout(context.Background(),time.Second)
-	//value := `[{"path":"/Users/python/kafka_test/nginx/nginx.log","topic":"nginx_log"},
-	//			{"path":"/Users/python/kafka_test/redis/redis.log","topic":"redis_log"}]
-	//		`
-	//rsp ,err := cli.Put(ctx,"/etcd_log",value)
-	//cancel()
-	//if err != nil{
-	//	fmt.Printf("[put ctcd  ] failed:%v\n",err)
-	//}
-	//fmt.Printf("[put ctcd  ] success,rsp :%v\n",rsp)
+	ctx, cancel := context.WithTimeout(context.Background(),time.Second)
+	value1 := `[{"path":"/Users/python/kafka_test/nginx/nginx.log","topic":"nginx_log"},
+				{"path":"/Users/python/kafka_test/redis/redis.log","topic":"redis_log"}]
+			`
+	//value2 := `[{"path":"/Users/python/kafka_test/nginx/nginx.log","topic":"nginx_log"},
+	//			{"path":"/Users/python/kafka_test/redis/redis.log","topic":"redis_log"},
+	//			{"path":"/Users/python/kafka_test/mysql/mysql.log","topic":"mysql_log"}]
+	//			`
+	rsp ,err := cli.Put(ctx,"/logAgent/collect_config",value1)
+	cancel()
+	if err != nil{
+		fmt.Printf("[put ctcd  ] failed:%v\n",err)
+	}
+	fmt.Printf("[put ctcd  ] success,rsp :%v\n",rsp)
 
 	//// get 操作
 	ctx2, cancel := context.WithTimeout(context.Background(),time.Second)
 
-	resp,err := cli.Get(ctx2,"/etcd_log")
+	resp,err := cli.Get(ctx2,"/logAgent/collect_config")
 	cancel()
 	if err != nil{
 		fmt.Printf("[get value] failed:%v\n",err)
@@ -50,13 +54,13 @@ func main()  {
 	}
 
 	// watch 操作 ，获取key的变化
-	watChan := cli.Watch(context.Background(),"/etcd_log")
-	cancel()
-	for wResp := range watChan {
-		for _,ev := range wResp.Events{
-			fmt.Printf("变化后的Type:%s Key:%s Value:%s\n",ev.Type,ev.Kv.Key,ev.Kv.Value)
-		}
-	}
+	//watChan := cli.Watch(context.Background(),"/logAgent/collect_config")
+	//cancel()
+	//for wResp := range watChan {
+	//	for _,ev := range wResp.Events{
+	//		fmt.Printf("变化后的Type:%s Key:%s Value:%s\n",ev.Type,ev.Kv.Key,ev.Kv.Value)
+	//	}
+	//}
 
 }
 
