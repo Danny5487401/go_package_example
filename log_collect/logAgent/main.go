@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go_test_project/log_collect/logAgent/conf"
+	"go_test_project/log_collect/logAgent/etcd"
 	"go_test_project/log_collect/logAgent/kafka"
 	tailLog "go_test_project/log_collect/logAgent/tail_log"
 	"time"
@@ -32,14 +33,38 @@ func main()  {
 		return
 	}
 
+
 	// 1. 初始化kafka连接
 	//err = kafka.Init([]string{cfg.Section("kafka").Key("address").String()})  //这是大写的Init,不是导入的小写init
-	err = kafka.Init([]string{appCfg.Address})  //这是大写的Init,不是导入的小写init
+	err = kafka.Init([]string{appCfg.KafkaConf.Address})  //这是大写的Init,不是导入的小写init
 	if err!=nil{
 		fmt.Printf("[InitKafka]failed:%v\n",err)
 		return
 	}
-	fmt.Println("[InitKafka]success")
+	fmt.Println("[InitKafka]success.")
+
+	// 1.1 初始化etcd
+	err = etcd.Init(appCfg.EtcdConf.Address,time.Duration(appCfg.EtcdConf.Timeout)*time.Second)
+	if err!=nil{
+		fmt.Printf("[InitEtcd]failed:%v\n",err)
+		return
+	}
+	fmt.Println("[InitEtcd]success.")
+
+	// 1.2 从etcd中中获取配置项信息，并监视key变化
+	logEntries ,err := etcd.GetConf("/etcd_log")
+	if err != nil {
+		fmt.Printf("get [Etcd]failed:%v\n",err)
+		return
+	}
+	fmt.Printf("get [Etcd]success,%v\n",logEntries)
+	for index,value := range logEntries{
+		fmt.Printf("index:%v,value:%v\n",index,value)
+	}
+
+
+
+
 
 	// 2.打开日志文件准备收集日记
 	//fileName := "/Users/python/Desktop/go_test_project/log_collect/logAgent/log.txt"

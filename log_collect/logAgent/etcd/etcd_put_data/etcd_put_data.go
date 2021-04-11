@@ -23,19 +23,22 @@ func main()  {
 	fmt.Println("[init etcd client ] success")
 	defer cli.Close()
 
-	// put 操作
+	//put 操作
 	//ctx, cancel := context.WithTimeout(context.Background(),time.Second)
-	//rsp ,err := cli.Put(ctx,"etcd_danny_key","etcd_value")
+	//value := `[{"path":"/Users/python/kafka_test/nginx/nginx.log","topic":"nginx_log"},
+	//			{"path":"/Users/python/kafka_test/redis/redis.log","topic":"redis_log"}]
+	//		`
+	//rsp ,err := cli.Put(ctx,"/etcd_log",value)
 	//cancel()
 	//if err != nil{
 	//	fmt.Printf("[put ctcd  ] failed:%v\n",err)
 	//}
 	//fmt.Printf("[put ctcd  ] success,rsp :%v\n",rsp)
 
-	// get 操作
+	//// get 操作
 	ctx2, cancel := context.WithTimeout(context.Background(),time.Second)
-	//resp,err := cli.Get(ctx2,"etcd_danny_key", clientv3.WithPrefix() )  //  clientv3.WithPrefix() 业务前缀
-	resp,err := cli.Get(ctx2,"etcd_key")
+
+	resp,err := cli.Get(ctx2,"/etcd_log")
 	cancel()
 	if err != nil{
 		fmt.Printf("[get value] failed:%v\n",err)
@@ -47,7 +50,7 @@ func main()  {
 	}
 
 	// watch 操作 ，获取key的变化
-	watChan := cli.Watch(context.Background(),"etcd_key")
+	watChan := cli.Watch(context.Background(),"/etcd_log")
 	cancel()
 	for wResp := range watChan {
 		for _,ev := range wResp.Events{
@@ -55,10 +58,5 @@ func main()  {
 		}
 	}
 
-
-
-
-
-
-
 }
+
