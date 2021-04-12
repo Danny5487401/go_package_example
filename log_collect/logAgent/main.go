@@ -6,6 +6,7 @@ import (
 	"go_test_project/log_collect/logAgent/etcd"
 	"go_test_project/log_collect/logAgent/kafka"
 	tailLog "go_test_project/log_collect/logAgent/tail_log"
+	"sync"
 	"time"
 
 	"gopkg.in/ini.v1"
@@ -60,9 +61,13 @@ func main()  {
 		return
 	}
 	fmt.Printf("get [Etcd]success,%v\n",logEntries)
+
 	for index,value := range logEntries{
-		fmt.Printf("index:%v,value:%v\n",index,value)
+		fmt.Printf("第一次Etcd获取结果index:%v,value:%v\n",index,value)
 	}
+
+
+
 
 	// 1.3 收集多个配置文件发送kafka
 	// 1.3.1 循环每个日记收集项 ，创建多个Tails  ---> tailObj
@@ -94,9 +99,15 @@ func main()  {
 	//
 	//	tailLog.NewTailTask(confValue.Path,confValue.Topic)
 	//}
-	// 优化后
-	tailLog.NewTailMgr(logEntries)
+	// 优化后：收集日志发送到kafka
+	tailLog.NewTailMgr(logEntries)  // 进行初始化newConfChan
 
+	// 派一个哨兵去监视logEntries变化
+	var wg sync.WaitGroup
+	wg.Add(1)
+	newConfChan := tailLog.ExposeChan() // 从tailLog 获取对外暴露的通道
+	go etcd.WatchConfChange(appCfg.EtcdConf.Key,newConfChan) //哨兵发现变化会通知到通道中
+	wg.Wait()  // 一直监听着
 
 	// 2.打开日志文件准备收集日记
 	//fileName := "/Users/python/Desktop/go_test_project/log_collect/logAgent/log.txt"

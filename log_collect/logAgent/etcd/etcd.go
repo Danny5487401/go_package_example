@@ -57,3 +57,35 @@ func GetConf(key string)(logEntries []*LogEntries,err error) {
 	return
 
 }
+func WatchConfChange(key string, ch chan <- []*LogEntries)  {
+	watChan := cli.Watch(context.Background(),key)
+	for wResp := range watChan {
+		for _,ev := range wResp.Events{
+			fmt.Printf("变化后的Type:%s Key:%s Value:%s\n",ev.Type,ev.Kv.Key,ev.Kv.Value)
+			// 不需要判断操作的类型 delete,put
+			var newConf []*LogEntries
+			//if ev.Type == clientv3.EventTypeDelete{
+			//	// 如果是删除操作,手动传递一个空的[]*LogEntries
+			//
+			//}else {
+			//	err := json.Unmarshal(ev.Kv.Value,&newConf)
+			//	if err != nil{
+			//		fmt.Printf("unmarshal failed,err:%v\n",err)
+			//		continue
+			//	}
+			//}
+			// 以下等价写法
+			if ev.Type != clientv3.EventTypeDelete{
+				err := json.Unmarshal(ev.Kv.Value,&newConf)
+				if err != nil{
+					fmt.Printf("unmarshal failed,err:%v\n",err)
+					continue
+				}
+			}
+
+			fmt.Printf("unmarshal new conf success:%v\n",newConf)
+			// 通知 tailTask
+			ch <- newConf
+		}
+	}
+}
