@@ -2,6 +2,7 @@ package tailLog
 // 专门从日志文件中收集日记
 
 import (
+	"context"
 	"fmt"
 	"github.com/hpcloud/tail"
 	"go_test_project/log_collect/logAgent/kafka"
@@ -18,12 +19,18 @@ type TailTask struct {
 	path string
 	topic string
 	instance *tail.Tail
+	// 用于取消运行的tailTask run()
+	ctx context.Context
+	cancelFunc context.CancelFunc
 }
 
 func NewTailTask(path,topic string) (tailObj *TailTask) {
+	ctx ,cancel := context.WithCancel(context.Background())
 	tailObj = &TailTask{
 		path: path,
 		topic: topic,
+		ctx: ctx,
+		cancelFunc: cancel,
 	}
 	_ = tailObj.init()  //根据路径去打开对应的日志信息
 	return
@@ -41,6 +48,8 @@ func (t *TailTask)init() (err error) {  // 小写init内部调用
 		fmt.Printf("tailFile [%v]failed err:%v",t.path,err)
 		return
 	}
+
+	// 后期需要退出
 	go t.ReadSendMsg()  // 直接采集数据并发送到kafka
 	return
 }
@@ -51,6 +60,11 @@ func (t *TailTask)ReadChan() <- chan *tail.Line {
 func (t *TailTask)ReadSendMsg()  {
 	for {
 		select {
+		case <-t.ctx.Done():
+			// 退出
+			fmt.Printf("tailTask [%s_%s] exit\n",t.path,t.topic)
+			return
+			
 		case line:=<-t.ReadChan():
 			// 发送到kafka
 			//kafka.SendToKafka(t.topic,line.Text)  //函数调用函数：需要优化-->同步变异步，太多日志，不适合直接go协程

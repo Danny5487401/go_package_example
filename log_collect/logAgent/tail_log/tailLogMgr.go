@@ -56,7 +56,22 @@ func (t *TailMgr )run ()  {
 					taskObj := NewTailTask(value.Path,value.Topic)
 					t.taskMap[key] = taskObj
 				}
-				// 原来配置文件有，新的配置文件没有，需要删除后台运行的任务
+
+			}
+			// 原来配置文件有，新的配置文件没有，需要删除后台运行的任务
+			for _,c1 := range t.logEntryList{
+				isDelete := true
+				for _,c2 := range newConf{
+					if c2.Path == c1.Path && c2.Topic == c1.Topic{
+						isDelete = false
+						continue
+					}
+				}
+				if isDelete{
+					// 把c1对应的tailObj停掉
+					key :=  fmt.Sprintf("%s_%s",c1.Path,c1.Topic)
+					t.taskMap[key].cancelFunc()
+				}
 			}
 
 		default:
