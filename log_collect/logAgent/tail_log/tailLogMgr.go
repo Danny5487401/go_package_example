@@ -20,12 +20,16 @@ func NewTailMgr(logConfList []*etcd.LogEntries) {
 	// 初始化对象
 	taskMgr = &TailMgr{
 		logEntryList: logConfList,
-		taskMap: make(map[string]*TailTask,32), // 32个配置项
+		taskMap: make(map[string]*TailTask,32), // 32个配置项,记载配置项
 		newConfChan: make(chan []*etcd.LogEntries), // 无缓冲区通道
 	}
 	for _, confValue := range taskMgr.logEntryList {
 		// 一个配置项对应一个配置任务
-		NewTailTask(confValue.Path,confValue.Topic)
+
+		// 记录初始化起了多少个tailTask，方便新配置来了对比
+		taskObj := NewTailTask(confValue.Path,confValue.Topic)
+		key := fmt.Sprintf("%s_%s",confValue.Path,confValue.Topic)
+		taskMgr.taskMap[key] = taskObj
 	}
 	go taskMgr.run()  //监听变化
 }
@@ -39,6 +43,22 @@ func (t *TailMgr )run ()  {
 		select {
 		case newConf := <-t.newConfChan:
 			fmt.Println("配置发生变化",newConf)
+			// 1。 新增判断
+			for _,value := range newConf{
+				// path路径变化 或者 topic变更，所以要合成一个key
+				key := fmt.Sprintf("%s_%s",value.Path,value.Topic)
+				_,ok := t.taskMap[key]
+				if ok{
+					// 原来就有
+					continue
+				}else {
+					// 说明新增或则修改--当作新增处理
+					taskObj := NewTailTask(value.Path,value.Topic)
+					t.taskMap[key] = taskObj
+				}
+				// 原来配置文件有，新的配置文件没有，需要删除后台运行的任务
+			}
+
 		default:
 			time.Sleep(time.Second)
 		}
