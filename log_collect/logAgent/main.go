@@ -6,6 +6,7 @@ import (
 	"go_test_project/log_collect/logAgent/etcd"
 	"go_test_project/log_collect/logAgent/kafka"
 	tailLog "go_test_project/log_collect/logAgent/tail_log"
+	"go_test_project/log_collect/logAgent/utils"
 	"sync"
 	"time"
 
@@ -55,7 +56,10 @@ func main()  {
 	fmt.Println("[InitEtcd]success.")
 
 	// 1.2 从etcd中中获取配置项信息，并监视key变化
-	logEntries ,err := etcd.GetConf(appCfg.EtcdConf.Key)
+	// 为了实现每个logAgent都获取自己的配置，绑定自己的Ip区别
+	ip, _ := utils.GetOutboundIP()
+	etcdKey := fmt.Sprintf(appCfg.EtcdConf.Key,ip)
+	logEntries ,err := etcd.GetConf(etcdKey)
 	if err != nil {
 		fmt.Printf("get [Etcd]failed:%v\n",err)
 		return
@@ -106,7 +110,7 @@ func main()  {
 	var wg sync.WaitGroup
 	wg.Add(1)
 	newConfChan := tailLog.ExposeChan() // 从tailLog 获取对外暴露的通道
-	go etcd.WatchConfChange(appCfg.EtcdConf.Key,newConfChan) //哨兵发现变化会通知到通道中
+	go etcd.WatchConfChange(etcdKey,newConfChan) //哨兵发现变化会通知到通道中
 	wg.Wait()  // 一直监听着
 
 	// 2.打开日志文件准备收集日记

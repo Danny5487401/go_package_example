@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/coreos/etcd/clientv3"
+	"go_test_project/log_collect/logAgent/utils"
 	"time"
 )
 
@@ -32,7 +33,10 @@ func main()  {
 	//			{"path":"/Users/python/kafka_test/redis/redis.log","topic":"redis_log"},
 	//			{"path":"/Users/python/kafka_test/mysql/mysql.log","topic":"mysql_log"}]
 	//			`
-	rsp ,err := cli.Put(ctx,"/logAgent/collect_config",value1)
+	ip,_ := utils.GetOutboundIP()
+	etcdKey := fmt.Sprintf("/logAgent/%s/collect_config",ip)
+	//rsp ,err := cli.Put(ctx,"/logAgent/collect_config",value1)
+	rsp ,err := cli.Put(ctx,etcdKey,value1)
 	cancel()
 	if err != nil{
 		fmt.Printf("[put ctcd  ] failed:%v\n",err)
@@ -42,7 +46,7 @@ func main()  {
 	//// get 操作
 	ctx2, cancel := context.WithTimeout(context.Background(),time.Second)
 
-	resp,err := cli.Get(ctx2,"/logAgent/collect_config")
+	resp,err := cli.Get(ctx2,etcdKey)
 	cancel()
 	if err != nil{
 		fmt.Printf("[get value] failed:%v\n",err)
@@ -52,15 +56,6 @@ func main()  {
 	for _,ev := range resp.Kvs{
 		fmt.Printf("键值对是%s:%s\n",ev.Key,ev.Value)
 	}
-
-	// watch 操作 ，获取key的变化
-	//watChan := cli.Watch(context.Background(),"/logAgent/collect_config")
-	//cancel()
-	//for wResp := range watChan {
-	//	for _,ev := range wResp.Events{
-	//		fmt.Printf("变化后的Type:%s Key:%s Value:%s\n",ev.Type,ev.Kv.Key,ev.Kv.Value)
-	//	}
-	//}
 
 }
 
