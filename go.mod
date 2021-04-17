@@ -10,6 +10,7 @@ require (
 	github.com/eapache/go-xerial-snappy v0.0.0-20180814174437-776d5712da21 // indirect
 	github.com/eapache/queue v1.1.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
+	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/frankban/quicktest v1.11.3 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/gin-gonic/gin v1.6.3
@@ -21,8 +22,10 @@ require (
 	github.com/hashicorp/consul/api v1.3.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/jinzhu/gorm v1.9.16
+	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mbobakov/grpc-consul-resolver v1.4.3
 	github.com/nacos-group/nacos-sdk-go v1.0.7
+	github.com/olivere/elastic v6.2.35+incompatible
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/spf13/viper v1.7.1
