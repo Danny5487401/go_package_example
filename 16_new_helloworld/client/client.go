@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go_test_project/new_helloworld/client_proxy"
+	"go_test_project/16_new_helloworld/client_proxy"
 )
 
 func main(){

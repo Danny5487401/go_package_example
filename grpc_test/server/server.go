@@ -4,8 +4,8 @@ import (
 	"context"
 	"net"
 
-	"google.golang.org/grpc"
 	"go_test_project/grpc_test/proto"
+	"google.golang.org/grpc"
 )
 
 type Server struct {

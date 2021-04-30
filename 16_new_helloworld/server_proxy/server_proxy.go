@@ -1,7 +1,7 @@
 package server_proxy
 
 import (
-	"go_test_project/new_helloworld/handler"
+	"go_test_project/16_new_helloworld/handler"
 	"net/rpc"
 )
 

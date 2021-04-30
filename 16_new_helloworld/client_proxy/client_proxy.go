@@ -2,7 +2,7 @@ package client_proxy
 
 import (
 	"net/rpc"
-	"go_test_project/new_helloworld/handler"
+	"go_test_project/16_new_helloworld/handler"
 )
 
 type HelloServiceStub struct {

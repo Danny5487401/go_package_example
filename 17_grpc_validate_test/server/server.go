@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"go_test_project/grpc_validate_test/proto"
+	"go_test_project/17_grpc_validate_test/proto"
 )
 
 
