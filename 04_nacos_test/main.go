@@ -5,7 +5,7 @@ import(
 	"fmt"
 	"time"
 
-	"go_test_project/nacos_test/config"
+	"go_test_project/04_nacos_test/config"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"

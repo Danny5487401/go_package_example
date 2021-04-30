@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"go_test_project/grpc_load_balance_test/proto"
+	"go_test_project/08_grpc_load_balance_test/proto"
 
 	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
 	"google.golang.org/grpc"

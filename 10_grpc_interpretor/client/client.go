@@ -2,7 +2,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"go_test_project/grpc_interpretor/proto"
+	"go_test_project/10_grpc_interpretor/proto"
 	"time"
 
 	"google.golang.org/grpc"

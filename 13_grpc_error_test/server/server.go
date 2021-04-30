@@ -4,7 +4,7 @@ import (
 	"context"
 	"net"
 
-	"go_test_project/grpc_error_test/proto"
+	"go_test_project/13_grpc_error_test/proto"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -28,7 +28,7 @@ func main()  {
 	proto.RegisterGreeterServer(g,&Server{})
 	lis,err := net.Listen("tcp","127.0.0.1:9000")
 	if err != nil{
-		panic("faild to listen:" + err.Error())
+		panic("failed to listen:" + err.Error())
 	}
 	_ = g.Serve(lis)
 }
