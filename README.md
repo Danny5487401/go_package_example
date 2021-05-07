@@ -17,9 +17,15 @@
 ## 15. grpc带头部token
 ## 16. rpc结构演变new_helloWorld
 ## 17. proto字段验证器
+## 18. redis操作
+## 19. 熔断和限流
+
 
 
 # 日志收集项目 log_collect
+    1. es操作
+    2. etcd操作
+    3. kafka操作
 # 配置文件获取 viper_test
 
 
