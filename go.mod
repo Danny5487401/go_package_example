@@ -5,6 +5,8 @@ go 1.15
 require (
 	github.com/Shopify/sarama v1.19.0
 	github.com/Shopify/toxiproxy v2.1.4+incompatible // indirect
+	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
+	github.com/alibaba/sentinel-golang v1.0.2
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
 	github.com/coreos/etcd v3.3.13+incompatible
 	github.com/eapache/go-resiliency v1.2.0 // indirect
@@ -15,6 +17,7 @@ require (
 	github.com/frankban/quicktest v1.11.3 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/gin-gonic/gin v1.6.3
+	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.2.0
@@ -32,6 +35,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/spf13/viper v1.7.1
 	go.uber.org/zap v1.16.0
+	golang.org/x/tools v0.0.0-20191112195655-aa38f8e97acc
 	google.golang.org/grpc v1.27.1
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/fsnotify.v1 v1.4.7 // indirect

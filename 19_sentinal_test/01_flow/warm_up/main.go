@@ -25,8 +25,10 @@ func main() {
 		{
 			Resource:               "test",      //资源名
 			TokenCalculateStrategy: flow.WarmUp, // 流量控制器的Token计算策略:冷启动
-			ControlBehavior:        flow.Reject, // 控制器的控制策略
-			Threshold:              1000,        // 流控阈值
+			// Throttling qps为2，代表500ms只能通过一个
+			ControlBehavior: flow.Reject, // 控制器的控制策略
+
+			Threshold: 1000, // 流控阈值
 			//StatIntervalInMs:       100,         // 流量控制器的独立统计结构的统计周，1000(也就是1秒)
 			WarmUpPeriodSec:  30, // 预热的时间长度.30s
 			WarmUpColdFactor: 3,  // 预热的因子，默认是3

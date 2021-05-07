@@ -24,7 +24,7 @@ func main()  {
 	proto.RegisterGreeterServer(g,&Server{})
 	lis,err := net.Listen("tcp","127.0.0.1:9000")
 	if err != nil{
-		panic("faild to listen:" + err.Error())
+		panic("failed to listen:" + err.Error())
 	}
 	_ = g.Serve(lis)
 }
