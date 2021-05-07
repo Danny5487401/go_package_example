@@ -20,6 +20,7 @@ require (
 	github.com/go-playground/validator/v10 v10.2.0
 	github.com/golang/protobuf v1.4.3
 	github.com/golang/snappy v0.0.3 // indirect
+	github.com/gomodule/redigo v1.8.4
 	github.com/hashicorp/consul/api v1.3.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/jinzhu/gorm v1.9.16
