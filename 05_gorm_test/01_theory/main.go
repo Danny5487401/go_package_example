@@ -1,5 +1,10 @@
 package main
 
+/*  GORM
+
+1 实现原理
+*/
+
 import (
 	"bytes"
 	"fmt"
