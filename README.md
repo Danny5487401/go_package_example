@@ -1,8 +1,11 @@
 # go_grpc_example
 ![grpc](./img/golang.jpeg)
+## 0. 自定义实现rpc
 ## 1. 服务注册中心consul
 ## 2. 日志库zap
     a. 源码结构
+    b. 控制台输出
+    c. 文件输出
 ## 3. 消息队列rocketmq
     a. 消费者：简单消费,延迟消费
     b. 生产者：简单消息，延迟消息，事务消息
@@ -26,6 +29,8 @@
     a. 开源库redigo使用
 ## 19. 熔断和限流
     a. 流量控制
+## 20. grpc入门
+## 21.配置文件获取 viper_test
 
 
 
@@ -33,6 +38,6 @@
     1. es操作
     2. etcd操作
     3. kafka操作
-# 配置文件获取 viper_test
+
 
 
