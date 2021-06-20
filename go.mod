@@ -39,11 +39,10 @@ require (
 	github.com/tklauser/go-sysconf v0.3.6 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
 	go.uber.org/zap v1.16.0
-	golang.org/x/net v0.0.0-20200324143707-d3edc9973b7e
+	golang.org/x/net v0.0.0-20201021035429-f5854403a974
 	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139 // indirect
 	google.golang.org/grpc v1.27.1
 	google.golang.org/protobuf v1.25.0
-	gopkg.in/fsnotify.v1 v1.4.7 // indirect
 	gopkg.in/ini.v1 v1.51.0
-	gopkg.in/tomb.v1 v1.0.0-20141024135613-dd632973f1e7 // indirect
+	xorm.io/xorm v1.1.0 // indirect
 )
