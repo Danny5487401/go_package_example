@@ -33,29 +33,20 @@ func main() {
 	)
 	failOnError(err, "创建队列失败")
 
-	// 开启一个 消费者
-	// 返回值是 ch 类型
-	msgChan, err := ch.Consume(
-		q.Name, // queue
-		"",     // consumer
-		true,   // auto-ack
-		false,  // exclusive
-		false,  // no-local
-		false,  // no-wait
-		nil,    // args
-	)
-	failOnError(err, "注册消费者 ，失败")
+	// 构建一个消息
+	body := "Hello World4!"
+	msg := amqp.Publishing{
+		ContentType: "text/plain", // （内容类型）
+		Body:        []byte(body), //消息主体（有效载荷)
+	}
 
-	//帮助阻塞
-	forever := make(chan bool)
-
-	// 开启一个 go程
-	go func() {
-		for d := range msgChan {
-			log.Printf("收到消息: %s", d.Body)
-		}
-	}()
-
-	log.Printf(" 开始等待消息...")
-	<-forever
+	// 构建一个生产者，将消息 放入队列
+	err = ch.Publish(
+		"",     // exchange
+		q.Name, // routing key
+		false,  // mandatory
+		false,  // immediate
+		msg)
+	log.Printf(" [x] Sent %s", body)
+	failOnError(err, "Failed to publish a message")
 }

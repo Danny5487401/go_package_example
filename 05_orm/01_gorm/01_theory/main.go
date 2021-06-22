@@ -143,7 +143,7 @@ func main() {
 
 // 以上了解后
 /*
-1. main.go 程序 ：type DB struct 主结构，用来管理当前的数据库连接, 它会包含下面将要列出的结构，比如Callback, Dialect
+1. producer.go 程序 ：type DB struct 主结构，用来管理当前的数据库连接, 它会包含下面将要列出的结构，比如Callback, Dialect
 2. scope.go 程序: ype Scope struct,包含每一次sql操作的信息，比如db.Create(&user), 创建一个用户时，scope包含了*DB信息,SQL信息， 字段，主键字段等
 3. callback.go 程序： type Callback struct 包含所以CRUD的回调，比如beforeSave, afterSave, beforeUpdate等等，
 	在实现我们一些自定义功能时（插件)， 就需要了解这个struct

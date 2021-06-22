@@ -42,5 +42,5 @@ func main() {
 	logger.Info("failed to fetch url",
 		zap.String("url", url),
 		zap.Int("num", 3))
-	// 结果键值对方式{"level":"info","ts":1620378081.4890263,"caller":"cosole/main.go:42","msg":"failed to fetch url","url":"https://www.baidu.com","num":3}
+	// 结果键值对方式{"level":"info","ts":1620378081.4890263,"caller":"cosole/producer.go:42","msg":"failed to fetch url","url":"https://www.baidu.com","num":3}
 }

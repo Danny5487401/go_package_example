@@ -33,20 +33,15 @@ func main() {
 	)
 	failOnError(err, "创建队列失败")
 
-	// 构建一个消息
-	body := "Hello World2!"
-	msg := amqp.Publishing{
-		ContentType: "text/plain", // （内容类型）
-		Body:        []byte(body), //消息主体（有效载荷)
+	// 开启一个 消费者
+	// 返回值是 ch 类型
+
+	// 第二种方式拉模式
+	msgChan, ok, err := ch.Get(q.Name, true)
+
+	failOnError(err, "注册消费者 ，失败")
+	if ok {
+		log.Printf("收到消息: %s", msgChan.Body)
 	}
 
-	// 构建一个生产者，将消息 放入队列
-	err = ch.Publish(
-		"",     // exchange
-		q.Name, // routing key
-		false,  // mandatory
-		false,  // immediate
-		msg)
-	log.Printf(" [x] Sent %s", body)
-	failOnError(err, "Failed to publish a message")
 }
