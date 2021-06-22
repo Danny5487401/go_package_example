@@ -39,4 +39,37 @@ func main() {
 	eg.SetMaxOpenConns(5)
 	fmt.Println("连接成功")
 
+	// 获取数据库表的结构信息
+	schemeTables, _ := eg.DBMetas()
+	fmt.Println("表的数量", len(schemeTables))
+	for _, tableInfo := range schemeTables {
+		fmt.Printf("%+v\n", *tableInfo)
+	}
+
+	masterTableInfo := new(masterSlaveTable)
+	table, err := eg.TableInfo(masterTableInfo)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Printf("%+v\n", *table)
+	// 创建表
+	eg.Charset("utf8")
+	eg.StoreEngine("ISAM")
+	err = eg.CreateTables(masterTableInfo)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+}
+
+type masterSlaveTable struct {
+	Id          int64  // 如果field名称为Id而且类型为int64并且没有定义tag，则会被xorm视为主键，并且拥有自增属性。
+	description string `xorm:"description comment('描述')"` // string类型默认映射为varchar(255)
+	name        string `xorm:"'usr_name' notnull varchar(25)" `
+}
+
+func (m *masterSlaveTable) TableName() string {
+	return "masterSlaveTable2"
 }
