@@ -21,7 +21,7 @@ require (
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
 	github.com/go-playground/validator/v10 v10.2.0
-	github.com/golang/protobuf v1.4.3
+	github.com/golang/protobuf v1.4.0
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/gomodule/redigo v1.8.4
 	github.com/google/gops v0.3.18
@@ -42,7 +42,7 @@ require (
 	golang.org/x/net v0.0.0-20201021035429-f5854403a974
 	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139 // indirect
 	google.golang.org/grpc v1.27.1
-	google.golang.org/protobuf v1.25.0
+	google.golang.org/protobuf v1.26.0-rc.1
 	gopkg.in/ini.v1 v1.51.0
 	xorm.io/xorm v1.1.0 // indirect
 )
