@@ -8,6 +8,7 @@ require (
 	github.com/alibaba/sentinel-golang v1.0.2
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
 	github.com/coreos/etcd v3.3.17+incompatible
+	github.com/docker/docker v1.4.2-0.20191101170500-ac7306503d23
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/fortytw2/leaktest v1.3.0 // indirect
@@ -22,7 +23,7 @@ require (
 	github.com/golang/protobuf v1.4.0
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/gomodule/redigo v1.8.4
-	github.com/google/gops v0.3.18
+	github.com/google/gops v0.3.18 // indirect
 	github.com/hashicorp/consul/api v1.3.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/jinzhu/gorm v1.9.16
@@ -38,6 +39,7 @@ require (
 	github.com/streadway/amqp v1.0.0
 	github.com/tklauser/go-sysconf v0.3.6 // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
+	go.mongodb.org/mongo-driver v1.5.3
 	go.uber.org/zap v1.16.0
 	golang.org/x/net v0.0.0-20201021035429-f5854403a974
 	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139 // indirect
