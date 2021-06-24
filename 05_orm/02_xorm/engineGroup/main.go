@@ -5,49 +5,20 @@ import (
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
-	"xorm.io/xorm"
 
 	"go_test_project/05_orm/02_xorm/model"
+	"go_test_project/05_orm/02_xorm/util"
 )
 
-var eg *xorm.EngineGroup
-
 func main() {
-	var err error
-	// 格式:sql.Open("mysql", "user:password@/dbname")
-	master, err := xorm.NewEngine("mysql", "root:chuanzhi@tcp(106.14.35.115:3307)/masterSlaveDB")
-	if err != nil {
-		return
-	}
-	slave1, err := xorm.NewEngine("mysql", "root:123456@tcp(106.14.35.115:3308)/masterSlaveDB")
-	if err != nil {
-		return
-	}
-	slave2, err := xorm.NewEngine("mysql", "root:123456@tcp(106.14.35.115:3309)/masterSlaveDB")
-	if err != nil {
-		return
-	}
-	slaves := []*xorm.Engine{slave1, slave2}
-	eg, err = xorm.NewEngineGroup(master, slaves)
-	eg = eg.SetPolicy(xorm.RandomPolicy())
-	//连接测试
-	if err := eg.Ping(); err != nil {
-		fmt.Println(err)
-		return
-	}
-	eg.ShowSQL(true) // 调试显示sql语句
-	//设置连接池的空闲数大小
-	eg.SetMaxIdleConns(5)
-	//设置最大打开连接数
-	eg.SetMaxOpenConns(5)
-	fmt.Println("连接成功")
-
+	//var err error
+	var eg = util.GetEngineGroup()
 	// 获取数据库表的结构信息
-	//schemeTables, _ := eg.DBMetas()
-	//fmt.Println("表的数量", len(schemeTables))
-	//for _, tableInfo := range schemeTables {
-	//	fmt.Printf("%+v\n", *tableInfo)
-	//}
+	schemeTables, _ := eg.DBMetas()
+	fmt.Println("表的数量", len(schemeTables))
+	for _, tableInfo := range schemeTables {
+		fmt.Printf("%+v\n", *tableInfo)
+	}
 	// 自己构建表结构信息
 	//masterTableInfo := new(masterSlaveTable)
 	//table, err := eg.TableInfo(masterTableInfo)
@@ -60,11 +31,11 @@ func main() {
 	//eg.Charset("utf8")
 	////eg.StoreEngine("ISAM")
 	//err = eg.CreateTables(masterSlaveTable{})
-	err = eg.CreateTables(ServerInfo{})
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
+	//err = eg.CreateTables(ServerInfo{})
+	//if err != nil {
+	//	fmt.Println(err)
+	//	return
+	//}
 
 	// 添加数据
 	//var data = masterSlaveTable{
@@ -90,10 +61,10 @@ func main() {
 	//fmt.Printf("返回data2:%+v", *data2)
 
 	// 排序
-	dataSlice := make([]masterSlaveTable, 0)
-	//eg.Asc("id").Find(&dataSlice) // 升序
-	_ = eg.Desc("id").Limit(1, 0).Find(&dataSlice) // 降序序限制一条
-	fmt.Printf("返回data2:%+v", dataSlice)
+	//dataSlice := make([]masterSlaveTable, 0)
+	////eg.Asc("id").Find(&dataSlice) // 升序
+	//_ = eg.Desc("id").Limit(1, 0).Find(&dataSlice) // 降序序限制一条
+	//fmt.Printf("返回data2:%+v", dataSlice)
 }
 
 type masterSlaveTable struct {

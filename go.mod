@@ -1,4 +1,4 @@
-module go_test_project
+module go_grpc_example
 
 go 1.15
 
@@ -32,12 +32,15 @@ require (
 	github.com/micro/go-micro v1.18.0
 	github.com/nacos-group/nacos-sdk-go v1.0.7
 	github.com/olivere/elastic v6.2.35+incompatible
+	github.com/opentracing/opentracing-go v1.1.0
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/shirou/gopsutil/v3 v3.21.5 // indirect
 	github.com/spf13/viper v1.7.1
 	github.com/streadway/amqp v1.0.0
 	github.com/tklauser/go-sysconf v0.3.6 // indirect
+	github.com/uber/jaeger-client-go v2.29.1+incompatible
+	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/xlab/treeprint v1.1.0 // indirect
 	go.mongodb.org/mongo-driver v1.5.3
 	go.uber.org/zap v1.16.0
@@ -46,5 +49,6 @@ require (
 	google.golang.org/grpc v1.27.1
 	google.golang.org/protobuf v1.26.0-rc.1
 	gopkg.in/ini.v1 v1.51.0
+	xorm.io/builder v0.3.8
 	xorm.io/xorm v1.1.0
 )
