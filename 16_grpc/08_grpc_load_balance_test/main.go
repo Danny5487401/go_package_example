@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"go_test_project/08_grpc_load_balance_test/proto"
+	"go_grpc_example/08_grpc_load_balance_test/proto"
 
 	_ "github.com/mbobakov/grpc-consul-resolver" // It's important
 	"google.golang.org/grpc"
@@ -26,17 +26,17 @@ func main() {
 	}
 	defer conn.Close()
 	// 模拟十次同时快速请求，保证在round_robin在一次
-	for i:=0;i<10;i++{
+	for i := 0; i < 10; i++ {
 		userSrvClient := proto.NewUserClient(conn)
-		rsp,err := userSrvClient.GetUserList(context.Background(),&proto.PageInfo{
-			Pn: 2,
+		rsp, err := userSrvClient.GetUserList(context.Background(), &proto.PageInfo{
+			Pn:    2,
 			PSize: 2,
 		})
 		if err != nil {
 			panic(err)
 		}
-		for index,data := range rsp.Data{
-			str := fmt.Sprintf("索引是%v，对应数据是%v",index,data)
+		for index, data := range rsp.Data {
+			str := fmt.Sprintf("索引是%v，对应数据是%v", index, data)
 			fmt.Println(str)
 		}
 	}

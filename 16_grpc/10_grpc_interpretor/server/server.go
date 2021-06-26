@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"go_test_project/16_grpc/10_grpc_interpretor/proto"
+	"go_grpc_example/16_grpc/10_grpc_interpretor/proto"
 	"net"
 
 	"google.golang.org/grpc"

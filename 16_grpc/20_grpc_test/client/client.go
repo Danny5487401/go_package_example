@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go_test_project/16_grpc/20_grpc_test/proto"
+	"go_grpc_example/16_grpc/20_grpc_test/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )

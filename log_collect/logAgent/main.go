@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"go_test_project/log_collect/logAgent/conf"
-	"go_test_project/log_collect/logAgent/etcd"
-	"go_test_project/log_collect/logAgent/kafka"
-	tailLog "go_test_project/log_collect/logAgent/tail_log"
-	"go_test_project/log_collect/logAgent/utils"
+	"go_grpc_example/log_collect/logAgent/conf"
+	"go_grpc_example/log_collect/logAgent/etcd"
+	"go_grpc_example/log_collect/logAgent/kafka"
+	tailLog "go_grpc_example/log_collect/logAgent/tail_log"
+	"go_grpc_example/log_collect/logAgent/utils"
 	"sync"
 	"time"
 
@@ -21,7 +21,7 @@ var (
 
 )
 
-func main()  {
+func main() {
 	// 0. 加载配置文件
 	//var err error
 	//cfg,err = ini.Load("./log_collect/logAgent/conf/config.ini")  //路径要从项目目录working directory算
@@ -29,28 +29,27 @@ func main()  {
 	//	fmt.Printf("[Load Init]failed:%v\n",err)
 	//	return
 	//}
-	err := ini.MapTo(appCfg,"./log_collect/logAgent/conf/config.ini")
-	if err!=nil{
-		fmt.Printf("[Load Init]failed:%v\n",err)
+	err := ini.MapTo(appCfg, "./log_collect/logAgent/conf/config.ini")
+	if err != nil {
+		fmt.Printf("[Load Init]failed:%v\n", err)
 		return
 	}
-
 
 	// 1. 初始化kafka连接
 	//err = kafka.Init([]string{cfg.Section("kafka").Key("address").String()})  //这是大写的Init,不是导入的小写init
 	//err = kafka.Init([]string{appCfg.KafkaConf.Address})  //这是大写的Init,不是导入的小写init
-	err = kafka.Init([]string{appCfg.KafkaConf.Address},appCfg.KafkaConf.ChanSize)  //带缓冲区大小
-	if err != nil{
-		fmt.Printf("[InitKafka]failed:%v\n",err)
+	err = kafka.Init([]string{appCfg.KafkaConf.Address}, appCfg.KafkaConf.ChanSize) //带缓冲区大小
+	if err != nil {
+		fmt.Printf("[InitKafka]failed:%v\n", err)
 		return
-		}
+	}
 
 	fmt.Println("[InitKafka]success.")
 
 	// 1.1 初始化etcd
-	err = etcd.Init(appCfg.EtcdConf.Address,time.Duration(appCfg.EtcdConf.Timeout)*time.Second)
-	if err!=nil{
-		fmt.Printf("[InitEtcd]failed:%v\n",err)
+	err = etcd.Init(appCfg.EtcdConf.Address, time.Duration(appCfg.EtcdConf.Timeout)*time.Second)
+	if err != nil {
+		fmt.Printf("[InitEtcd]failed:%v\n", err)
 		return
 	}
 	fmt.Println("[InitEtcd]success.")
@@ -58,20 +57,17 @@ func main()  {
 	// 1.2 从etcd中中获取配置项信息，并监视key变化
 	// 为了实现每个logAgent都获取自己的配置，绑定自己的Ip区别
 	ip, _ := utils.GetOutboundIP()
-	etcdKey := fmt.Sprintf(appCfg.EtcdConf.Key,ip)
-	logEntries ,err := etcd.GetConf(etcdKey)
+	etcdKey := fmt.Sprintf(appCfg.EtcdConf.Key, ip)
+	logEntries, err := etcd.GetConf(etcdKey)
 	if err != nil {
-		fmt.Printf("get [Etcd]failed:%v\n",err)
+		fmt.Printf("get [Etcd]failed:%v\n", err)
 		return
 	}
-	fmt.Printf("get [Etcd]success,%v\n",logEntries)
+	fmt.Printf("get [Etcd]success,%v\n", logEntries)
 
-	for index,value := range logEntries{
-		fmt.Printf("第一次Etcd获取结果index:%v,value:%v\n",index,value)
+	for index, value := range logEntries {
+		fmt.Printf("第一次Etcd获取结果index:%v,value:%v\n", index, value)
 	}
-
-
-
 
 	// 1.3 收集多个配置文件发送kafka
 	// 1.3.1 循环每个日记收集项 ，创建多个Tails  ---> tailObj
@@ -104,17 +100,17 @@ func main()  {
 	//	tailLog.NewTailTask(confValue.Path,confValue.Topic)
 	//}
 	// 优化后：收集日志发送到kafka
-	tailLog.NewTailMgr(logEntries)  // 进行初始化newConfChan
+	tailLog.NewTailMgr(logEntries) // 进行初始化newConfChan
 
 	// 派一个哨兵去监视logEntries变化
 	var wg sync.WaitGroup
 	wg.Add(1)
-	newConfChan := tailLog.ExposeChan() // 从tailLog 获取对外暴露的通道
-	go etcd.WatchConfChange(etcdKey,newConfChan) //哨兵发现变化会通知到通道中
-	wg.Wait()  // 一直监听着
+	newConfChan := tailLog.ExposeChan()           // 从tailLog 获取对外暴露的通道
+	go etcd.WatchConfChange(etcdKey, newConfChan) //哨兵发现变化会通知到通道中
+	wg.Wait()                                     // 一直监听着
 
 	// 2.打开日志文件准备收集日记
-	//fileName := "/Users/python/Desktop/go_test_project/log_collect/logAgent/log.txt"
+	//fileName := "/Users/python/Desktop/go_grpc_example/log_collect/logAgent/log.txt"
 	//if err := tailLog.Init(fileName);err!=nil{
 	//if err := tailLog.Init(appCfg.FilePath);err!=nil{
 	//	fmt.Printf("[Init tailLog failed]:%v",err)
@@ -124,14 +120,14 @@ func main()  {
 	//run()
 }
 
-func run()  {
+func run() {
 	// 1. 不停的读取日志
-	for{
+	for {
 		select {
-		case line := <- tailLog.ReadChan():
+		case line := <-tailLog.ReadChan():
 			// 2. 发送到kafka
 			//kafka.SendToKafka(cfg.Section("kafka").Key("topic").String(),line.Text) // cfg得全局变量
-			kafka.SendToKafka(appCfg.Topic,line.Text)
+			kafka.SendToKafka(appCfg.Topic, line.Text)
 		default:
 			time.Sleep(time.Second)
 		}

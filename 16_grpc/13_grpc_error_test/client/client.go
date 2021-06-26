@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"go_test_project/16_grpc/13_grpc_error_test/proto"
+	"go_grpc_example/16_grpc/13_grpc_error_test/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 	"time"

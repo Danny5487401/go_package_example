@@ -6,8 +6,8 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"go_test_project/05_orm/02_xorm/model"
-	"go_test_project/05_orm/02_xorm/util"
+	"go_grpc_example/05_orm/02_xorm/model"
+	"go_grpc_example/05_orm/02_xorm/util"
 )
 
 func main() {
