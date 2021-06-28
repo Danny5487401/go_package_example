@@ -1,14 +1,14 @@
 package server_proxy
 
 import (
-	"go_grpc_example/00_rpc_options/16_new_helloworld/handler"
+	"go_grpc_example/00_rpc_options/02_new_helloworld_withStub/handler"
 	"net/rpc"
 )
 
-type HelloServicer interface {
+type HelloServer interface {
 	Hello(request string, reply *string) error
 }
 
-func RegisterHelloService(srv HelloServicer) error {
+func RegisterHelloService(srv HelloServer) error {
 	return rpc.RegisterName(handler.HelloServiceName, srv)
 }

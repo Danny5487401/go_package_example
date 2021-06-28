@@ -1,6 +1,10 @@
 # go_grpc_example
 ![grpc](./img/golang.jpeg)
 ## 第一章 rpc实现选项
+    1. 手动实现rpc
+    2. 手动实现stub
+    3. json_rpc
+    3. http_rpc
 ## 第二章 服务注册中心consul
 ## 第三章 日志库zap
     a. 源码结构
@@ -14,7 +18,7 @@
         a. 消费者：简单消费,延迟消费
         b. 生产者：简单消息，延迟消息，事务消息
 ## 第五章 配置文件中心nacos
-## 第六章 数据库操作
+## 第六章 数据操作
     5.1 GORM
         a. GORM原理及实现 
         b. 连接池使用
@@ -26,30 +30,28 @@
         b. go-redis使用
 ## 第七章 Go-Micro框架
 ## 第八章 GRPC编程
+    8.1 负载均衡
+    8.2 拦截器
+    8.3 grpc错误抛出与捕获
+    8.4 元数据
+    8.5 auth认证
+    8.6 proto字段验证器
+    8.7 Grpc基本使用
+    8.8 流式GRPC
 ## 第九章 GRPC生态中间件
 ## 第十章 链路追踪结合XORM
-## 6. 获取对外可用IP和端口
-## 7. gin验证器
-## 8. grpc负载均衡
-## 9. 错误和异常处理
-## 10. grpc拦截器
-## 11. json实现rpc
-## 12. http实现rpc
-## 13. grpc错误抛出与捕获
-## 14. metadata编程
-## 15. grpc带头部token
-## 16. rpc结构演变new_helloWorld
-## 17. proto字段验证器
-## 19. 熔断和限流
-    a. 流量控制
-## 21. 配置文件获取 viper_test
-## 22. ETCD
-
-
-# 日志收集项目 log_collect
+## 第十一章 Gin表格验证器
+## 第十二章 熔断和限流Sentinel
+    1. 流量控制
+    2. 熔断
+## 第十三章 配置文件获取 viper_test
+## 第十四章 ETCD
+## 第十五章 日志收集项目 log_collect
     1. es操作
     2. etcd操作
     3. kafka操作
+## 6. 获取对外可用IP和端口
+
 
 
 

@@ -1,7 +1,7 @@
 package client_proxy
 
 import (
-	"go_grpc_example/00_rpc_options/16_new_helloworld/handler"
+	"go_grpc_example/00_rpc_options/02_new_helloworld_withStub/handler"
 	"net/rpc"
 )
 
@@ -10,8 +10,8 @@ type HelloServiceStub struct {
 }
 
 // 初始化
-func NewHelloServiceClient(protol, address string) HelloServiceStub {
-	conn, err := rpc.Dial(protol, address)
+func NewHelloServiceClient(protocol, address string) HelloServiceStub {
+	conn, err := rpc.Dial(protocol, address)
 	if err != nil {
 		panic("connect error")
 	}

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go_grpc_example/00_rpc_options/16_new_helloworld/client_proxy"
+	"go_grpc_example/00_rpc_options/02_new_helloworld_withStub/client_proxy"
 )
 
 func main() {

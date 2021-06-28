@@ -5,18 +5,22 @@ import (
 	"net/rpc"
 )
 
+/*
+// 最原始的rpc调用
+缺点
+	客户端需要了解服务的全名方法
+*/
 type HelloService struct {
-
 }
 
-func (s *HelloService) Hello(request string, reply *string) error{
+func (s *HelloService) Hello(request string, reply *string) error {
 	*reply = "hello, " + request
 	return nil
 }
 
-func main(){
+func main() {
 	// 1.实例话一个server
-	listener,_ := net.Listen("tcp",":1234")
+	listener, _ := net.Listen("tcp", ":1234")
 	//2. 注册处理逻辑 handler
 	_ = rpc.RegisterName("HelloService", &HelloService{})
 	// 3.启动服务
