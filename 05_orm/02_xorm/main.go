@@ -6,12 +6,12 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"go_test_project/05_orm/02_xorm/model"
-	"go_test_project/05_orm/02_xorm/util"
+	"go_grpc_example/05_orm/02_xorm/model"
+	"go_grpc_example/05_orm/02_xorm/util"
 )
 
 func main() {
-	//var err error
+	var err error
 	var eg = util.GetEngineGroup()
 	// 获取数据库表的结构信息
 	schemeTables, _ := eg.DBMetas()
@@ -32,10 +32,12 @@ func main() {
 	////eg.StoreEngine("ISAM")
 	//err = eg.CreateTables(masterSlaveTable{})
 	//err = eg.CreateTables(ServerInfo{})
-	//if err != nil {
-	//	fmt.Println(err)
-	//	return
-	//}
+	err = eg.Table("yaya").CreateTable(HasterSlaveTable2{})
+
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	// 添加数据
 	//var data = masterSlaveTable{
@@ -65,6 +67,18 @@ func main() {
 	////eg.Asc("id").Find(&dataSlice) // 升序
 	//_ = eg.Desc("id").Limit(1, 0).Find(&dataSlice) // 降序序限制一条
 	//fmt.Printf("返回data2:%+v", dataSlice)
+}
+
+type HasterSlaveTable2 struct {
+	Id          int64     `xorm:"id notnull pk autoincr" `   // 如果field名称为Id而且类型为int64并且没有定义tag，则会被xorm视为主键，并且拥有自增属性。
+	Description string    `xorm:"description comment('描述')"` // string类型默认映射为varchar(255)
+	Name        string    `xorm:"'usr_name' notnull varchar(25) comment('用户名')" `
+	CreatedAt   time.Time `xorm:"'created'"` // 注意双引号里面加单引号
+	UpdatedAt   JsonTime  `xorm:"'updated'"`
+}
+
+func (m *HasterSlaveTable2) TableName() string {
+	return "hehe"
 }
 
 type masterSlaveTable struct {

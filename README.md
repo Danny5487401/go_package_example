@@ -22,7 +22,8 @@
         a. 主从连接
     5.3 MongoDB
     5.4 Redis
-        a. 开源库redigo使用
+        a. redigo使用
+        b. go-redis使用
 ## 第七章 Go-Micro框架
 ## 第八章 GRPC编程
 ## 第九章 GRPC生态中间件
