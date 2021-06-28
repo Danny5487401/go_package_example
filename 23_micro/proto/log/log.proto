@@ -1,0 +1,6 @@
+syntax= "proto3";
+option go_package=".;log";
+
+message LogEvt{
+  string msg =1;
+}

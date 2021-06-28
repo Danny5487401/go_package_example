@@ -11,8 +11,8 @@ import (
 	"fmt"
 	"log"
 
-	"go_test_project/05_orm/03_mongo/model"
-	"go_test_project/05_orm/03_mongo/util"
+	"go_grpc_example/05_orm/03_mongo/model"
+	"go_grpc_example/05_orm/03_mongo/util"
 )
 
 func main() {

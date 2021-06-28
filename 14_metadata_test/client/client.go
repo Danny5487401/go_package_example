@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"go_test_project/14_metadata_test/proto"
+	"go_grpc_example/14_metadata_test/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
@@ -20,7 +20,7 @@ func main() {
 	c := proto.NewGreeterClient(conn)
 
 	md := metadata.Pairs("timestamp", time.Now().Format("2006-01-02 15:04:05"),
-		"name","Joy")
+		"name", "Joy")
 	ctx := metadata.NewOutgoingContext(context.Background(), md)
 
 	r, err := c.SayHello(ctx, &proto.HelloRequest{
