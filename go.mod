@@ -9,6 +9,7 @@ require (
 	github.com/alibaba/sentinel-golang v1.0.2
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
 	github.com/coreos/etcd v3.3.17+incompatible
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/fortytw2/leaktest v1.3.0 // indirect

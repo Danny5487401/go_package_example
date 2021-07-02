@@ -28,12 +28,12 @@ func main() {
 	// 选择表
 	collection = db.Collection("collection1")
 	//// 构建数据
-	//lr := &model.LogRecord{
+	//lr := &models.LogRecord{
 	//	JobName: "Python",
 	//	Command: "echo 4",
 	//	Err:     "",
 	//	Content: "4",
-	//	Tp: model.TimePrint{
+	//	Tp: models.TimePrint{
 	//		StartTime: time.Now().Unix(),
 	//		EndTime:   time.Now().Unix() + 10,
 	//	},
@@ -66,7 +66,7 @@ func main() {
 
 	//遍历方式一：游标获取结果数据
 	//for cursor.Next(context.Background()) {
-	//	var lr model.LogRecord
+	//	var lr models.LogRecord
 	//	//反序列化Bson到对象
 	//	if cursor.Decode(&lr) != nil {
 	//		fmt.Print(err)
@@ -126,8 +126,8 @@ func main() {
 	var uResult *mongo.UpdateResult
 	filter := bson.M{"jobName": "job10"}
 	update := bson.M{"$set": bson.M{"command": "ByBsonM"}}
-	//update := bson.M{"$set": model.UpdateByJobName{Command: "byModel", Content: "model"}}
-	//update := bson.M{"$set": model.LogRecord{JobName:"job10",Command:"byModel"}}
+	//update := bson.M{"$set": models.UpdateByJobName{Command: "byModel", Content: "models"}}
+	//update := bson.M{"$set": models.LogRecord{JobName:"job10",Command:"byModel"}}
 	if uResult, err = collection.UpdateMany(context.TODO(), filter, update); err != nil {
 		log.Fatal(err)
 	}

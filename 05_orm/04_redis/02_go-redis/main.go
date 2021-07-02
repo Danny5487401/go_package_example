@@ -35,11 +35,11 @@ func testRedisBase() {
 
 	//ExampleClient_String()
 	//ExampleClient_List()
-	//ExampleClient_Hash()
+	ExampleClient_Hash()
 	//ExampleClient_Set()
 	//ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
-	ExampleClient_CMD()
+	//ExampleClient_CMD()
 	//ExampleClient_Scan()
 	//ExampleClient_Tx()
 	//ExampleClient_Script()

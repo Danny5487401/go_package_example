@@ -7,6 +7,7 @@ import (
 
 const localDateTimeFormat string = "2006-01-02 15:04:05"
 
+// 自定义时间格式
 type LocalTime time.Time
 
 func (l LocalTime) MarshalJSON() ([]byte, error) {
@@ -35,12 +36,12 @@ func (l LocalTime) ParseTime(t time.Time) LocalTime {
 	return LocalTime(t)
 }
 
-func (j LocalTime) format() string {
-	return time.Time(j).Format(localDateTimeFormat)
+func (l LocalTime) format() string {
+	return time.Time(l).Format(localDateTimeFormat)
 }
 
-func (j LocalTime) MarshalText() ([]byte, error) {
-	return []byte(j.format()), nil
+func (l LocalTime) MarshalText() ([]byte, error) {
+	return []byte(l.format()), nil
 }
 
 func (l *LocalTime) FromDB(b []byte) error {

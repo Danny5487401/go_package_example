@@ -22,7 +22,7 @@ func main() {
 	}
 	// 客户端信息
 	clientConfig := constant.ClientConfig{
-		NamespaceId:         "84f5c407-5661-4306-abda-b51a9f02fba1", //we can create multiple clients with different namespaceId to support multiple namespace.When namespace is public, fill in the blank string here.
+		NamespaceId:         "84f5c407-5661-4306-abda-b51a9f02fba1", //we can retrieve multiple clients with different namespaceId to support multiple namespace.When namespace is public, fill in the blank string here.
 		TimeoutMs:           5000,
 		NotLoadCacheAtStart: true,
 		LogDir:              "tmp/nacos/log",   //当前项目目录
