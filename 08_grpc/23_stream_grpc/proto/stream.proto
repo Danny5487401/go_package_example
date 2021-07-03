@@ -1,0 +1,24 @@
+syntax = "proto3";//声明proto的版本 只能 是3，才支持 grpc
+
+//声明 包名
+option go_package = "./;proto";
+
+//声明grpc服务
+service Greeter {
+  /*
+  以下 分别是 服务端 推送流， 客户端 推送流 ，双向流。
+  */
+  rpc GetStream (StreamReqData) returns (stream StreamResData){}
+  rpc PutStream (stream StreamReqData) returns (StreamResData){}
+  rpc AllStream (stream StreamReqData) returns (stream StreamResData){}
+}
+
+
+//stream请求结构
+message StreamReqData {
+  string data = 1;
+}
+//stream返回结构
+message StreamResData {
+  string data = 1;
+}
