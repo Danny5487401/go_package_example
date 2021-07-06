@@ -35,15 +35,16 @@ func testRedisBase() {
 
 	//ExampleClient_String()
 	//ExampleClient_List()
-	ExampleClient_Hash()
+	//ExampleClient_Hash()
 	//ExampleClient_Set()
 	//ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
-	//ExampleClient_Tx()
+	ExampleClient_Tx() // 事物pipeline
 	//ExampleClient_Script()
 	//ExampleClient_PubSub()
+
 }
 
 func ExampleClient_String() {
@@ -327,10 +328,12 @@ func ExampleClient_Scan() {
 	}
 }
 
+// 事务pipeline
 func ExampleClient_Tx() {
 	pipe := redisdb.TxPipeline()
 	incr := pipe.Incr("tx_pipeline_counter")
-	pipe.Expire("tx_pipeline_counter", time.Hour)
+	boolCmd := pipe.Expire("tx_pipeline_counter", time.Hour)
+	stringCmd := pipe.HGetAll("danny")
 
 	// Execute
 	//
@@ -340,8 +343,32 @@ func ExampleClient_Tx() {
 	//     EXEC
 	//
 	// using one rdb-server roundtrip.
-	_, err := pipe.Exec()
-	fmt.Println(incr.Val(), err)
+	cmders, err := pipe.Exec()
+	fmt.Println(incr.Val(), boolCmd.Val(), stringCmd.Val(), err)
+	for _, cmder := range cmders {
+		switch cmd := cmder.(type) {
+		case *redis.StringStringMapCmd:
+			strMap, err := cmd.Result()
+			if err != nil {
+				fmt.Println("err", err)
+			}
+			fmt.Println("strMap", strMap)
+		case *redis.IntCmd:
+			intRet, err := cmd.Result()
+			if err != nil {
+				fmt.Println("err", err)
+			}
+			fmt.Println("IntRet", intRet)
+		case *redis.BoolCmd:
+			boolRet, err := cmd.Result()
+			if err != nil {
+				fmt.Println("err", err)
+			}
+			fmt.Println("boolRet", boolRet)
+
+		}
+
+	}
 }
 
 func ExampleClient_Script() {
