@@ -16,7 +16,7 @@ func main() {
 	//查询条件
 	var data2 = new(models.MasterSlaveTable)
 	//_, err = eg.Alias("o").Where("o.usr_name=?", "master").Get(data2)
-	_, err = eg.Where("usr_name=?", "master").Get(data2)
+	_, err = eg.Where("usr_name= ?", "master").Get(data2)
 
 	if err != nil {
 		fmt.Println("错误信息是", err)

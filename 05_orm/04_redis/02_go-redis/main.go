@@ -62,6 +62,7 @@ func ExampleClient_String() {
 	log.Println(val, err)
 
 	val2, err := redisdb.Get("missing_key").Result()
+	// redis.Nil 用于区分an empty string reply 和 a nil reply (key does not exist)键不存在:
 	if err == redis.Nil {
 		log.Println("missing_key does not exist")
 	} else if err != nil {
@@ -133,12 +134,16 @@ func ExampleClient_Hash() {
 	//存在
 	bExist, err := redisdb.HExists("hash_test", "tel").Result()
 	log.Println(bExist, err)
-
+	// 只有在字段 field 不存在时，设置哈希表字段的值
 	bRet, err := redisdb.HSetNX("hash_test", "id", 100).Result()
 	log.Println(bRet, err)
 
 	//删除
 	log.Println(redisdb.HDel("hash_test", "age").Result())
+
+	//为哈希表 key 中的指定字段的整数值加上增量 increment
+	HRet, err := redisdb.HIncrBy("hash_test", "id", 10).Result()
+	log.Println(HRet, err) // 返回的是增加后的结果
 }
 
 func ExampleClient_Set() {
