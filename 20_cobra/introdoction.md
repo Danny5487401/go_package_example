@@ -1,3 +1,22 @@
+# 介绍
+Cobra 是一个非常实用(流行)的golang包，很多优秀的开源应用都在使用它，包括 Docker 和 Kubernetes 等，
+它提供了简单的接口来创建命令行程序。同时，Cobra 也是一个应用程序，用来生成应用框架，从而开发以 Cobra 为基础的应用
+# 主要功能
+*简易的子命令行模式，如 app server， app fetch 等等
+*完全兼容 posix 命令行模式
+*嵌套子命令 subcommand
+*支持全局，局部，串联 flags
+*使用 cobra 很容易的生成应用程序和命令，使用 cobra create - appname 和 cobra add cmdname
+*如果命令输入错误，将提供智能建议，如 app srver，将提示 srver 没有，是不是 app server
+*自动生成 commands 和 flags 的帮助信息
+*自动生成详细的 help 信息，如 app help
+*自动识别帮助 flag -h，--help
+*自动生成应用程序在 bash 下命令自动完成功能
+*自动生成应用程序的 man 手册
+*命令行别名
+*自定义 help 和 usage 信息
+*可选的与 viper apps 的紧密集成
+
 # 初始化项目
 ```shell script
 cobra init --pkg-name go_grpc_example/20_cobra

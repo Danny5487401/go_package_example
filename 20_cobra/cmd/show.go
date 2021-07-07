@@ -26,19 +26,20 @@ import (
 需求：
 （1）show 查看当前时间
 （2）parse 指定时间格式 --format，parse为show的子命令。
- */
+*/
 // showCmd represents the show command
 var showCmd = &cobra.Command{
 	Use:   "show",
 	Short: "show简短介绍展示当前时间",
-	Long: `show详细介绍`,
-	Run: ShowTime,
-}
-// ShowTime 显示当前时间
-func ShowTime(cmd *cobra.Command, args []string) {
-	fmt.Println(time.Now())
+	Long:  `show详细介绍`,
+	Run:   ShowTime,
 }
 
+// ShowTime 显示当前时间
+func ShowTime(cmd *cobra.Command, args []string) {
+	fmt.Printf("cmd是%+v,args是%+v\n", *cmd, args)
+	fmt.Println(time.Now())
+}
 
 func init() {
 	rootCmd.AddCommand(showCmd)
