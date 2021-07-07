@@ -37,11 +37,11 @@ func testRedisBase() {
 	//ExampleClient_List()
 	//ExampleClient_Hash()
 	//ExampleClient_Set()
-	//ExampleClient_SortSet()
+	ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
-	ExampleClient_Tx() // 事物pipeline
+	//ExampleClient_Tx() // 事物pipeline
 	//ExampleClient_Script()
 	//ExampleClient_PubSub()
 
@@ -216,18 +216,18 @@ func ExampleClient_SortSet() {
 
 	//添加
 	ret, err := redisdb.ZAddNX("sortset_test", addArgs...).Result()
-	log.Println(ret, err)
+	log.Println("ZAddNX", ret, err)
 
 	//获取指定成员score
 	score, err := redisdb.ZScore("sortset_test", "a_10").Result()
-	log.Println(score, err)
+	log.Println("ZScore", score, err)
 
 	//获取制定成员的索引
 	index, err := redisdb.ZRank("sortset_test", "a_50").Result()
-	log.Println(index, err)
-
-	count, err := redisdb.SCard("sortset_test").Result()
-	log.Println(count, err)
+	log.Println("ZRank", index, err)
+	// ZCARD key 获取有序集合的成员数
+	count, err := redisdb.ZCard("sortset_test").Result()
+	log.Println("SCard", count, err)
 
 	//返回有序集合指定区间内的成员
 	rets, err := redisdb.ZRange("sortset_test", 10, 20).Result()
