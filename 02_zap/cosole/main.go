@@ -48,21 +48,16 @@ func main() {
 		zap.String("url", url),
 		zap.Int("num", 3))
 	// 结果键值对方式{"level":"info","ts":1625733829.883981,"caller":"cosole/main.go:46","msg":"failed to fetch url","url":"https://www.baidu.com","num":3}
-
 	// 错误栈帧调用
-	errorStacktraceDemo()
+	errorStacktraceDemo(logger)
 
 }
 
 // 错误栈帧查看
-func errorStacktraceDemo() {
-	logger, err := zap.NewDevelopment()
-	defer logger.Sync()
-	if err != nil {
-		panic(err)
-	}
+func errorStacktraceDemo(logger *zap.Logger) {
+	// 抛出错误
 	logger.Info("errorField", zap.Error(errors.New("demo err")))
-
+	// 定义错误
 	fmt.Println(zap.Stack("default stack").String) //main65行->main52行>proc.go 203行
 	fmt.Println("------")
 	fmt.Println(zap.StackSkip("skip 2", 2).String) // 跳过两行 proc.go 203行
