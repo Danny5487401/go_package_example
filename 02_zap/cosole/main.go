@@ -18,7 +18,10 @@ zap 通过 sync.Pool 提供的对象池，复用了大量可以复用的对象�
 */
 
 import (
+	"errors"
+	"fmt"
 	"go.uber.org/zap"
+	"time"
 )
 
 func main() {
@@ -29,18 +32,40 @@ func main() {
 	url := "https://www.baidu.com"
 
 	// 方式一 :兼容Printf
-	//sugar := logger.Sugar()
-	//sugar.Infow("failed to fetch URL",
-	//	// Structured context as loosely typed key-value pairs.
-	//	"url", url,
-	//	"attempt", 3,
-	//	"backoff", time.Second,
-	//)
-	//sugar.Infof("Failed to fetch URL: %s", url)
+	sugar := logger.Sugar()
+	sugar.Infow("failed to fetch URL1",
+		// Structured context as loosely typed key-value pairs.
+		"url", url,
+		"attempt", 3,
+		"backoff", time.Second,
+	)
+	// {"level":"info","ts":1625733799.522482,"caller":"cosole/main.go:36","msg":"failed to fetch URL1","url":"https://www.baidu.com","attempt":3,"backoff":1}
+	sugar.Infof("Failed to fetch URL2: %s", url)
+	// {"level":"info","ts":1625733829.883971,"caller":"cosole/main.go:43","msg":"Failed to fetch URL2: https://www.baidu.com"}
 
 	// 方式二 :无反射机制
 	logger.Info("failed to fetch url",
 		zap.String("url", url),
 		zap.Int("num", 3))
-	// 结果键值对方式{"level":"info","ts":1620378081.4890263,"caller":"cosole/producer.go:42","msg":"failed to fetch url","url":"https://www.baidu.com","num":3}
+	// 结果键值对方式{"level":"info","ts":1625733829.883981,"caller":"cosole/main.go:46","msg":"failed to fetch url","url":"https://www.baidu.com","num":3}
+
+	// 错误栈帧调用
+	errorStacktraceDemo()
+
+}
+
+// 错误栈帧查看
+func errorStacktraceDemo() {
+	logger, err := zap.NewDevelopment()
+	defer logger.Sync()
+	if err != nil {
+		panic(err)
+	}
+	logger.Info("errorField", zap.Error(errors.New("demo err")))
+
+	fmt.Println(zap.Stack("default stack").String) //main65行->main52行>proc.go 203行
+	fmt.Println("------")
+	fmt.Println(zap.StackSkip("skip 2", 2).String) // 跳过两行 proc.go 203行
+	logger.Info("stacktrace default", zap.Stack("default stack"))
+	logger.Info("stacktrace skip 2", zap.StackSkip("skip 2", 2))
 }
