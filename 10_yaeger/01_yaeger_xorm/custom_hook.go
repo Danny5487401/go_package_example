@@ -1,4 +1,4 @@
-package main
+package _1_yaeger_xorm
 
 import (
 	"context"
