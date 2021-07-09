@@ -38,6 +38,7 @@ type ServerInfo struct {
 	LastUploadDataTime LocalTime `xorm:"timestamp last_upload_data_time" json:"lastUploadDataTime"`
 	LastCheckTime      LocalTime `xorm:"timestamp last_check_time" json:"lastCheckTime"`
 	LastErrorTime      LocalTime `xorm:"timestamp last_error_time" json:"lastErrorTime"`
+	Money              float64   `xorm:"money decimal"`
 }
 
 //既有LocalTime类型的，又有*LocalTime类型的，*LocalTime是考虑到有时候数据值可能为NULL，即字段值可能为空的情况。
