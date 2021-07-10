@@ -11,7 +11,6 @@ require (
 	github.com/coreos/etcd v3.3.17+incompatible
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
-	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/frankban/quicktest v1.11.3 // indirect
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/gin-gonic/gin v1.6.3
@@ -22,20 +21,20 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v8 v8.11.0
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/golang/protobuf v1.4.2
+	github.com/golang/protobuf v1.4.3
 	github.com/golang/snappy v0.0.3 // indirect
 	github.com/gomodule/redigo v1.8.4
 	github.com/google/wire v0.5.0
 	github.com/hashicorp/consul/api v1.3.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/jinzhu/gorm v1.9.16
-	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mbobakov/grpc-consul-resolver v1.4.3
 	github.com/micro/go-micro v1.18.0
 	github.com/micro/go-plugins/broker/rabbitmq v0.0.0-20200119172437-4fe21aa238fd
 	github.com/nacos-group/nacos-sdk-go v1.0.7
 	github.com/olivere/elastic v6.2.35+incompatible
-	github.com/opentracing/opentracing-go v1.1.0
+	github.com/olivere/elastic/v7 v7.0.26
+	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/spf13/cobra v0.0.3
@@ -48,9 +47,14 @@ require (
 	go.uber.org/zap v1.16.0
 	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
 	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139 // indirect
-	google.golang.org/grpc v1.27.1
+	google.golang.org/grpc v1.37.0
 	google.golang.org/protobuf v1.26.0-rc.1
 	gopkg.in/ini.v1 v1.51.0
 	xorm.io/builder v0.3.8
 	xorm.io/xorm v1.1.0
+)
+
+replace (
+	google.golang.org/grpc v1.32.0 => google.golang.org/grpc v1.26.0
+	google.golang.org/grpc v1.37.0 => google.golang.org/grpc v1.26.0
 )
