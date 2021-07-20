@@ -8,6 +8,7 @@ require (
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
 	github.com/alibaba/sentinel-golang v1.0.2
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
+	github.com/confluentinc/confluent-kafka-go v1.7.0
 	github.com/coreos/etcd v3.3.17+incompatible
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/envoyproxy/protoc-gen-validate v0.1.0

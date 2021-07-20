@@ -9,12 +9,18 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-// kafka consumer
+/*
+	消费者；Consumer or Consumer-Group API.
+*/
+var Addr = []string{"tencent.danny.games:9092", "tencent.danny.games:9093", "tencent.danny.games:9094"}
+
+const Topic = "danny_kafka_log"
 
 func main() {
 	config := sarama.NewConfig()
 	config.Consumer.Return.Errors = true
-	client, err := sarama.NewClient([]string{"81.68.197.3:9092"}, config)
+	client, err := sarama.NewClient(Addr, config)
+	// 关闭防止泄漏
 	defer client.Close()
 	if err != nil {
 		panic(err)
@@ -26,7 +32,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Println("starting consumer success")
-	partitionList, err := consumer.Partitions("redis_log") // 根据topic取到所有的分区
+	partitionList, err := consumer.Partitions(Topic) // 根据topic取到所有的分区
 	if err != nil {
 		fmt.Printf("fail to get list of partition:err%v\n", err)
 		return
@@ -35,8 +41,8 @@ func main() {
 	for _, partitionId := range partitionList {
 		// retrieve partitionConsumer for every partitionId
 		// 最新的位置开始读
-		partitionConsumer, err := consumer.ConsumePartition("redis_log", partitionId, sarama.OffsetNewest)
-		//partitionConsumer, err := consumer.ConsumePartition("redis_log", partitionId, sarama.OffsetOldest)
+		//partitionConsumer, err := consumer.ConsumePartition("redis_log", partitionId, sarama.OffsetNewest)
+		partitionConsumer, err := consumer.ConsumePartition(Topic, partitionId, sarama.OffsetOldest)
 		if err != nil {
 			panic(err)
 		}
