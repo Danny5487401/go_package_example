@@ -21,8 +21,8 @@ type MasterSlaveTable struct {
 	Id          int64     `xorm:"id notnull pk autoincr" `   // 如果field名称为Id而且类型为int64并且没有定义tag，则会被xorm视为主键，并且拥有自增属性。
 	Description string    `xorm:"description comment('描述')"` // string类型默认映射为varchar(255)
 	Name        string    `xorm:"'usr_name' notnull varchar(25) comment('用户名')" `
-	CreatedAt   int64     `xorm:"'created'"` // 注意双引号里面加单引号 添加数据会自动更新
-	UpdatedAt   time.Time `xorm:"'updated'"`
+	CreatedAt   int64     `xorm:"created"` // 记住重复写created,第一个为column标签并且加单引号，不加单引号为tag，添加数据会自动更新
+	UpdatedAt   time.Time `xorm:"'updated_at' updated"`
 }
 
 type ServerInfo struct {

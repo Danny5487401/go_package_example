@@ -13,11 +13,11 @@ func main() {
 	var err error
 	var eg = util.GetEngineGroup()
 	// 获取数据库表的结构信息
-	schemeTables, _ := eg.DBMetas()
-	fmt.Println("表的数量", len(schemeTables))
-	for _, tableInfo := range schemeTables {
-		fmt.Printf("%+v\n", *tableInfo)
-	}
+	//schemeTables, _ := eg.DBMetas()
+	//fmt.Println("表的数量", len(schemeTables))
+	//for _, tableInfo := range schemeTables {
+	//	fmt.Printf("%+v\n", *tableInfo)
+	//}
 	// 自己构建表结构信息
 	//masterTableInfo := new(masterSlaveTable)
 	//table, err := eg.TableInfo(masterTableInfo)
@@ -37,7 +37,7 @@ func main() {
 	// 方式二
 	//err = eg.CreateTables(models.MasterSlaveTable{}, models.MasterSlaveTable2{}, models.ServerInfo{})
 	// 方式三 推荐方式 有创建索引
-	err = eg.Sync2(models.ServerInfo{})
+	err = eg.Sync2(models.MasterSlaveTable{})
 
 	if err != nil {
 		fmt.Println(err)

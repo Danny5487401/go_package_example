@@ -5,7 +5,7 @@
 *.so
 *.dylib
 
-# Test binary, built with `go sarama_tail_demo -c`
+# Test binary, built with `go 01_sarama_tail_demo -c`
 *.test
 
 # Output of the go coverage tool, specifically when used with LiteIDE

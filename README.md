@@ -14,7 +14,10 @@
     1. rabbitmq
         a. 消费者：推拉模式
         b. 生产者
-    2. rocketmq
+    2. kafka
+        2.1 客户端sarama
+        2.2 客户端confluent-kafka-go
+    3. rocketmq
         a. 消费者：简单消费,延迟消费
         b. 生产者：简单消息，延迟消息，事务消息
 ## 第四章 配置文件中心nacos

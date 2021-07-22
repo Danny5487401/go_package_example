@@ -26,18 +26,18 @@ func testRedisBase() {
 	redisdb = redis.NewClient(&redis.Options{
 		Addr:     "ali.danny.games:6379", // use default Addr
 		Password: "",                     // no password set
-		DB:       0,                      // use default DB
+		DB:       1,                      // use default DB
 	})
 
 	//心跳
 	pong, err := redisdb.Ping().Result()
 	log.Println(pong, err) // Output: PONG <nil>
 
-	//ExampleClient_String()
+	ExampleClient_String()
 	//ExampleClient_List()
 	//ExampleClient_Hash()
 	//ExampleClient_Set()
-	ExampleClient_SortSet()
+	//ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
@@ -54,6 +54,10 @@ func ExampleClient_String() {
 	//kv读写
 	err := redisdb.Set("key", "value", 10*time.Second).Err()
 	log.Println(err)
+
+	// 判断key是否存在,不存在为0
+	res, err := redisdb.Exists("set_key1").Result()
+	log.Println("判断key是否存在", res, err)
 
 	//获取过期时间
 	tm, err := redisdb.TTL("key").Result()

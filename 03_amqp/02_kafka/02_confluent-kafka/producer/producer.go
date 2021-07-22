@@ -5,6 +5,10 @@ import (
 	"github.com/confluentinc/confluent-kafka-go/kafka"
 )
 
+/*
+confluent-kafka-go
+	使用了c库
+*/
 func main() {
 
 	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "tencent.danny.games"})
