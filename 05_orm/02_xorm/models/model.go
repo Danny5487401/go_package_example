@@ -42,3 +42,32 @@ type ServerInfo struct {
 }
 
 //既有LocalTime类型的，又有*LocalTime类型的，*LocalTime是考虑到有时候数据值可能为NULL，即字段值可能为空的情况。
+
+// user-active-record用户活跃记录表
+type UserActiveRecord struct {
+	Id            int64  `xorm:"id notnull pk autoincr" `
+	Uid           int64  `xorm:"uid bigint index comment('用户Id')"`
+	Platform      int    `xorm:"platform SMALLINT comment('安卓1 ios2') "`
+	Date          string `xorm:"date varchar(8) comment('日期') "`
+	DeviceId      string `xorm:"device_id  comment('设备Id') "`
+	ClientIP      string `xorm:"client_id  comment('客户端Id') "`
+	Imei          string `xorm:"imei  comment('艾美Id') "`
+	TrustId       string `xorm:"trust_id comment('设备唯一Id') "`
+	Brand         string `xorm:"brand  comment('品牌') "`
+	Model         string `xorm:"model  comment('手机型号') "`
+	SystemVersion string `xorm:"system_version  comment('系统版本号') "`
+	AppVersion    string `xorm:"app_version  comment('app版本') "`
+	ExtendField   string `xorm:"extend_field default('') comment('json扩展字符串') "`
+	CreatedAt     int64  `xorm:"not null created"`
+	UpdatedAt     int64  `xorm:"not null updated"`
+}
+
+// 用户活跃天数表 user_active
+type UserActive struct {
+	Id         int64  `xorm:"id notnull pk autoincr" `
+	Uid        int64  `xorm:"uid bigint index comment('用户Id')"`
+	TotalDays  int64  `xorm:"total_days  comment('总天数')"`
+	LatestDate string `xorm:"latest_date  comment('上次更新的活跃日期')"`
+	CreatedAt  int64  `xorm:"not null created"`
+	UpdatedAt  int64  `xorm:"not null updated"`
+}
