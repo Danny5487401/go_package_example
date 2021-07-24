@@ -1,9 +1,9 @@
 package util
 
 import (
-	"xorm.io/xorm"
-
 	"fmt"
+	_ "github.com/go-sql-driver/mysql" //别忘记倒入
+	"xorm.io/xorm"
 )
 
 var eg *xorm.EngineGroup

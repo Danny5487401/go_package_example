@@ -1,6 +1,6 @@
 package main
 
-import "go_grpc_example/11_DependencyInjection/01_wire/02_wire/wire"
+import "go_grpc_example/11_dependency_injection/01_wire/02_wire/wire"
 
 /*
 安装工具go get github.com/google/wire/cmd/wire

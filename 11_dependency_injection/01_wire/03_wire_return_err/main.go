@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go_grpc_example/11_DependencyInjection/01_wire/03_wire_return_err/wire"
+	"go_grpc_example/11_dependency_injection/01_wire/03_wire_return_err/wire"
 	"os"
 )
 

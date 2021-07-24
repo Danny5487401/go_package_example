@@ -33,10 +33,10 @@ func testRedisBase() {
 	pong, err := redisdb.Ping().Result()
 	log.Println(pong, err) // Output: PONG <nil>
 
-	ExampleClient_String()
+	//ExampleClient_String()
 	//ExampleClient_List()
 	//ExampleClient_Hash()
-	//ExampleClient_Set()
+	ExampleClient_Set()
 	//ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
@@ -155,9 +155,12 @@ func ExampleClient_Set() {
 	log.Println("ExampleClient_Set")
 	defer log.Println("ExampleClient_Set")
 
-	//添加
+	//第一次添加
 	ret, err := redisdb.SAdd("set_test", "11", "22", "33", "44").Result()
-	log.Println(ret, err)
+	log.Println("第一次添加结果", ret, err) //
+	//第一次添加
+	ret2, err := redisdb.SAdd("set_test", "44").Result()
+	log.Println("第二次添加结果", ret2, err) //返回的是成功添加的个数,如果是1，代表之前没有,不需要去exist判断
 
 	//数量
 	count, err := redisdb.SCard("set_test").Result()
@@ -171,8 +174,8 @@ func ExampleClient_Set() {
 	members, err := redisdb.SMembers("set_test").Result()
 	log.Println(members, err)
 
-	bret, err := redisdb.SIsMember("set_test", "33").Result()
-	log.Println(bret, err)
+	bret, err := redisdb.SIsMember("set_test", "100").Result()
+	log.Println("是否是其成员", bret, err)
 
 	redisdb.SAdd("set_a", "11", "22", "33", "44")
 	redisdb.SAdd("set_b", "11", "22", "33", "55", "66", "77")

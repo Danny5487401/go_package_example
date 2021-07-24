@@ -37,7 +37,7 @@ func main() {
 	// 方式二
 	//err = eg.CreateTables(models.MasterSlaveTable{}, models.MasterSlaveTable2{}, models.ServerInfo{})
 	// 方式三 推荐方式 有创建索引
-	err = eg.Sync2(models.MasterSlaveTable{})
+	err = eg.Sync2(models.UserActiveRecord{}, models.UserActive{})
 
 	if err != nil {
 		fmt.Println(err)

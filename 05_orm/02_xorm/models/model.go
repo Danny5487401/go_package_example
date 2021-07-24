@@ -45,29 +45,29 @@ type ServerInfo struct {
 
 // user-active-record用户活跃记录表
 type UserActiveRecord struct {
-	Id            int64  `xorm:"id notnull pk autoincr" `
-	Uid           int64  `xorm:"uid bigint index comment('用户Id')"`
-	Platform      int    `xorm:"platform SMALLINT comment('安卓1 ios2') "`
-	Date          string `xorm:"date varchar(8) comment('日期') "`
-	DeviceId      string `xorm:"device_id  comment('设备Id') "`
-	ClientIP      string `xorm:"client_id  comment('客户端Id') "`
-	Imei          string `xorm:"imei  comment('艾美Id') "`
-	TrustId       string `xorm:"trust_id comment('设备唯一Id') "`
-	Brand         string `xorm:"brand  comment('品牌') "`
-	Model         string `xorm:"model  comment('手机型号') "`
-	SystemVersion string `xorm:"system_version  comment('系统版本号') "`
-	AppVersion    string `xorm:"app_version  comment('app版本') "`
-	ExtendField   string `xorm:"extend_field default('') comment('json扩展字符串') "`
-	CreatedAt     int64  `xorm:"not null created"`
-	UpdatedAt     int64  `xorm:"not null updated"`
+	Id            int64  `xorm:"'id' notnull pk autoincr" `
+	Uid           int64  `xorm:"'uid' int(10) notnull index comment('用户Id')"`
+	Platform      int    `xorm:"'platform' SMALLINT(3) notnull comment('安卓1 ios2') "`
+	ActiveDate    int    `xorm:"'active_date' int(8)  notnull  comment('日期') "`
+	DeviceId      string `xorm:"'device_id' varchar(100) notnull comment('数美Id') "`
+	ClientIP      string `xorm:"'client_id'  varchar(100) notnull comment('客户端请求的ip') "`
+	Imei          string `xorm:"'imei'  varchar(64) notnull comment('客户端的imei') "`
+	TrustId       string `xorm:"'trust_id' varchar(100) notnull comment('数盟的可信id') "`
+	Brand         string `xorm:"'brand' varchar(100) notnull comment('手机品牌') "`
+	Model         string `xorm:"'model' varchar(100) notnull comment('手机型号') "`
+	SystemVersion string `xorm:"'sys_ver' varchar(64) notnull comment('系统版本号') "`
+	AppVersion    int    `xorm:"'app_ver' int(8)  comment('客户端的app版本') "`
+	ExtendField   string `xorm:"'extend_field' json notnull comment('json扩展字符串') "`
+	CreatedAt     int64  `xorm:"'created_at'  int(10) DEFAULT(0) notnull created"`
+	UpdatedAt     int64  `xorm:"'updated_at'  int(10) DEFAULT(0) notnull updated"`
 }
 
-// 用户活跃天数表 user_active
+// UserActive 用户活跃天数表 user_active
 type UserActive struct {
-	Id         int64  `xorm:"id notnull pk autoincr" `
-	Uid        int64  `xorm:"uid bigint index comment('用户Id')"`
-	TotalDays  int64  `xorm:"total_days  comment('总天数')"`
-	LatestDate string `xorm:"latest_date  comment('上次更新的活跃日期')"`
-	CreatedAt  int64  `xorm:"not null created"`
-	UpdatedAt  int64  `xorm:"not null updated"`
+	Id         int64 `xorm:"'id' notnull pk autoincr" `
+	Uid        int64 `xorm:"'uid' bigint notnull DEFAULT(0) unique(uid) comment('用户Id')"` // UNIQUE KEY `UQE_user_active_uid` (`uid`)  UQE_表名_括号内文字(uid)
+	TotalDays  int64 `xorm:"'total_days' int(5) notnull DEFAULT(0) comment('总天数')"`
+	LatestDate int64 `xorm:"'latest_date' int(6) notnull DEFAULT(0) comment('上次更新的活跃日期')"`
+	CreatedAt  int64 `xorm:"'created_at'  int(10) DEFAULT(0) notnull created"`
+	UpdatedAt  int64 `xorm:"'updated_at'  int(10) DEFAULT(0) notnull updated"`
 }
