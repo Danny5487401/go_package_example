@@ -29,6 +29,7 @@ require (
 	github.com/hashicorp/consul/api v1.3.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/jinzhu/gorm v1.9.16
+	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/mbobakov/grpc-consul-resolver v1.4.3
 	github.com/micro/go-micro v1.18.0
 	github.com/micro/go-plugins/broker/rabbitmq v0.0.0-20200119172437-4fe21aa238fd
@@ -45,10 +46,11 @@ require (
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	go.mongodb.org/mongo-driver v1.5.3
-	go.uber.org/dig v1.11.0 // indirect
+	go.uber.org/dig v1.11.0
 	go.uber.org/zap v1.16.0
 	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
 	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139 // indirect
+	golang.org/x/time v0.0.0-20190921001708-c4c64cad1fd0
 	google.golang.org/grpc v1.37.0
 	google.golang.org/protobuf v1.26.0-rc.1
 	gopkg.in/ini.v1 v1.51.0
