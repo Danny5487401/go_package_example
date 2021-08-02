@@ -50,6 +50,7 @@ require (
 	go.uber.org/zap v1.16.0
 	golang.org/x/net v0.0.0-20201202161906-c7110b5ffcbb
 	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139 // indirect
+	golang.org/x/time v0.0.0-20190921001708-c4c64cad1fd0
 	google.golang.org/grpc v1.37.0
 	google.golang.org/grpc/examples v0.0.0-20210730002332-ea9b7a0a7651 // indirect
 	google.golang.org/protobuf v1.26.0-rc.1
