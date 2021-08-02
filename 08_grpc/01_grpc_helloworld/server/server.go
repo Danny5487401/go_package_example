@@ -1,11 +1,12 @@
 package main
 
 import (
-	"golang.org/x/net/context"
-	"net"
+	"go_grpc_example/08_grpc/20_grpc_test/proto"
 
-	"go_grpc_exam"
 	"google.golang.org/grpc"
+
+	"context"
+	"net"
 )
 
 type Server struct {
