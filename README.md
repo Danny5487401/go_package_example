@@ -34,14 +34,15 @@
 ## 第六章 获取对外可用IP和端口
 ## 第七章 Gin前端form验证器
 ## 第八章 GRPC编程 
-    8.1 负载均衡
-    8.2 拦截器
-    8.3 grpc错误抛出与捕获
-    8.4 元数据
-    8.5 auth认证
-    8.6 proto字段验证器
-    8.7 Grpc基本使用
-    8.8 流式GRPC
+    8.1 Grpc基本使用HelloWorld
+    8.2 元数据metada
+    8.3 流式GRPC
+    8.4 protobuf的jsonpb包序列化和反序列化
+    8.5 负载均衡 
+    8.6 拦截器 
+    8.7 grpc错误抛出与捕获 
+    8.8 auth认证 
+    8.9 proto字段验证器 
 ## 第九章 错误及异常
 ## 第十章 链路追踪Jaeger
     10.1 结合XORM

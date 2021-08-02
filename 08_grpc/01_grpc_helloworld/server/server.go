@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go_grpc_example/08_grpc/20_grpc_test/proto"
+	"go_grpc_example/08_grpc/01_grpc_helloworld/proto"
 
 	"google.golang.org/grpc"
 

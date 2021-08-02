@@ -4,7 +4,7 @@ import (
 	"context"
 	"net"
 
-	"go_grpc_example/08_grpc/13_grpc_error_test/proto"
+	"go_grpc_example/08_grpc/07_grpc_error/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"go_grpc_example/08_grpc/17_grpc_validate_test/proto"
+	"go_grpc_example/08_grpc/09_grpc_validate/proto"
 	"google.golang.org/grpc"
 )
 

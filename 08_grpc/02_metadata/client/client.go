@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"go_grpc_example/08_grpc/14_metadata_test/proto"
+	"go_grpc_example/08_grpc/02_metadata/proto"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
