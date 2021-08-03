@@ -8,10 +8,14 @@ import (
 /*
 confluent-kafka-go
 	使用了c库
+生产者幂等性：
+	if enable.idempotence is set). Requires broker version >= 0.11.0 要求版本大于0.11.0,要求acks=all
 */
 func main() {
-
-	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "tencent.danny.games"})
+	// 生产者客户端
+	p, err := kafka.NewProducer(&kafka.ConfigMap{"bootstrap.servers": "tencent.danny.games",
+		"enable.idempotence": "true",
+		"acks":               "all"})
 	if err != nil {
 		panic(err)
 	}

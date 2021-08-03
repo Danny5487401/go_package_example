@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+//使用envoyproxy/protoc-gen-validate验证器 1.6k star，在更新，但还是alpha阶段
+// 不推荐：mwitkow/go-proto-validators 0.8k star,停止更新
 import "validate.proto";
 option go_package=".;proto";
 
