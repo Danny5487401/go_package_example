@@ -11,7 +11,7 @@ func main() {
 	//  创建连接客户端
 	cli, err := clientv3.New(clientv3.Config{
 		Endpoints: []string{
-			"81.68.197.3:2379",
+			"tencent.danny.games:2379",
 		},
 		DialTimeout: 5 * time.Second,
 	})
