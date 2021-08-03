@@ -5,7 +5,7 @@ import (
 	"github.com/Shopify/sarama"
 )
 
-// 集群地址
+// Addr 集群地址
 var Addr = []string{"tencent.danny.games:9092", "tencent.danny.games:9093", "tencent.danny.games:9094"}
 
 const Topic = "danny_kafka_log"
