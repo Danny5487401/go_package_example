@@ -48,3 +48,18 @@ func main() {
 	// Wait for message deliveries before shutting down
 	p.Flush(15 * 1000)
 }
+
+/*\
+源码分析
+	// Message represents a Kafka message
+	type Message struct {
+		TopicPartition TopicPartition
+		Value          []byte
+		Key            []byte
+		Timestamp      time.Time
+		TimestampType  TimestampType
+		Opaque         interface{}
+		Headers        []Header
+	}
+	消息字段,Value中默认带了id字段，没写为0.
+*/
