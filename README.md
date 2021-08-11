@@ -47,6 +47,8 @@
     8.7 grpc错误抛出与捕获 
     8.8 auth认证 
     8.9 proto字段验证器 
+    8.9 grpc网关-直接对外http服务 
+    8.9 Grpc插件-gogoprotobuf
 ## 第九章 错误及异常
 ## 第十章 链路追踪Jaeger
     10.1 结合XORM
@@ -55,6 +57,9 @@
     11.1 dig依赖注入及http服务分层
     11.2 wire依赖注入
 ## 第十一章 GRPC生态中间件
+## 第十二章 测试框架testify
+## 第十三章 map和structure相互转化
+    13.1 mapstructure使用（性能低但是方便）
 ## 第十九章 熔断和限流Sentinel
     0. 熔断，降级，限流的方法及官方包实现
     1. 流量控制

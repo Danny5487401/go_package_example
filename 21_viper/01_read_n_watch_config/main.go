@@ -17,12 +17,13 @@ type ServerConfig struct {
 }
 
 func GetEnvInfo(env string) bool {
+	// 获取环境变量区分环境
 	viper.AutomaticEnv()
 	return viper.GetBool(env) //必须重启goland才行
 }
 
 func main() {
-	debug := GetEnvInfo("MXSHOP_DEBUG")
+	debug := GetEnvInfo("ENV_DEBUG")
 	configFileName := "viper_test/ch02/config-prod.yaml"
 	if debug {
 		configFileName = "viper_test/ch02/config-debug.yaml"
@@ -33,6 +34,7 @@ func main() {
 	if err := v.ReadInConfig(); err != nil {
 		panic(err)
 	}
+	// 获取配置
 	serverConfig := ServerConfig{}
 	if err := v.Unmarshal(&serverConfig); err != nil {
 		panic(err)
