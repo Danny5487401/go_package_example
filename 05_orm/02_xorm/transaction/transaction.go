@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"go_grpc_example/05_orm/02_xorm/models"
@@ -16,12 +17,13 @@ func main() {
 	zap.ReplaceGlobals(logger)
 
 	today := time.Now().Format("20060102")
+	activeDate, _ := strconv.Atoi(today)
 	eg := util.GetEngineGroup()
 	eg.Sync2(models.UserActive{}, models.UserActiveRecord{})
 	ok, err := eg.Transaction(func(session *xorm.Session) (interface{}, error) {
 		var data = models.UserActiveRecord{
-			Uid:  19,
-			Date: today,
+			Uid:        19,
+			ActiveDate: activeDate,
 		}
 		_, err := session.Insert(data)
 		if err != nil {
@@ -48,13 +50,13 @@ func main() {
 				fmt.Printf("获取到数据%+v", actData)
 			}
 			fmt.Printf("没有获取到%+v", actData)
-			actData.LatestDate = today
+			actData.LatestDate = int64(activeDate)
 			actData.TotalDays += 1
 			affected, err := session.Where("uid=?", uid).Cols("total_days,updated").Update(&actData)
 			fmt.Println(affected, err)
 		} else {
 			actData.Uid = uid
-			actData.LatestDate = today
+			actData.LatestDate = int64(activeDate)
 			actData.TotalDays = 1
 			affected, err := session.Insert(&actData)
 			if err != nil {
