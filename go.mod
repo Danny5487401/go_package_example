@@ -11,6 +11,7 @@ require (
 	github.com/confluentinc/confluent-kafka-go v1.7.0
 	github.com/coreos/etcd v3.3.17+incompatible
 	github.com/eapache/go-resiliency v1.2.0 // indirect
+	github.com/elliotchance/phpserialize v1.3.1
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/frankban/quicktest v1.11.3 // indirect
 	github.com/fsnotify/fsnotify v1.4.9
