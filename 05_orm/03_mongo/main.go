@@ -93,6 +93,12 @@ func main() {
 			M：一张无序的map。它和D是一样的，只是它不保持顺序。
 			A：一个BSON数组。
 			E：D里面的一个元素
+		BSON就是二进制编码的JSON序列化数据。
+		BSON官网上提到的三个特点有：
+			1.更轻量
+			2.可转换（序列化和反序列化）
+			3.更高效，因为是二进制的
+		有四种struct可以定义bson的数据结构：bson.D{}、bson.E{}、bson.M{}、bson.A{}
 	*/
 
 	//按照jobName分组,countJob中存储每组的数目

@@ -1,0 +1,16 @@
+syntax = "proto3";
+//声明 包名
+option go_package = "./;proto";
+
+// 需要安装go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
+
+message StringMessage {
+  string value = 1;
+}
+//路由扩展元信息也是通过Protobuf的元数据扩展用法提供
+service RestService {
+  rpc Get(StringMessage) returns (StringMessage) {
+  }
+  rpc Post(StringMessage) returns (StringMessage) {
+  }
+}

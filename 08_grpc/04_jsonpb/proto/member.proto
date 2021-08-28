@@ -1,0 +1,17 @@
+syntax = "proto3";
+//声明 包名
+option go_package = "./;proto";
+
+service Member {
+  rpc GetMember(MemberRequest)returns (MemberResponse);
+}
+
+message MemberRequest {
+  int32 Id = 1;
+}
+
+message MemberResponse {
+  int32 Id = 1;
+  string Phone = 2;
+  int32 Age = 3;
+}
