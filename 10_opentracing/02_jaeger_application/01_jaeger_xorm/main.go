@@ -1,8 +1,8 @@
-package _1_yaeger_xorm
+package _1_jaeger_xorm
 
 import (
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/opentracing/opentracing-go"
+	"github.com/opentracing/opentracing-go" // opentracing协议
 	"github.com/uber/jaeger-client-go"
 	"github.com/uber/jaeger-client-go/config"
 	"github.com/uber/jaeger-client-go/log/zap"
