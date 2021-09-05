@@ -78,10 +78,18 @@ func main() {
 	// 会把空数值打印处理，方便返回给前端
 
 	// Unmarshaler使用:转换成pb对象
+	// school没有这字段，Age为0
+	mockData := `{"Id":12,"Phone":"15112810201","Age":0,"school":"Beijing"}`
+	bufferObj := new(bytes.Buffer)
+	bufferObj.WriteString(mockData)
+
 	memberRsp := proto.MemberResponse{}
-	if err := jsonpb.UnmarshalString(string(jsonCnt), &memberRsp); err != nil {
+	unmarshaler := jsonpb.Unmarshaler{
+		AllowUnknownFields: true, //允许忽略未知字段，如school
+	}
+	if err := unmarshaler.Unmarshal(bufferObj, &memberRsp); err != nil {
 		fmt.Println("jsonpb UnmarshalString fail: ", err)
 		os.Exit(0)
 	}
-	fmt.Println("member info pb: ", memberRsp.String())
+	fmt.Printf("member info pb: %+v", memberRsp.String())
 }
