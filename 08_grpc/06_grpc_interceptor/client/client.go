@@ -47,7 +47,7 @@ func main() {
 
 	c := credentials.NewTLS(&tls.Config{
 		Certificates: []tls.Certificate{cert},
-		ServerName:   "go-grpc-example",
+		ServerName:   "go-grpc-example", //使用证书生成的Common Name 字段
 		RootCAs:      certPool,
 	})
 	conn, err := grpc.Dial("127.0.0.1:8000", grpc.WithTransportCredentials(c))
@@ -73,6 +73,11 @@ func main() {
 	Client 通过请求得到 Server 端的证书
 	使用 CA 认证的根证书对 Server 端的证书进行可靠性、有效性等校验
 	校验 ServerName 是否可用、有效
-注意点
-	在 Client 中绝大部分与 Server 一致，不同点的地方是，在 Client 请求 Server 端时，Client 端会使用根证书和 ServerName 去对 Server 端进行校验
+注意点:
+	golang 1.15+版本上，用 gRPC通过TLS实现数据传输加密时，会报错证书的问题
+原因:
+	因为我们用的证书，并没有开启SAN扩展（默认是没有开启SAN扩展）所生成的，导致客户端和服务端无法建立连接
+什么是 SAN
+	SAN(Subject Alternative Name) 是 SSL 标准 x509 中定义的一个扩展。使用了 SAN 字段的 SSL 证书，可以扩展此证书支持的域名，
+	使得一个证书可以支持多个不同域名的解析。
 */
