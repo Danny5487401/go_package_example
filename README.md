@@ -38,7 +38,7 @@
     1. 错误英转中
     2. 前端数据校验
 ## 第八章 GRPC编程 
-    8.1 Grpc基本使用HelloWorld
+    8.1 HelloWorld分析Grpc源码
     8.2 元数据metada
     8.3 流式GRPC
     8.4 protobuf的jsonpb包序列化和反序列化
@@ -47,8 +47,8 @@
     8.7 grpc错误抛出与捕获 
     8.8 auth认证 
     8.9 proto字段验证器 
-    8.9 grpc网关-直接对外http服务 
-    8.9 Grpc插件-gogoprotobuf
+    8.10 grpc网关-直接对外http服务 
+    8.11 Grpc插件-gogoprotobuf
 ## 第九章 错误及异常
 ## 第十章 链路追踪Jaeger
     10.1 结合XORM
