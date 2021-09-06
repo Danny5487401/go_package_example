@@ -6,11 +6,10 @@ import (
 	"crypto/x509"
 	"fmt"
 	"go_grpc_example/08_grpc/06_grpc_interceptor/proto"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"io/ioutil"
 	"log"
-
-	"google.golang.org/grpc"
 )
 
 func main() {
@@ -75,9 +74,15 @@ func main() {
 	校验 ServerName 是否可用、有效
 注意点:
 	golang 1.15+版本上，用 gRPC通过TLS实现数据传输加密时，会报错证书的问题
+	panic: rpc error: code = Unavailable desc = connection error: desc = "transport: authentication handshake failed: x509: certificate relies on legacy Common Name field, use SANs or temporarily enable Common Name matching with GODEBUG=x509ignoreCN=0"
+
 原因:
 	因为我们用的证书，并没有开启SAN扩展（默认是没有开启SAN扩展）所生成的，导致客户端和服务端无法建立连接
-什么是 SAN
+
+解决方式
+	1.设置 GODEBUG 为 x509ignoreCN=0，Danny我没成功
+
+什么是 SAN?
 	SAN(Subject Alternative Name) 是 SSL 标准 x509 中定义的一个扩展。使用了 SAN 字段的 SSL 证书，可以扩展此证书支持的域名，
 	使得一个证书可以支持多个不同域名的解析。
 */
