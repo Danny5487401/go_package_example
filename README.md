@@ -38,7 +38,7 @@
     1. 错误英转中
     2. 前端数据校验
 ## 第八章 GRPC编程 
-    8.1 Grpc基本使用HelloWorld
+    8.1 HelloWorld分析Grpc源码
     8.2 元数据metada
     8.3 流式GRPC
     8.4 protobuf的jsonpb包序列化和反序列化
@@ -47,8 +47,8 @@
     8.7 grpc错误抛出与捕获 
     8.8 auth认证 
     8.9 proto字段验证器 
-    8.9 grpc网关-直接对外http服务 
-    8.9 Grpc插件-gogoprotobuf
+    8.10 grpc网关-直接对外http服务 
+    8.11 Grpc插件-gogoprotobuf
 ## 第九章 错误及异常
 ## 第十章 链路追踪Jaeger
     10.1 结合XORM
@@ -71,6 +71,8 @@
     1. es操作
     2. etcd操作
     3. kafka操作
+## 第十六章 数据复制
+    1. copier(不同类型数据复制)
 ## 第二十章 命令行框架Cobra
     1. 介绍及功能使用
 ## 第二十一章 配置文件获取工具viper
@@ -78,7 +80,9 @@
     2. 监听文件变化
 ## 第二十二章 ETCD
     1. CRUD及watch
-## 第二十三章 Go-Micro框架 
+    2. 读和写流程分析
+    3. Raft协议
+## 第二十三章 Go-Micro框架 (不推荐使用)
 
 
 

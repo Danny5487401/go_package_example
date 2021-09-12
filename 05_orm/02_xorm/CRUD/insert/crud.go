@@ -12,11 +12,11 @@ func main() {
 
 	var eg = util.GetEngineGroup()
 	// 获取数据库表的结构信息
-	//schemeTables, _ := eg.DBMetas()
-	//fmt.Println("表的数量", len(schemeTables))
-	//for _, tableInfo := range schemeTables {
-	//	fmt.Printf("%+v\n", *tableInfo)
-	//}
+	schemeTables, _ := eg.DBMetas()
+	fmt.Println("表的数量", len(schemeTables))
+	for _, tableInfo := range schemeTables {
+		fmt.Printf("%+v\n", *tableInfo)
+	}
 
 	// 添加数据
 	// 插入一条
