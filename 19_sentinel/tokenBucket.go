@@ -90,8 +90,23 @@ func main() {
 	// 当调用完成后，无论 Token 是否充足，都会返回一个 *Reservation 对象。你可以调用该对象的Delay()方法，该方法返回的参数类型为time.Duration，
 	//	反映了需要等待的时间，必须等到等待时间之后，才能进行接下来的工作。如果不想等待，可以调用Cancel()方法，该方法会将 Token 归还
 	r := limiter.Reserve()
+	//是否愿意等待
 	if !r.OK() {
 		// Not allowed to act! Did you remember to set lim.burst to be > 0 ?
 		return
 	}
+	//如果愿意等待，将等待时间抛给用户 time.Sleep代表用户需要等待的时间。
+	time.Sleep(r.Delay())
+	Act() // 一段时间后生成生成新的令牌，开始执行相关逻辑
+
+	// 3.动态调整速率
+	//Limiter 支持可以调整速率和桶大小
+	//SetLimit(Limit) 改变放入 Token 的速率
+	//SetBurst(int) 改变 Token 桶大小
+
+}
+
+//执行业务逻辑
+func Act() {
+
 }
