@@ -76,4 +76,7 @@ Redis集群特点
     并发量很高的情况下同时创建key-value会降低性能并导致不可预测的行为  
     4. 支持在线增加、删除节点  
     5. 客户端可以连任何一个主节点进行读写
+    
+#高并发缓存
+![](.redis_images/high_concurrency_buffer.png)
 
