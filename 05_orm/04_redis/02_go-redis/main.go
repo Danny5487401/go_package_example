@@ -33,10 +33,10 @@ func testRedisBase() {
 	pong, err := redisdb.Ping().Result()
 	log.Println(pong, err) // Output: PONG <nil>
 
-	//ExampleClient_String()
+	ExampleClient_String()
 	//ExampleClient_List()
 	//ExampleClient_Hash()
-	ExampleClient_Set()
+	//ExampleClient_Set()
 	//ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
@@ -63,7 +63,10 @@ func ExampleClient_String() {
 	tm, err := redisdb.TTL("key").Result()
 	log.Println(tm)
 
-	val, err := redisdb.Get("key").Result()
+	val, err := redisdb.Get("key_notExist").Result()
+	if err == redis.Nil {
+		log.Println("key不存在")
+	}
 	log.Println(val, err)
 
 	val2, err := redisdb.Get("missing_key").Result()

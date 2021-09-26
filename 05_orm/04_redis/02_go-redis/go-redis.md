@@ -1,5 +1,6 @@
 #go-redis源码分析
 
+##连接池分析
 ```go
 // 键不存在时返回内容
 const Nil = proto.Nil
@@ -190,3 +191,4 @@ func (p *ConnPool) reapStaleConn() *Conn {
     2.创建一个时间间隔为 frequency 的计时器，在连接池关闭时关闭该计时器
     3.循环判断计时器是否到时和连接池是否关闭
     4.移除空闲连接队列中的过期连接
+
