@@ -34,7 +34,6 @@
 	# 3. 使用C语言编写，更好的发挥服务器性能，并且代码简介，性能高
 Redis五种数据类型应用场景
 ![](img/string.png)
-![](.redis_images/string_structure.png)
 
 	1.String(sds): 常规的set/get操作,因为string 类型是二进制安全的，可以用来存放图片，视频等内容，另外由于Redis的高性能读写功能，
 		而string类型的value也可以是数字，一般做一些复杂的计数功能的缓存,还可以用作计数器（INCR,DECR），
@@ -42,7 +41,7 @@ Redis五种数据类型应用场景
 
 		
 ![](img/hash.png)
-![](.redis_images/hash_table.png)
+
 
 	2. hash(hash table): value 存放的是键值对结构化后的对象，比较方便操作其中某个字段，比如可以做单点登录存放用户信息,以cookiele作为key，
 		设置30分钟为缓存过期时间，能很好的模拟出类似session的效
@@ -53,14 +52,43 @@ Redis五种数据类型应用场景
 	
 ![](img/set.png)
 
+
 	4. set(intset+dict):由于底层是字典实现的，查找元素特别快，另外set 数据类型不允许重复，利用这两个特性我们可以进行全局去重，
 		比如在用户注册模块，判断用户名是否注册；另外就是利用交集、并集、差集等操作，可以计算共同喜好，全部的喜好，自己独有的喜好等功能
 
 ![](img/sort_set.png)		
 
 	5. Zset(skip list + hash table):有序的集合，可以做范围查找，排行榜应用，取 TOP N 操作等,还可以做延时任务
-RedisDB内部结构
+##RedisDB内部结构
 ![](.redis_images/redis_db_structure.png)
+
+##Redis数据类型底层数据结构
+![](.redis_images/redis_data_structure.png)
+###1.string(sds)
+
+![](.redis_images/string_structure.png)
+![](.redis_images/sdshdr.png)
+
+###2.hash(ziplist+dict)
+![](.redis_images/ziplist.png)
+![](.redis_images/dict.png)
+
+###3.set(intset+dict)
+![](.redis_images/intset.png)
+![](.redis_images/dict.png)
+
+###4.list(ziplist+quicklist)
+![](.redis_images/ziplist.png)
+![](.redis_images/quicklist.png)
+
+
+###5.Sort Set(hash+skiptable)
+![](.redis_images/skiptable.png)
+
+
+###6.stream(radix-tree)
+
+
 
 PipeLine:
 
@@ -110,6 +138,14 @@ Redis集群特点
     并发量很高的情况下同时创建key-value会降低性能并导致不可预测的行为  
     4. 支持在线增加、删除节点  
     5. 客户端可以连任何一个主节点进行读写
+
+集群方案
+![](.redis_images/codis_vs_cluster.png)
+    1. vip多线程版本 twemproxy(Twitter开源)
+    2. codis
+![](.redis_images/codis.png)
+    3. redis cluster
+![](.redis_images/redis_cluster.png)
 
 #高并发缓存
 ![](.redis_images/high_concurrency_buffer.png)
