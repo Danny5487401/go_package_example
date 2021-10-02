@@ -54,6 +54,10 @@ Headers exchange（头交换机）	amq.match (and amq.headers in RabbitMQ)
 
 ##队列（ Queue)
     队列 存储着即将被应用消费掉的消息
+队列持久化
+
+    持久化队列（Durable queues）会被存储在磁盘上，当消息代理（broker）重启的时候，它可以被重新恢复。
+    没有被持久化的队列称作暂存队列（Transient queues）
 
 ##消息确认 (acknowledgement)
 什么时候删除消息才是正确的？有两种情况

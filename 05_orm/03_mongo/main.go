@@ -143,12 +143,13 @@ func main() {
 	// 删除数据
 	var uResult2 *mongo.DeleteResult
 	filter2 := bson.M{"content": "100"}
-	//3.删除开始时间早于当前时间的数据
+
 	if uResult2, err = collection.DeleteMany(context.TODO(), filter2); err != nil {
 		log.Fatal(err)
 	}
 	log.Println(uResult2.DeletedCount)
 
+	//3.删除开始时间早于当前时间的数据
 	// 删除小于这时间
 	var delCond *model.DeleteCond
 	var uResult3 *mongo.DeleteResult
