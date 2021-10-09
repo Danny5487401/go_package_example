@@ -114,6 +114,23 @@ Headers exchange（头交换机）	amq.match (and amq.headers in RabbitMQ)
     这跟Web servers虚拟主机概念非常相似，这为AMQP实体提供了完全隔离的环境。当连接被建立的时候，AMQP客户端来指定使用哪个虚拟主机
 
 
+##消息的顺序性
+
+    消息在投入到queue的时候是有顺序，如果只是单个消费者来处理对应的单个queue，是不会出现消息错乱的问题。但是在消费的时候有可能多个消费者消费同一个queue，由于各个消费者处理消息的时间不同，导致消息未能按照预期的顺序处理。
+
+###出现消费顺序错乱的情况
+为了提高处理效率，一个queue存在多个consumer
+![](.introduction_images/multi_consumer.png)
+一个queue只存在一个consumer，但是为了提高处理效率，consumer中使用了多线程进行处理
+![](.introduction_images/one_consumer_with_multi_threading.png)
+
+###保证消息顺序性的方法
+将原来的一个queue拆分成多个queue，每个queue都有一个自己的consumer。该种方案的核心是生产者在投递消息的时候根据业务数据关键值（例如订单ID哈希值对订单队列数取模）来将需要保证先后顺序的同一类数据（同一个订单的数据） 发送到同一个queue当中
+![](.introduction_images/multi_queue_with_own_consumer.png)
+一个queue就一个consumer，在consumer中维护多个内存队列，根据业务数据关键值（例如订单ID哈希值对内存队列数取模）将消息加入到不同的内存队列中，然后多个真正负责处理消息的线程去各自对应的内存队列当中获取消息进行消费。
+![](.introduction_images/multiqueue_with_own_threading.png)
+
+
 
 
 
