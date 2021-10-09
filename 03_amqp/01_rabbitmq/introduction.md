@@ -127,12 +127,40 @@ Headers exchange（头交换机）	amq.match (and amq.headers in RabbitMQ)
 ###保证消息顺序性的方法
 将原来的一个queue拆分成多个queue，每个queue都有一个自己的consumer。该种方案的核心是生产者在投递消息的时候根据业务数据关键值（例如订单ID哈希值对订单队列数取模）来将需要保证先后顺序的同一类数据（同一个订单的数据） 发送到同一个queue当中
 ![](.introduction_images/multi_queue_with_own_consumer.png)
+
 一个queue就一个consumer，在consumer中维护多个内存队列，根据业务数据关键值（例如订单ID哈希值对内存队列数取模）将消息加入到不同的内存队列中，然后多个真正负责处理消息的线程去各自对应的内存队列当中获取消息进行消费。
 ![](.introduction_images/multiqueue_with_own_threading.png)
 
 
+##消息的可靠性
+###丢失的场景
+![](.introduction_images/msg_loss.png)
+生产者弄丢了消息
 
+    生产者在将数据发送到MQ的时候，可能由于网络等原因造成消息投递失败
 
+MQ自身弄丢了消息
+
+    未开启RabbitMQ的持久化，数据存储于内存，服务挂掉后队列数据丢失；
+    开启了RabbitMQ持久化，消息写入后会持久化到磁盘，但是在落盘的时候挂掉了，
+
+消费者弄丢了消息
+
+    消费者刚接收到消息还没处理完成，结果消费者挂掉了…
+
+###保证消息可靠性的方法
+生产者弄丢消息时的解决方法
+
+    方法一：生产者在发送数据之前开启RabbitMQ的事务
+
+MQ自身弄丢消息时的解决方法
+  
+    第一步： 创建queue时设置为持久化队列，这样可以保证RabbitMQ持久化queue的元数据，此时还是不会持久化queue里的数据
+    第二步： 发送消息时将消息的deliveryMode设置为持久化，此时queue中的消息才会持久化到磁盘。
+
+消费者自身弄丢消息时的解决方法
+
+    关闭自动ACK，使用手动ACK
 
 借助备用交换机、TTL+DLX代替mandatory、immediate方案：
 1、P发送msg给Ex，Ex无法把msg路由到Q，则会把路由转发给ErrEx。
