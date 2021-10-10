@@ -119,3 +119,11 @@ NoSQL适合存储非结构化数据，如文章、评论：
 ##不适用的场景
     1）MongoDB不支持事务操作，需要用到事务的应用建议不用MongoDB。
     2）MongoDB目前不支持join操作，需要复杂查询的应用也不建议使用MongoDB
+
+#bson简介
+
+    BSON是一种类json的一种二进制形式的存储格式，简称Binary JSON，它和JSON一样，支持内嵌的文档对象和数组对象，但是BSON有JSON没有的一些数据类型，如Date和BinData类型。
+
+    MongoDB使用了BSON这种结构来存储数据和网络数据交换。把这种格式转化成一文档这个概念(Document)，
+    因为BSON是schema-free的，所以在MongoDB中所对应的文档也有这个特征，这里的一个Document也可以理解成关系数据库中的一条记录(Record)，
+    只是这里的Document的变化更丰富一些，如Document可以嵌套

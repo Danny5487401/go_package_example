@@ -52,8 +52,16 @@ func main() {
 	//如果直接使用 LogRecord{JobName: "job10"}是查不到数据的，因为其他字段有初始值0或者“”
 	cond := model.FindByJobName{JobName: "Python"}
 
+	//分页查询
 	//按照jobName字段进行过滤jobName="job10",翻页参数0-2
-	if cursor, err = collection.Find(context.TODO(), cond, options.Find().SetSkip(0), options.Find().SetLimit(2)); err != nil {
+	// 分页查询选项设置
+	// Pass these options to the Find method
+	findOptions := options.Find()
+	findOptions.SetSkip(0)
+	findOptions.SetLimit(2)
+
+	//if cursor, err = collection.Find(context.TODO(), cond, options.Find().SetSkip(0), options.Find().SetLimit(2)); err != nil {
+	if cursor, err = collection.Find(context.TODO(), cond, findOptions); err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -119,6 +127,7 @@ func main() {
 			log.Fatal(err)
 		}
 	}()
+
 	//遍历游标
 	var results2 []bson.M
 	if err = cursor.All(context.TODO(), &results2); err != nil {
@@ -149,7 +158,7 @@ func main() {
 	}
 	log.Println(uResult2.DeletedCount)
 
-	//3.删除开始时间早于当前时间的数据
+	//3.删除开始时间早于当前时间的数据,注意bson的tag
 	// 删除小于这时间
 	var delCond *model.DeleteCond
 	var uResult3 *mongo.DeleteResult
