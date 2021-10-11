@@ -28,22 +28,23 @@ func main() {
 	// 选择表
 	collection = db.Collection("collection1")
 	//// 构建数据
-	//lr := &models.LogRecord{
-	//	JobName: "Python",
-	//	Command: "echo 4",
-	//	Err:     "",
-	//	Content: "4",
-	//	Tp: models.TimePrint{
-	//		StartTime: time.Now().Unix(),
-	//		EndTime:   time.Now().Unix() + 10,
-	//	},
-	//}
+	lr := &model.LogRecord{
+		JobName: "Python",
+		Command: "echo 4",
+		Err:     "",
+		Content: "4",
+		Tp: model.TimePrint{
+			StartTime: time.Now().Unix(),
+			EndTime:   time.Now().Unix() + 10,
+		},
+	}
 	////插入某一条数据
-	//iResult, err := collection.InsertOne(context.Background(), lr)
-	//if err != nil {
-	//	fmt.Println("错误", err)
-	//	return
-	//}
+	iResult, err := collection.InsertOne(context.Background(), lr)
+	if err != nil {
+		fmt.Println("错误", err)
+		return
+	}
+	fmt.Println("插入结果是", iResult)
 	////_id:默认生成一个全局唯一ID
 	//id := iResult.InsertedID.(primitive.ObjectID)
 	//fmt.Println("自增ID", id.Hex())
@@ -150,21 +151,21 @@ func main() {
 	log.Println(uResult.MatchedCount)
 
 	// 删除数据
-	var uResult2 *mongo.DeleteResult
-	filter2 := bson.M{"content": "100"}
-
-	if uResult2, err = collection.DeleteMany(context.TODO(), filter2); err != nil {
-		log.Fatal(err)
-	}
-	log.Println(uResult2.DeletedCount)
-
-	//3.删除开始时间早于当前时间的数据,注意bson的tag
-	// 删除小于这时间
-	var delCond *model.DeleteCond
-	var uResult3 *mongo.DeleteResult
-	delCond = &model.DeleteCond{BeforeCond: model.TimeBeforeCond{BeforeTime: time.Now().Unix()}}
-	if uResult3, err = collection.DeleteMany(context.TODO(), delCond); err != nil {
-		log.Fatal(err)
-	}
-	log.Println(uResult3.DeletedCount)
+	//var uResult2 *mongo.DeleteResult
+	//filter2 := bson.M{"content": "100"}
+	//
+	//if uResult2, err = collection.DeleteMany(context.TODO(), filter2); err != nil {
+	//	log.Fatal(err)
+	//}
+	//log.Println(uResult2.DeletedCount)
+	//
+	////3.删除开始时间早于当前时间的数据,注意bson的tag
+	//// 删除小于这时间
+	//var delCond *model.DeleteCond
+	//var uResult3 *mongo.DeleteResult
+	//delCond = &model.DeleteCond{BeforeCond: model.TimeBeforeCond{BeforeTime: time.Now().Unix()}}
+	//if uResult3, err = collection.DeleteMany(context.TODO(), delCond); err != nil {
+	//	log.Fatal(err)
+	//}
+	//log.Println(uResult3.DeletedCount)
 }
