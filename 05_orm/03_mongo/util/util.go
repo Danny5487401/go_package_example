@@ -60,13 +60,13 @@ func initEngine() {
 func getMonitor() *event.CommandMonitor {
 	return &event.CommandMonitor{
 		Started: func(ctx context.Context, startedEvent *event.CommandStartedEvent) {
-			fmt.Printf("[mongo] started:%v \n", *startedEvent)
+			fmt.Printf("[mongo] started:%+v \n", *startedEvent)
 		},
 		Succeeded: func(ctx context.Context, succeededEvent *event.CommandSucceededEvent) {
-			fmt.Printf("[mongo] success:%v \n", *succeededEvent)
+			fmt.Printf("[mongo] success:%+v \n", *succeededEvent)
 		},
 		Failed: func(ctx context.Context, failedEvent *event.CommandFailedEvent) {
-			fmt.Printf("[mongo] ERROR failed:%v \n", *failedEvent)
+			fmt.Printf("[mongo] ERROR failed:%+v \n", *failedEvent)
 		},
 	}
 }

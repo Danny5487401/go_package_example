@@ -28,18 +28,28 @@ func main() {
 	// 选择表
 	collection = db.Collection("collection1")
 	//// 构建数据
-	lr := &model.LogRecord{
-		JobName: "Python",
-		Command: "echo 4",
+	//lr := &model.LogRecord{
+	//	JobName: "Python",
+	//	Command: "echo 4",
+	//	Err:     "",
+	//	Content: "4",
+	//	Tp: model.TimePrint{
+	//		StartTime: time.Now().Unix(),
+	//		EndTime:   time.Now().Unix() + 10,
+	//	},
+	//}
+	lr2 := &model.LogRecord{
+		JobName: "Goland",
+		Command: "test k8s",
 		Err:     "",
-		Content: "4",
+		Content: "devops",
 		Tp: model.TimePrint{
 			StartTime: time.Now().Unix(),
-			EndTime:   time.Now().Unix() + 10,
+			EndTime:   time.Now().Unix() + 20,
 		},
 	}
 	////插入某一条数据
-	iResult, err := collection.InsertOne(context.Background(), lr)
+	iResult, err := collection.InsertOne(context.Background(), lr2)
 	if err != nil {
 		fmt.Println("错误", err)
 		return
