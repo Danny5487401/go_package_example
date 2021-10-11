@@ -26,7 +26,14 @@ func initEngine() {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	// 连接:在本地的时候mgo 的mongodburl 可以写成127.0.0.1,但是mongo driver 必须写成 mongodb://127.0.0.1
-	uri := "mongodb://ali.danny.games:27017"
+	//uri := "mongodb://ali.danny.games:27017"
+	user := "python"
+	password := "chuanzhi"
+	url := "ali.danny.games:27017"
+	dbname := "db1"
+	auth := "authSource=admin"
+	//开启auth认证
+	uri := "mongodb://" + user + ":" + password + "@" + url + "/" + dbname + "?" + auth
 	var err error
 
 	mode, err := readpref.ModeFromString("primary")

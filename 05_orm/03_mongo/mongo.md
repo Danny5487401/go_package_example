@@ -1,4 +1,8 @@
 #mongo
+    MongoDB 是由C++语言编写的，是一个基于分布式文件存储的开源数据库系统
+
+    MongoDB 是一个介于关系数据库和非关系数据库之间的产品，是非关系数据库当中功能最丰富，最像关系数据库的。
+
 
 ##关系型数据库和非关系型数据库的应用场景对比
 
@@ -24,6 +28,7 @@ NoSQL适合存储非结构化数据，如文章、评论：
 
     1）不支持事务
     2）不支持join、复杂查询
+
 ##Mysql和MongoDB内存结构   
 ###1、InnoDb内存使用机制
 ![](.mongo_images/innodb.png)
@@ -127,3 +132,67 @@ NoSQL适合存储非结构化数据，如文章、评论：
     MongoDB使用了BSON这种结构来存储数据和网络数据交换。把这种格式转化成一文档这个概念(Document)，
     因为BSON是schema-free的，所以在MongoDB中所对应的文档也有这个特征，这里的一个Document也可以理解成关系数据库中的一条记录(Record)，
     只是这里的Document的变化更丰富一些，如Document可以嵌套
+
+#聚合查询
+##1.聚合通道
+    MongoDB中聚合的方法使用aggregate()。聚合就是可以对数据查询进行多次过滤操作，以达到复杂查询的目的。
+    聚合查询函数接收一个数组，数组里面是若干个对象，每个对象就是一次查询的步骤。前一个查询的查询结果，作为后一个查询的筛选内容。
+```shell
+db.getCollection("student").aggregate(
+    [
+        { 
+            "$match" : {
+                "age" : {
+                    "$gt" : 20.0
+                }
+            }
+        }, 
+        { 
+            "$lookup" : {
+                "from" : "room", 
+                "localField" : "class", 
+                "foreignField" : "name", 
+                "as" : "num"
+            }
+        }, 
+        { 
+            "$unwind" : {
+                "path" : "$num", 
+                "includeArrayIndex" : "l", 
+                "preserveNullAndEmptyArrays" : false
+            }
+        }, 
+        { 
+            "$project" : {
+                "num.name" : 1.0
+            }
+        }, 
+        { 
+            "$count" : "cou"
+        }
+    ]
+
+
+```
+常用的管道查询操作：
+
+    $project：修改输入文档的结构。可以用来重命名、增加或删除域，也可以用于创建计算结果以及嵌套文档。
+    m a t c h ： 用 于 过 滤 数 据 ， 只 输 出 符 合 条 件 的 文 档 。 match：用于过滤数据，只输出符合条件的文档。match：用于过滤数据，只输出符合条件的文档。match使用MongoDB的标准查询操作。
+    $limit：用来限制MongoDB聚合管道返回的文档数。
+    $skip：在聚合管道中跳过指定数量的文档，并返回余下的文档。
+    $unwind：将文档中的某一个数组类型字段拆分成多条，每条包含数组中的一个值。
+    $group：将集合中的文档分组，可用于统计结果。
+    $sort：将输入文档排序后输出。
+    $geoNear：输出接近某一地理位置的有序文档。
+    $lookup：连表查询
+
+##readPreference读策略
+readPreference 主要控制客户端 Driver 从复制集的哪个节点读取数据，这个特性可方便的配置读写分离、就近读取等策略。结合Tag，可以进一步细分控制读取策略。
+    
+    primary （只主）只从 primary 节点读数据，这个是默认设置
+    primaryPreferred （先主后从）优先从 primary 读取，primary 不可服务，从 secondary 读
+    secondary （只从）只从 scondary 节点读数据
+    secondaryPreferred （先从后主）优先从 secondary 读取，没有 secondary 成员时，从 primary 读取
+    nearest （就近）根据网络距离就近读取，根据客户端与服务端的PingTime实现
+
+

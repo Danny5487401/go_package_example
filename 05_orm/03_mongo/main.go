@@ -2,6 +2,7 @@ package main
 
 import (
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/x/bsonx"
 	"time"
 
 	"go.mongodb.org/mongo-driver/mongo"
@@ -24,7 +25,7 @@ func main() {
 		err        error
 	)
 	// 选择数据库
-	db = client.Database("test2")
+	db = client.Database("db1")
 	// 选择表
 	collection = db.Collection("collection1")
 	//// 构建数据
@@ -39,8 +40,8 @@ func main() {
 	//	},
 	//}
 	lr2 := &model.LogRecord{
-		JobName: "Goland",
-		Command: "test k8s",
+		JobName: "C++",
+		Command: "postgres",
 		Err:     "",
 		Content: "devops",
 		Tp: model.TimePrint{
@@ -129,6 +130,7 @@ func main() {
 			}},
 		}},
 	}}
+	//聚合查询
 	if cursor, err = collection.Aggregate(context.TODO(), groupStage); err != nil {
 		log.Fatal(err)
 	}
@@ -178,4 +180,19 @@ func main() {
 	//	log.Fatal(err)
 	//}
 	//log.Println(uResult3.DeletedCount)
+
+	//ttl
+	// mongo-go-driver v0.3.0 使用如下代码
+	indexModel := mongo.IndexModel{
+		Keys:    bsonx.Doc{{"expire_date", bsonx.Int32(20)}}, // 设置TTL索引列"expire_date"
+		Options: options.Index().SetExpireAfterSeconds(30),   // 设置过期时间1天，即，条目过期一天过自动删除
+	}
+
+	resp, err := collection.Indexes().CreateOne(context.Background(), indexModel) // 创建TTL
+	if err != nil {
+		// 出错处理
+		fmt.Println("创建ttl数据错误", err.Error())
+	}
+	fmt.Println("创建ttl数据结果", resp)
+
 }
