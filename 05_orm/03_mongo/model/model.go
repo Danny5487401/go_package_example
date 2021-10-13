@@ -32,3 +32,19 @@ type DeleteCond struct {
 type TimeBeforeCond struct {
 	BeforeTime int64 `bson:"$lt"`
 }
+
+type TestLog struct {
+	CreatedAt int64 `bson:"created_at"` //开始时间
+	Uid       int64 `bson:"uid"`
+	Coin      int64 `bson:"coin"`
+	Day       int64 `bson:"day"`
+}
+
+type TimeBeforeCond2 struct {
+	BeforeTime DeleteTestLogCond `bson:"day"`
+	Uid        int64             `bson:"uid"`
+}
+type DeleteTestLogCond struct {
+	Day int64 `bson:"$lt"` //开始时间
+
+}
