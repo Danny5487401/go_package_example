@@ -4,13 +4,13 @@
     1. 手动实现rpc
     2. 手动实现stub
     3. json_rpc
-    3. http_rpc
+    4. http_rpc
 ## 第一章 服务注册中心consul
     1. 注册，过滤，获取
 ## 第二章 日志库zap
-    a. 源码结构
-    b. 控制台输出
-    c. 文件输出
+    1. 源码结构
+    2. 控制台输出
+    3. 文件输出
 ## 第三章 消息队列
     1. rabbitmq
         a. 消费者：推拉模式
@@ -24,46 +24,50 @@
 ## 第四章 配置文件中心Nacos
     4.1. 获取配置及监听文件变化
 ## 第五章 数据操作
-    5.1 GORM
-        a. GORM原理及实现 
-        b. 连接池使用
-    5.2 XORM
-        a. 主从连接
-    5.3 MongoDB
+    1 GORM
+        1.1 GORM原理及实现 
+        1.2 连接池使用
+    2 XORM
+        2.1 主从连接
+    3 MongoDB
         mongo和mysql储存引擎及内存结构
-    5.4 Redis
-        a. redigo使用
-        b. go-redis使用
+    4 Redis
+        4.1 redigo使用
+        4.2 go-redis使用
 ## 第六章 获取对外可用IP和端口
 ## 第七章 Gin前端form验证器
     1. 错误英转中
     2. 前端数据校验
 ## 第八章 GRPC编程 
-    8.1 HelloWorld分析Grpc源码
-    8.2 元数据metada
-    8.3 流式GRPC
-    8.4 protobuf的jsonpb包序列化和反序列化
-    8.5 负载均衡 
-    8.6 拦截器 
-    8.7 grpc错误抛出与捕获 
-    8.8 auth认证 
-    8.9 proto字段验证器 
-    8.10 grpc网关-直接对外http服务 
-    8.11 Grpc插件-gogoprotobuf
+    1 HelloWorld分析Grpc源码
+    2 元数据metada
+    3 流式GRPC
+    4 protobuf的jsonpb包序列化和反序列化
+    5 负载均衡 
+    6 拦截器 
+    7 grpc错误抛出与捕获 
+    8 auth认证 
+    9 proto字段验证器 
+    10 grpc网关-直接对外http服务 
+    11 Grpc插件-gogoprotobuf
 ## 第九章 错误及异常
 ## 第十章 链路追踪Jaeger
-    10.1 结合XORM
-    10.2 结合redis
+    1 结合XORM
+    2 结合redis
 ## 第十一章 依赖注入
-    11.1 dig依赖注入及http服务分层
-    11.2 wire依赖注入
+    1 dig依赖注入及http服务分层
+    2 wire依赖注入
 ## 第十一章 GRPC生态中间件
 ## 第十二章 测试框架testify
 ## 第十三章 序列化反序列化
-    13.1 Jsoniter(完全兼容标准库json，性能好)
-        13.1.1 序列化
-        13.1.2 反序列化
-    13.2 mapstructure使用（性能低但是方便）
+    1 Jsoniter(完全兼容标准库json，性能好)
+        1.1 序列化
+        1.2 反序列化
+    2 mapstructure使用（性能低但是方便）
+## 第十四章 系统监控指标
+## 第十五章 分布式事务
+    1 两阶段提交2pc
+## 第十六章 不同结构数据之间copy
 ## 第十九章 熔断和限流Sentinel
     0. 熔断，降级，限流的方法及官方包实现
     1. 流量控制
