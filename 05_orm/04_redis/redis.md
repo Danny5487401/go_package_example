@@ -35,8 +35,8 @@
 Redis五种数据类型应用场景
 ![](img/string.png)
 
-	1.String(sds): 常规的set/get操作,因为string 类型是二进制安全的，可以用来存放图片，视频等内容，另外由于Redis的高性能读写功能，
-		而string类型的value也可以是数字，一般做一些复杂的计数功能的缓存,还可以用作计数器（INCR,DECR），
+	1.String(sds,simple dynamic string简单动态字符串): 常规的set/get操作,因为string 类型是二进制安全的，可以用来存放图片，视频等内容，
+        另外由于Redis的高性能读写功能，而string类型的value也可以是数字，一般做一些复杂的计数功能的缓存,还可以用作计数器（INCR,DECR），
 		比如分布式环境中统计系统的在线人数，秒杀等
 
 		

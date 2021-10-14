@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"go_grpc_example/04_nacos_test/config"
+	"go_grpc_example/04_nacos/config"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"
@@ -13,14 +13,14 @@ import (
 )
 
 func main() {
-	// 服务端信息
+	// 1.服务端信息 ，至少一个
 	serverConfigs := []constant.ServerConfig{
 		{
 			IpAddr: "81.68.197.3",
 			Port:   8848,
 		},
 	}
-	// 客户端信息
+	// 2.客户端信息
 	clientConfig := constant.ClientConfig{
 		NamespaceId:         "84f5c407-5661-4306-abda-b51a9f02fba1", //we can retrieve multiple clients with different namespaceId to support multiple namespace.When namespace is public, fill in the blank string here.
 		TimeoutMs:           5000,
@@ -32,6 +32,7 @@ func main() {
 		LogLevel:            "debug",
 	}
 
+	//  3.创建动态配置客户端
 	// Create config client for dynamic configuration
 	clientCfg, err := clients.CreateConfigClient(map[string]interface{}{
 		"serverConfigs": serverConfigs,
@@ -41,7 +42,7 @@ func main() {
 		panic(err)
 	}
 
-	// 获取具体配置信息
+	// 4.获取具体配置信息
 	content, err := clientCfg.GetConfig(vo.ConfigParam{
 		//DataId: "user-web-dev.yaml",
 		DataId: "user-web-dev.json",
