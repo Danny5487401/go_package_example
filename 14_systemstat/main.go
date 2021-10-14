@@ -1,1 +1,4 @@
-package _4_systemstat
+package main
+
+func main() {
+}
