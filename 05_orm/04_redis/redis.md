@@ -39,19 +39,17 @@ Redis五种数据类型应用场景
         另外由于Redis的高性能读写功能，而string类型的value也可以是数字，一般做一些复杂的计数功能的缓存,还可以用作计数器（INCR,DECR），
 		比如分布式环境中统计系统的在线人数，秒杀等
 
-		
 ![](img/hash.png)
-
 
 	2. hash(hash table): value 存放的是键值对结构化后的对象，比较方便操作其中某个字段，比如可以做单点登录存放用户信息,以cookiele作为key，
 		设置30分钟为缓存过期时间，能很好的模拟出类似session的效
 		
 ![](img/list.png)
 
-	3. list(deque): 可以实现简单的消息队列，另外可以利用lrange命令，做基于redis的分页功能,性能极佳，用户体验好
+	3. list(deque): 发布和订阅、慢查询、监视器等都用到了链表，Redis服务器本身还是用链表来保存多个客户端的状态信息，以及使用链表来构建客户端输出缓冲区。
+    另外可以利用lrange命令，做基于redis的分页功能,性能极佳，用户体验好
 	
 ![](img/set.png)
-
 
 	4. set(intset+dict):由于底层是字典实现的，查找元素特别快，另外set 数据类型不允许重复，利用这两个特性我们可以进行全局去重，
 		比如在用户注册模块，判断用户名是否注册；另外就是利用交集、并集、差集等操作，可以计算共同喜好，全部的喜好，自己独有的喜好等功能
@@ -59,31 +57,162 @@ Redis五种数据类型应用场景
 ![](img/sort_set.png)		
 
 	5. Zset(skip list + hash table):有序的集合，可以做范围查找，排行榜应用，取 TOP N 操作等,还可以做延时任务
+
 ##RedisDB内部结构
 ![](.redis_images/redis_db_structure.png)
 
 ##Redis数据类型底层数据结构
 ![](.redis_images/redis_data_structure.png)
-###1.string(sds)
 
+###1.string(sds)
 ![](.redis_images/string_structure.png)
 ![](.redis_images/sdshdr.png)
 
+```c   
+typedef char *sds;
+```
+sds字符串根据字符串的长度，划分了五种结构体sdshdr5、sdshdr8、sdshdr16、sdshdr32、sdshdr64,分别对应的类型为SDS_TYPE_5、SDS_TYPE_8、SDS_TYPE_16、SDS_TYPE_32、SDS_TYPE_64
+每个sds 所能存取的最大字符串长度为：
+
+    sdshdr5最大为32(2^5)
+    sdshdr8最大为0xff(2^8-1)
+    sdshdr16最大为0xffff(2^16-1)
+    sdshdr32最大为0xffffffff(2^32-1)
+    sdshdr64最大为(2^64-1)
+SDS_TYPE_8结构体
+```c
+struct __attribute__ ((__packed__)) sdshdr8 {
+    uint8_t len; /* used */
+    uint8_t alloc; /* excluding the header and null terminator */
+    unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    char buf[];
+};
+
+```
 ###2.hash(ziplist+dict)
 ![](.redis_images/ziplist.png)
 ![](.redis_images/dict.png)
+字典的结构体
+```c
+//dict.h
+typedef struct dict {
+    dictType *type;
+    void *privdata;
+    // ht是一个长度为2的数组，对应的是两个哈希表，一般使用使用ht[0],ht[1]主要在扩容和缩容时使用。
+    dictht ht[2];
+    long rehashidx; /* rehashing not in progress if rehashidx == -1 */
+    unsigned long iterators; /* number of iterators currently running */
+} dict;
+
+```
+哈希表结构体
+```c
+typedef struct dictht {
+	//哈希表数组,对应的是多个哈希表节点dictEntry
+    dictEntry **table;
+    //哈希表大小
+    unsigned long size;
+   	//哈希表大小的掩码,用于计算索引值
+   	//总是等于size-1
+    unsigned long sizemask;
+   	//已有节点的数量
+    unsigned long used;
+} dictht;
+```
+哈希表节点key/value结构体定义
+```c
+typedef struct dictEntry {
+	//键
+    void *key;
+    //值
+    union {
+        void *val;
+        uint64_t u64;
+        int64_t s64;
+        double d;
+    } v;
+    //指向下一个哈希表节点,形成链表
+    struct dictEntry *next;
+} dictEntry
+```
+哈希表每个节点都保存着一个键值对，key就是键值对的键，v属性就是对应键值对的值，v可以是一个指针也可以是uint64_t,整数也可以是int64_t整数。 
+next是一个链表，指向着下一个哈希表节点，这个指针可以将多个哈希值相同的键值对连接在一起，以此来解决哈希冲突问题。
 
 ###3.set(intset+dict)
 ![](.redis_images/intset.png)
 ![](.redis_images/dict.png)
+整数集合intset是集合键的底层实现之一，当一个集合只包含整数值元素，并且这个集合的元素数量不多时，Redis就会使用整数集合键的底层实现。
+```c
+typedef struct intset {
+	//编码方式
+    uint32_t encoding;
+    //集合包含的元素数量
+    uint32_t length;
+    //保存元素的数组
+    int8_t contents[];
+} intset;
+```
+contents数组是整数集合的底层实现：整数集合的每个元素都是contents数组的一个数据项(item),各个项在数组中按值得大小从小到大有序得排列，并且数组中不包含任何重复项
+
+虽然intset结构将contents属性声明为int8_t类型的数组，但实际上contents并不保存任何int8_t类型的值，contents数组得真正类型取决于encoding属性的值:
+
+    如果encoding属性得值为INTSET_ENC_INT16，那么contents就是一个int16_t类型的数组，数组里得每个项都是一个int16_t类型的整数值(最小值为-32768,最大值为32767)。
+    
+    如果encoding属性得值为INTSET_ENC_INT32，那么contents就是一个int32_t类型的数组，数组里的每个项都是一个int32_t类型的整数值(最小值为-2147483648,最大值为2147483648)。
+    
+    如果encoding属性的值为INTSET_ENC_INT64,那么contents就是一个int64_t类型的数组，数组里的每个项都是一个int64_t类型得整数值(最小值为-9223372036854775808,9223372036854775808)
+length属性记录了整数集合包含得元素数量，也即是contents数组得长度。
 
 ###4.list(ziplist+quicklist)
 ![](.redis_images/ziplist.png)
 ![](.redis_images/quicklist.png)
+```c
+//链表节点adlist.h/listNode
+typedef struct listNode {
+    struct listNode *prev;//前置节点
+    struct listNode *next;//后置节点
+    void *value;//节点值
+} listNode;
+
+typedef struct list {
+    listNode *head;//表头节点
+    listNode *tail;//表尾节点
+    //节点值复制函数
+    void *(*dup)(void *ptr);
+    //节点值释放函数
+    void (*free)(void *ptr);
+    //节点值对比函数
+    int (*match)(void *ptr, void *key);
+    unsigned long len;
+} list;
+```
 
 
 ###5.Sort Set(hash+skiptable)
 ![](.redis_images/skiptable.png)
+跳跃表的结构
+```c
+//定义在server.h/zskiplist
+typedef struct zskiplistNode {
+    sds ele;//成员对象
+    double score;//分数
+    struct zskiplistNode *backward;
+    //层
+    struct zskiplistLevel {
+    	//前进指针
+        struct zskiplistNode *forward;
+        //跨度
+        unsigned long span;
+    } level[];
+    
+} zskiplistNode;
+
+typedef struct zskiplist {
+    struct zskiplistNode *header, *tail;
+    unsigned long length; // 跳跃表的长度
+    int level; // 记录跳跃表内，层数最大的那个节点的层数
+} zskiplist;
+```
 
 
 ###6.stream(radix-tree)
