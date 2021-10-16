@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/coreos/etcd/clientv3"
-	"go_grpc_example/log_collect/logAgent/utils"
+	"go_grpc_example/18_log_collect/logAgent/utils"
 	"time"
 )
 

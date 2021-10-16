@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"go_grpc_example/log_collect/logAgent/conf"
-	"go_grpc_example/log_collect/logAgent/etcd"
-	"go_grpc_example/log_collect/logAgent/kafka"
-	tailLog "go_grpc_example/log_collect/logAgent/tail_log"
-	"go_grpc_example/log_collect/logAgent/utils"
+	"go_grpc_example/18_log_collect/logAgent/conf"
+	"go_grpc_example/18_log_collect/logAgent/etcd"
+	"go_grpc_example/18_log_collect/logAgent/kafka"
+	tailLog "go_grpc_example/18_log_collect/logAgent/tail_log"
+	"go_grpc_example/18_log_collect/logAgent/utils"
 	"sync"
 	"time"
 

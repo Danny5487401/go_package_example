@@ -2,7 +2,7 @@ package tailLog
 
 import (
 	"fmt"
-	"go_grpc_example/log_collect/logAgent/etcd"
+	"go_grpc_example/18_log_collect/logAgent/etcd"
 	"time"
 )
 

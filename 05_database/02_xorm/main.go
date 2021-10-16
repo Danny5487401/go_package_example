@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"go_grpc_example/05_orm/02_xorm/models"
+	"go_grpc_example/05_database/02_xorm/models"
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"go_grpc_example/05_orm/02_xorm/util"
+	"go_grpc_example/05_database/02_xorm/util"
 )
 
 func main() {

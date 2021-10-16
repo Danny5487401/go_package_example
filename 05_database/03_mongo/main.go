@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"time"
 
-	"go_grpc_example/05_orm/03_mongo/model"
-	"go_grpc_example/05_orm/03_mongo/util"
+	"go_grpc_example/05_database/03_mongo/model"
+	"go_grpc_example/05_database/03_mongo/util"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
