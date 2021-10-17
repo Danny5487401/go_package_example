@@ -32,20 +32,28 @@ func initEngine() {
 	url := "ali.danny.games:27017"
 	dbname := "db1"
 	auth := "authSource=admin"
+
+	var numPool uint64 = 10
 	//开启auth认证
 	uri := "mongodb://" + user + ":" + password + "@" + url + "/" + dbname + "?" + auth
 	var err error
 
+	// primary （只主）只从 primary 节点读数据，这个是默认设置
 	mode, err := readpref.ModeFromString("primary")
 	if err != nil {
 		return
 	}
 	rp, err := readpref.New(mode)
+
 	if err != nil {
 		return
 	}
+	opt := options.Client().SetReadPreference(rp).ApplyURI(uri)
 
-	opts := []*options.ClientOptions{options.Client().SetReadPreference(rp).ApplyURI(uri)}
+	// 设置连接池,默认100
+	opt.SetMaxPoolSize(numPool)
+
+	opts := []*options.ClientOptions{opt}
 
 	// 添加中间件
 	opts = append(opts, options.Client().SetMonitor(getMonitor()))
