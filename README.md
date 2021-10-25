@@ -51,9 +51,10 @@
     10 grpc网关-直接对外http服务 
     11 Grpc插件-gogoprotobuf
 ## 第九章 错误及异常
-## 第十章 链路追踪Jaeger
-    1 结合XORM
-    2 结合redis
+## 第十章 链路追踪(Distributed Tracing)
+    1.Jaeger
+        1.1 结合XORM
+        1.2 结合redis
 ## 第十一章 依赖注入
     1 dig依赖注入及http服务分层
     2 wire依赖注入
