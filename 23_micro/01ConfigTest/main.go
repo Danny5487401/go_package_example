@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/micro/go-micro/config/encoder/json"
+	"github.com/micro/go-micro/config/encoder/yaml"
 	"github.com/micro/go-micro/config/source"
 	"time"
 
@@ -11,13 +12,21 @@ import (
 )
 
 func main() {
-	//指定编码器
 
-	// 加载配置文件
-	if err := config.Load(file.NewSource(
+	// 配置来源
+	jsonSource := file.NewSource(
+		//从文件中读取
 		file.WithPath("23_micro/01ConfigTest/config/config.json"),
-		source.WithEncoder(json.NewEncoder()),
-	)); err != nil {
+		//指定json编码器
+		source.WithEncoder(json.NewEncoder()))
+
+	yamlSource := file.NewSource( //从文件中读取
+		file.WithPath("23_micro/01ConfigTest/config/config.yaml"),
+		//指定json编码器
+		source.WithEncoder(yaml.NewEncoder()))
+
+	// 后面读取的优先级越高，所以yaml的配置会覆盖json的配置
+	if err := config.Load(jsonSource, yamlSource); err != nil {
 		fmt.Println(err)
 		return
 	}
@@ -33,7 +42,7 @@ func main() {
 	go func() {
 		for range time.Tick(time.Second) {
 			conf := config.Map()
-			fmt.Println(conf)
+			fmt.Printf("配置是%+v\n", conf)
 		}
 	}()
 	select {}
