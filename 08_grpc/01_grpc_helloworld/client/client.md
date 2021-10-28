@@ -1,11 +1,56 @@
 #client源码分析
 
+连接对象
+```go
+type ClientConn struct {
+	ctx    context.Context
+	cancel context.CancelFunc
+
+	target       string
+	parsedTarget resolver.Target
+	authority    string
+	dopts        dialOptions
+	csMgr        *connectivityStateManager
+
+	balancerBuildOpts balancer.BuildOptions
+	blockingpicker    *pickerWrapper
+
+	safeConfigSelector iresolver.SafeConfigSelector
+
+	mu              sync.RWMutex
+	resolverWrapper *ccResolverWrapper
+	sc              *ServiceConfig
+	conns           map[*addrConn]struct{}
+	// Keepalive parameter can be updated if a GoAway is received.
+	mkp             keepalive.ClientParameters
+	curBalancerName string
+	balancerWrapper *ccBalancerWrapper
+	retryThrottler  atomic.Value
+
+	firstResolveEvent *grpcsync.Event
+
+	channelzID int64 // channelz unique identification number
+	czData     *channelzData
+
+	lceMu               sync.Mutex // protects lastConnectionError
+	lastConnectionError error
+}
+```
+
 一,grpc.Dial 方法实际上是对于 grpc.DialContext 的封装，区别在于 ctx 是直接传入 context.Background。
+
+首先要做的就是调用Dial或DialContext函数来初始化一个clientConn对象，而resolver是这个连接对象的一个重要的成员，
+所以我们首先看一看clientConn对象创建过程中，resolver是怎么设置进去的。
+
+客户端启动时，一定会调用grpc的Dial或DialContext函数来创建连接，而这两个函数都需要传入一个名为target的参数，target，就是连接的目标，也就是server了，
+接下来，我们就看一看，DialContext函数里是如何处理这个target的.
+
+首先，创建了一个clientConn对象，并把target赋给了对象中的target：
 
 ```go
 func DialContext(ctx context.Context, target string, opts ...DialOption) (conn *ClientConn, err error) {
     cc := &ClientConn{
-        target:            target,
+        target:            target,  //将target连接对象赋给了对象中的target
         csMgr:             &connectivityStateManager{},
         conns:             make(map[*addrConn]struct{}),
         dopts:             defaultDialOptions(),
@@ -20,6 +65,43 @@ func DialContext(ctx context.Context, target string, opts ...DialOption) (conn *
     ...
 }
 ```
+
+对target进行解析
+```go
+	cc.parsedTarget = grpcutil.ParseTarget(cc.target, cc.dopts.copts.Dialer != nil)
+```
+解析完target之后执行的是下面这一句：
+```go
+	resolverBuilder := cc.getResolver(cc.parsedTarget.Scheme)
+	
+```
+也就是在根据解析的结果，包括scheme和endpoint这两个参数，获取一个resolver的builder
+```go
+func (cc *ClientConn) getResolver(scheme string) resolver.Builder {
+	for _, rb := range cc.dopts.resolvers {
+		if scheme == rb.Scheme() {
+			return rb
+		}
+	}
+	return resolver.Get(scheme)
+}
+```
+
+Get函数是通过m这个map，去查找有没有scheme对应的resolver的builder，那么m这个map是什么时候插入的值呢？这个在resolver的Register函数里
+```go
+func Register(b Builder) {
+	m[b.Scheme()] = b
+}
+```
+
+那么谁会去调用这个Register函数，向map中写入resolver呢？有两个人会去调，首先，grpc实现了一个默认的解析器，也就是"passthrough"，这个看名字就理解了，就是透传，所谓透传就是，什么都不做，那么什么时候需要透传呢？当你调用DialContext的时候，如果传入的target本身就是一个ip+port，这个时候，自然就不需要再解析什么了。那么"passthrough"对应的这个默认的解析器是什么时候注册到m这个map中的呢？这个调用在passthrough包的init函数里
+```go
+
+func init() {
+	resolver.Register(&passthroughBuilder{})
+}
+```
+
 
 其主要功能是创建与给定目标的客户端连接，其承担了以下职责
 
@@ -57,7 +139,30 @@ func NewGreeterClient(cc *grpc.ClientConn) GreeterClient {
 }
 ```
 三。调用
-	实际上调用的还是 grpc.invoke 方法。
+
+底层http2连接对应的是一个grpc的stream，而stream的创建有两种方式
+
+	1.一种就是我们主动去创建一个stream池，这样当有请求需要发送时，我们可以直接使用我们创建好的stream，
+
+	2.除了我们自己创建，我们使用protoc为我们生成的客户端接口里，也会为我们实现stream的创建，也就是说这个完全是可以不用我们自己费心的
+
+```go
+// Invoke sends the RPC request on the wire and returns after response is
+// received.  This is typically called by generated code.
+//
+// All errors returned by Invoke are compatible with the status package.
+func (cc *ClientConn) Invoke(ctx context.Context, method string, args, reply interface{}, opts ...CallOption) error {
+	// allow interceptor to see all applicable call options, which means those
+	// configured as defaults from dial option as well as per-call options
+	opts = combine(cc.dopts.callOptions, opts)
+
+	if cc.dopts.unaryInt != nil {
+		return cc.dopts.unaryInt(ctx, method, args, reply, cc, invoke, opts...)
+	}
+	return invoke(ctx, method, args, reply, cc, opts...)
+}
+```
+在没有设置拦截器的情况下，会直接调invoke
 
 ```go
 func invoke(ctx context.Context, method string, req, reply interface{}, cc *ClientConn, opts ...CallOption) error {
