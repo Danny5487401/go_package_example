@@ -19,19 +19,35 @@ func main() {
 	wg.Wait()
 }
 
-func testRedisBase() {
-	defer wg.Done()
-
+func InitCache(conf *RedisConfig) {
 	//连接服务器
 	redisdb = redis.NewClient(&redis.Options{
-		Addr:     "ali.danny.games:6379", // use default Addr
-		Password: "",                     // no password set
-		DB:       1,                      // use default DB
+		Addr:         conf.Addr,
+		DB:           conf.DB,
+		PoolSize:     conf.PoolSize,
+		IdleTimeout:  time.Duration(conf.IdleTimeout) * time.Second,
+		DialTimeout:  time.Duration(conf.DialTimeout) * time.Second,
+		ReadTimeout:  time.Duration(conf.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(conf.WriteTimeout) * time.Second,
 	})
-
 	//心跳
 	pong, err := redisdb.Ping().Result()
 	log.Println(pong, err) // Output: PONG <nil>
+}
+
+func testRedisBase() {
+	conf := &RedisConfig{
+		Addr:         "ali.danny.games:6379",
+		DB:           1,
+		PoolSize:     10, // 连接池大小
+		IdleTimeout:  30, // 客户端关闭空闲连接的时间
+		DialTimeout:  1,
+		ReadTimeout:  1,
+		WriteTimeout: 1,
+	}
+
+	defer wg.Done()
+	InitCache(conf)
 
 	ExampleClient_String()
 	//ExampleClient_List()
@@ -45,6 +61,16 @@ func testRedisBase() {
 	//ExampleClient_Script()
 	//ExampleClient_PubSub()
 
+}
+
+type RedisConfig struct {
+	Addr         string `yaml:"addr"`
+	DB           int    `yaml:"db"`
+	PoolSize     int    `yaml:"pool_size"`
+	IdleTimeout  int    `yam:"idle_timeout"`
+	DialTimeout  int    `yam:"dial_timeout"`
+	ReadTimeout  int    `yam:"read_timeout"`
+	WriteTimeout int    `yam:"write_timeout"`
 }
 
 func ExampleClient_String() {
