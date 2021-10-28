@@ -39,7 +39,9 @@
     1. 错误英转中
     2. 前端数据校验
 ## 第八章 GRPC编程 
-    1 HelloWorld分析Grpc源码
+    1 HelloWorld分析
+        1.1 客户端Grpc源码
+        1.2 服务端Grpc源码
     2 元数据metada
     3 流式GRPC
     4 protobuf的jsonpb包序列化和反序列化

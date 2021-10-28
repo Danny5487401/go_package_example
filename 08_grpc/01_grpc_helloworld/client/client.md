@@ -1,4 +1,7 @@
 #client源码分析
+因为gRPC没有提供服务注册，服务发现的功能，所以需要开发者自己编写服务发现的逻辑：也就是Resolver——解析器。
+
+在得到了解析的结果，也就是一连串的IP地址之后，需要对其中的IP进行选择，也就是Balancer
 
 连接对象
 ```go
@@ -49,40 +52,37 @@ type ClientConn struct {
 
 ```go
 func DialContext(ctx context.Context, target string, opts ...DialOption) (conn *ClientConn, err error) {
-    cc := &ClientConn{
-        target:            target,  //将target连接对象赋给了对象中的target
-        csMgr:             &connectivityStateManager{},
-        conns:             make(map[*addrConn]struct{}),
-        dopts:             defaultDialOptions(),
-        blockingpicker:    newPickerWrapper(),
-        czData:            new(channelzData),
-        firstResolveEvent: grpcsync.NewEvent(),
-    }
-    ...
-    chainUnaryClientInterceptors(cc)
-    chainStreamClientInterceptors(cc)
 
-    ...
-}
-```
-
-对target进行解析
-```go
+	// 1.创建ClientConn结构体
+	cc := &ClientConn{
+		target:            target, //将target连接对象赋给了对象中的target
+		//...
+	}
+	
+	// 2.解析target
 	cc.parsedTarget = grpcutil.ParseTarget(cc.target, cc.dopts.copts.Dialer != nil)
-```
-解析完target之后执行的是下面这一句：
-```go
+	
+	// 3.根据解析的target找到合适的resolverBuilder
 	resolverBuilder := cc.getResolver(cc.parsedTarget.Scheme)
 	
+	// 4.创建Resolver
+	rWrapper, err := newCCResolverWrapper(cc, resolverBuilder)
+	
+	// 5.完事
+	return cc, nil
+
 ```
+
 也就是在根据解析的结果，包括scheme和endpoint这两个参数，获取一个resolver的builder
 ```go
 func (cc *ClientConn) getResolver(scheme string) resolver.Builder {
+    // 先查看是否在配置中存在resolver
 	for _, rb := range cc.dopts.resolvers {
 		if scheme == rb.Scheme() {
 			return rb
 		}
 	}
+    // 如果配置中没有相应的resolver，再从注册的resolver中寻找
 	return resolver.Get(scheme)
 }
 ```
@@ -94,7 +94,11 @@ func Register(b Builder) {
 }
 ```
 
-那么谁会去调用这个Register函数，向map中写入resolver呢？有两个人会去调，首先，grpc实现了一个默认的解析器，也就是"passthrough"，这个看名字就理解了，就是透传，所谓透传就是，什么都不做，那么什么时候需要透传呢？当你调用DialContext的时候，如果传入的target本身就是一个ip+port，这个时候，自然就不需要再解析什么了。那么"passthrough"对应的这个默认的解析器是什么时候注册到m这个map中的呢？这个调用在passthrough包的init函数里
+那么谁会去调用这个Register函数，向map中写入resolver呢 ？
+
+    有两个人会去调，首先，grpc实现了一个默认的解析器，也就是"passthrough"，这个看名字就理解了，就是透传，所谓透传就是，什么都不做，那么什么时候需要透传呢？
+    当你调用DialContext的时候，如果传入的target本身就是一个ip+port，这个时候，自然就不需要再解析什么了。
+    那么"passthrough"对应的这个默认的解析器是什么时候注册到m这个map中的呢？这个调用在passthrough包的init函数里
 ```go
 
 func init() {
@@ -102,8 +106,75 @@ func init() {
 }
 ```
 
+ResolverWrapper的创建
+```go
+func newCCResolverWrapper(cc *ClientConn, rb resolver.Builder) (*ccResolverWrapper, error) {
+	ccr := &ccResolverWrapper{
+		cc:   cc,
+		done: grpcsync.NewEvent(),
+	}
+  
+  // 根据传入的Builder，创建resolver，并放入wrapper中
+  ccr.resolver, err = rb.Build(cc.parsedTarget, ccr, rbo)
+ 	return ccr, nil
+}
+```
 
-其主要功能是创建与给定目标的客户端连接，其承担了以下职责
+为了解耦Resolver和Balancer，我们希望能够有一个中间的部分，接收到Resolver解析到的地址，然后对它们进行负载均衡。
+因此，在接下来的代码阅读过程中，我们可以带着这个问题：Resolver和Balancer的通信过程是什么样的
+
+
+在创建Resolver的时候，我们需要在Build方法里面初始化Resolver的各种状态。并且，因为Build方法中有一个target的参数，我们会在创建Resolver的时候，需要对这个target进行解析。
+
+也就是说，创建Resolver的时候，会进行第一次的域名解析。并且，这个解析过程，是由开发者自己设计的。
+
+到了这里我们会自然而然的接着考虑，解析之后的结果应该保存为什么样的数据结构，又应该怎么去将这个结果传递下去呢？
+
+我们拿最简单的passthroughResolver来举例
+```go
+func (*passthroughBuilder) Build(target resolver.Target, cc resolver.ClientConn, opts resolver.BuildOptions) (resolver.Resolver, error) {
+	r := &passthroughResolver{
+		target: target,
+		cc:     cc,
+	}
+  // 创建Resolver的时候，进行第一次的解析
+	r.start()
+	return r, nil
+}
+
+// 对于passthroughResolver来说，正如他的名字，直接将参数作为结果返回
+func (r *passthroughResolver) start() {
+	r.cc.UpdateState(resolver.State{Addresses: []resolver.Address{{Addr: r.target.Endpoint}}})
+```
+我们可以看到，对于一个Resolver，需要将解析出的地址，传入resolver.State中，然后调用r.cc.UpdateState方法。
+
+那么这个r.cc.UpdateState又是什么呢？
+
+他就是我们上面提到的ccResolverWrapper。
+
+这个时候逻辑就很清晰了，gRPC的ClientConn通过调用ccResolverWrapper来进行域名解析，而具体的解析过程则由开发者自己决定。在解析完毕后，将解析的结果返回给ccResolverWrapper
+
+
+balancer的选择
+我们因此也可以进行推测：在ccResolverWrapper中，会将解析出的结果以某种形式传递给Balancer
+```go
+func (ccr *ccResolverWrapper) UpdateState(s resolver.State) error {
+    //...
+	// 将Resolver解析的最新状态保存下来
+	ccr.curState = s
+
+	//...
+	
+	// 对状态进行更新
+	if err := ccr.cc.updateResolverState(ccr.curState, nil); err == balancer.ErrBadResolverState {
+        return balancer.ErrBadResolverState
+    }
+    return nil
+}
+```
+总结
+
+    其主要功能是创建与给定目标的客户端连接，其承担了以下职责
 
     1.初始化 ClientConn
     2.初始化（基于进程 LB）负载均衡配置
