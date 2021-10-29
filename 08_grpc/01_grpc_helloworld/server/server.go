@@ -2,6 +2,7 @@ package main
 
 import (
 	"go_grpc_example/08_grpc/01_grpc_helloworld/proto"
+	"strconv"
 
 	"google.golang.org/grpc"
 
@@ -14,7 +15,8 @@ type Server struct {
 
 func (s *Server) SayHello(ctx context.Context, request *proto.HelloRequest) (*proto.HelloReply, error) {
 	return &proto.HelloReply{
-		Message: "hello," + request.Name,
+		Message: "hello," + request.Name + strconv.Itoa(int(request.Age)),
+		Age:     request.Age,
 	}, nil
 }
 
@@ -33,3 +35,5 @@ func main() {
 
 	_ = g.Serve(lis)
 }
+
+//注意：更改protobuf文件，先后上线server和client端没有影响
