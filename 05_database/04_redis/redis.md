@@ -1,4 +1,4 @@
-#Redis:
+#Redis
 
 ![](img/redis_info.png)
 
@@ -27,6 +27,7 @@
 
 ##Redis协议
 ![](.redis_images/redis_scheme.png)
+
 Redis客户端使用RESP（Redis的序列化协议）协议与Redis的服务器端进行通信。 虽然该协议是专门为Redis设计的，但是该协议也可以用于其他 客户端-服务器 （Client-Server）软件项目。RESP是对以下几件事情的折中实现：
     
     1、实现简单
@@ -62,9 +63,9 @@ RESP实际上是一个支持以下数据类型的序列化协议：简单字符�
 ##Reactor 单线程的Redis为什么这么快?
 ![](.redis_images/reason_why_redis_so_fast.png)
 
-	# 1. 基于内存的访问，非阻塞I/O，Redis使用事件驱动模型epoll多路复用实现，连接，读写，关闭都转换为事件不在网络I/O上浪费过多的时间.
-	# 2. 单线程避免高并发的时候，多线程有锁的问题和线程切换的CPU开销问题.《虽然是单线程，但可以开多实例弥补》
-	# 3. 使用C语言编写，更好的发挥服务器性能，并且代码简介，性能高
+	* 1. 基于内存的访问，非阻塞I/O，Redis使用事件驱动模型epoll多路复用实现，连接，读写，关闭都转换为事件不在网络I/O上浪费过多的时间.
+	* 2. 单线程避免高并发的时候，多线程有锁的问题和线程切换的CPU开销问题.《虽然是单线程，但可以开多实例弥补》
+	* 3. 使用C语言编写，更好的发挥服务器性能，并且代码简介，性能高
 	
 Redis6.0后引入多线程提速：
 ![](.redis_images/reactor_model.png)
@@ -114,7 +115,7 @@ Redis6.0后引入多线程提速：
 
 	5. Zset(skip list + hash table):有序的集合，可以做范围查找，排行榜应用，取 TOP N 操作等,还可以做延时任务
 	
-扩展：
+###扩展：
 1.bitmap
     
     BitMap 原本的含义是用一个比特位来映射某个元素的状态。由于一个比特位只能表示 0 和 1 两种状态，所以 BitMap 能映射的状态有限，
@@ -400,13 +401,17 @@ Redis集群特点
     5. 客户端可以连任何一个主节点进行读写
 
 集群方案
+
 ![](.redis_images/codis_vs_cluster.png)
+
     1. vip多线程版本 twemproxy(Twitter开源)
     2. codis
+
 ![](.redis_images/codis.png)
+
     3. redis cluster
 ![](.redis_images/redis_cluster.png)
 
-#高并发缓存
+##高并发缓存
 ![](.redis_images/high_concurrency_buffer.png)
 

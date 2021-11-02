@@ -49,9 +49,9 @@ func testRedisBase() {
 	defer wg.Done()
 	InitCache(conf)
 
-	ExampleClient_String()
+	//ExampleClient_String()
 	//ExampleClient_List()
-	ExampleClient_Hash()
+	//ExampleClient_Hash()
 	//ExampleClient_Set()
 	//ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
@@ -59,7 +59,7 @@ func testRedisBase() {
 	//ExampleClient_Scan()
 	//ExampleClient_Tx() // 事物pipeline
 	//ExampleClient_Script()
-	//ExampleClient_PubSub()
+	ExampleClient_PubSub()
 
 }
 
@@ -305,12 +305,25 @@ func ExampleClient_PubSub() {
 	log.Println("ExampleClient_PubSub")
 	defer log.Println("ExampleClient_PubSub")
 	//发布订阅
-	pubsub := redisdb.Subscribe("subkey")
-	_, err := pubsub.Receive()
+
+	//开始订阅
+	pubSub := redisdb.Subscribe("subkey")
+	iface, err := pubSub.Receive()
+	switch iface.(type) {
+	case *redis.Subscription:
+		fmt.Println("subscribe succeeded")
+	case *redis.Message:
+		fmt.Println("received first message")
+	case *redis.Pong:
+		// pong received
+	default:
+		// handle error
+	}
 	if err != nil {
 		log.Fatal("pubsub.Receive")
 	}
-	ch := pubsub.Channel()
+	ch := pubSub.Channel()
+	// 定时发布消息
 	time.AfterFunc(1*time.Second, func() {
 		log.Println("Publish")
 
@@ -322,8 +335,9 @@ func ExampleClient_PubSub() {
 		redisdb.Publish("subkey", "test publish 2")
 	})
 	for msg := range ch {
-		log.Println("recv channel:", msg.Channel, msg.Pattern, msg.Payload)
+		log.Printf("recv channel:%+v,pattern:%+v，payload:%+v", msg.Channel, msg.Pattern, msg.Payload)
 	}
+
 }
 
 func ExampleClient_CMD() {
