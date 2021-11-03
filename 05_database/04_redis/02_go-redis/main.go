@@ -57,7 +57,7 @@ func testRedisBase() {
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
-	//ExampleClient_Tx() // 事物pipeline
+	ExampleClient_Tx() // 事物pipeline
 	//ExampleClient_Script()
 	ExampleClient_PubSub()
 
@@ -380,6 +380,7 @@ func ExampleClient_Scan() {
 
 // 事务pipeline
 func ExampleClient_Tx() {
+
 	pipe := redisdb.TxPipeline()
 	incr := pipe.Incr("tx_pipeline_counter")
 	boolCmd := pipe.Expire("tx_pipeline_counter", time.Hour)

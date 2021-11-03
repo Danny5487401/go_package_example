@@ -20,7 +20,13 @@ Go-Redis 的链接池链接池有三种：
     ConnPool： 实现了真的连接池
 这里我们重点说明 ConnPool，因为 StickyConnPool 和 SingleConnPool 是根据 ConnPool 封装出来的。
 
+###连接池的三种状态
+![](.go-redis_pool_images/conn_status.png)
+using 正在使用中、idle 闲置待命中、stale 已失效待回收（闲置时间过长、存活时间过长）；conns队列中的连接按创建时间排序，而idleConns队列则面向 Get, Put, reaper 操作，顺序不定
+
 一个典型的链接池设计都会包含以下几个功能：连接建立、管理连接、连接释放
+
+
 连接池接口
 ```go
 type Pooler interface {
@@ -51,12 +57,12 @@ type ConnPool struct {
     queue chan struct{} // 工作连接队列
 
     connsMu      sync.Mutex // 连接队列锁
-    conns        []*Conn // 连接队列
-    idleConns    []*Conn // 空闲连接队列
+    conns        []*Conn // 全局连接队列，面向新建和关闭连接
+    idleConns    []*Conn // 闲置连接队列，面向 Get,Put,reaper 操作
     poolSize     int // 连接池大小
     idleConnsLen int // 空闲连接队列长度
 
-    stats Stats // 连接池统计
+    stats Stats // 连接池命中率、错误率等统计信息
 
     _closed  uint32 // 连接池关闭标志，atomic
     closedCh chan struct{} // 通知连接池关闭通道
@@ -137,6 +143,13 @@ func (p *ConnPool) Close() error {
     2。关闭 closedCh 通道，连接池中的所有协程都可以通过判断该通道是否关闭来确定连接池是否已经关闭。
     3。连接队列锁上锁，关闭队列中的所有连接，并置空所有维护连接池状态的数据结构，解锁。
 ###连接管理
+```go
+type Pooler interface {
+    Get(context.Context) (*Conn, error)   // 取 // 操作前 connsMu 加锁保证线程安全
+    Put(context.Context, *Conn)           // 写 // 约定 Context 为第一个参数做超时控制
+    Remove(context.Context, *Conn, error) // 删
+}
+```
 ####连接建立
 连接的建立会先判断是否需要熔断，如果不需要，则会进行连接的建立，将连接包装为自己的conn，记录使用的时间，
 熔断机制：当所有连接都失败后，再新建连接将直接返回错误；同时在单独的 goroutine 中轮询探测服务端可用性，若成功则及时终止熔断
@@ -168,6 +181,48 @@ func (p *ConnPool) newConn(pooled bool) (*Conn, error) {
 
 ```
 ####从连接池获取
+信号量
+![](.go-redis_pool_images/redis_semaphore.png)
+
+    连接池是典型的信号量资源，Get 操作先到先得否则等待。但由于 sync.semaphore 仅支持 contenxt 控制超时，Get 操作还需实现 PoolTimeout 等待超时，
+    故用缓冲 channel 实现了信号量的 accquire, release 逻辑；
+```go
+// accquire
+func (p *ConnPool) waitTurn(ctx context.Context) error {
+    select {
+    case <-ctx.Done(): // 操作超时及时返回
+        return ctx.Err()
+    default:
+    }
+    select {
+    case p.queue <- struct{}{}: // 优化：尝试直接 accquire
+        return nil
+    default:
+    }
+
+    timer := timers.Get().(*time.Timer) // sync.Pool 优化过的高频临时对象
+    timer.Reset(p.opt.PoolTimeout)
+    select {
+    case <-ctx.Done(): // 1. 操作超时
+        if !timer.Stop() { <-timer.C }
+        timers.Put(timer)
+        return ctx.Err()
+    case p.queue <- struct{}{}: // 2. accquire 成功
+        if !timer.Stop() { <-timer.C }
+        timers.Put(timer)
+        return nil
+    case <-timer.C: // 3. 等待超时
+        timers.Put(timer)
+        return ErrPoolTimeout
+    }
+}
+
+// release
+func (p *ConnPool) freeTurn() {
+    <-p.queue
+}
+```
+![](.go-redis_pool_images/conn_pool_get.png)    
 先从idleConns队列取 idle 连接，若实为 stale 连接则回收，若无可用的 idle 连接则穿透新建连接
 ```go
 func (p *ConnPool) Get() (*Conn, error) {
@@ -322,4 +377,7 @@ func (p *ConnPool) reapStaleConn() *Conn {
     2.创建一个时间间隔为 frequency 的计时器，在连接池关闭时关闭该计时器
     3.循环判断计时器是否到时和连接池是否关闭
     4.移除空闲连接队列中的过期连接
+
+总结
+    优秀设计：用缓冲 channel 模拟信号量实现精确的超时控制、用连接错误数实现了穿透熔断、用 reaper goroutine 定时回收 stale 连接
 
