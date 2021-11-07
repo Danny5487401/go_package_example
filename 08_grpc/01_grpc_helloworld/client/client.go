@@ -5,6 +5,7 @@ import (
 	"go_grpc_example/08_grpc/01_grpc_helloworld/proto"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
+	"time"
 )
 
 func main() {
@@ -15,14 +16,18 @@ func main() {
 	}
 	defer conn.Close()
 	c := proto.NewGreeterClient(conn)
+	for {
+		r, err := c.SayHello(context.Background(), &proto.HelloRequest{
+			Name: "danny",
+			Age:  18,
+		}) // 核心调用的是 Invoke 方法，具体实现要看grpc.ClientConn中
+		// grpc.ClientConn中实现了Invoke方法，在call.go文件中，详情都在invoke
 
-	r, err := c.SayHello(context.Background(), &proto.HelloRequest{
-		Name: "danny",
-	}) // 核心调用的是 Invoke 方法，具体实现要看grpc.ClientConn中
-	// grpc.ClientConn中实现了Invoke方法，在call.go文件中，详情都在invoke
-
-	if err != nil {
-		panic(err)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(r.Message, r.GetAge())
+		time.Sleep(time.Second * 10)
 	}
-	fmt.Println(r.Message)
+
 }

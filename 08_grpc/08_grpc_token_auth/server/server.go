@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"go_grpc_example/08_grpc/06_grpc_interpretor/proto"
+	"go_grpc_example/08_grpc/08_grpc_token_auth/proto"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"

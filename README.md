@@ -6,7 +6,7 @@
     3. json_rpc
     4. http_rpc
 ## 第一章 服务注册中心consul
-    1. 注册，过滤，获取
+    1. 服务注册，过滤，获取
 ## 第二章 日志库zap
     1. 源码结构
     2. 控制台输出
@@ -30,16 +30,23 @@
     2 XORM
         2.1 主从连接
     3 MongoDB
+        3.1 增删改查
         mongo和mysql储存引擎及内存结构
-    4 Redis
+    4 Redis(协议，原理，数据结构分析)
         4.1 redigo使用
         4.2 go-redis使用
+            4.2.1 连接池分析
+            4.2.2 连接初始化及命令执行流程
+            4.2.3 protol协议封装
+            4.2.4 批处理pipeline分析
 ## 第六章 获取对外可用IP和端口
 ## 第七章 Gin前端form验证器
     1. 错误英转中
     2. 前端数据校验
 ## 第八章 GRPC编程 
-    1 HelloWorld分析Grpc源码
+    1 HelloWorld分析
+        1.1 客户端Grpc源码
+        1.2 服务端Grpc源码
     2 元数据metada
     3 流式GRPC
     4 protobuf的jsonpb包序列化和反序列化
@@ -50,15 +57,19 @@
     9 proto字段验证器 
     10 grpc网关-直接对外http服务 
     11 Grpc插件-gogoprotobuf
+    12 GRPC生态中间件
 ## 第九章 错误及异常
-## 第十章 链路追踪Jaeger
-    1 结合XORM
-    2 结合redis
+## 第十章 链路追踪(Distributed Tracing)
+    1.Jaeger
+        1.1 结合XORM
+        1.2 结合redis
 ## 第十一章 依赖注入
     1 dig依赖注入及http服务分层
     2 wire依赖注入
-## 第十一章 GRPC生态中间件
-## 第十二章 测试框架testify
+## 第十二章 测试框架testify(gin使用)
+    1 assert断言
+    2 mock测试替身
+    3 suite测试套件
 ## 第十三章 序列化反序列化
     1 Jsoniter(完全兼容标准库json，性能较好)
         1.1 序列化
@@ -81,7 +92,6 @@
 ## 第十八章 日志收集项目 log_collect
     1. 动态选择文件
     2. 文件内容读取发送
-
 ## 第二十章 命令行框架Cobra
     1. 介绍及功能使用
 ## 第二十一章 配置文件获取工具viper
@@ -92,6 +102,7 @@
     2. 读和写流程分析
     3. Raft协议
 ## 第二十三章 Go-Micro框架 (不推荐使用)
+    1. Config配置加载包
 ## 第二十四章 搜索引擎es
     1. V6版本 
     2. V7版本 

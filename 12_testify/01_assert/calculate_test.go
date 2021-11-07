@@ -5,21 +5,17 @@ import (
 	"testing"
 )
 
-/*
-源码使用
-	gin中使用
-*/
-
 func TestCalculate(t *testing.T) {
 	// 方式一 if
 	//if Calculate(2) != 4 {
 	//	t.Error("Expected 2 + 2 to equal 4")
 	//}
 	// 方式二 简短
-	//assert.Equal(t, Calculate(2), 4)
+	assert.Equal(t, Calculate(2), 3, "应该相等")
+	assert.Equalf(t, Calculate(4), 7, "应该%d相等7", Calculate(4))
 
 	// 表驱动
-	// 初始化assert
+	// 初始化Assertions 对象
 	assert := assert.New(t)
 
 	var tests = []struct {

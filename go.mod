@@ -10,7 +10,6 @@ require (
 	github.com/alibaba/sentinel-golang v1.0.2
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
 	github.com/confluentinc/confluent-kafka-go v1.7.0
-	github.com/coreos/etcd v3.3.17+incompatible
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/elliotchance/phpserialize v1.3.1
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
@@ -24,7 +23,6 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v8 v8.11.0
 	github.com/go-sql-driver/mysql v1.5.0
-	github.com/gogo/protobuf v1.3.2 // indirect
 	github.com/golang/glog v0.0.0-20210429001901-424d2337a529 // indirect
 	github.com/golang/mock v1.4.4 // indirect
 	github.com/golang/protobuf v1.5.2
@@ -40,7 +38,6 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/mbobakov/grpc-consul-resolver v1.4.3
 	github.com/micro/go-micro v1.18.0
-	github.com/micro/go-plugins/broker/rabbitmq v0.0.0-20200119172437-4fe21aa238fd
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/nacos-group/nacos-sdk-go v1.0.7
 	github.com/olivere/elastic v6.2.35+incompatible

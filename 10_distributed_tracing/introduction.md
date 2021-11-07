@@ -1,4 +1,22 @@
-# 链路监控组件要求
+#链路追踪(Distributed Tracing)
+是一种用于分析和监控应用程序的方法，尤其是使用微服务架构构建的应用程序。分布式跟踪有助于精确定位故障发生的位置以及导致性能差的原因
+
+##常用的链路追踪系统
+    *Skywalking
+    *阿里 鹰眼
+    *大众点评 CAT
+    *Twitter Zipkin
+    *Naver pinpoint
+    *Uber Jaeger
+
+##分类
+![](.introduction_images/openTracing_n_OpenCensus.png)
+开源领域主要分为两派，一派是以 CNCF技术委员 会为主的 OpenTracing 的规范，例如 jaeger zipkin 都是遵循了OpenTracing 的规范。而另一派则是谷歌作为发起者的 OpenCensus，而且谷歌本身还是最早提出链路追踪概念的公司，后期连微软也加入了 OpenCensus
+
+##OpenTelemetry 诞生
+微软加入 OpenCensus 后，直接打破了之前平衡的局面，间接的导致了 OpenTelemetry 的诞生 谷歌和微软下定决心结束江湖之乱，首要的问题是如何整合两个两个社区已有的项目，OpenTelemetry 主要的理念就是，兼容 OpenCensus 和 OpenTracing ，可以让使用者无需改动或者很小的改动就可以接入 OpenTelemetry
+
+## 链路监控组件要求
 探针的性能消耗。
     APM组件服务的影响应该做到足够小。在一些高度优化过的服务，即使一点点损耗也会很容易察觉到，而且有可能迫使在线服务的部署团队不得不将跟踪系统关停。
 
@@ -11,7 +29,7 @@
 数据的分析
     数据的分析要快 ，分析的维度尽可能多。跟踪系统能提供足够快的信息反馈，就可以对生产环境下的异常状况做出快速反应。分析的全面，能够避免二次开发
 
-# 基础概念
+## 基础概念
 Trace:
     类似于树结构的Span集合，表示一条调用链路，存在唯一标识。比如你运行的分布式大数据存储一次Trace就由你的一次请求组成。
 

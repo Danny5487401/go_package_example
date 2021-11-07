@@ -19,32 +19,58 @@ func main() {
 	wg.Wait()
 }
 
-func testRedisBase() {
-	defer wg.Done()
-
+func InitCache(conf *RedisConfig) {
 	//连接服务器
 	redisdb = redis.NewClient(&redis.Options{
-		Addr:     "ali.danny.games:6379", // use default Addr
-		Password: "",                     // no password set
-		DB:       1,                      // use default DB
+		Addr:         conf.Addr,
+		DB:           conf.DB,
+		PoolSize:     conf.PoolSize,
+		IdleTimeout:  time.Duration(conf.IdleTimeout) * time.Second,
+		DialTimeout:  time.Duration(conf.DialTimeout) * time.Second,
+		ReadTimeout:  time.Duration(conf.ReadTimeout) * time.Second,
+		WriteTimeout: time.Duration(conf.WriteTimeout) * time.Second,
 	})
-
 	//心跳
 	pong, err := redisdb.Ping().Result()
 	log.Println(pong, err) // Output: PONG <nil>
+}
 
-	ExampleClient_String()
+func testRedisBase() {
+	conf := &RedisConfig{
+		Addr:         "ali.danny.games:6379",
+		DB:           1,
+		PoolSize:     10, // 连接池大小
+		IdleTimeout:  30, // 客户端关闭空闲连接的时间
+		DialTimeout:  1,
+		ReadTimeout:  1,
+		WriteTimeout: 1,
+	}
+
+	defer wg.Done()
+	InitCache(conf)
+
+	//ExampleClient_String()
 	//ExampleClient_List()
-	ExampleClient_Hash()
+	//ExampleClient_Hash()
 	//ExampleClient_Set()
 	//ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
-	//ExampleClient_Tx() // 事物pipeline
+	ExampleClient_Tx() // 事物pipeline
 	//ExampleClient_Script()
-	//ExampleClient_PubSub()
+	ExampleClient_PubSub()
 
+}
+
+type RedisConfig struct {
+	Addr         string `yaml:"addr"`
+	DB           int    `yaml:"db"`
+	PoolSize     int    `yaml:"pool_size"`
+	IdleTimeout  int    `yam:"idle_timeout"`
+	DialTimeout  int    `yam:"dial_timeout"`
+	ReadTimeout  int    `yam:"read_timeout"`
+	WriteTimeout int    `yam:"write_timeout"`
 }
 
 func ExampleClient_String() {
@@ -279,12 +305,25 @@ func ExampleClient_PubSub() {
 	log.Println("ExampleClient_PubSub")
 	defer log.Println("ExampleClient_PubSub")
 	//发布订阅
-	pubsub := redisdb.Subscribe("subkey")
-	_, err := pubsub.Receive()
+
+	//开始订阅
+	pubSub := redisdb.Subscribe("subkey")
+	iface, err := pubSub.Receive()
+	switch iface.(type) {
+	case *redis.Subscription:
+		fmt.Println("subscribe succeeded")
+	case *redis.Message:
+		fmt.Println("received first message")
+	case *redis.Pong:
+		// pong received
+	default:
+		// handle error
+	}
 	if err != nil {
 		log.Fatal("pubsub.Receive")
 	}
-	ch := pubsub.Channel()
+	ch := pubSub.Channel()
+	// 定时发布消息
 	time.AfterFunc(1*time.Second, func() {
 		log.Println("Publish")
 
@@ -296,8 +335,9 @@ func ExampleClient_PubSub() {
 		redisdb.Publish("subkey", "test publish 2")
 	})
 	for msg := range ch {
-		log.Println("recv channel:", msg.Channel, msg.Pattern, msg.Payload)
+		log.Printf("recv channel:%+v,pattern:%+v，payload:%+v", msg.Channel, msg.Pattern, msg.Payload)
 	}
+
 }
 
 func ExampleClient_CMD() {
@@ -340,6 +380,7 @@ func ExampleClient_Scan() {
 
 // 事务pipeline
 func ExampleClient_Tx() {
+
 	pipe := redisdb.TxPipeline()
 	incr := pipe.Incr("tx_pipeline_counter")
 	boolCmd := pipe.Expire("tx_pipeline_counter", time.Hour)
