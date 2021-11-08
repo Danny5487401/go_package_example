@@ -34,7 +34,7 @@
 ![](.intro_images/definition.png)
 二进制分帧层
 ![](.intro_images/binary_frame.png)
-多路复用
+多路复用multiplex
 ![](.intro_images/multi_routes.png)
 ![](.intro_images/multi_routes2.png)
 
@@ -74,7 +74,7 @@ frame types类型
     6.WINDOW_UPDATE流量控制
     主要作用是管理和流的窗口控制。
     
-    7. GOAWAY停止
+    7.GOAWAY停止
     
 
 header frame
