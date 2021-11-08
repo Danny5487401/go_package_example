@@ -3,6 +3,7 @@ module go_grpc_example
 go 1.15
 
 require (
+	bitbucket.org/bertimus9/systemstat v0.0.0-20180207000608-0eeff89b0690
 	github.com/HdrHistogram/hdrhistogram-go v1.1.0 // indirect
 	github.com/Shopify/sarama v1.19.0
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
@@ -22,6 +23,7 @@ require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-redis/redis/v8 v8.11.0
 	github.com/go-sql-driver/mysql v1.5.0
+	github.com/golang/glog v0.0.0-20210429001901-424d2337a529 // indirect
 	github.com/golang/mock v1.4.4 // indirect
 	github.com/golang/protobuf v1.5.2
 	github.com/golang/snappy v0.0.3 // indirect
@@ -58,7 +60,7 @@ require (
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	google.golang.org/genproto v0.0.0-20210729151513-df9385d47c1b // indirect
 	google.golang.org/grpc v1.39.0
-	google.golang.org/grpc/examples v0.0.0-20211103202053-3b94303f3754
+	google.golang.org/grpc/examples v0.0.0-20211103202053-3b94303f3754 // indirect
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/ini.v1 v1.51.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
@@ -66,3 +68,5 @@ require (
 	xorm.io/builder v0.3.8
 	xorm.io/xorm v1.1.0
 )
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.26.0
