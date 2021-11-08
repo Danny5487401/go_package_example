@@ -58,6 +58,7 @@ require (
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	google.golang.org/genproto v0.0.0-20210729151513-df9385d47c1b // indirect
 	google.golang.org/grpc v1.39.0
+	google.golang.org/grpc/examples v0.0.0-20211103202053-3b94303f3754
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/ini.v1 v1.51.0
 	gopkg.in/yaml.v2 v2.4.0 // indirect
