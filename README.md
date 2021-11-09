@@ -60,14 +60,14 @@
     12 GRPC生态中间件
     13 channelz调试
     14 multiplex多路复用
-## 第九章 错误及异常
+## 第九章 DDD领域驱动
 ## 第十章 链路追踪(Distributed Tracing)
-    1.Jaeger
-        1.1 结合XORM
-        1.2 结合redis
+1.Jaeger
+- 1.1 结合XORM
+- 1.2 结合redis
 ## 第十一章 依赖注入
-    1 dig依赖注入及http服务分层
-    2 wire依赖注入
+- 1 dig依赖注入及http服务分层 
+- 2 wire依赖注入
 ## 第十二章 测试框架testify(gin使用)
     1 assert断言
     2 mock测试替身
