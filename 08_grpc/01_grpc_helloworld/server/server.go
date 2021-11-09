@@ -1,39 +1,45 @@
 package main
 
 import (
-	"go_grpc_example/08_grpc/01_grpc_helloworld/proto"
-	"strconv"
-
-	"google.golang.org/grpc"
-
 	"context"
+	"flag"
+	"fmt"
+	"log"
 	"net"
+
+	pb "go_grpc_example/08_grpc/01_grpc_helloworld/proto"
+	"google.golang.org/grpc"
 )
 
-type Server struct {
+var (
+	port = flag.Int("port", 50051, "The server port")
+)
+
+// server is used to implement helloworld.GreeterServer.
+type server struct {
+	pb.UnimplementedGreeterServer
 }
 
-func (s *Server) SayHello(ctx context.Context, request *proto.HelloRequest) (*proto.HelloReply, error) {
-	return &proto.HelloReply{
-		Message: "hello," + request.Name + strconv.Itoa(int(request.Age)),
-		Age:     request.Age,
-	}, nil
+// SayHello implements helloworld.GreeterServer
+func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+	log.Printf("Received: %v", in.GetName())
+	return &pb.HelloReply{Message: "Hello " + in.GetName()}, nil
 }
 
 func main() {
-	//1。初始化
-	g := grpc.NewServer()
-
-	// 2.注册服务 service放在 m map[string]*service 中
-	proto.RegisterGreeterServer(g, &Server{})
-
-	// 3.gRPC的应用层是基于HTTP2的，所以这里不出意外，监听的是tcp端口
-	lis, err := net.Listen("tcp", "127.0.0.1:9000")
+	flag.Parse()
+	lis, err := net.Listen("tcp", fmt.Sprintf("localhost:%d", *port))
 	if err != nil {
-		panic("failed to listen:" + err.Error())
+		log.Fatalf("failed to listen: %v", err)
 	}
-
-	_ = g.Serve(lis)
+	//1。初始化
+	s := grpc.NewServer()
+	// 2.注册服务 service放在 m map[string]*service 中
+	pb.RegisterGreeterServer(s, &server{})
+	log.Printf("server listening at %v", lis.Addr())
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }
 
 //注意：更改protobuf文件，先后上线server和client端没有影响

@@ -1,33 +1,40 @@
 package main
 
 import (
-	"fmt"
-	"go_grpc_example/08_grpc/01_grpc_helloworld/proto"
-	"golang.org/x/net/context"
-	"google.golang.org/grpc"
+	"context"
+	"flag"
+	"log"
 	"time"
+
+	pb "go_grpc_example/08_grpc/01_grpc_helloworld/proto"
+	"google.golang.org/grpc"
+)
+
+const (
+	defaultName = "world"
+)
+
+var (
+	addr = flag.String("addr", "localhost:50051", "the address to connect to")
+	name = flag.String("name", defaultName, "Name to greet")
 )
 
 func main() {
-	//1.新建一个conn连接，
-	conn, err := grpc.Dial("127.0.0.1:9000", grpc.WithInsecure())
+	flag.Parse()
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(*addr, grpc.WithInsecure())
 	if err != nil {
-		panic(err)
+		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	c := proto.NewGreeterClient(conn)
-	for {
-		r, err := c.SayHello(context.Background(), &proto.HelloRequest{
-			Name: "danny",
-			Age:  18,
-		}) // 核心调用的是 Invoke 方法，具体实现要看grpc.ClientConn中
-		// grpc.ClientConn中实现了Invoke方法，在call.go文件中，详情都在invoke
+	c := pb.NewGreeterClient(conn)
 
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(r.Message, r.GetAge())
-		time.Sleep(time.Second * 10)
+	// Contact the server and print out its response.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.SayHello(ctx, &pb.HelloRequest{Name: *name})
+	if err != nil {
+		log.Fatalf("could not greet: %v", err)
 	}
-
+	log.Printf("Greeting: %s", r.GetMessage())
 }

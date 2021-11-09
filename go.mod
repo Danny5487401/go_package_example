@@ -68,4 +68,4 @@ require (
 	xorm.io/xorm v1.1.0
 )
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.31.0
+replace google.golang.org/grpc => google.golang.org/grpc v1.32.0

@@ -1,34 +1,69 @@
+// Binary server is an example server.
 package main
 
 import (
 	"context"
+	"flag"
+	"fmt"
+	"log"
 	"net"
-
-	"go_grpc_example/08_grpc/07_grpc_error/proto"
+	"sync"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+
+	pb "go_grpc_example/08_grpc/01_grpc_helloworld/proto"
+	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 )
 
-type Server struct {
+var port = flag.Int("port", 50052, "port number")
+
+// server is used to implement helloworld.GreeterServer.
+type server struct {
+	pb.UnimplementedGreeterServer
+	mu    sync.Mutex
+	count map[string]int
 }
 
-func (s *Server) SayHello(ctx context.Context, request *proto.HelloRequest) (*proto.HelloReply, error) {
-	return nil, status.Errorf(codes.AlreadyExists, "账号已存在%s", request.Name)
-	//return &proto.HelloReply{
-	//	Message:"hello," + request.Name,
-	//},nil
+// SayHello implements helloworld.GreeterServer
+func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloReply, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	// Track the number of times the user has been greeted.
+	s.count[in.Name]++
+	if s.count[in.Name] > 1 {
+		st := status.New(codes.ResourceExhausted, "Request limit exceeded.")
+		ds, err := st.WithDetails(
+			&epb.QuotaFailure{
+				Violations: []*epb.QuotaFailure_Violation{{
+					Subject:     fmt.Sprintf("name:%s", in.Name),
+					Description: "Limit one greeting per person",
+				}},
+			},
+		)
+		if err != nil {
+			return nil, st.Err()
+		}
+		return nil, ds.Err()
+	}
+	return &pb.HelloReply{Message: "Hello " + in.Name}, nil
 }
 
 func main() {
-	g := grpc.NewServer()
-	proto.RegisterGreeterServer(g, &Server{})
-	lis, err := net.Listen("tcp", "127.0.0.1:9000")
+	flag.Parse()
+
+	address := fmt.Sprintf(":%v", *port)
+	lis, err := net.Listen("tcp", address)
 	if err != nil {
-		panic("failed to listen:" + err.Error())
+		log.Fatalf("failed to listen: %v", err)
 	}
-	_ = g.Serve(lis)
+
+	s := grpc.NewServer()
+	pb.RegisterGreeterServer(s, &server{count: make(map[string]int)})
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }
 
 /*

@@ -999,6 +999,8 @@ google.golang.org/genproto v0.0.0-20210729151513-df9385d47c1b h1:4xoALQmXxqVdDdL
 google.golang.org/genproto v0.0.0-20210729151513-df9385d47c1b/go.mod h1:ob2IJxKrgPT52GcgX759i1sleT07tiKowYBGbczaW48=
 google.golang.org/grpc v1.31.0 h1:T7P4R73V3SSDPhH7WW7ATbfViLtmamH0DKrP3f9AuDI=
 google.golang.org/grpc v1.31.0/go.mod h1:N36X2cJ7JwdamYAgDz+s+rVMFjt3numwzf/HckM8pak=
+google.golang.org/grpc v1.32.0 h1:zWTV+LMdc3kaiJMSTOFz2UgSBgx8RNQoTGiZu3fR9S0=
+google.golang.org/grpc v1.32.0/go.mod h1:N36X2cJ7JwdamYAgDz+s+rVMFjt3numwzf/HckM8pak=
 google.golang.org/grpc/examples v0.0.0-20211103202053-3b94303f3754 h1:fkw0Z8wGtZYj4L3KX3sp74Qdb3H2R021uYVElHFtAlk=
 google.golang.org/grpc/examples v0.0.0-20211103202053-3b94303f3754/go.mod h1:gID3PKrg7pWKntu9Ss6zTLJ0ttC0X9IHgREOCZwbCVU=
 google.golang.org/protobuf v0.0.0-20200109180630-ec00e32a8dfd/go.mod h1:DFci5gLYBciE7Vtevhsrf46CRTquxDuWsQurQQe4oz8=

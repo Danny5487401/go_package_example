@@ -1,43 +1,51 @@
+// Binary client is an example client.
 package main
 
 import (
 	"context"
-	"fmt"
-	"go_grpc_example/08_grpc/07_grpc_error/proto"
+	"flag"
+	"log"
+	"os"
+	"time"
+
+	pb "go_grpc_example/08_grpc/01_grpc_helloworld/proto"
+	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
-	"time"
 )
 
+var addr = flag.String("addr", "localhost:50052", "the address to connect to")
+
 func main() {
-	conn, err := grpc.Dial("127.0.0.1:9000", grpc.WithInsecure())
+	flag.Parse()
+
+	// Set up a connection to the server.
+	conn, err := grpc.Dial(*addr, grpc.WithInsecure())
 	if err != nil {
-		panic(err)
+		log.Fatalf("did not connect: %v", err)
 	}
-	defer conn.Close()
-
-	c := proto.NewGreeterClient(conn)
-	// 超时机制
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
-	defer cancel()
-	_, err = c.SayHello(ctx, &proto.HelloRequest{
-		Name: "danny",
-	})
-
-	//_,err = c.SayHello(context.Background(),&proto.HelloRequest{
-	//	Name: "danny",
-	//})
-	//if err != nil{
-	//	panic(err)
-	//}
-	if err != nil {
-		sta, ok := status.FromError(err)
-		if !ok {
-			panic("解析error失败")
+	defer func() {
+		if e := conn.Close(); e != nil {
+			log.Printf("failed to close connection: %s", e)
 		}
-		fmt.Println(sta.Message())
-		fmt.Println(sta.Code())
+	}()
+	c := pb.NewGreeterClient(conn)
 
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	r, err := c.SayHello(ctx, &pb.HelloRequest{Name: "world"})
+	if err != nil {
+		// 比FromError更加友好
+		s := status.Convert(err)
+		for _, d := range s.Details() {
+			switch info := d.(type) {
+			case *epb.QuotaFailure:
+				log.Printf("Quota failure: %s", info)
+			default:
+				log.Printf("Unexpected type: %s", info)
+			}
+		}
+		os.Exit(1)
 	}
-	//fmt.Println(r.Message)
+	log.Printf("Greeting: %s", r.Message)
 }

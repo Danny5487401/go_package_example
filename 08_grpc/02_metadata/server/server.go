@@ -1,50 +1,192 @@
+// Binary server is an example server.
 package main
 
 import (
 	"context"
+	"flag"
 	"fmt"
-	"google.golang.org/grpc/metadata"
+	"io"
+	"log"
+	"math/rand"
 	"net"
+	"time"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 
-	"go_grpc_example/08_grpc/02_metadata/proto"
+	pb "go_grpc_example/08_grpc/02_metadata/echo"
 )
 
-type Server struct {
+var port = flag.Int("port", 50051, "the port to serve on")
+
+const (
+	timestampFormat = time.StampNano
+	streamingCount  = 10
+)
+
+type server struct {
+	pb.UnimplementedEchoServer
 }
 
-func (s *Server) SayHello(ctx context.Context, request *proto.HelloRequest) (*proto.HelloReply, error) {
+func (s *server) UnaryEcho(ctx context.Context, in *pb.EchoRequest) (*pb.EchoResponse, error) {
+	fmt.Printf("--- UnaryEcho ---\n")
+	// Create trailer in defer to record function return time.
+	defer func() {
+		trailer := metadata.Pairs("timestamp", time.Now().Format(timestampFormat))
+		grpc.SetTrailer(ctx, trailer)
+	}()
+
+	// Read metadata from client.
 	md, ok := metadata.FromIncomingContext(ctx)
 	if !ok {
-		fmt.Println("get metadata errors")
+		return nil, status.Errorf(codes.DataLoss, "UnaryEcho: failed to get metadata")
 	}
-	/*
-		timestamp [2021-03-20 15:10:53]
-		:authority [127.0.0.1:9000]
-		content-type [application/grpc]
-	*/
-	if nameSlice, ok := md["name"]; ok {
-		fmt.Println(nameSlice)
-		for _, v := range nameSlice {
-			fmt.Println(v)
+	if t, ok := md["timestamp"]; ok {
+		fmt.Printf("timestamp from metadata:\n")
+		for i, e := range t {
+			fmt.Printf(" %d. %s\n", i, e)
 		}
 	}
-	//for key, val := range md{
-	//	fmt.Println(key,val)
-	//}
-	return &proto.HelloReply{
-		Message: "hello," + request.Name,
-	}, nil
+
+	// Create and send header.
+	header := metadata.New(map[string]string{"location": "MTV", "timestamp": time.Now().Format(timestampFormat)})
+	grpc.SendHeader(ctx, header)
+
+	fmt.Printf("request received: %v, sending echo\n", in)
+
+	return &pb.EchoResponse{Message: in.Message}, nil
+}
+
+func (s *server) ServerStreamingEcho(in *pb.EchoRequest, stream pb.Echo_ServerStreamingEchoServer) error {
+	fmt.Printf("--- ServerStreamingEcho ---\n")
+	// Create trailer in defer to record function return time.
+	defer func() {
+		trailer := metadata.Pairs("timestamp", time.Now().Format(timestampFormat))
+		stream.SetTrailer(trailer)
+	}()
+
+	// Read metadata from client.
+	md, ok := metadata.FromIncomingContext(stream.Context())
+	if !ok {
+		return status.Errorf(codes.DataLoss, "ServerStreamingEcho: failed to get metadata")
+	}
+	if t, ok := md["timestamp"]; ok {
+		fmt.Printf("timestamp from metadata:\n")
+		for i, e := range t {
+			fmt.Printf(" %d. %s\n", i, e)
+		}
+	}
+
+	// Create and send header.
+	header := metadata.New(map[string]string{"location": "MTV", "timestamp": time.Now().Format(timestampFormat)})
+	stream.SendHeader(header)
+
+	fmt.Printf("request received: %v\n", in)
+
+	// Read requests and send responses.
+	for i := 0; i < streamingCount; i++ {
+		fmt.Printf("echo message %v\n", in.Message)
+		err := stream.Send(&pb.EchoResponse{Message: in.Message})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *server) ClientStreamingEcho(stream pb.Echo_ClientStreamingEchoServer) error {
+	fmt.Printf("--- ClientStreamingEcho ---\n")
+	// Create trailer in defer to record function return time.
+	defer func() {
+		trailer := metadata.Pairs("timestamp", time.Now().Format(timestampFormat))
+		stream.SetTrailer(trailer)
+	}()
+
+	// Read metadata from client.
+	md, ok := metadata.FromIncomingContext(stream.Context())
+	if !ok {
+		return status.Errorf(codes.DataLoss, "ClientStreamingEcho: failed to get metadata")
+	}
+	if t, ok := md["timestamp"]; ok {
+		fmt.Printf("timestamp from metadata:\n")
+		for i, e := range t {
+			fmt.Printf(" %d. %s\n", i, e)
+		}
+	}
+
+	// Create and send header.
+	header := metadata.New(map[string]string{"location": "MTV", "timestamp": time.Now().Format(timestampFormat)})
+	stream.SendHeader(header)
+
+	// Read requests and send responses.
+	var message string
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			fmt.Printf("echo last received message\n")
+			return stream.SendAndClose(&pb.EchoResponse{Message: message})
+		}
+		message = in.Message
+		fmt.Printf("request received: %v, building echo\n", in)
+		if err != nil {
+			return err
+		}
+	}
+}
+
+func (s *server) BidirectionalStreamingEcho(stream pb.Echo_BidirectionalStreamingEchoServer) error {
+	fmt.Printf("--- BidirectionalStreamingEcho ---\n")
+	// Create trailer in defer to record function return time.
+	defer func() {
+		trailer := metadata.Pairs("timestamp", time.Now().Format(timestampFormat))
+		stream.SetTrailer(trailer)
+	}()
+
+	// Read metadata from client.
+	md, ok := metadata.FromIncomingContext(stream.Context())
+	if !ok {
+		return status.Errorf(codes.DataLoss, "BidirectionalStreamingEcho: failed to get metadata")
+	}
+
+	if t, ok := md["timestamp"]; ok {
+		fmt.Printf("timestamp from metadata:\n")
+		for i, e := range t {
+			fmt.Printf(" %d. %s\n", i, e)
+		}
+	}
+
+	// Create and send header.
+	header := metadata.New(map[string]string{"location": "MTV", "timestamp": time.Now().Format(timestampFormat)})
+	stream.SendHeader(header)
+
+	// Read requests and send responses.
+	for {
+		in, err := stream.Recv()
+		if err == io.EOF {
+			return nil
+		}
+		if err != nil {
+			return err
+		}
+		fmt.Printf("request received %v, sending echo\n", in)
+		if err := stream.Send(&pb.EchoResponse{Message: in.Message}); err != nil {
+			return err
+		}
+	}
 }
 
 func main() {
-	g := grpc.NewServer()
-
-	proto.RegisterGreeterServer(g, &Server{})
-	lis, err := net.Listen("tcp", "127.0.0.1:9000")
+	flag.Parse()
+	rand.Seed(time.Now().UnixNano())
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", *port))
 	if err != nil {
-		panic("faild to listen:" + err.Error())
+		log.Fatalf("failed to listen: %v", err)
 	}
-	_ = g.Serve(lis)
+	fmt.Printf("server listening at %v\n", lis.Addr())
+
+	s := grpc.NewServer()
+	pb.RegisterEchoServer(s, &server{})
+	s.Serve(lis)
 }
