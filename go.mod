@@ -15,6 +15,7 @@ require (
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/frankban/quicktest v1.11.3 // indirect
 	github.com/fsnotify/fsnotify v1.4.9
+	github.com/getsentry/sentry-go v0.11.0
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/go-playground/locales v0.13.0
@@ -44,7 +45,7 @@ require (
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
-	github.com/spf13/cobra v0.0.3
+	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.7.1
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.7.0
@@ -54,14 +55,13 @@ require (
 	go.uber.org/dig v1.11.0
 	go.uber.org/zap v1.16.0
 	golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6 // indirect
-	golang.org/x/net v0.0.0-20210405180319-a5a99cb37ef4
 	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	google.golang.org/genproto v0.0.0-20210729151513-df9385d47c1b // indirect
+	google.golang.org/genproto v0.0.0-20210729151513-df9385d47c1b
 	google.golang.org/grpc v1.39.0
 	google.golang.org/grpc/examples v0.0.0-20211103202053-3b94303f3754
 	google.golang.org/protobuf v1.27.1
-	gopkg.in/ini.v1 v1.51.0
+	gopkg.in/ini.v1 v1.51.1
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	honnef.co/go/tools v0.0.1-2020.1.4 // indirect
 	xorm.io/builder v0.3.8
