@@ -53,13 +53,13 @@ func testRedisBase() {
 	//ExampleClient_List()
 	//ExampleClient_Hash()
 	//ExampleClient_Set()
-	//ExampleClient_SortSet()
+	ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
-	ExampleClient_Tx() // 事物pipeline
+	//ExampleClient_Tx() // 事物pipeline
 	//ExampleClient_Script()
-	ExampleClient_PubSub()
+	//ExampleClient_PubSub()
 
 }
 
@@ -251,16 +251,23 @@ func ExampleClient_SortSet() {
 	Shuffle(addArgs)
 
 	//添加
-	ret, err := redisdb.ZAddNX("sortset_test", addArgs...).Result()
-	log.Println("ZAddNX", ret, err)
+	//ret, err := redisdb.ZAddNX("sortset_test", addArgs...).Result()
+	//log.Println("ZAddNX", ret, err)
 
 	//获取指定成员score
-	score, err := redisdb.ZScore("sortset_test", "a_10").Result()
+	score, err := redisdb.ZScore("sortset_test", "a_1000").Result()
+	if err == redis.Nil {
+		fmt.Printf("ZScore键不存在\n")
+	}
 	log.Println("ZScore", score, err)
 
 	//获取制定成员的索引
-	index, err := redisdb.ZRank("sortset_test", "a_50").Result()
+	index, err := redisdb.ZRank("sortset_test", "a_1").Result()
 	log.Println("ZRank", index, err)
+	// 返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
+	index, err = redisdb.ZRevRank("sortset_test", "a_99").Result()
+	log.Println("ZRevRank", index, err)
+
 	// ZCARD key 获取有序集合的成员数
 	count, err := redisdb.ZCard("sortset_test").Result()
 	log.Println("SCard", count, err)
