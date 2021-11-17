@@ -1,3 +1,4 @@
+#Etcd的读写
 # 分层模型
 Client 层：Client 层包括 client v2 和 v3 两个大版本 API 客户端库，提供了简洁易用的 API，同时支持负载均衡、节点间故障自动转移，
 可极大降低业务使用 etcd 复杂度，提升开发效率、服务可用性。
@@ -16,7 +17,7 @@ Raft 算法层：Raft 算法层实现了 Leader 选举、日志复制、ReadInde
 
 # 读请求
 
-![readprocess](./request_read_process.png)
+![readprocess](./img/request_read_process.png)
 ##串行读与线性读
 直接读状态机数据返回、无需通过 Raft 协议与集群进行交互的模式，在 etcd 里叫做串行 (Serializable) 读，它具有低延时、高吞吐量的特点，适合对数据一致性要求不高的场景。   
 
@@ -27,7 +28,7 @@ Raft 算法层：Raft 算法层实现了 Leader 选举、日志复制、ReadInde
 后来实现了 ReadIndex 读机制来提升读性能，满足了 Kubernetes 等业务的诉求
 
 ##ReadIndex
-![readIndex](./readIndex.png)
+![readIndex](./img/readIndex.png)
 它是在 etcd 3.1 中引入的，我把简化后的原理图放在了上面。当收到一个线性读请求时，它首先会从 Leader 获取集群最新的已提交的日志索引 (committed index)，
 如上图中的流程二所示。Leader 收到 ReadIndex 请求时，为防止脑裂等异常场景，会向 Follower 节点发送心跳确认，
 一半以上节点确认 Leader 身份后才能将已提交的索引 (committed index) 返回给节点 C(上图中的流程三)。
@@ -36,7 +37,7 @@ C 节点则会等待，直到状态机已应用索引 (applied index) 大于等�
 当然还有其它机制也能实现线性读，如在早期 etcd 3.0 中读请求通过走一遍 Raft 协议保证一致性， 这种 Raft log read 机制依赖磁盘 IO， 性能相比 ReadIndex 较差
 
 ##MVCC
-![readIndex](./vision_n_key_value_in_botdb_n_treeindex.png)
+![readIndex](./img/vision_n_key_value_in_botdb_n_treeindex.png)
 流程五中的多版本并发控制 (Multiversion concurrency control) 模块是为了解决上一讲我们提到 etcd v2 不支持保存 key 的历史版本、不支持多 key 事务等问题而产生的。
 它核心由内存树形索引模块 (treeIndex) 和嵌入式的 KV 持久化存储库 boltdb 组成。
 
@@ -57,7 +58,7 @@ etcd 出于数据一致性、性能等考虑，在访问 boltdb 前，首先会�
 
 
 #写请求
-![readIndex](./request_wirte_process.png)
+![readIndex](./img/request_wirte_process.png)
 首先 client 端通过负载均衡算法选择一个 etcd 节点，发起 gRPC 调用。然后 etcd 节点收到请求后经过 gRPC 拦截器、Quota 模块后，进入 KVServer 模块，
 KVServer 模块向 Raft 模块提交一个提案，提案内容为“大家好，请使用 put 方法执行一个 key 为 hello，value 为 world 的命令”。
 
@@ -104,7 +105,7 @@ Leader 收到提案后，通过 Raft 模块输出待转发给 Follower 节点的
 etcdserver 从 Raft 模块获取到以上消息和日志条目后，作为 Leader，它会将 put 提案消息广播给集群各个节点，
 同时需要把集群 Leader 任期号、投票信息、已提交索引、提案内容持久化到一个 WAL（Write Ahead Log）日志文件中，用于保证集群的一致性、可恢复性，也就是我们图中的流程五模块
 
-![WAL 日志结构](./wal_log_structure.png)
+![WAL 日志结构](./img/wal_log_structure.png)
 上图是 WAL 结构，它由多种类型的 WAL 记录顺序追加写入组成，每个记录由类型、数据、循环冗余校验码组成。不同类型的记录通过 Type 字段区分，Data 为对应记录内容，CRC 为循环校验码信息
 WAL 记录类型目前支持 5 种，分别是文件元数据记录、日志条目记录、状态信息记录、CRC 记录、快照记录：
 
@@ -145,7 +146,7 @@ WAL 模块如何持久化 Raft 日志条目:
 于是进入流程六，etcdserver 模块从 channel 取出提案内容，添加到先进先出（FIFO）调度队列，随后通过 Apply 模块按入队顺序，异步、依次执行提案内容。
 
 ###APPLY模块
-![APPLY模块](./apply_module.png)
+![APPLY模块](./img/apply_module.png)
 apply 模块从 Raft 模块获得的日志条目信息里，是否有唯一的字段能标识这个提案？
 
 答案就是我们上面介绍 Raft 日志条目中的索引（index）字段。日志条目索引是全局单调递增的，每个日志条目索引对应一个提案， 如果一个命令执行后，
@@ -160,6 +161,7 @@ etcd 通过引入一个 consistent index 的字段，来存储系统当前已经
 ###MVCC
 MVCC 主要由两部分组成，一个是内存索引模块 treeIndex，保存 key 的历史版本号信息，另一个是 boltdb 模块，用来持久化存储 key-value 数据
 ####treeIndex索引模块
+
 版本号（revision）在 etcd 里面发挥着重大作用，它是 etcd 的逻辑时钟。etcd 启动的时候默认版本号是 1，随着你对 key 的增、删、改操作而全局单调递增。
 
 因为 boltdb 中的 key 就包含此信息，所以 etcd 并不需要再去持久化一个全局版本号。我们只需要在启动的时候，从最小值 1 开始枚举到最大值，

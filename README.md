@@ -102,7 +102,8 @@
     3. Raft协议
 ## 第二十三章 Go-Micro框架 (不推荐使用)
     1. Config配置加载包
-## 第二十四章 搜索引擎es
+[## 第二十四章 搜索引擎es](24_elasticSearch/es.md)
+
     1. V6版本 
     2. V7版本 
 
