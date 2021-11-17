@@ -1,0 +1,9 @@
+#ElasticSearch
+与关系型数据库对比
+![](es/es_n_mysql.png)
+es架构
+![](es/distribution.png)
+es倒排索引原理
+![](es/inverted_index.png)
+增删改查
+![](es/crud.png)
