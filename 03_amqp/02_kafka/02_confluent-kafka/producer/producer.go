@@ -49,7 +49,7 @@ func main() {
 	p.Flush(15 * 1000)
 }
 
-/*\
+/*
 源码分析
 	// Message represents a Kafka message
 	type Message struct {

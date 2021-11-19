@@ -1,4 +1,4 @@
-#redis数据类型与11中编码方式
+#redis数据类型与11zh3ong编码方式
 
 ## 1.redis核心对象结构
 ###Redis object对象的数据结构,具有五种属性
@@ -65,9 +65,12 @@ sds字符串根据字符串的长度，划分了五种结构体sdshdr5、sdshdr8
 SDS_TYPE_8结构体
 ```c
 struct __attribute__ ((__packed__)) sdshdr8 {
+    // 已使用字符串长度
     uint8_t len; /* used */
+    // 一共分配了多少字节
     uint8_t alloc; /* excluding the header and null terminator */
     unsigned char flags; /* 3 lsb of type, 5 unused bits */
+    // 字节数组
     char buf[];
 };
 
@@ -331,3 +334,57 @@ struct redisServer {
     list *slaves, *monitors;    /* List of slaves and MONITORs */
 }
 ```
+
+## 2.操作
+```
+// 查看数据的编码类型
+object encoding key
+```
+
+###RedisDB内部结构
+![](.redis_images/object_to_encoding.png)
+
+![](.redis_images/redis_data_structure.png)
+
+###1.string
+![](.redis_images/c_string.png)
+
+c语言自带的字符串,不过是一个以0结束的字符数组.想要获取 「Redis」的长度，需要从头开始遍历，直到遇到 '\0' 为止。
+其主要原因是C的字符串是底层的API，存在以下问题：（1）没有记录字符串长度，故需要O(n)复杂度获取字符串长度；（2）由于没有记录字符串长度，故容易出现缓冲区溢出问题；（3）每次对字符串拓容都需要使用系统调用，没有预留空间（4）C的字符串只能保存字符。
+
+![](.redis_images/string_structure.png)
+在redis中，sds提供简单动态字符串,（1）通过len记录字符串长度，实现O(1)复杂度获取；（2）内部字符串数组预留了空间，减少字符串的内存重分配次数，同时实现了自动拓容避免缓冲区溢出问题；（3）内部字符数组基于字节来保存数据，故可以保存字符和二进制数据
+
+具体分配规则
+
+    1、int：8个字节的长整型
+    
+    2、embstar：小于等于 39 字节的字符串
+    
+    3、raw：大于 39 字节的字符串
+###2.hash(ziplist+dict)
+
+###3.set(intset+dict)
+
+###4.list双端链表
+
+###5.Sort Set(dict+zskiplist)
+```cgo
+typedef struct zset {
+    dict *dict;
+    zskiplist *zsl;
+} zset;
+```
+其中字典里面保存了有序集合中member与score的键值对，跳跃表则用于实现按score排序的功能
+
+
+###6.stream(radix-tree)
+
+PipeLine:
+
+	Redis的pipeline功能的原理是 Client通过一次性将多条redis命令发往Redis Server，减少了每条命令分别传输的IO开销。
+	同时减少了系统调用的次数，因此提升了整体的吞吐能力。
+	我们在主-从模式的Redis中，pipeline功能应该用的很多，但是Cluster模式下，估计还没有几个人用过。
+	我们知道 redis cluster 默认分配了 16384 个slot，当我们set一个key 时，会用CRC16算法来取模得到所属的slot，
+	然后将这个key 分到哈希槽区间的节点上，具体算法就是：CRC16(key) % 16384。如果我们使用pipeline功能，
+	一个批次中包含的多条命令，每条命令涉及的key可能属于不同的slot

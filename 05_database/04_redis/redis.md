@@ -25,41 +25,6 @@
 	出现了一批基于内存的关系型数据库，比如SAP HAHA数据库，其物理机器内存2T，包含软件以及服务，购买需要1亿元,由于内存关系型数据库的昂贵价格，
 	所以大部分公司采用了折中的方案,使用磁盘关系型数据库+内存缓存,比如 Oracle+Memcached,Mysql+Redis
 
-##Redis协议
-![](.redis_images/redis_scheme.png)
-
-Redis客户端使用RESP（Redis的序列化协议）协议与Redis的服务器端进行通信。 虽然该协议是专门为Redis设计的，但是该协议也可以用于其他 客户端-服务器 （Client-Server）软件项目。RESP是对以下几件事情的折中实现：
-    
-    1、实现简单
-    
-    2、解析快速
-    
-    3、人类可读
-RESP实际上是一个支持以下数据类型的序列化协议：简单字符串（Simple Strings），错误（Errors），整数（Integers），块字符串（Bulk Strings）和数组（Arrays）
-
-    RESP可以序列化不同的数据类型，如整数（integers），字符串（strings），数组（arrays）。它还使用了一个特殊的类型来表示错误（errors）。
-    请求以字符串数组的形式来表示要执行命令的参数从客户端发送到Redis服务器。Redis使用命令特有（command-specific）数据类型作为回复。
-    
-    RESP协议是二进制安全的，并且不需要处理从一个进程传输到另一个进程的块数据的大小，因为它使用前缀长度（prefixed-length）的方式来传输块数据的
-在Redis中,RESP用作 请求-响应 协议的方式如下：
-
-    1、客户端将命令作为批量字符串的RESP数组发送到Redis服务器。
-    
-    2、服务器（Server）根据命令执行的情况返回一个具体的RESP类型作为回复。
-
-在RESP协议中，有些的数据类型取决于第一个字节：
-
-    1、对于简单字符串，回复的第一个字节是“+”
-    
-    2、对于错误，回复的第一个字节是“ - ”
-    
-    3、对于整数，回复的第一个字节是“：”
-    
-    4、对于批量字符串，回复的第一个字节是“$”
-    
-    5、对于数组，回复的第一个字节是“*”
-
-
 ##Reactor 单线程的Redis为什么这么快?
 ![](.redis_images/reason_why_redis_so_fast.png)
 
@@ -85,6 +50,7 @@ Redis6.0后引入多线程提速：
     
 	
 ##Redis五种数据类型应用场景
+![](.redis_images/redis_db_structure.png)
 ![](img/string.png)
 
 	1.String(sds,simple dynamic string简单动态字符串): 常规的set/get操作,因为string 类型是二进制安全的,可以用来存放图片，视频等内容.
@@ -137,56 +103,14 @@ Redis6.0后引入多线程提速：
     功能：误差允许范围内做基数统计 (基数就是指一个集合中不同值的个数) 的时候非常有用，每个HyperLogLog的键可以计算接近2^64不同元素的基数，
     而大小只需要12KB。错误率大概在0.81%。所以如果用做 UV 统计很合适
     
-    HyperLogLog底层 一共分了 2^14 个桶，也就是 16384 个桶。每个(registers)桶中是一个 6 bit 的数组，这里有个骚操作就是一般人可能直接用一个字节当桶浪费2个bit空间，但是Redis底层只用6个然后通过前后拼接实现对内存用到了极致，最终就是 16384*6/8/1024 = 12KB。
+    HyperLogLog底层 一共分了 2^14 个桶，也就是 16384 个桶。每个(registers)桶中是一个 6 bit 的数组，
+    这里有个骚操作就是一般人可能直接用一个字节当桶浪费2个bit空间，但是Redis底层只用6个然后通过前后拼接实现对内存用到了极致，最终就是 16384*6/8/1024 = 12KB。
     
 3.Bloom Filter
 
     使用布隆过滤器得到的判断结果： 不存在的一定不存在，存在的不一定存在。
     
-##RedisDB内部结构
-![](.redis_images/redis_internal_structure.png)
-![](.redis_images/redis_db_structure.png)
 
-
-##Redis数据类型底层数据结构
-![](.redis_images/redis_data_structure.png)
-
-###1.sds简单动态字符串
-c语言自带的字符串,不过是一个以0结束的字符数组.想要获取 「Redis」的长度，需要从头开始遍历，直到遇到 '\0' 为止
-
-![](.redis_images/c_string.png)
-
-在redis中，想要获取长度只需要获取 len 字段即可
-
-![](.redis_images/string_structure.png)
-
-###2.hash(ziplist+dict)
-
-###3.set(intset+dict)
-
-###4.list双端链表
-
-###5.Sort Set(hash+skiptable)
-```cgo
-typedef struct zset {
-    dict *dict;
-    zskiplist *zsl;
-} zset;
-```
-其中字典里面保存了有序集合中member与score的键值对，跳跃表则用于实现按score排序的功能
-
-
-
-###6.stream(radix-tree)
-
-PipeLine:
-
-	Redis的pipeline功能的原理是 Client通过一次性将多条redis命令发往Redis Server，减少了每条命令分别传输的IO开销。
-	同时减少了系统调用的次数，因此提升了整体的吞吐能力。
-	我们在主-从模式的Redis中，pipeline功能应该用的很多，但是Cluster模式下，估计还没有几个人用过。
-	我们知道 redis cluster 默认分配了 16384 个slot，当我们set一个key 时，会用CRC16算法来取模得到所属的slot，
-	然后将这个key 分到哈希槽区间的节点上，具体算法就是：CRC16(key) % 16384。如果我们使用pipeline功能，
-	一个批次中包含的多条命令，每条命令涉及的key可能属于不同的slot
 	
 ##持久化方式
 

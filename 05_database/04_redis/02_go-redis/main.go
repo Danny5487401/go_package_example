@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"os"
 	"sync"
 	"time"
 
@@ -25,6 +26,7 @@ func InitCache(conf *RedisConfig) {
 		Addr:         conf.Addr,
 		DB:           conf.DB,
 		PoolSize:     conf.PoolSize,
+		Password:     conf.Password,
 		IdleTimeout:  time.Duration(conf.IdleTimeout) * time.Second,
 		DialTimeout:  time.Duration(conf.DialTimeout) * time.Second,
 		ReadTimeout:  time.Duration(conf.ReadTimeout) * time.Second,
@@ -32,12 +34,17 @@ func InitCache(conf *RedisConfig) {
 	})
 	//心跳
 	pong, err := redisdb.Ping().Result()
-	log.Println(pong, err) // Output: PONG <nil>
+	if err != nil {
+		os.Exit(1)
+	}
+
+	log.Println(pong) // Output: PONG
 }
 
 func testRedisBase() {
 	conf := &RedisConfig{
 		Addr:         "ali.danny.games:6379",
+		Password:     "root",
 		DB:           1,
 		PoolSize:     10, // 连接池大小
 		IdleTimeout:  30, // 客户端关闭空闲连接的时间
@@ -51,9 +58,9 @@ func testRedisBase() {
 
 	//ExampleClient_String()
 	//ExampleClient_List()
-	//ExampleClient_Hash()
+	ExampleClient_Hash()
 	//ExampleClient_Set()
-	ExampleClient_SortSet()
+	//ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
@@ -67,6 +74,7 @@ type RedisConfig struct {
 	Addr         string `yaml:"addr"`
 	DB           int    `yaml:"db"`
 	PoolSize     int    `yaml:"pool_size"`
+	Password     string `yaml:"password"`
 	IdleTimeout  int    `yam:"idle_timeout"`
 	DialTimeout  int    `yam:"dial_timeout"`
 	ReadTimeout  int    `yam:"read_timeout"`
@@ -158,7 +166,19 @@ func ExampleClient_Hash() {
 	}
 
 	//获取
+	ret, err := redisdb.HGet("hash_test", "name1").Result()
+	if err != nil {
+		fmt.Println("HGet的错误是", err.Error())
+	}
+	if err == redis.Nil {
+		fmt.Println("不存在")
+	}
+	log.Println("rets:", ret, err)
+
 	rets, err := redisdb.HMGet("hash_test", "name", "sex").Result()
+	if err != nil {
+		fmt.Println("HMGet的错误是", err.Error())
+	}
 	log.Println("rets:", rets, err)
 
 	//成员
