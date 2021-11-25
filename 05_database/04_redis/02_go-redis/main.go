@@ -56,7 +56,7 @@ func testRedisBase() {
 	defer wg.Done()
 	InitCache(conf)
 
-	//ExampleClient_String()
+	ExampleClient_String()
 	//ExampleClient_List()
 	ExampleClient_Hash()
 	//ExampleClient_Set()
