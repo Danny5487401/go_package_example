@@ -2,63 +2,30 @@ package main
 
 import (
 	"fmt"
+	"go_grpc_example/05_database/04_redis/02_go-redis/conn"
 	"log"
 	"math/rand"
-	"os"
-	"sync"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/go-redis/redis/v7"
 )
 
 var redisdb *redis.Client
-var wg sync.WaitGroup
 
-func main() {
-	wg.Add(1)
-	go testRedisBase()
-	wg.Wait()
+func init() {
+	redisdb = conn.GetRedisDB()
 }
+func main() {
 
-func InitCache(conf *RedisConfig) {
-	//连接服务器
-	redisdb = redis.NewClient(&redis.Options{
-		Addr:         conf.Addr,
-		DB:           conf.DB,
-		PoolSize:     conf.PoolSize,
-		Password:     conf.Password,
-		IdleTimeout:  time.Duration(conf.IdleTimeout) * time.Second,
-		DialTimeout:  time.Duration(conf.DialTimeout) * time.Second,
-		ReadTimeout:  time.Duration(conf.ReadTimeout) * time.Second,
-		WriteTimeout: time.Duration(conf.WriteTimeout) * time.Second,
-	})
-	//心跳
-	pong, err := redisdb.Ping().Result()
-	if err != nil {
-		os.Exit(1)
-	}
+	testRedisBase()
 
-	log.Println(pong) // Output: PONG
 }
 
 func testRedisBase() {
-	conf := &RedisConfig{
-		Addr:         "ali.danny.games:6379",
-		Password:     "root",
-		DB:           1,
-		PoolSize:     10, // 连接池大小
-		IdleTimeout:  30, // 客户端关闭空闲连接的时间
-		DialTimeout:  1,
-		ReadTimeout:  1,
-		WriteTimeout: 1,
-	}
-
-	defer wg.Done()
-	InitCache(conf)
 
 	ExampleClient_String()
 	//ExampleClient_List()
-	ExampleClient_Hash()
+	//ExampleClient_Hash()
 	//ExampleClient_Set()
 	//ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
@@ -70,24 +37,15 @@ func testRedisBase() {
 
 }
 
-type RedisConfig struct {
-	Addr         string `yaml:"addr"`
-	DB           int    `yaml:"db"`
-	PoolSize     int    `yaml:"pool_size"`
-	Password     string `yaml:"password"`
-	IdleTimeout  int    `yam:"idle_timeout"`
-	DialTimeout  int    `yam:"dial_timeout"`
-	ReadTimeout  int    `yam:"read_timeout"`
-	WriteTimeout int    `yam:"write_timeout"`
-}
-
 func ExampleClient_String() {
 	log.Println("ExampleClient_String starts")
 	defer log.Println("ExampleClient_String ends")
 
 	//kv读写
-	err := redisdb.Set("key", "value", 10*time.Second).Err()
-	log.Println(err)
+	err := redisdb.Set("key", "value", 100*time.Second).Err()
+	if err != nil {
+		log.Println(err)
+	}
 
 	// 判断key是否存在,不存在为0
 	res, err := redisdb.Exists("set_key1").Result()
@@ -301,7 +259,7 @@ func ExampleClient_SortSet() {
 	log.Println(rets, err)
 
 	//指定分数区间的成员列表
-	rets, err = redisdb.ZRangeByScore("sortset_test", redis.ZRangeBy{Min: "(30", Max: "(50", Offset: 1, Count: 10}).Result()
+	rets, err = redisdb.ZRangeByScore("sortset_test", &redis.ZRangeBy{Min: "(30", Max: "(50", Offset: 1, Count: 10}).Result()
 	log.Println(rets, err)
 }
 
@@ -381,7 +339,7 @@ func ExampleClient_CMD() {
 	v, err := Get(redisdb, "NewStringCmd").Result()
 	log.Println("NewStringCmd", v, err)
 
-	v, err = redisdb.Do("get", "redisdb.do").String()
+	v = redisdb.Do("get", "redisdb.do").String()
 	log.Println("redisdb.Do", v, err)
 }
 
