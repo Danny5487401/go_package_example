@@ -1,8 +1,6 @@
-package _2_kafka
-
-/*
+# Kafka
 建议参考阿里文档：https://help.aliyun.com/document_detail/68166.html?spm=a2c4g.11186623.6.760.4d62203aT0ks10#title-k03-if4-cs8:
-一。基本概念
+## 一。基本概念
 	服务端：Broker相当于Kafka的服务端，你可以理解为是队列存在的地方，生产者把消息发送到Broker中，消费者从Broker中获取消息
 	客户端:生产者与消费者
 	1.producer：
@@ -28,7 +26,7 @@ package _2_kafka
 	　　kafka 集群中的其中一个服务器，用来进行 leader election 以及 各种 failover。
 	12.zookeeper：
 	　　kafka 通过 zookeeper 来存储集群的 meta 信息。
-二. producer发布消息
+## 二. producer发布消息
 
 1.写入方式
 	producer 采用 push 模式将消息发布到 broker，每条消息都被 append 到 partition 中，属于顺序写磁盘（顺序写磁盘效率比随机写内存要高，保障 kafka 吞吐率）
@@ -47,7 +45,7 @@ package _2_kafka
 	b. At least one 消息绝不会丢，但可能会重复传输
 	c. Exactly once 每条消息肯定会被传输一次且仅传输一次
 
-三. broker保存消息
+##三. broker保存消息
 	所理解的“消息”，在Kafka中被称为日志。
 	在每一个broker中，保存了多个名字为{Topic}-{Partition}的文件夹，例如Test-1、Test-2.这里的意思是，这个broker中能够处理topic为Test，分区为1和2的消息
 
@@ -75,7 +73,7 @@ package _2_kafka
 	log格式的文件记录了消息，index是偏移量索引，timeindex是时间戳索引。
 	broker在接收到生产者发过来的消息的时候，需要将消息写在最后的Log Segment中。这样还带来了一个好处，消息的写入是顺序的IO。也因为如此，最后的一个Log Segment，被称为“active Log Segment”
 
-四. kafka高可用HA
+## 四. kafka高可用HA
 1。复制replication
 	同一个 partition 可能会有多个 replica（对应 server.properties 配置中的 default.replication.factor=N）。
 	没有 replica 的情况下，一旦 broker 宕机，其上所有 patition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 patition。
@@ -119,7 +117,7 @@ package _2_kafka
 	4.11. 若 auto.leader.rebalance.enable=true（默认值是true），则启动 partition-rebalance 线程。
 	4.12. 若 delete.topic.enable=true 且Delete Topic Patch(/admin/delete_topics)中有值，则删除相应的Topic。
 
-五. 消费者
+## 五. 消费者
 	5.1kafka 提供了两套 consumer API：
 		a  The high-level Consumer API
 		b  The SimpleConsumer API
@@ -186,11 +184,11 @@ package _2_kafka
 		c. N=size(PT)/size(CG)，向上取整
 		d. 解除 Ci 对原来分配的 partition 的消费权（i从0开始）
 		e. 将第i*N到（i+1）*N-1个 partition 分配给 Ci
-六. 注意事项
+## 六. 注意事项
 	6.1 producer 却无法发布消息到 broker（奇怪也没有抛错）
 		 解决方式：server.properties 配置
 		advertised.listeners 是 broker 给 producer 和 consumer 连接使用的，如果没有设置，就使用 listeners，而如果 host_name 没有设置的话，就使用 java.net.InetAddress.getCanonicalHostName() 方法返回的主机名
-七。 位移主题
+## 七。 位移主题
 	在Kafka中的主题名称是__consumer_offsets。因为位移主题也是一个主题。
 	1。问题：
 		讨论一下发往位移主题的消息格式。因为我们是希望保存位移，所以很容易会想到这是一个KV结构。那么Key中应该保存哪些消息呢？
@@ -215,4 +213,4 @@ package _2_kafka
 		手动提交又分为同步提交和异步提交两种提交方式。
 		1。同步提交会直到消息被写入了位移主题，才会返回，这样是安全的，但是可能造成的问题是TPS降低。
 		2。异步提交是触发了提交这个操作，就会返回。这样速度是很快的，但是可能会造成提交失败的情况
-*/
+
