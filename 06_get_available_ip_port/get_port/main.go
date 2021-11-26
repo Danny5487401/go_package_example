@@ -1,13 +1,13 @@
 package main
 
-
 import (
 	"fmt"
 	"net"
 )
 
+// 获取可用端口
 func GetFreePort() (int, error) {
-	addr, err := net.ResolveTCPAddr("tcp", "localhost:0")
+	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:0")
 	if err != nil {
 		return 0, err
 	}
@@ -17,12 +17,12 @@ func GetFreePort() (int, error) {
 		return 0, err
 	}
 	defer l.Close()
-	return l.Addr().(*net.TCPAddr).Port,  nil
+	return l.Addr().(*net.TCPAddr).Port, nil
 }
 
-func main(){
+func main() {
 	port, err := GetFreePort()
-	if err !=nil{
+	if err != nil {
 		fmt.Println(err)
 	}
 	fmt.Println(port)
