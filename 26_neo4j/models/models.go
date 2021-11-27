@@ -7,48 +7,67 @@ import (
 	"strconv"
 )
 
-type Aomobj struct {
-	NodeId    string `json:"id" 			form:"id"`
-	ObjId     string `json:"objId" 		form:"objId"`
-	ObjString string `json:"name" 		form:"name"`
+type StuObj struct {
+	NodeId string `json:"id" form:"id"`
+	Class  string `json:"class" form:"class"`
+	Name   string `json:"name" form:"name"`
 }
 
-type Aomedge struct {
-	EdgeId   string `json:"id" form:"id"`
-	EdgeName string `json:"relationship" form:"relationship"`
-	StartId  string `json:"source" form:"source"`
-	EndId    string `json:"target"  form:"target"`
+type StudentTeacherdge struct {
+	EdgeId  string `json:"id" form:"id"`
+	Teach   string `json:"teach" form:"teach"`
+	StartId string `json:"source" form:"source"`
+	EndId   string `json:"target"  form:"target"`
 }
 
 type NodeData struct {
-	Data Aomobj `json:"data" form:"data"`
+	Data StuObj `json:"data" form:"data"`
 }
 type EdgeData struct {
-	Data Aomedge `json:"data" form:"data"`
+	Data StudentTeacherdge `json:"data" form:"data"`
 }
 
 var (
-	neo4jURL = "neo4j+s://28b56052.databases.neo4j.io"
+	neo4jURL = "bolt://tencent.danny.games:7687"
+	db       = "neo4j"
 )
 
-func GetAomObjList(count int32) (nodes []NodeData) {
+func CreateStudent(name string, class string) {
+	driver, err := database.CreateDriver(neo4jURL, "neo4j", "chuanzhi")
+	if err != nil {
+		log.Println("error connecting to neo4j:", err)
+		return
+	}
+	sql := fmt.Sprintf(`create n:Student{name:%v, class: %v } `, name, class)
+	_ = database.NodeCreate(driver, sql, db)
+}
+
+func GetStuObjList(count int32) (nodes []NodeData) {
 
 	nodes = make([]NodeData, 0)
 
-	driver, err := database.CreateDriver(neo4jURL, "neo4j", "QHX9NbyAbhRihh266kuD7DZO8MobVFL-VjX9yWi1qt4")
+	driver, err := database.CreateDriver(neo4jURL, "neo4j", "chuanzhi")
 	if err != nil {
 		log.Println("error connecting to neo4j:", err)
 		return nil
 	}
 
-	data, err := database.NodeQuery(driver, fmt.Sprintf("MATCH (n:AOM) RETURN  n LIMIT %d", count), "")
-
+	data, err := database.NodeQuery(driver, fmt.Sprintf("match(n:Student) return (n) LIMIT %d", count), db)
+	if err != nil {
+		return nil
+	}
 	//log.Println("Lenght of data is :", len(data))
 	for i := 0; i < len(data); i++ {
 		var node NodeData
 		node.Data.NodeId = strconv.FormatInt(data[i].Id, 10)
-		node.Data.ObjId = data[i].Props["OID"].(string)      /// OID 是我自己创建 neo4j db entry 的时候，添加的私有属性
-		node.Data.ObjString = data[i].Props["Desc"].(string) /// "Desc" is same with "OID"， 私有属性
+		name, ok := data[i].Props["name"].(string)
+		if ok {
+			node.Data.Name = name
+		}
+		class, ok := data[i].Props["class"].(string)
+		if ok {
+			node.Data.Class = class
+		}
 
 		nodes = append(nodes, node)
 	}
@@ -57,11 +76,11 @@ func GetAomObjList(count int32) (nodes []NodeData) {
 	return nodes
 }
 
-func GetAomObjRelationship(count int32) (Edges []EdgeData) {
+func GetTeachStudentRelationship(count int32) (Edges []EdgeData) {
 
 	Edges = make([]EdgeData, 0)
 
-	driver, err := database.CreateDriver(neo4jURL, "neo4j", "neo4j")
+	driver, err := database.CreateDriver(neo4jURL, "neo4j", "chuanzhi")
 	if err != nil {
 		log.Println("error connecting to neo4j:", err)
 		return nil
@@ -73,7 +92,7 @@ func GetAomObjRelationship(count int32) (Edges []EdgeData) {
 	for i := 0; i < len(data); i++ {
 		var edge EdgeData
 		edge.Data.EdgeId = "r" + strconv.FormatInt(data[i].Id, 10)
-		edge.Data.EdgeName = data[i].Type
+		edge.Data.Teach = data[i].Type
 		edge.Data.StartId = strconv.FormatInt(data[i].StartId, 10)
 		edge.Data.EndId = strconv.FormatInt(data[i].EndId, 10)
 		Edges = append(Edges, edge)

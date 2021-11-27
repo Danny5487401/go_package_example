@@ -14,11 +14,18 @@ type elements struct {
 
 func GetAomObj(c *gin.Context) {
 
-	log.Println("call GetAomObj")
-	nodes := models.GetAomObjList(200)
-	edges := models.GetAomObjRelationship(200)
+	log.Println("call GetStudTeacherRelationObj")
+	// 获取节点
+	nodes := models.GetStuObjList(200)
+	// 获取关系
+	edges := models.GetTeachStudentRelationship(200)
 
 	e := elements{Nodes: nodes, Edges: edges}
 
 	c.JSON(http.StatusOK, gin.H{"elements": e})
+}
+
+func CreateObj(c *gin.Context) {
+
+	models.CreateStudent(c.Query("name"), c.Query("class"))
 }

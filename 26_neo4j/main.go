@@ -8,6 +8,7 @@ import (
 func main() {
 	engine := gin.Default()
 	router := engine.RouterGroup
-	router.GET("hello", apis.GetAomObj)
+	router.GET("getStudent", apis.GetAomObj)
+	router.GET("creatStudent", apis.CreateObj)
 	engine.Run(":8080")
 }
