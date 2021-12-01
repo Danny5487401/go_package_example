@@ -21,6 +21,7 @@ import (
 
 	"github.com/spf13/cobra"
 )
+
 var format string
 
 // parseCmd represents the parse command
@@ -43,3 +44,10 @@ func init() {
 	_ = parseCmd.MarkFlagRequired("format")
 
 }
+
+/*
+命令： ./time show parse --format="20060102 15:04:05"
+结果： 20211201 12:50:02
+
+
+*/

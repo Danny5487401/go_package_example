@@ -20,26 +20,28 @@ import (
 
 	"github.com/spf13/cobra"
 )
+
 // 全局
 var (
-	Foo *string  //指针类型
+	Foo   *string //指针类型
 	Print string
-	show bool
+	show  bool
 )
+
 // 局部
 var (
-	FooL *string
-	showL bool
+	FooL   *string
+	showL  bool
 	PrintL string
+)
 
- )
 // testCmd represents the test command
 var testCmd = &cobra.Command{
-	Use:   "test",
+	Use: "test",
 	// 定义arguments数量最少为1个,不传Error: requires at least 1 arg(s), only received 0
 	Args:  cobra.MinimumNArgs(1),
 	Short: "test简短介绍",
-	Long: `test详细介绍`,
+	Long:  `test详细介绍:关于变量的使用`,
 	Run: func(cmd *cobra.Command, args []string) {
 		fmt.Println("test called")
 		if show {
