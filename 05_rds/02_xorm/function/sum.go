@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go_grpc_example/05_database/02_xorm/models"
-	"go_grpc_example/05_database/02_xorm/util"
+	"go_grpc_example/05_rds/02_xorm/models"
+	"go_grpc_example/05_rds/02_xorm/util"
 
 	"fmt"
 )

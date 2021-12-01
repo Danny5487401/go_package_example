@@ -41,6 +41,7 @@ require (
 	github.com/micro/go-micro v1.18.0
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/nacos-group/nacos-sdk-go v1.0.7
+	github.com/neo4j/neo4j-go-driver/v4 v4.4.0
 	github.com/olivere/elastic v6.2.35+incompatible
 	github.com/olivere/elastic/v7 v7.0.26
 	github.com/opentracing/opentracing-go v1.2.0
@@ -56,14 +57,12 @@ require (
 	go.uber.org/dig v1.11.0
 	go.uber.org/zap v1.16.0
 	golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6 // indirect
-	golang.org/x/sys v0.0.0-20210608053332-aa57babbf139 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	google.golang.org/genproto v0.0.0-20210729151513-df9385d47c1b
 	google.golang.org/grpc v1.39.0
 	google.golang.org/grpc/examples v0.0.0-20211103202053-3b94303f3754
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/ini.v1 v1.51.1
-	gopkg.in/yaml.v2 v2.4.0 // indirect
 	honnef.co/go/tools v0.0.1-2020.1.4 // indirect
 	xorm.io/builder v0.3.8
 	xorm.io/xorm v1.1.0

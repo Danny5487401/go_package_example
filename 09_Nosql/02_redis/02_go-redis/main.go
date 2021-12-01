@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go_grpc_example/05_database/04_redis/02_go-redis/conn"
+	"go_grpc_example/09_Nosql/02_redis/02_go-redis/conn"
 	"log"
 	"math/rand"
 	"time"

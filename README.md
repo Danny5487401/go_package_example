@@ -24,22 +24,12 @@
 ## 第四章 [服务注册及配置文件中心Nacos](04_nacos/nacos.md)
 - 1 获取配置及监听文件变化
 - 2 服务注册
-## 第五章 数据操作
+## 第五章 关系型数据库
 - 1 GORM
   - 1.1 GORM原理及实现 
   - 1.2 连接池使用
 - 2 XORM
   - 2.1 主从连接
-- 3 MongoDB
-  - mongo和mysql储存引擎及内存结构
-  - 3.1 增删改查
-- 4 Redis(协议，原理，数据结构分析)
-  - 4.1 redigo使用
-  - 4.2 go-redis使用
-    - 4.2.1 连接池分析
-    - 4.2.2 连接初始化及命令执行流程
-    - 4.2.3 protocol协议封装
-    - 4.2.4 批处理pipeline分析
 ## 第六章 获取对外可用IP和端口
 ## 第七章 Gin前端form验证器
 - 1 错误英转中
@@ -61,7 +51,17 @@
 - 12 GRPC生态中间件
 - 13 channelz调试
 - 14 multiplex多路复用
-## 第九章 DDD领域驱动
+## 第九章 Nosql非关系型数据库
+- 1 MongoDB
+  - mongo和mysql储存引擎及内存结构
+  - 1.1 增删改查
+- 2 Redis(协议，原理，数据结构分析)
+  - 2.1 redigo使用
+  - 2.2 go-redis使用
+    - 2.2.1 连接池分析
+    - 2.2.2 连接初始化及命令执行流程
+    - 2.2.3 protocol协议封装
+    - 2.2.4 批处理pipeline分析
 ## 第十章 链路追踪(Distributed Tracing)
 - 1 Jaeger
   - 1.1 结合XORM
@@ -112,6 +112,10 @@
 
 ## 第二十五章 监控sentry
 - 结合gin使用
+
+## 第二十六章 图数据库neo4j
+- cypher语句
+
 
 
 
