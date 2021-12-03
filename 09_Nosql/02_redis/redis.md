@@ -1,4 +1,4 @@
-#Redis
+# Redis
 
 ![](img/redis_info.png)
 
@@ -13,7 +13,7 @@
 	# 如果数据时写入命令，例如set name:1  zhangsan 方式添加一个字符串.
 	# Redis将根据策略，将这对key:value来用内部编码格式存储，好处是改变内部编码不会对外有影响，正常操作即可,
 	# 同时不同情况下存储格式不一样，发挥优势.
-##为什么需要Redis?
+## 为什么需要Redis?
 
 	传统数据库在存储数据时，需要先定义schema，以确定类型(字节宽度)，并以行存储，所以每行所占的字节宽度是一致的（便于索引数据）。
 	数据库内部数据分为多个datapage(一般是4kb)存储，随着数据量的增大，数据库查询速度会越来越慢，其主要瓶颈在于磁盘I/O。
@@ -25,7 +25,7 @@
 	出现了一批基于内存的关系型数据库，比如SAP HAHA数据库，其物理机器内存2T，包含软件以及服务，购买需要1亿元,由于内存关系型数据库的昂贵价格，
 	所以大部分公司采用了折中的方案,使用磁盘关系型数据库+内存缓存,比如 Oracle+Memcached,Mysql+Redis
 
-##Reactor 单线程的Redis为什么这么快?
+## Reactor 单线程的Redis为什么这么快?
 ![](.redis_images/reason_why_redis_so_fast.png)
 
 	* 1. 基于内存的访问，非阻塞I/O，Redis使用事件驱动模型epoll多路复用实现，连接，读写，关闭都转换为事件不在网络I/O上浪费过多的时间.
@@ -49,7 +49,7 @@ Redis6.0后引入多线程提速：
     多线程可以使得性能翻倍，但是多线程只是用来处理网络数据的读写和协议解析，执行命令仍然是单线程顺序执行
     
 	
-##Redis五种数据类型应用场景
+## Redis五种数据类型应用场景
 ![](.redis_images/redis_db_structure.png)
 ![](img/string.png)
 
@@ -81,7 +81,7 @@ Redis6.0后引入多线程提速：
 
 	5. Zset(skip list + hash table):有序的集合，可以做范围查找，排行榜应用，取 TOP N 操作等,还可以做延时任务
 	
-###扩展：
+### 扩展：
 1.bitmap
     
     BitMap 原本的含义是用一个比特位来映射某个元素的状态。由于一个比特位只能表示 0 和 1 两种状态，所以 BitMap 能映射的状态有限，
@@ -112,9 +112,9 @@ Redis6.0后引入多线程提速：
     
 
 	
-##持久化方式
+## 持久化方式
 
-###1.RDB(redis database)：
+### 1. RDB(redis database)：
     以快照的形式将数据持久化到磁盘
 ![](.redis_images/rdb_format.png)
 
@@ -123,7 +123,7 @@ Redis6.0后引入多线程提速：
         * 可以通过Save以及BGSAVE 来调用 
         * 二进制文件, lzf
     
-###2.AOF(append only file)
+### 2. AOF(append only file)
     
     以日志的形式记录每个操作，将Redis执行过的所有指令全部记录下来（读操作不记录）， 只许追加文件但不可以修改文件， Redis启动时会读取AOF配置文件重构数据
 
@@ -164,6 +164,6 @@ Redis集群特点
     3. redis cluster
 ![](.redis_images/redis_cluster.png)
 
-##高并发缓存
+## 高并发缓存
 ![](.redis_images/high_concurrency_buffer.png)
 

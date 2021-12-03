@@ -7,17 +7,18 @@
 - 4 http_rpc
 ## [第一章 服务注册中心consul](01_consul/consul.md)
 - 1 服务注册，过滤，获取
-## [第二章 日志库zap](02_zap/zap.md)
-- 1 源码结构
-- 2 控制台输出
-- 3 文件输出
+## [第二章 日志库zap使用及源码分析](02_zap/zap.md)
+- 1 控制台输出
+- 2 文件输出
 ## 第三章 消息队列
 - 1 [rabbitmq](03_amqp/01_rabbitmq/introduction.md)
   - 1.1 消费者：推拉模式
   - 1.1 生产者
-- 2 [kafka](03_amqp/02_kafka/introduction.md)
+- 2 [kafka](03_amqp/02_kafka/kafka_intro.md)
   - 2.1 客户端sarama
-  - 2.2 客户端confluent-kafka-go
+  - 2.2 [客户端confluent-kafka-go源码分析](03_amqp/02_kafka/02_confluent-kafka/confluent_kafka_source_code.md)
+    - 2.2.1 生产者
+    - 2.2.2 消费者
 - 3 rocketmq
   - 3.1 消费者：简单消费,延迟消费
   - 3.2 生产者：简单消息，延迟消息，事务消息
@@ -55,7 +56,8 @@
 - 1 MongoDB
   - mongo和mysql储存引擎及内存结构
   - 1.1 增删改查
-- 2 Redis(协议，原理，数据结构分析)
+- 2 [Redis(协议，原理，数据结构分析)](09_Nosql/02_redis/redis.md)
+  - [redis底层数据结构对象源码分析](09_Nosql/02_redis/redis_obj.md)
   - 2.1 redigo使用
   - 2.2 go-redis使用
     - 2.2.1 连接池分析

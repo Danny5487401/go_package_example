@@ -1,7 +1,7 @@
-#redis数据类型与11zh3ong编码方式
+# redis数据类型与11zh3ong编码方式
 
 ## 1.redis核心对象结构
-###Redis object对象的数据结构,具有五种属性
+### Redis object对象的数据结构,具有五种属性
 ```cgo
 // src/server.h
 typedef struct redisObject {
@@ -22,7 +22,7 @@ typedef struct redisObject {
     [4] refcount ====> 引用计数。这个属性主要是为了实现redis中的内存回收机制
     [5] lru ====> 最近最少使用。用来解决对象的空转时长，同时也会被用于当缓冲达到最大值，再向其中添加数据时，应该删除什么数据。
 
-####基本数据类型
+#### 基本数据类型
 ```cgo
 /* The actual Redis Object */
 #define OBJ_STRING 0    /* String object. */
@@ -33,7 +33,7 @@ typedef struct redisObject {
 ```
 
 
-####encoding编码方式
+#### encoding编码方式
 ```cgo
 #define OBJ_ENCODING_RAW 0     /* Raw representation */
 #define OBJ_ENCODING_INT 1     /* Encoded as integer 整数*/
@@ -307,7 +307,7 @@ typedef struct quicklistNode {
 } quicklistNode;
 ```
 
-###client、redisServer对象
+### client、redisServer对象
 ```cgo
 struct client {
     int fd;// Client socket.
@@ -341,12 +341,12 @@ struct redisServer {
 object encoding key
 ```
 
-###RedisDB内部结构
+### RedisDB内部结构
 ![](.redis_images/object_to_encoding.png)
 
 ![](.redis_images/redis_data_structure.png)
 
-###1.string
+### 1.string
 ![](.redis_images/c_string.png)
 
 c语言自带的字符串,不过是一个以0结束的字符数组.想要获取 「Redis」的长度，需要从头开始遍历，直到遇到 '\0' 为止。
@@ -362,13 +362,13 @@ c语言自带的字符串,不过是一个以0结束的字符数组.想要获取 
     2、embstar：小于等于 39 字节的字符串
     
     3、raw：大于 39 字节的字符串
-###2.hash(ziplist+dict)
+### 2.hash(ziplist+dict)
 
-###3.set(intset+dict)
+### 3.set(intset+dict)
 
-###4.list双端链表
+### 4.list双端链表
 
-###5.Sort Set(dict+zskiplist)
+### 5.Sort Set(dict+zskiplist)
 ```cgo
 typedef struct zset {
     dict *dict;
@@ -378,7 +378,7 @@ typedef struct zset {
 其中字典里面保存了有序集合中member与score的键值对，跳跃表则用于实现按score排序的功能
 
 
-###6.stream(radix-tree)
+### 6.stream(radix-tree)
 
 PipeLine:
 
