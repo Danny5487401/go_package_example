@@ -108,9 +108,10 @@
 - 1 [Config配置加载包](23_micro/01ConfigTest/config.md)
 
 ## [ 第二十四章 搜索引擎es](24_elasticSearch/es.md)
-
-- 1 V6版本 
-- 2 V7版本 
+- 1 官方包
+- 2 oliver包
+  - 2.1 V6版本 
+  - 2.2 V7版本 
 
 ## 第二十五章 监控sentry
 - 结合gin使用
