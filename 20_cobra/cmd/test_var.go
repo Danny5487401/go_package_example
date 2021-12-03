@@ -33,6 +33,7 @@ var (
 	FooL   *string
 	showL  bool
 	PrintL string
+	Age    int64
 )
 
 // testCmd represents the test command
@@ -49,6 +50,7 @@ var testCmd = &cobra.Command{
 		}
 		fmt.Println("Print:", Print)
 		fmt.Println("Foo:", *Foo)
+		fmt.Println("age:", Age)
 	},
 }
 
@@ -57,11 +59,12 @@ func init() {
 
 	// 1。全局
 	// 下面定义了一个Flag foo, foo后面接的值会被赋值给Foo
-	Foo = testCmd.PersistentFlags().String("foo", "", "A help for foo")
+	perFlags := testCmd.PersistentFlags()
+	Foo = perFlags.String("foo", "", "A help for foo")
 	// 下面定义了一个Flag print ,print后面的值会被赋值给Print变量
-	testCmd.PersistentFlags().StringVar(&Print, "print", "", "print")
+	perFlags.StringVar(&Print, "print", "", "print")
 	// 下面定义了一个Flag show,show默认为false, 有两种调用方式--show\-s，命令后面接了show则上面定义的show变量就会变成true
-	testCmd.PersistentFlags().BoolVarP(&show, "show", "s", false, "show")
+	perFlags.BoolVarP(&show, "show", "s", false, "show")
 
 	// 2.局部
 	// 下面定义了一个Flag foo, foo后面接的值会被赋值给Foo
@@ -70,9 +73,12 @@ func init() {
 	testCmd.Flags().StringVar(&PrintL, "printL", "", "print")
 	// 下面定义了一个Flag show,show默认为false, 有两种调用方式--show\-s，命令后面接了show则上面定义的show变量就会变成true
 	showL = *testCmd.Flags().BoolP("showL", "S", false, "showL")
+	testCmd.Flags().Int64VarP(&Age, "age", "a", 22, "年龄")
 
 	// 必须设置某些选项
 	// 设置使用test的时候后面必须接show
 	_ = testCmd.MarkFlagRequired("showL") // 不写会提示Error: required flag(s) "showLd" not set
 
 }
+
+// Note:短变量只能一个英文："panic: "ln" shorthand is more than one ASCII character"
