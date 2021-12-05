@@ -26,6 +26,7 @@
 - 1 获取配置及监听文件变化
 - 2 服务注册
 ## 第五章 关系型数据库
+- [go-mysql-driver插件源码分析](05_rds/go_mysql_driver.md)
 - 1 GORM
   - 1.1 GORM原理及实现 
   - 1.2 连接池使用
