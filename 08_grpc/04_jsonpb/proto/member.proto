@@ -14,4 +14,9 @@ message MemberResponse {
   int32 Id = 1;
   string Phone = 2;
   int32 Age = 3;
+  Detail data = 4;
+}
+
+message  Detail {
+  int32 School = 1;
 }
