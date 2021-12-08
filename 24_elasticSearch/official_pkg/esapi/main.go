@@ -6,13 +6,17 @@ import (
 	"context"
 	"encoding/json"
 	"log"
+	"net/http"
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
-	"github.com/elastic/go-elasticsearch"
-	"github.com/elastic/go-elasticsearch/esapi"
+	"github.com/elastic/go-elasticsearch/v7"
+	"github.com/elastic/go-elasticsearch/v7/esapi"
 )
+
+// 服务器使用的是v7版本
 
 func main() {
 	log.SetFlags(0)
@@ -22,8 +26,14 @@ func main() {
 		wg sync.WaitGroup
 	)
 
+	// 配置服务器地址
 	addr := []string{`http://106.14.35.115:9200`}
-	config := elasticsearch.Config{Addresses: addr}
+	// 配置http数据传输
+	transport := &http.Transport{
+		MaxIdleConnsPerHost:   10,
+		ResponseHeaderTimeout: time.Second,
+	}
+	config := elasticsearch.Config{Addresses: addr, Transport: transport}
 	es, err := elasticsearch.NewClient(config)
 	if err != nil {
 		log.Fatalf("Error creating the client: %s", err)
@@ -35,31 +45,38 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error getting response: %s", err)
 	}
+	// 关闭是为了复用tcp🔗
+	//  It is critical to both close the response body and to consume it, in order to re-use persistent TCP connections in the default HTTP transport
+	defer res.Body.Close()
 	// Deserialize the response into a map.
 	if err := json.NewDecoder(res.Body).Decode(&r); err != nil {
 		log.Fatalf("Error parsing the response body: %s", err)
 	}
 	// Print version number.
-	log.Printf("~~~~~~~> Elasticsearch %s", r["version"].(map[string]interface{})["number"])
+	// Print client and server version numbers.
+	log.Printf("Client: %s", elasticsearch.Version)                           // Client: 7.16.0
+	log.Printf("Server: %s", r["version"].(map[string]interface{})["number"]) // Server: 7.13.2
+	log.Println(strings.Repeat("~", 37))
 
 	/*
-		{
-		  "name" : "danny",
-		  "cluster_name" : "elasticsearch",
-		  "cluster_uuid" : "pr0k5JSSTXq2v4CB8OLdQA",
-		  "version" : {
-		    "number" : "7.13.2",
-		    "build_flavor" : "default",
-		    "build_type" : "tar",
-		    "build_hash" : "4d960a0733be83dd2543ca018aa4ddc42e956800",
-		    "build_date" : "2021-06-10T21:01:55.251515791Z",
-		    "build_snapshot" : false,
-		    "lucene_version" : "8.8.2",
-		    "minimum_wire_compatibility_version" : "6.8.0",
-		    "minimum_index_compatibility_version" : "6.0.0-beta1"
-		  },
-		  "tagline" : "You Know, for Search"
-		}
+		json返回内容
+			{
+			  "name" : "danny",
+			  "cluster_name" : "elasticsearch",
+			  "cluster_uuid" : "pr0k5JSSTXq2v4CB8OLdQA",
+			  "version" : {
+			    "number" : "7.13.2",
+			    "build_flavor" : "default",
+			    "build_type" : "tar",
+			    "build_hash" : "4d960a0733be83dd2543ca018aa4ddc42e956800",
+			    "build_date" : "2021-06-10T21:01:55.251515791Z",
+			    "build_snapshot" : false,
+			    "lucene_version" : "8.8.2",
+			    "minimum_wire_compatibility_version" : "6.8.0",
+			    "minimum_index_compatibility_version" : "6.0.0-beta1"
+			  },
+			  "tagline" : "You Know, for Search"
+			}
 	*/
 
 	// 2. Index documents concurrently
@@ -116,7 +133,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("ERROR: %s", err)
 	}
-	defer res.Body.Close()
 
 	if res.IsError() {
 		var e map[string]interface{}
@@ -150,7 +166,7 @@ func main() {
 	log.Println(strings.Repeat("=", 37))
 }
 
-// ~~~~~~~> Elasticsearch 7.0.0-SNAPSHOT
+//~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 // [200 OK] updated; version=1
 // [200 OK] updated; version=1
 // -------------------------------------

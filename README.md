@@ -10,6 +10,7 @@
 ## [第二章 日志库zap使用及源码分析](02_zap/zap.md)
 - 1 控制台输出
 - 2 文件输出
+- 3 并发安全logger
 ## 第三章 消息队列
 - 1 [rabbitmq](03_amqp/01_rabbitmq/introduction.md)
   - 1.1 消费者：推拉模式
