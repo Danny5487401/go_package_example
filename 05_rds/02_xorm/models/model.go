@@ -50,9 +50,9 @@ type UserActiveRecord struct {
 	Platform      int    `xorm:"'platform' SMALLINT(3) notnull comment('安卓1 ios2') "`
 	ActiveDate    int    `xorm:"'active_date' int(8)  notnull  comment('日期') "`
 	DeviceId      string `xorm:"'device_id' varchar(100) notnull comment('数美Id') "`
-	ClientIP      string `xorm:"'client_id'  varchar(100) notnull comment('客户端请求的ip') "`
+	ClientIP      string `xorm:"'client_ip'  varchar(100) notnull comment('客户端请求的ip') "`
 	Imei          string `xorm:"'imei'  varchar(64) notnull comment('客户端的imei') "`
-	TrustId       string `xorm:"'trust_id' varchar(100) notnull comment('数盟的可信id') "`
+	TrustId       string `xorm:"'trusted_id' varchar(100) notnull comment('数盟的可信id') "`
 	Brand         string `xorm:"'brand' varchar(100) notnull comment('手机品牌') "`
 	Model         string `xorm:"'model' varchar(100) notnull comment('手机型号') "`
 	SystemVersion string `xorm:"'sys_ver' varchar(64) notnull comment('系统版本号') "`

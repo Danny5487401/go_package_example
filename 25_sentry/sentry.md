@@ -1,6 +1,6 @@
-#Sentry
+# Sentry
 Sentry 是一个开源的实时错误追踪系统，可以帮助开发者实时监控并修复异常问题。它主要专注于持续集成、提高效率并且提升用户体验。
-##初始化客户端配置
+## 初始化客户端配置
 ```go
 // ClientOptions that configures a SDK Client.
 type ClientOptions struct {

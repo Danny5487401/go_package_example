@@ -33,6 +33,8 @@
   - 1.2 连接池使用
 - 2 XORM
   - 2.1 主从连接
+  - 2.2 调用mysql函数
+  - 2.3 事务处理
 ## 第六章 获取对外可用IP和端口
 ## 第七章 Gin前端form验证器
 - 1 错误英转中
@@ -92,10 +94,12 @@
 ## 第十八章 日志收集项目 log_collect
 - 1 动态选择文件
 - 2 文件内容读取发送
-## 第十九章 熔断和限流Sentinel
-- 0 熔断，降级，限流的方法及官方包实现
-- 1 流量控制
-- 2 熔断
+## [第十九章 熔断,限流及降级](19_fuse_currentLimiting_degradation/rate_limit.md)
+- 0 熔断，降级，限流(官方包实现)
+- 1 Sentinel
+  - 1 流量控制
+  - 2 熔断
+- [2 sentry](19_fuse_currentLimiting_degradation/hystrix.md)
 ## 第二十章 [命令行框架Cobra](20_cobra/introdoction.md)
 - 1 介绍及功能使用
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
