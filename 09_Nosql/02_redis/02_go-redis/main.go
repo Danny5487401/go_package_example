@@ -23,11 +23,11 @@ func main() {
 
 func testRedisBase() {
 
-	ExampleClient_String()
+	//ExampleClient_String()
 	//ExampleClient_List()
 	//ExampleClient_Hash()
 	//ExampleClient_Set()
-	//ExampleClient_SortSet()
+	ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
@@ -209,13 +209,13 @@ func ExampleClient_SortSet() {
 	log.Println("ExampleClient_SortSet")
 	defer log.Println("ExampleClient_SortSet")
 
-	addArgs := make([]redis.Z, 100)
+	addArgs := make([]*redis.Z, 0)
 	for i := 1; i < 100; i++ {
-		addArgs = append(addArgs, redis.Z{Score: float64(i), Member: fmt.Sprintf("a_%d", i)})
+		addArgs = append(addArgs, &redis.Z{Score: float64(i), Member: fmt.Sprintf("a_%d", i)})
 	}
 	//log.Println(addArgs)
 
-	Shuffle := func(slice []redis.Z) {
+	Shuffle := func(slice []*redis.Z) {
 		r := rand.New(rand.NewSource(time.Now().Unix()))
 		for len(slice) > 0 {
 			n := len(slice)
@@ -229,15 +229,20 @@ func ExampleClient_SortSet() {
 	Shuffle(addArgs)
 
 	//添加
-	//ret, err := redisdb.ZAddNX("sortset_test", addArgs...).Result()
-	//log.Println("ZAddNX", ret, err)
+	ret, err := redisdb.ZAddNX("sortset_test", addArgs...).Result()
+	log.Println("ZAddNX", ret, err)
 
 	//获取指定成员score
-	score, err := redisdb.ZScore("sortset_test", "a_1000").Result()
+	score, err := redisdb.ZScore("sortset_test1", "a_200").Result()
+
 	if err == redis.Nil {
-		fmt.Printf("ZScore键不存在\n")
+		fmt.Printf("ZScore键或者member不存在:%v\n", err)
 	}
-	log.Println("ZScore", score, err)
+	if err != nil {
+		fmt.Println("错误是", err)
+		return
+	}
+	log.Println("ZScore", score)
 
 	//获取制定成员的索引
 	index, err := redisdb.ZRank("sortset_test", "a_1").Result()
