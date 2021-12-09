@@ -113,6 +113,7 @@
 - 1 Sentinel
   - 1 流量控制
   - 2 熔断
+- 2 Hystrix
 - [2 sentry](19_fuse_currentLimiting_degradation/hystrix.md)
 ## 第二十章 [命令行框架Cobra](20_cobra/introdoction.md)
 - 1 介绍及功能使用
