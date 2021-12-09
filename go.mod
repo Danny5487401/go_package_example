@@ -18,6 +18,7 @@ require (
 	github.com/fsnotify/fsnotify v1.4.9
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/gin-gonic/gin v1.6.3
+	github.com/go-mysql-org/go-mysql v1.3.0
 	github.com/go-ole/go-ole v1.2.5 // indirect
 	github.com/go-playground/locales v0.13.0
 	github.com/go-playground/universal-translator v0.17.0
