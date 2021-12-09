@@ -16,7 +16,7 @@ func main() {
 	// 1.服务端信息 ，至少一个
 	serverConfigs := []constant.ServerConfig{
 		{
-			IpAddr: "81.68.197.3",
+			IpAddr: "tencent.danny.games",
 			Port:   8848,
 		},
 	}

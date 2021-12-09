@@ -11,7 +11,8 @@ require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
 	github.com/confluentinc/confluent-kafka-go v1.7.0
 	github.com/eapache/go-resiliency v1.2.0 // indirect
-	github.com/elastic/go-elasticsearch v0.0.0
+	github.com/elastic/go-elasticsearch/v7 v7.16.0
+	github.com/elastic/go-elasticsearch/v8 v8.0.0-20211207161625-b8fa12c97f1d
 	github.com/elliotchance/phpserialize v1.3.1
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/frankban/quicktest v1.11.3 // indirect
@@ -42,6 +43,7 @@ require (
 	github.com/micro/go-micro v1.18.0
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/nacos-group/nacos-sdk-go v1.0.7
+	github.com/nacos-group/nacos-sdk-go/v2 v2.0.0-Beta.1
 	github.com/neo4j/neo4j-go-driver/v4 v4.4.0
 	github.com/olivere/elastic v6.2.35+incompatible
 	github.com/olivere/elastic/v7 v7.0.26

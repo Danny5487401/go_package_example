@@ -77,6 +77,7 @@ type MemberResponse struct {
 	Id                   int32    `protobuf:"varint,1,opt,name=Id,proto3" json:"Id,omitempty"`
 	Phone                string   `protobuf:"bytes,2,opt,name=Phone,proto3" json:"Phone,omitempty"`
 	Age                  int32    `protobuf:"varint,3,opt,name=Age,proto3" json:"Age,omitempty"`
+	Data                 *Detail  `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
 	XXX_sizecache        int32    `json:"-"`
@@ -136,27 +137,85 @@ func (m *MemberResponse) GetAge() int32 {
 	return 0
 }
 
+func (m *MemberResponse) GetData() *Detail {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+type Detail struct {
+	School               int32    `protobuf:"varint,1,opt,name=School,proto3" json:"School,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *Detail) Reset()         { *m = Detail{} }
+func (m *Detail) String() string { return proto.CompactTextString(m) }
+func (*Detail) ProtoMessage()    {}
+func (*Detail) Descriptor() ([]byte, []int) {
+	return fileDescriptor_0ad85d125372441f, []int{2}
+}
+func (m *Detail) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *Detail) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_Detail.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *Detail) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_Detail.Merge(m, src)
+}
+func (m *Detail) XXX_Size() int {
+	return m.Size()
+}
+func (m *Detail) XXX_DiscardUnknown() {
+	xxx_messageInfo_Detail.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_Detail proto.InternalMessageInfo
+
+func (m *Detail) GetSchool() int32 {
+	if m != nil {
+		return m.School
+	}
+	return 0
+}
+
 func init() {
 	proto.RegisterType((*MemberRequest)(nil), "MemberRequest")
 	proto.RegisterType((*MemberResponse)(nil), "MemberResponse")
+	proto.RegisterType((*Detail)(nil), "Detail")
 }
 
 func init() { proto.RegisterFile("04_jsonpb/proto/member.proto", fileDescriptor_0ad85d125372441f) }
 
 var fileDescriptor_0ad85d125372441f = []byte{
-	// 181 bytes of a gzipped FileDescriptorProto
+	// 226 bytes of a gzipped FileDescriptorProto
 	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xe2, 0x92, 0x31, 0x30, 0x89, 0xcf,
 	0x2a, 0xce, 0xcf, 0x2b, 0x48, 0xd2, 0x2f, 0x28, 0xca, 0x2f, 0xc9, 0xd7, 0xcf, 0x4d, 0xcd, 0x4d,
 	0x4a, 0x2d, 0xd2, 0x03, 0x73, 0x94, 0xe4, 0xb9, 0x78, 0x7d, 0xc1, 0xfc, 0xa0, 0xd4, 0xc2, 0xd2,
 	0xd4, 0xe2, 0x12, 0x21, 0x3e, 0x2e, 0x26, 0xcf, 0x14, 0x09, 0x46, 0x05, 0x46, 0x0d, 0xd6, 0x20,
-	0x26, 0xcf, 0x14, 0x25, 0x0f, 0x2e, 0x3e, 0x98, 0x82, 0xe2, 0x82, 0xfc, 0xbc, 0xe2, 0x54, 0x74,
+	0x26, 0xcf, 0x14, 0xa5, 0x54, 0x2e, 0x3e, 0x98, 0x82, 0xe2, 0x82, 0xfc, 0xbc, 0xe2, 0x54, 0x74,
 	0x15, 0x42, 0x22, 0x5c, 0xac, 0x01, 0x19, 0xf9, 0x79, 0xa9, 0x12, 0x4c, 0x0a, 0x8c, 0x1a, 0x9c,
-	0x41, 0x10, 0x8e, 0x90, 0x00, 0x17, 0xb3, 0x63, 0x7a, 0xaa, 0x04, 0x33, 0x58, 0x19, 0x88, 0x69,
-	0x64, 0xc6, 0xc5, 0x06, 0x31, 0x49, 0x48, 0x87, 0x8b, 0xd3, 0x3d, 0xb5, 0x04, 0xca, 0xe1, 0xd3,
-	0x43, 0x71, 0x80, 0x14, 0xbf, 0x1e, 0xaa, 0x7d, 0x4e, 0x52, 0x27, 0x1e, 0xc9, 0x31, 0x5e, 0x78,
-	0x24, 0xc7, 0xf8, 0xe0, 0x91, 0x1c, 0xe3, 0x8c, 0xc7, 0x72, 0x0c, 0x51, 0x1c, 0x7a, 0xfa, 0xd6,
-	0x60, 0xe7, 0x27, 0xb1, 0x81, 0x29, 0x63, 0x40, 0x00, 0x00, 0x00, 0xff, 0xff, 0xd1, 0xc6, 0xee,
-	0x2c, 0xe5, 0x00, 0x00, 0x00,
+	0x41, 0x10, 0x8e, 0x90, 0x00, 0x17, 0xb3, 0x63, 0x7a, 0xaa, 0x04, 0x33, 0x58, 0x19, 0x88, 0x29,
+	0x24, 0xcd, 0xc5, 0x92, 0x92, 0x58, 0x92, 0x28, 0xc1, 0xa2, 0xc0, 0xa8, 0xc1, 0x6d, 0xc4, 0xae,
+	0xe7, 0x92, 0x5a, 0x92, 0x98, 0x99, 0x13, 0x04, 0x16, 0x54, 0x52, 0xe0, 0x62, 0x83, 0xf0, 0x85,
+	0xc4, 0xb8, 0xd8, 0x82, 0x93, 0x33, 0xf2, 0xf3, 0x73, 0xa0, 0x56, 0x40, 0x79, 0x46, 0x66, 0x5c,
+	0x6c, 0x10, 0x87, 0x08, 0xe9, 0x70, 0x71, 0xba, 0xa7, 0x96, 0x40, 0x39, 0x7c, 0x7a, 0x28, 0xee,
+	0x97, 0xe2, 0xd7, 0x43, 0x75, 0xae, 0x93, 0xd4, 0x89, 0x47, 0x72, 0x8c, 0x17, 0x1e, 0xc9, 0x31,
+	0x3e, 0x78, 0x24, 0xc7, 0x38, 0xe3, 0xb1, 0x1c, 0x43, 0x14, 0x87, 0x9e, 0xbe, 0x35, 0xd8, 0xf7,
+	0x49, 0x6c, 0x60, 0xca, 0x18, 0x10, 0x00, 0x00, 0xff, 0xff, 0xd8, 0x5a, 0x6e, 0x1d, 0x24, 0x01,
+	0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -295,6 +354,18 @@ func (m *MemberResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 		i -= len(m.XXX_unrecognized)
 		copy(dAtA[i:], m.XXX_unrecognized)
 	}
+	if m.Data != nil {
+		{
+			size, err := m.Data.MarshalToSizedBuffer(dAtA[:i])
+			if err != nil {
+				return 0, err
+			}
+			i -= size
+			i = encodeVarintMember(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
 	if m.Age != 0 {
 		i = encodeVarintMember(dAtA, i, uint64(m.Age))
 		i--
@@ -309,6 +380,38 @@ func (m *MemberResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	}
 	if m.Id != 0 {
 		i = encodeVarintMember(dAtA, i, uint64(m.Id))
+		i--
+		dAtA[i] = 0x8
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *Detail) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *Detail) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *Detail) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.XXX_unrecognized != nil {
+		i -= len(m.XXX_unrecognized)
+		copy(dAtA[i:], m.XXX_unrecognized)
+	}
+	if m.School != 0 {
+		i = encodeVarintMember(dAtA, i, uint64(m.School))
 		i--
 		dAtA[i] = 0x8
 	}
@@ -356,6 +459,25 @@ func (m *MemberResponse) Size() (n int) {
 	}
 	if m.Age != 0 {
 		n += 1 + sovMember(uint64(m.Age))
+	}
+	if m.Data != nil {
+		l = m.Data.Size()
+		n += 1 + l + sovMember(uint64(l))
+	}
+	if m.XXX_unrecognized != nil {
+		n += len(m.XXX_unrecognized)
+	}
+	return n
+}
+
+func (m *Detail) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.School != 0 {
+		n += 1 + sovMember(uint64(m.School))
 	}
 	if m.XXX_unrecognized != nil {
 		n += len(m.XXX_unrecognized)
@@ -534,6 +656,112 @@ func (m *MemberResponse) Unmarshal(dAtA []byte) error {
 				b := dAtA[iNdEx]
 				iNdEx++
 				m.Age |= int32(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Data", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMember
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthMember
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthMember
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.Data == nil {
+				m.Data = &Detail{}
+			}
+			if err := m.Data.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipMember(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthMember
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.XXX_unrecognized = append(m.XXX_unrecognized, dAtA[iNdEx:iNdEx+skippy]...)
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *Detail) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowMember
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: Detail: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: Detail: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field School", wireType)
+			}
+			m.School = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowMember
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.School |= int32(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

@@ -10,6 +10,7 @@
 ## [第二章 日志库zap使用及源码分析](02_zap/zap.md)
 - 1 控制台输出
 - 2 文件输出
+- 3 并发安全logger
 ## 第三章 消息队列
 - 1 [rabbitmq](03_amqp/01_rabbitmq/introduction.md)
   - 1.1 消费者：推拉模式
@@ -24,7 +25,7 @@
   - 3.2 生产者：简单消息，延迟消息，事务消息
 ## 第四章 [服务注册及配置文件中心Nacos](04_nacos/nacos.md)
 - 1 获取配置及监听文件变化
-- 2 服务注册
+- 2 服务注册，监听，获取
 ## 第五章 关系型数据库
 - [go-mysql-driver插件源码分析](05_rds/go_mysql_driver.md)
 - 1 GORM
@@ -32,6 +33,8 @@
   - 1.2 连接池使用
 - 2 XORM
   - 2.1 主从连接
+  - 2.2 调用mysql函数
+  - 2.3 事务处理
 ## 第六章 获取对外可用IP和端口
 ## 第七章 Gin前端form验证器
 - 1 错误英转中
@@ -76,11 +79,25 @@
 - 1 assert断言
 - 2 mock测试替身
 - 3 suite测试套件
-## 第十三章 序列化反序列化
+## [第十三章 序列化反序列化](13_serialize/serialize.md)
 - 1 Jsoniter(完全兼容标准库json，性能较好)
   - 1.1 序列化
+    - 结构体成员为基本类型,嵌套结构体，及tag标签使用
+    - 结构体成员为interface{}
   - 1.2 反序列化
+    - 基本使用
+    - json字符串数组
+    - json.RawMessage二次反序列化
 - 2 mapstructure使用（性能低但是方便）
+  - 无tag标签
+  - 带tag标签
+  - embeded内嵌
+  - 字段保留
+  - 省略字段
+  - 元数据
+  - 错误
+  - 弱解析
+  - 自定义解析器
 ## 第十四章 系统监控指标
 ## 第十五章 分布式事务
 - 1 两阶段提交2pc
@@ -91,10 +108,13 @@
 ## 第十八章 日志收集项目 log_collect
 - 1 动态选择文件
 - 2 文件内容读取发送
-## 第十九章 熔断和限流Sentinel
-- 0 熔断，降级，限流的方法及官方包实现
-- 1 流量控制
-- 2 熔断
+## [第十九章 熔断,限流及降级](19_fuse_currentLimiting_degradation/rate_limit.md)
+- 0 熔断，降级，限流(官方包实现)
+- 1 Sentinel
+  - 1 流量控制
+  - 2 熔断
+- 2 Hystrix
+- [2 sentry](19_fuse_currentLimiting_degradation/hystrix.md)
 ## 第二十章 [命令行框架Cobra](20_cobra/introdoction.md)
 - 1 介绍及功能使用
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
