@@ -12,7 +12,6 @@ require (
 	github.com/confluentinc/confluent-kafka-go v1.7.0
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/elastic/go-elasticsearch/v7 v7.16.0
-	github.com/elastic/go-elasticsearch/v8 v8.0.0-20211207161625-b8fa12c97f1d
 	github.com/elliotchance/phpserialize v1.3.1
 	github.com/envoyproxy/protoc-gen-validate v0.1.0
 	github.com/frankban/quicktest v1.11.3 // indirect
