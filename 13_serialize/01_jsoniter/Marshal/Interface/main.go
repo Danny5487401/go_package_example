@@ -28,9 +28,11 @@ func main() {
 	jsonStu, err := json.Marshal(stu)
 	if err != nil {
 		fmt.Println("生成json字符串错误")
+		return
 	}
 
 	//jsonStu是[]byte类型，转化成string类型便于查看
+	// {"name":"张三","Age":18,"HIgh":true,"class":{"Name":"1班","Grade":3}}
 	fmt.Println(string(jsonStu))
 	// 在实际项目中，编码成json串的数据结构，往往是切片类型。如下定义了一个[]StuRead类型的切片
 	/*

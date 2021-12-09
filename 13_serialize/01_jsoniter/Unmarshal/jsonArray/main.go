@@ -22,6 +22,7 @@ func main() {
 	multiErr := json.Unmarshal([]byte(articleStrings), &articleSlide)
 	if multiErr != nil {
 		fmt.Println("转换出错：", multiErr)
+		return
 	}
 
 	for k, v := range articleSlide {

@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-// 服务器测试的是nacos 2.0.3
+// 服务器测试： nacos 2.0.3
+// 客户端版本: Nacos-Go-Client:v1.0.7
 
 package main
 
@@ -28,7 +29,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/util"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 
-	"go_grpc_example/04_nacos/service_center/server"
+	"go_grpc_example/04_nacos/service_center/v1/server"
 )
 
 func main() {
@@ -260,6 +261,7 @@ func main() {
 	//	Ephemeral:   true,
 	//})
 	//wait for client pull change from server
+	// 监听保证10秒钟
 	time.Sleep(10 * time.Second)
 	//
 	////Now we just unsubscribe callback1, and callback2 will still receive change event

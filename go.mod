@@ -42,6 +42,7 @@ require (
 	github.com/micro/go-micro v1.18.0
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/nacos-group/nacos-sdk-go v1.0.7
+	github.com/nacos-group/nacos-sdk-go/v2 v2.0.0-Beta.1
 	github.com/neo4j/neo4j-go-driver/v4 v4.4.0
 	github.com/olivere/elastic v6.2.35+incompatible
 	github.com/olivere/elastic/v7 v7.0.26
