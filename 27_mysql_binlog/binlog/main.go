@@ -12,6 +12,7 @@ func main() {
 
 	// Create a binlog syncer with a unique server id, the server id must be different from other MySQL's.
 	// flavor is mysql or mariadb
+	// 创建配置
 	cfg := replication.BinlogSyncerConfig{
 		ServerID: 1000000,
 		Flavor:   "mysql",
@@ -22,7 +23,7 @@ func main() {
 	}
 	syncer := replication.NewBinlogSyncer(cfg)
 
-	// Start sync with specified binlog file and position
+	// 指定的文件及偏移位置
 	streamer, _ := syncer.StartSync(mysql.Position{Name: "binlog.000002", Pos: 4})
 
 	// or you can start a gtid replication like
