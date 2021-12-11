@@ -7,6 +7,7 @@
 - 4 http_rpc
 ## [第一章 服务注册中心consul](01_consul/consul.md)
 - 1 服务注册，过滤，获取
+- 2 [分布式锁(consul实现方式)](01_consul/distributed_lock.md)
 ## [第二章 日志库zap使用及源码分析](02_zap/zap.md)
 - 1 控制台输出
 - 2 文件输出
