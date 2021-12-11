@@ -114,14 +114,13 @@
 - 1 Sentinel
   - 1 流量控制
   - 2 熔断
-- 2 Hystrix
-- [2 sentry](19_fuse_currentLimiting_degradation/hystrix.md)
+- [2 Hystrix](19_fuse_currentLimiting_degradation/hystrix.md)
 ## 第二十章 [命令行框架Cobra](20_cobra/introdoction.md)
 - 1 介绍及功能使用
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
-## 第二十一章 配置文件获取工具viper
+## 第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify)
 - 1 获取文件内容
-- 2 监听文件变化(fsNotify)
+- [2 监听文件变化(fsNotify)](21_viper/02_fsnotify/fsnotify.md)
 ## 第二十二章 ETCD
 - 1 CRUD及watch
 - 2 [读和写流程分析](22_etcd/etcd_read_n_write.md)
