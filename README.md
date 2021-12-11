@@ -118,9 +118,10 @@
 ## 第二十章 [命令行框架Cobra](20_cobra/introdoction.md)
 - 1 介绍及功能使用
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
-## 第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify)
-- 1 获取文件内容
-- [2 监听文件变化(fsNotify)](21_viper/02_fsnotify/fsnotify.md)
+## [第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify)](21_viper/viper.md)
+- 1 获取本地文件内容
+- [2 监听文件变化(fsnotify)](21_viper/02_fsnotify/fsnotify.md)
+- 3 远程读取nacos配置
 ## 第二十二章 ETCD
 - 1 CRUD及watch
 - 2 [读和写流程分析](22_etcd/etcd_read_n_write.md)

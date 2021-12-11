@@ -25,14 +25,19 @@ func GetEnvInfo(env string) bool {
 func main() {
 	// 获取环境变量
 	debug := GetEnvInfo("ENV_DEBUG")
+	//将线上线下文件配置文件隔离
 	configFileName := "viper_test/ch02/config-prod.yaml"
 	if debug {
 		configFileName = "viper_test/ch02/config-debug.yaml"
 	}
 
-	//将线上线下文件配置文件隔离
+	// 初始化
 	v := viper.New()
+
+	// 指定读取配置文件
 	v.SetConfigFile(configFileName) // 注意路径问题  看goland edit configuration:working directory
+
+	// 查找并读取配置文件，
 	if err := v.ReadInConfig(); err != nil {
 		panic(err)
 	}
