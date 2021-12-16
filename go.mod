@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	bitbucket.org/bertimus9/systemstat v0.0.0-20180207000608-0eeff89b0690
+	github.com/ClickHouse/clickhouse-go v1.5.1
 	github.com/HdrHistogram/hdrhistogram-go v1.1.0 // indirect
 	github.com/Shopify/sarama v1.19.0
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
