@@ -5,15 +5,11 @@ import (
 	"github.com/hashicorp/consul/api"
 )
 
-// 注册服务
-func Register(address string, port int, name string, tags []string, id string) error {
-	cfg := api.DefaultConfig()
-	cfg.Address = fmt.Sprintf("%s:8500", address)
-	fmt.Println(cfg)
-	client, err := api.NewClient(cfg)
-	if err != nil {
-		panic(err.Error())
-	}
+var client *api.Client
+
+// Register 注册服务
+func Register(address string, port int, name string, tags []string, id string) (err error) {
+
 	// 生成检查对象
 	check := &api.AgentServiceCheck{
 		HTTP:                           fmt.Sprintf(`http://%s:%d/health`, address, port),
@@ -35,33 +31,19 @@ func Register(address string, port int, name string, tags []string, id string) e
 	return nil
 }
 
-// 获取服务 ：服务发现
-func AllService(address string) {
-	cfg := api.DefaultConfig()
-	cfg.Address = fmt.Sprintf("%s:8500", address)
-	fmt.Println(cfg)
-	client, err := api.NewClient(cfg)
-	if err != nil {
-		panic(err.Error())
-	}
+// AllService 获取服务 ：服务发现
+func AllService() {
 	data, err := client.Agent().Services()
 	if err != nil {
 		panic(err)
 	}
-	for key, _ := range data {
+	for key := range data {
 		fmt.Println(key)
 	}
 }
 
-// 过滤服务
-func FilterService(address, name string) {
-	cfg := api.DefaultConfig()
-	cfg.Address = fmt.Sprintf("%s:8500", address)
-	fmt.Println(*cfg)
-	client, err := api.NewClient(cfg)
-	if err != nil {
-		panic(err.Error())
-	}
+// FilterService 过滤服务
+func FilterService(name string) {
 	filter := fmt.Sprintf(`Service =="%s"`, name)
 	data, err := client.Agent().ServicesWithFilter(filter)
 	if err != nil {
@@ -72,14 +54,39 @@ func FilterService(address, name string) {
 	}
 }
 
-func main() {
-	//err := Register("192.168.16.111",8022,"user_web",[]string{
-	//	"danny_shop","user_web",
-	//},"user_web_id")
-	//if err !=nil{
-	//	fmt.Println(err.Error())
-	//}
-	//AllService("192.168.16.111")
+func initClient() (err error) {
+	address := "tencent.danny.games"
+	port := 8500
+	// 创建默认配置，返回指针可修改
+	cfg := api.DefaultConfig()
+	cfg.Address = fmt.Sprintf("%s:%d", address, port)
 
-	FilterService("192.168.16.111", "user-srv")
+	client, err = api.NewClient(cfg)
+	if err != nil {
+		fmt.Println("初始化客户端失败")
+		return
+	}
+	return
+}
+
+func main() {
+	var err error
+	err = initClient()
+	if err != nil {
+		panic("启动失败")
+	}
+
+	// 注册服务
+	err = Register("192.168.16.111", 8022, "user_web", []string{
+		"danny_shop", "user_web",
+	}, "user_web_id")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
+	// 列举服务
+	AllService()
+
+	// 筛选服务
+	FilterService("user-srv")
 }
