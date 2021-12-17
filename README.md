@@ -138,8 +138,14 @@
 ## 第二十五章 监控sentry
 - 结合gin使用
 
-## 第二十六章 图数据库neo4j
+## 第二十六章 图数据库Neo4j
 - cypher语句
+
+## 第二十七章 Mysql的binlog
+- binlog
+- canal
+
+## 第二十八章 列数据库ClickHouse
 
 
 

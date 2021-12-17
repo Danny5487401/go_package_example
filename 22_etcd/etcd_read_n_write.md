@@ -1,5 +1,5 @@
-#Etcd的读写
-# 分层模型
+# Etcd的读写
+## 分层模型
 Client 层：Client 层包括 client v2 和 v3 两个大版本 API 客户端库，提供了简洁易用的 API，同时支持负载均衡、节点间故障自动转移，
 可极大降低业务使用 etcd 复杂度，提升开发效率、服务可用性。
 
@@ -17,7 +17,7 @@ Raft 算法层：Raft 算法层实现了 Leader 选举、日志复制、ReadInde
 
 # 读请求
 
-![readprocess](./img/request_read_process.png)
+![readProcess](./img/request_read_process.png)
 ##串行读与线性读
 直接读状态机数据返回、无需通过 Raft 协议与集群进行交互的模式，在 etcd 里叫做串行 (Serializable) 读，它具有低延时、高吞吐量的特点，适合对数据一致性要求不高的场景。   
 
@@ -27,7 +27,7 @@ Raft 算法层：Raft 算法层实现了 Leader 选举、日志复制、ReadInde
 早期 etcd 线性读使用的 Raft log read，也就是说把读请求像写请求一样走一遍 Raft 的协议，基于 Raft 的日志的有序性，实现线性读。但此方案读涉及磁盘 IO 开销，性能较差，
 后来实现了 ReadIndex 读机制来提升读性能，满足了 Kubernetes 等业务的诉求
 
-##ReadIndex
+## ReadIndex
 ![readIndex](./img/readIndex.png)
 它是在 etcd 3.1 中引入的，我把简化后的原理图放在了上面。当收到一个线性读请求时，它首先会从 Leader 获取集群最新的已提交的日志索引 (committed index)，
 如上图中的流程二所示。Leader 收到 ReadIndex 请求时，为防止脑裂等异常场景，会向 Follower 节点发送心跳确认，
@@ -36,7 +36,7 @@ C 节点则会等待，直到状态机已应用索引 (applied index) 大于等�
 数据已赶上 Leader，你可以去状态机中访问数据了 (上图中的流程五)。以上就是线性读通过 ReadIndex 机制保证数据一致性原理，
 当然还有其它机制也能实现线性读，如在早期 etcd 3.0 中读请求通过走一遍 Raft 协议保证一致性， 这种 Raft log read 机制依赖磁盘 IO， 性能相比 ReadIndex 较差
 
-##MVCC
+## MVCC
 ![readIndex](./img/vision_n_key_value_in_botdb_n_treeindex.png)
 流程五中的多版本并发控制 (Multiversion concurrency control) 模块是为了解决上一讲我们提到 etcd v2 不支持保存 key 的历史版本、不支持多 key 事务等问题而产生的。
 它核心由内存树形索引模块 (treeIndex) 和嵌入式的 KV 持久化存储库 boltdb 组成。
@@ -47,17 +47,17 @@ C 节点则会等待，直到状态机已应用索引 (applied index) 大于等�
 然后通过 treeIndex 模块来保存用户 key 和版本号的映射关系。treeIndex 与 boltdb 关系如下面的读事务流程图所示，
 从 treeIndex 中获取 key hello 的版本号，再以版本号作为 boltdb 的 key，从 boltdb 中获取其 value 信息。
 
-##buffer
+## buffer
 在获取到版本号信息后，就可从 boltdb 模块中获取用户的 key-value 数据了。不过有一点你要注意，并不是所有请求都一定要从 boltdb 获取数据。
 etcd 出于数据一致性、性能等考虑，在访问 boltdb 前，首先会从一个内存读事务 buffer 中，二分查找你要访问 key 是否在 buffer 里面，若命中则直接返回
 
-##boltdb
+## boltdb
 若 buffer 未命中，此时就真正需要向 boltdb 模块查询数据了，进入了流程七。我们知道 MySQL 通过 table 实现不同数据逻辑隔离，那么在 boltdb 是如何隔离集群元数据与用户数据的呢？
 答案是 bucket。boltdb 里每个 bucket 类似对应 MySQL 一个表，用户的 key 数据存放的 bucket 名字的是 key，etcd MVCC 元数据存放的 bucket 是 meta。
 因 boltdb 使用 B+ tree 来组织用户的 key-value 数据，获取 bucket key 对象后，通过 boltdb 的游标 Cursor 可快速在 B+ tree 找到 key hello 对应的 value 数据，返回给 client
 
 
-#写请求
+# 写请求
 ![readIndex](./img/request_wirte_process.png)
 首先 client 端通过负载均衡算法选择一个 etcd 节点，发起 gRPC 调用。然后 etcd 节点收到请求后经过 gRPC 拦截器、Quota 模块后，进入 KVServer 模块，
 KVServer 模块向 Raft 模块提交一个提案，提案内容为“大家好，请使用 put 方法执行一个 key 为 hello，value 为 world 的命令”。
@@ -66,7 +66,7 @@ KVServer 模块向 Raft 模块提交一个提案，提案内容为“大家好�
 Apply 模块通过 MVCC 模块执行提案内容，更新状态机。与读流程不一样的是写流程还涉及 Quota、WAL、Apply 三个模块。
 crash-safe 及幂等性也正是基于 WAL 和 Apply 流程的 consistent index 等实现的
 
-##Quota模块
+## Quota模块
 当 etcd server 收到 put/txn 等写请求的时候，会首先检查下当前 etcd db 大小加上你请求的 key-value 大小之和是否超过了配额（quota-backend-bytes）。
 如果超过了配额，它会产生一个告警（Alarm）请求，告警类型是 NO SPACE，并通过 Raft 日志同步给其它节点，告知 db 无空间了，并将告警持久化存储到 db 中。
 最终，无论是 API 层 gRPC 模块还是负责将 Raft 侧已提交的日志条目应用到状态机的 Apply 模块，都拒绝写入，集群只读
@@ -80,11 +80,11 @@ etcd 保存了一个 key 所有变更历史版本，如果没有一个机制去�
 后续新的数据写入的时候可复用这块空间，而无需申请新的空间。如果你需要回收空间，减少 db 大小，得使用碎片整理（defrag）， 它会遍历旧的 db 文件数据，
 写入到一个新的 db 文件。但是它对服务性能有较大影响，不建议你在生产集群频繁使用。
 
-##KVServer 模块
+## KVServer 模块
 通过流程二的配额检查后，请求就从 API 层转发到了流程三的 KVServer 模块的 put 方法，我们知道 etcd 是基于 Raft 算法实现节点间数据复制的，
 因此它需要将 put 写请求内容打包成一个提案消息，提交给 Raft 模块。不过 KVServer 模块在提交提案前，还有如下的一系列检查和限速。
 
-###Preflight Check
+### Preflight Check
 为了保证集群稳定性，避免雪崩，任何提交到 Raft 模块的请求，都会做一些简单的限速判断。如下面的流程图所示，首先，
 如果 Raft 模块已提交的日志索引（committed index）比已应用到状态机的日志索引（applied index）超过了 5000，
 那么它就返回一个"etcdserver: too many requests"错误给 client
@@ -93,13 +93,13 @@ etcd 保存了一个 key 所有变更历史版本，如果没有一个机制去�
 
 其次它会检查你写入的包大小是否超过默认的 1.5MB， 如果超过了会返回"etcdserver: request is too large"错误给给 client。
 
-###Propose
+### Propose
 最后通过一系列检查之后，会生成一个唯一的 ID，将此请求关联到一个对应的消息通知 channel，然后向 Raft 模块发起（Propose）一个提案（Proposal），
 提案内容为“大家好，请使用 put 方法执行一个 key 为 hello，value 为 world 的命令”，也就是整体架构图里的流程四。
 向 Raft 模块发起提案后，KVServer 模块会等待此 put 请求，等待写入结果通过消息通知 channel 返回或者超时。
 etcd 默认超时时间是 7 秒（5 秒磁盘 IO 延时 +2*1 秒竞选超时时间），如果一个请求超时未返回结果，则可能会出现你熟悉的 etcdserver: request timed out 错误。
 
-###WAL 模块
+### WAL 模块
 Raft 模块收到提案后，如果当前节点是 Follower，它会转发给 Leader，只有 Leader 才能处理写请求。
 Leader 收到提案后，通过 Raft 模块输出待转发给 Follower 节点的消息和待持久化的日志条目，日志条目则封装了我们上面所说的 put hello 提案内容。
 etcdserver 从 Raft 模块获取到以上消息和日志条目后，作为 Leader，它会将 put 提案消息广播给集群各个节点，
@@ -145,7 +145,7 @@ WAL 模块如何持久化 Raft 日志条目:
 当一半以上节点持久化此日志条目后， Raft 模块就会通过 channel 告知 etcdserver 模块，put 提案已经被集群多数节点确认，提案状态为已提交，你可以执行此提案内容了。
 于是进入流程六，etcdserver 模块从 channel 取出提案内容，添加到先进先出（FIFO）调度队列，随后通过 Apply 模块按入队顺序，异步、依次执行提案内容。
 
-###APPLY模块
+### APPLY模块
 ![APPLY模块](./img/apply_module.png)
 apply 模块从 Raft 模块获得的日志条目信息里，是否有唯一的字段能标识这个提案？
 
@@ -158,9 +158,9 @@ apply 模块从 Raft 模块获得的日志条目信息里，是否有唯一的�
 etcd 通过引入一个 consistent index 的字段，来存储系统当前已经执行过的日志条目索引，实现幂等性。Apply 模块在执行提案内容前，首先会判断当前提案是否已经执行过了，如果执行了则直接返回，
 若未执行同时无 db 配额满告警，则进入到 MVCC 模块，开始与持久化存储模块打交道。
 
-###MVCC
+### MVCC
 MVCC 主要由两部分组成，一个是内存索引模块 treeIndex，保存 key 的历史版本号信息，另一个是 boltdb 模块，用来持久化存储 key-value 数据
-####treeIndex索引模块
+#### treeIndex索引模块
 
 版本号（revision）在 etcd 里面发挥着重大作用，它是 etcd 的逻辑时钟。etcd 启动的时候默认版本号是 1，随着你对 key 的增、删、改操作而全局单调递增。
 
@@ -170,7 +170,7 @@ MVCC 主要由两部分组成，一个是内存索引模块 treeIndex，保存 k
 MVCC 写事务在执行 put hello 为 world 的请求时，会基于 currentRevision 自增生成新的 revision 如{2,0}，然后从 treeIndex 模块中查询 key 的创建版本号、修改次数信息。
 这些信息将填充到 boltdb 的 value 中，同时将用户的 hello key 和 revision 等信息存储到 B-tree，
 
-####boltdb模块
+#### boltdb模块
 写入 boltdb 的 value 含有哪些信息呢？
 
 写入 boltdb 的 value， 并不是简单的"world"，如果只存一个用户 value，索引又是保存在易失的内存上，那重启 etcd 后，我们就丢失了用户的 key 名，无法构建 treeIndex 模块了。

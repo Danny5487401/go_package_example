@@ -4,6 +4,7 @@ go 1.15
 
 require (
 	bitbucket.org/bertimus9/systemstat v0.0.0-20180207000608-0eeff89b0690
+	github.com/ClickHouse/clickhouse-go v1.5.1
 	github.com/HdrHistogram/hdrhistogram-go v1.1.0 // indirect
 	github.com/Shopify/sarama v1.19.0
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
@@ -31,7 +32,7 @@ require (
 	github.com/gomodule/redigo v1.8.4
 	github.com/google/wire v0.5.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
-	github.com/hashicorp/consul/api v1.3.0
+	github.com/hashicorp/consul/api v1.9.1
 	github.com/hpcloud/tail v1.0.0
 	github.com/jinzhu/copier v0.3.2
 	github.com/jinzhu/gorm v1.9.16
