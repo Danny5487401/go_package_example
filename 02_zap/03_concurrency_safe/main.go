@@ -7,7 +7,7 @@ import (
 
 func main() {
 	logger, _ := zap.NewDevelopment()
-	// 使用全局bifa
+	// 使用全局并发安全
 	zap.ReplaceGlobals(logger)
 
 	err := fmt.Errorf("数据有误")

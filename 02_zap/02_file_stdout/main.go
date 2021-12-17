@@ -5,9 +5,9 @@ import (
 	"time"
 )
 
-
 func NewLogger() (*zap.Logger, error) {
 	cfg := zap.NewProductionConfig()
+	// 文件输出位置
 	cfg.OutputPaths = []string{
 		"./myproject.log", // 默认路径在/go/src
 		"stderr",
@@ -15,7 +15,7 @@ func NewLogger() (*zap.Logger, error) {
 	return cfg.Build()
 }
 
-func main()  {
+func main() {
 	//logger, _ := zap.NewProduction()
 	logger, err := NewLogger()
 	if err != nil {

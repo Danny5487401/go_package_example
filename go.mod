@@ -36,12 +36,14 @@ require (
 	github.com/jinzhu/copier v0.3.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/json-iterator/go v1.1.11
+	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/mbobakov/grpc-consul-resolver v1.4.3
 	github.com/micro/go-micro v1.18.0
 	github.com/mitchellh/mapstructure v1.4.1
 	github.com/nacos-group/nacos-sdk-go v1.0.7
 	github.com/nacos-group/nacos-sdk-go/v2 v2.0.0-Beta.1
+	github.com/natefinch/lumberjack v2.0.0+incompatible
 	github.com/neo4j/neo4j-go-driver/v4 v4.4.0
 	github.com/olivere/elastic v6.2.35+incompatible
 	github.com/olivere/elastic/v7 v7.0.26
