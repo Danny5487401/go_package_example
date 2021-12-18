@@ -141,8 +141,9 @@
 ## 第二十五章 监控sentry
 - 结合gin使用
 
-## 第二十六章 图数据库Neo4j
-- cypher语句
+## [第二十六章 图数据库Neo4j](26_neo4j/neo4j.md)
+- [cypher语句](26_neo4j/cypher.md)
+-  1 CRUD在web服务中
 
 ## 第二十七章 Mysql的binlog
 - [binlog](27_mysql_binlog/binlog.md)
@@ -150,6 +151,8 @@
 
 ## 第二十八章 OLAP(Online Analytical Processing联机分析处理)
 - 1 [列数据库ClickHouse](28_OLAP/01_clickHouse/clickHouse.md)
+  - 1.1 标准库sql操作clickHouse
+  - 1.2 扩展包sqlx操作clickHouse
 
 
 

@@ -36,6 +36,7 @@ require (
 	github.com/hpcloud/tail v1.0.0
 	github.com/jinzhu/copier v0.3.2
 	github.com/jinzhu/gorm v1.9.16
+	github.com/jmoiron/sqlx v1.3.3
 	github.com/json-iterator/go v1.1.11
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/mbobakov/grpc-consul-resolver v1.4.3
