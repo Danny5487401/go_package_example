@@ -6,6 +6,9 @@
 - 3 json_rpc
 - 4 http_rpc
 ## [第一章 服务注册中心consul](01_consul/consul.md)
+- consul架构
+- [Raft协议](01_consul/raft.md)
+- [raft在consul实现](01_consul/raft_in_consul.md)
 - 1 服务注册，过滤，获取
 - 2 [分布式锁(consul实现方式)](01_consul/distributed_lock.md)
 ## [第二章 日志库zap使用及源码分析](02_zap/zap.md)
@@ -59,7 +62,7 @@
 - 14 multiplex多路复用
 ## 第九章 Nosql非关系型数据库
 - 1 MongoDB
-  - mongo和mysql储存引擎及内存结构
+  - [mongo和mysql储存引擎及内存结构](09_Nosql/01_mongo/mongo.md)
   - 1.1 增删改查
 - 2 [Redis(协议，原理，数据结构分析)](09_Nosql/02_redis/redis.md)
   - [redis底层数据结构对象源码分析](09_Nosql/02_redis/redis_obj.md)
@@ -125,7 +128,7 @@
 ## 第二十二章 ETCD
 - 1 CRUD及watch
 - 2 [读和写流程分析](22_etcd/etcd_read_n_write.md)
-- 3 [Raft协议](22_etcd/raft.md)
+
 ## 第二十三章 Go-Micro框架 (不推荐使用)
 - 1 [Config配置加载包](23_micro/01ConfigTest/config.md)
 
@@ -142,11 +145,11 @@
 - cypher语句
 
 ## 第二十七章 Mysql的binlog
-- binlog
+- [binlog](27_mysql_binlog/binlog.md)
 - canal
 
-## 第二十八章 列数据库ClickHouse
-
+## 第二十八章 OLAP(Online Analytical Processing联机分析处理)
+- 1 [列数据库ClickHouse](28_OLAP/01_clickHouse/clickHouse.md)
 
 
 
