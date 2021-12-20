@@ -43,7 +43,9 @@
 ## 第七章 Gin前端form验证器
 - 1 错误英转中
 - 2 前端数据校验
-## 第八章 GRPC编程 
+## [第八章 GRPC编程 ](08_grpc/grpc.md)
+- [MakeFile介绍](08_grpc/makefile.md)
+- [protobuf介绍](08_grpc/proto.md)
 - 1  HelloWorld入门
   - 1.1 [客户端Grpc源码](08_grpc/01_grpc_helloworld/client/client.md)
   - 1.2 [服务端Grpc源码](08_grpc/01_grpc_helloworld/server/server.md)

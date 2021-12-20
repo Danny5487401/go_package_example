@@ -52,16 +52,4 @@ func main() {
 	eg.In("id", "2", 3).Find(&dataSlice1) // 参数可以不同类型
 	fmt.Printf("返回dataSlice1:%+v\n", dataSlice1)
 
-	// 更新数据
-	var data5 = new(models.MasterSlaveTable)
-	data5.Name = "Joy"
-	data5.Description = "我是Joy弟弟"
-	// Update方法将返回两个参数，第一个为 更新的记录数
-	//eg.Cols("description").Update(data5) // 这是更新所有数据的Description字段
-	affected, err := eg.Where("usr_name=?", "Joy").Cols("description").Update(data5)
-	if err != nil {
-		fmt.Println("选择部分字段错误", err.Error())
-	}
-	fmt.Println("影响的行数", affected)
-
 }

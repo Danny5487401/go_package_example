@@ -26,9 +26,9 @@ func main() {
 	// 获取环境变量
 	debug := GetEnvInfo("ENV_DEBUG")
 	//将线上线下文件配置文件隔离
-	configFileName := "viper_test/ch02/config-prod.yaml"
+	configFileName := "21_viper/01_read_n_watch_config/config-prod.yaml"
 	if debug {
-		configFileName = "viper_test/ch02/config-debug.yaml"
+		configFileName = "21_viper/01_read_n_watch_config/config-debug.yaml"
 	}
 
 	// 初始化
