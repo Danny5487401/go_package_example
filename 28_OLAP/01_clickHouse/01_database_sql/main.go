@@ -10,7 +10,18 @@ import (
 )
 
 func main() {
-	connect, err := sql.Open("clickhouse", "tcp://tencent.danny.games:9000?debug=true")
+	var (
+		// 多个主机，使用逗号分割
+		host1    = "tencent.danny.games:9000"
+		host2    = "" // 可以写多个
+		username = "root"
+		password = "chuanzhi"
+		database = "default"
+		tcpInfo  = "tcp://%s?username=%s&password=%s&database=%s&read_timeout=5&write_timeout=5&debug=true&compress=true&alt_hosts=%s"
+	)
+	tcpInfo = fmt.Sprintf(tcpInfo, host1, username, password, database, host2)
+
+	connect, err := sql.Open("clickhouse", tcpInfo)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -23,6 +34,7 @@ func main() {
 		return
 	}
 
+	// 创建表
 	_, err = connect.Exec(`
 		CREATE TABLE IF NOT EXISTS example (
 			country_code FixedString(2),
@@ -37,6 +49,8 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// 插入数据
 	var (
 		tx, _   = connect.Begin()
 		stmt, _ = tx.Prepare("INSERT INTO example (country_code, os_id, browser_id, categories, action_day, action_time) VALUES (?, ?, ?, ?, ?, ?)")
@@ -60,6 +74,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// 查询数据
 	rows, err := connect.Query("SELECT country_code, os_id, browser_id, categories, action_day, action_time FROM example")
 	if err != nil {
 		log.Fatal(err)
@@ -83,6 +98,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	// 删除表
 	if _, err := connect.Exec("DROP TABLE example"); err != nil {
 		log.Fatal(err)
 	}

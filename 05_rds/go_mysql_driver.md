@@ -1,6 +1,6 @@
 # go-sql-driver/mysql源码分析
 
-## go-sql-driver/mysql@v1.5.0/buffer.go
+## 1. go-sql-driver/mysql@v1.5.0/buffer.go
 buffer 数是据库连接 (net.Conn) 进行缓冲的一个数据结构
 ```go
 type buffer struct {
@@ -43,11 +43,11 @@ func (b *buffer) readNext(need int) ([]byte, error) {
 }
 
 ```
-## Collations.go
+## 2. Collations.go
 MySQL 所有支持的 字符集 格式
 
 
-## Dsn.go   数据源名称 （Data Source Name）
+## 3. Dsn.go   数据源名称 （Data Source Name）
 数据库的连接配置
 ```go
 type Config struct {
@@ -82,7 +82,7 @@ type Config struct {
 }·
 ```
 
-## Errors.go
+## 4. Errors.go
 定义MySQLError数据结构
 ```go
 // MySQLError is an error type which represents a single MySQL error
@@ -117,7 +117,7 @@ func SetLogger(logger Logger) error {
 	return nil
 }
 ```
-## Packets.go
+## 5. Packets.go
 
 常量
 ```go
@@ -339,7 +339,7 @@ func (mc *mysqlConn) readHandshakePacket() (data []byte, plugin string, err erro
 }
 ```
 
-## Driver.go
+## 6. Driver.go
 主要负责与 MySQL 数据库进行各种协议的连接，并返回该连接
 
 先看标准包database/sql包中的定义
@@ -565,7 +565,7 @@ func (c *connector) Connect(ctx context.Context) (driver.Conn, error) {
 }
 ```
 
-## connection.go
+## 7. connection.go
 ```go
 type mysqlConn struct {
 	buf              buffer  // buffer 缓冲器
@@ -775,7 +775,7 @@ func (mc *mysqlConn) cleanup() {
 }
 ```
 
-## result.go
+## 8. result.go
 每当 MySQL 返回一个 OK 的 状态报文 ，该报文协议会携带上本次执行的结果 affectedRows 以及 insertId ，而 result.go 就包含着一个数据结构，用于存储本次的执行结果
 ```go
 package mysql
@@ -798,7 +798,7 @@ func (res *mysqlResult) RowsAffected() (int64, error) {
 Note: 当 MySQL 执行 插入、更新、删除 等操作后，都会返回 Result    
 
 但是 查询 返回的是 Rows ，我们先来看看 go-mysql-driver 驱动所实现的 接口 Rows 的接口描述
-## row.go
+## 9. row.go
 接口描述 Rows
 ```go
 // database/sql/driver/driver.go
@@ -930,7 +930,7 @@ func (rows *textRows) Next(dest []driver.Value) error {
 Note: 使用 textRows 的场景在 getSystemVar 以及 Query 中，而使用 binaryRows 的场景在 statement 中
 
 
-## Statement.go
+## 10. Statement.go
 Prepared Statement ，即预处理语句
 - 执行性能更高：MySQL 会对 Prepared Statement 语句预先进行编译成模板，并将 占位符 替换 参数 的位置，这样如果频繁执行一条参数只有少量替换的语句时候，性能会得到大量提高。
 可能有同学会有疑问，为什么 MySQL 语句还需要编译？那么可以来参考下这篇 MySQL Prepare 原理: https://www.cnblogs.com/justfortaste/p/3920140.html
@@ -1134,7 +1134,7 @@ func (stmt *mysqlStmt) writeExecutePacket(args []driver.Value) error {
 }
 ```
 
-## Transaction.go
+## 11. Transaction.go
 事务是 MySQL 中很重要的一部分，但是驱动的实现却很简单，因为一切的事务控制都已经交由 MySQL 去执行了，驱动所需要做的，只要发送一个 commit 或者 rollback 的 command packet 即可
 ```go
 type mysqlTx struct {

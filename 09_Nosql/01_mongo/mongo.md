@@ -1,10 +1,10 @@
-#mongo
+# mongo
     MongoDB 是由C++语言编写的，是一个基于分布式文件存储的开源数据库系统
 
     MongoDB 是一个介于关系数据库和非关系数据库之间的产品，是非关系数据库当中功能最丰富，最像关系数据库的。
 
 
-##关系型数据库和非关系型数据库的应用场景对比
+## 关系型数据库和非关系型数据库的应用场景对比
 
 关系型数据库适合存储结构化数据，如用户的帐号、地址：
     
@@ -29,8 +29,8 @@ NoSQL适合存储非结构化数据，如文章、评论：
     1）不支持事务
     2）不支持join、复杂查询
 
-##Mysql和MongoDB内存结构   
-###1、InnoDb内存使用机制
+## Mysql和MongoDB内存结构   
+### 1、InnoDb内存使用机制
 ![](.mongo_images/innodb.png)
     
     Innodb关于查询效率有影响的两个比较重要的参数分别是innodb_buffer_pool_size，innodb_read_ahead_threshold。
@@ -47,15 +47,15 @@ NoSQL适合存储非结构化数据，如文章、评论：
     Innodb_buffer_pool_read_ahead_evicted：表示由于请求到buffer pool中没有被访问，而驱逐出内存的页数。
     
     可以看出来，Mysql的缓冲池机制是能充分利用内存且有预加载机制，在某些条件下目标数据完全在内存中，也能够具备非常好的查询性能
-###2、MongoDB的存储结构及数据模型
-####1）MongoDB使用的储存引擎是WiredTiger，WiredTiger的结构如图所示
+### 2、MongoDB的存储结构及数据模型
+#### 1）MongoDB使用的储存引擎是WiredTiger，WiredTiger的结构如图所示
 ![](.mongo_images/wiredTiger.png)
 ![](.mongo_images/wireTiger_cache.png)
     
     Wiredtiger的Cache采用Btree的方式组织，每个Btree节点为一个page，root page是btree的根节点，internal page是btree的中间索引节点，leaf page是真正存储数据的叶子节点；btree的数据以page为单位按需从磁盘加载或写入磁盘。
     可以通过在配置文件中指定storage.wiredTiger.engineConfig.cacheSizeGB参数设定引擎使用的内存量。此内存用于缓存工作集数据（索引、namespace，未提交的write，query缓冲等）。
-####2）数据模型
-#####内嵌
+#### 2）数据模型
+##### 内嵌
 ![](.mongo_images/embeded_model.png)
 内嵌类型支持一组相关的数据存储在一个文档中，这样的好处就是，应用程序可以通过比较少的的查询和更新操作来完成一些常规的数据的查询和更新工作。
 当遇到以下情况的时候，我们应该考虑使用内嵌类型：
@@ -104,14 +104,14 @@ NoSQL适合存储非结构化数据，如文章、评论：
 ```
 
     内嵌模型可以给应用程序提供很好的数据查询性能，因为基于内嵌模型，可以通过一次数据库操作得到所有相关的数据。同时，内嵌模型可以使数据更新操作变成一个原子写操作。然而，内嵌模型也可能引入一些问题，比如说文档会越来越大，这样就可能会影响数据库写操作的性能，还可能会产生数据碎片（data fragmentation）
-#####引用模型又称规格化模型（Normalized data models)
+##### 引用模型又称规格化模型（Normalized data models)
 
 当我们遇到以下情况的时候，就可以考虑使用引用模型了：
 ![](.mongo_images/refer_model.png)
     使用内嵌模型往往会带来数据的冗余，却可以提升数据查询的效率。但是，当应用程序基本上不通过内嵌模型查询，或者说查询效率的提升不足以弥补数据冗余带来的问题时，我们就应该考虑引用模型了。
     当需要实现复杂的多对多关系的时候，可以考虑引用模型。比如我们熟知的例子，学生-课程-老师关系，如果用引用模型来实现三者的关系，可能会比内嵌模型更清晰直观，同时会减少很多冗余数据。
     当需要实现复杂的树形关系的时候，可以考虑引用模型
-##MongoDB的应用场景
+## MongoDB的应用场景
     1）表结构不明确且数据不断变大
     MongoDB是非结构化文档数据库，扩展字段很容易且不会影响原有数据。内容管理或者博客平台等，例如圈子系统，存储用户评论之类的。
     2）更高的写入负载
@@ -121,11 +121,11 @@ NoSQL适合存储非结构化数据，如文章、评论：
     4）高可用性
     自带高可用，自动主从切换（副本集）
 
-##不适用的场景
+## 不适用的场景
     1）MongoDB不支持事务操作，需要用到事务的应用建议不用MongoDB。
     2）MongoDB目前不支持join操作，需要复杂查询的应用也不建议使用MongoDB
 
-#bson简介
+# bson简介
 
     BSON是一种类json的一种二进制形式的存储格式，简称Binary JSON，它和JSON一样，支持内嵌的文档对象和数组对象，但是BSON有JSON没有的一些数据类型，如Date和BinData类型。
 
@@ -133,8 +133,8 @@ NoSQL适合存储非结构化数据，如文章、评论：
     因为BSON是schema-free的，所以在MongoDB中所对应的文档也有这个特征，这里的一个Document也可以理解成关系数据库中的一条记录(Record)，
     只是这里的Document的变化更丰富一些，如Document可以嵌套
 
-#聚合查询
-##1.聚合通道
+# 聚合查询
+## 1.聚合通道
     MongoDB中聚合的方法使用aggregate()。聚合就是可以对数据查询进行多次过滤操作，以达到复杂查询的目的。
     聚合查询函数接收一个数组，数组里面是若干个对象，每个对象就是一次查询的步骤。前一个查询的查询结果，作为后一个查询的筛选内容。
 ```shell
@@ -186,13 +186,13 @@ db.getCollection("student").aggregate(
     $geoNear：输出接近某一地理位置的有序文档。
     $lookup：连表查询
 
-##readPreference读策略
+## readPreference读策略
 readPreference 主要控制客户端 Driver 从复制集的哪个节点读取数据，这个特性可方便的配置读写分离、就近读取等策略。结合Tag，可以进一步细分控制读取策略。
     
-    primary （只主）只从 primary 节点读数据，这个是默认设置
-    primaryPreferred （先主后从）优先从 primary 读取，primary 不可服务，从 secondary 读
-    secondary （只从）只从 scondary 节点读数据
-    secondaryPreferred （先从后主）优先从 secondary 读取，没有 secondary 成员时，从 primary 读取
-    nearest （就近）根据网络距离就近读取，根据客户端与服务端的PingTime实现
+- primary （只主）只从 primary 节点读数据，这个是默认设置
+- primaryPreferred （先主后从）优先从 primary 读取，primary 不可服务，从 secondary 读
+- secondary （只从）只从 scondary 节点读数据
+- secondaryPreferred （先从后主）优先从 secondary 读取，没有 secondary 成员时，从 primary 读取
+- nearest （就近）根据网络距离就近读取，根据客户端与服务端的PingTime实现
 
 
