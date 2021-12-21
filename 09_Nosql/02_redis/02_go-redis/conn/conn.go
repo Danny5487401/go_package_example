@@ -33,7 +33,7 @@ var wg sync.WaitGroup
 
 func initRedisEngine() {
 	conf := &RedisConfig{
-		Addr:         "ali.danny.games:6379",
+		Addr:         "106.14.35.115:6379",
 		Password:     "root",
 		DB:           2,
 		PoolSize:     10, // 连接池大小

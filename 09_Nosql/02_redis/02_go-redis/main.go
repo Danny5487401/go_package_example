@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"go_grpc_example/09_Nosql/02_redis/02_go-redis/conn"
 	"log"
@@ -25,7 +26,7 @@ func testRedisBase() {
 
 	//ExampleClient_String()
 	//ExampleClient_List()
-	//ExampleClient_Hash()
+	ExampleClient_Hash()
 	//ExampleClient_Set()
 	ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
@@ -125,8 +126,9 @@ func ExampleClient_Hash() {
 
 	//获取
 	ret, err := redisdb.HGet("hash_test", "name1").Result()
-	if err != nil {
+	if err != nil && !errors.Is(err, redis.Nil) {
 		fmt.Println("HGet的错误是", err.Error())
+		return
 	}
 	if err == redis.Nil {
 		fmt.Println("不存在")
