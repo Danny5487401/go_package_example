@@ -17,13 +17,13 @@ func main() {
 		return
 	}
 	for _, v := range rsp {
-		fmt.Printf("数据是%+v\n", v)
+		fmt.Printf("解析前数据是%+v\n", v)
 	}
 
 	// 原生插入数据
 	affected, err := eg.Exec("insert into user_active(id,uid) values(11,100321346)")
 	if err != nil {
-		fmt.Println("插入数据有误")
+		fmt.Println("插入数据有误", err.Error())
 		return
 	}
 	fmt.Println(affected.RowsAffected())

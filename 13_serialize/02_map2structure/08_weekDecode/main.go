@@ -19,16 +19,16 @@ type Person struct {
 
 func main() {
 	m := map[string]interface{}{
-		"name":   123,            //类型不一致
-		"age":    "18",           //类型不一致
-		"emails": []int{1, 2, 3}, // 类型不一致
+		"name":   123,            //类型不一致,string- >int
+		"age":    "18",           //类型不一致  int->string
+		"emails": []int{1, 2, 3}, // 类型不一致 []string->[]int
 	}
 
 	var p Person
 	err := mapstructure.WeakDecode(m, &p)
 	if err == nil {
-		fmt.Println("person:", p)
+		fmt.Printf("person:%+v", p)
 	} else {
-		fmt.Println(err.Error())
+		fmt.Println("反序列化错误", err.Error())
 	}
 }
