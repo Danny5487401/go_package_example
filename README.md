@@ -106,9 +106,11 @@
   - 自定义解析器
 ## 第十四章 系统监控
   - 1 systemstat包(适合linux系统，已断更)
-  - 2 gopsutil
-    - 物理机和虚拟机
-    - 容器环境
+  - 2 [gopsutil](14_system_monitor/02_gopsutil/gopsutil.md)
+    - 进程信息获取
+      - 物理机和虚拟机
+      - 容器环境
+    - cpu,mem,disk
 ## 第十五章 分布式事务
 - 1 两阶段提交2pc
 ## 第十六章 数据复制
