@@ -24,11 +24,11 @@ func main() {
 
 func testRedisBase() {
 
-	//ExampleClient_String()
+	ExampleClient_String()
 	//ExampleClient_List()
-	ExampleClient_Hash()
+	//ExampleClient_Hash()
 	//ExampleClient_Set()
-	ExampleClient_SortSet()
+	//ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
@@ -41,9 +41,18 @@ func testRedisBase() {
 func ExampleClient_String() {
 	log.Println("ExampleClient_String starts")
 	defer log.Println("ExampleClient_String ends")
+	var err error
+
+	// 批量删除key
+	redisKeys := []string{"key1", "key2"}
+	err = redisdb.Del(redisKeys...).Err()
+	if err != nil {
+		// key不存在时，
+		fmt.Println("批量删除key", err.Error())
+	}
 
 	//kv读写
-	err := redisdb.Set("key", "value", 100*time.Second).Err()
+	err = redisdb.Set("key", "value", 100*time.Second).Err()
 	if err != nil {
 		log.Println(err)
 	}
