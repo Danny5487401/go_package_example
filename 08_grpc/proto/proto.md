@@ -1,5 +1,5 @@
 # Protobuf
-
+Protocol buffers 是一种语言无关、平台无关的可扩展机制或者说是数据交换格式，用于序列化结构化数据。与 XML、JSON 相比，Protocol buffers 序列化后的码流更小、速度更快、操作更简单。
 ## v2 和 v3 主要区别
 * 删除原始值字段的字段存在逻辑
 * 删除 required 字段
@@ -13,11 +13,57 @@
 * repeated 默认使用 packed 编码
 * 引入了新的语言实现（C＃，JavaScript，Ruby，Objective-C）
 
-## protobuf优化
-![](.intro_images/proto_optimize.png)
+## 使用
+## 1. 引入其他proto文件
+```shell
+pwd 
+# /Users/xiaxin/Desktop/go_grpc_example
+cd 08_grpc
+```
+目录结构   
+![](.proto_images/dir_proto.png)
 
-### wiretype   
-![](.intro_images/wire_type.png)
+Note: Goland proto插件展示问题，需要手动添加路径，不添加也不影响(这是插件问题)  
+![](.proto_images/goland_proto_display_problem.png)   
+解决方式:解决后   
+![](.proto_images/goland_protobuf_plugin.png)
+![](.proto_images/goland_protobuf_display_fix.png)
+
+### 生成protobuf
+```makefile
+.PHONY: proto
+proto:
+	protoc --proto_path=. --go_out=. ./proto/dir_import/*.proto
+```
+解释：
+1) --proto_path =.  指定在当前目录(go_grpc_example/08_grpc)寻找 import 的文件
+```protobuf
+// 08_grpc/proto/dir_import/computer.proto
+import "proto/dir_import/component.proto";
+```
+所以最终会去找 go_grpc_example/08_grpc/proto/dir_import/component.proto
+
+2）–go_out=.
+指定将生成文件放在当前目录( go_grpc_example/08_grpc)，同时因为 proto 文件中也指定了目录为protobuf/import,具体如下：
+```protobuf
+option go_package = "proto/dir_import;proto";
+```
+所以最终生成目录为--go_out+go_package= go_grpc_example/08_grpc/proto/dir_import
+
+Note:  可以通过参数 --go_opt=paths=source_relative 来指定使用绝对路径，从而忽略掉 proto 文件中的 go_package 路径，直接生成在 –go_out 指定的路径
+
+3）./protobuf/import/*.proto 
+
+指定编译 import 目录下的所有 proto 文件，由于有文件的引入所以需要一起编译才能生效。
+
+Note: 当然也可以一个一个编译，只要把相关文件都编译好即可。
+
+
+## protobuf优化
+![](.proto_images/proto_optimize.png)
+
+### wiretype     
+![](.proto_images/wire_type.png)
 
 ## 工具
 ### protoc
@@ -42,7 +88,7 @@ main包
 
 - doc.go 主要是说明。
 - link_grpc.go 显式引用protoc-gen-go/grpc包，触发grpc的init函数。
-- main.go 代码不到50行，初始化generator，并调用generator相应的方法输出protobuf的Go语言文件。
+- main.go 代码不到50行，初始generator，并调用generator相应的方输出protobuf的Go语言文件。
 
 - generator.go 包含了大部分由protobuf原生结构到Go语言文件的渲染方法，其中 func (g *Generator) P(str ...interface{}) 这个方法会把渲染输出到generator的output（generator匿名嵌套了bytes.Buffer，因此有Buffer的方法）。
 name_test.go 测试，主要包含generator中名称相关方法的测试。
@@ -56,7 +102,7 @@ descriptor 包含protobuf的描述文件（.proto文件及其对应的Go编译�
 ### 生成方式
 参考scripts脚本
 
-####  gogoprotobuf
+##  gogoprotobuf
 在go中使用protobuf，有两个可选用的包goprotobuf（go官方出品）和gogoprotobuf。gogoprotobuf完全兼容google protobuf，
 它生成的代码质量和编解码性能均比goprotobuf高一些。
 主要是它在goprotobuf之上extend了一些option。这些option也是有级别区分的，有的option只能修饰field，有的可以修饰enum，有的可以修饰message，有的是修饰package（即对整个文件都有效)
@@ -73,7 +119,7 @@ go get github.com/gogo/protobuf/protoc-gen-gofast
 protoc --gofast_out=. myproto.proto
 ```
 
-# protobuf源码分析
+## protobuf源码分析
 ```go
 //message接口
 type Message = protoiface.MessageV1
