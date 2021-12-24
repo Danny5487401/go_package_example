@@ -37,6 +37,7 @@ func main() {
 	defer cancel()
 	r, err := c.SayHello(ctx, &pb.HelloRequest{Name: "world"})
 	if err != nil {
+		// 默认返回的是status.Error
 		fmt.Printf("错误是%+v\n", err.Error())
 
 		// 比FromError更加友好
