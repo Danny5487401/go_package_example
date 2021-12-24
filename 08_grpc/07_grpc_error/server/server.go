@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	pb "go_grpc_example/08_grpc/01_grpc_helloworld/proto"
+	grpcErrProtobuf "go_grpc_example/08_grpc/07_grpc_error/proto"
 	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 )
 
@@ -33,13 +34,23 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 	// Track the number of times the user has been greeted.
 	s.count[in.Name]++
 	if s.count[in.Name] > 1 {
-		st := status.New(codes.ResourceExhausted, "Request limit exceeded.")
+
+		// 使用默认自带的error code
+		//st := status.New(codes.ResourceExhausted, "Request limit exceeded.")
+
+		// 自定义的error code
+		st := status.New(codes.Code(grpcErrProtobuf.Error_RESOURCE_ERR_NOT_FOUND), "Request limit exceeded.")
+		// 添加具体描述信息
 		ds, err := st.WithDetails(
 			&epb.QuotaFailure{
 				Violations: []*epb.QuotaFailure_Violation{{
 					Subject:     fmt.Sprintf("name:%s", in.Name),
 					Description: "Limit one greeting per person",
 				}},
+			},
+			&grpcErrProtobuf.ErrDetail{
+				Key: "hello",
+				Msg: "danny",
 			},
 		)
 		if err != nil {

@@ -1,6 +1,6 @@
 syntax = "proto3";
 option go_package = "proto/dir_import;proto";
-package import;
+package import;   // 表示当前 protobuf 文件属于 import包，这个package不是 Go 语言中的那个package
 
 message CPU {
   string Name = 1;

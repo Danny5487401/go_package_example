@@ -1,0 +1,33 @@
+syntax = "proto3";
+option go_package = "07_grpc_error/proto;grpcErrProtobuf";
+package proto;  // 当前proto包的名称，用于引入用
+
+import "google/protobuf/descriptor.proto";
+
+
+// @plugins=protoc-gen-go-errors
+// 错误
+enum Error {
+  // 未知类型
+  // @code=UNKNOWN
+  RESOURCE_ERR_UNKNOWN = 0;
+  // 找不到资源
+  // @code=NOT_FOUND
+  RESOURCE_ERR_NOT_FOUND = 101;
+  // 获取列表数据出错
+  // @code=INTERNAL
+  RESOURCE_ERR_LIST_MYSQL = 102;
+  // 获取详情数据出错
+  // @code=INTERNAL
+  RESOURCE_ERR_INFO_MYSQL = 103;
+
+}
+
+// 扩展信息
+extend google.protobuf.EnumOptions {
+   int32 default_code = 1108;
+}
+
+extend google.protobuf.EnumValueOptions {
+  int32 code = 1109;
+}

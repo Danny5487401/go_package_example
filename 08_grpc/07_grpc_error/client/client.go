@@ -4,6 +4,8 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
+	grpcErrProtobuf "go_grpc_example/08_grpc/07_grpc_error/proto"
 	"log"
 	"os"
 	"time"
@@ -35,17 +37,22 @@ func main() {
 	defer cancel()
 	r, err := c.SayHello(ctx, &pb.HelloRequest{Name: "world"})
 	if err != nil {
+		fmt.Printf("错误是%+v\n", err.Error())
+
 		// 比FromError更加友好
 		s := status.Convert(err)
+		fmt.Printf("code:%v，msg：%v\n", s.Code(), s.Message())
 		for _, d := range s.Details() {
 			switch info := d.(type) {
 			case *epb.QuotaFailure:
-				log.Printf("Quota failure: %s", info)
+				log.Printf("Quota failure: %s\n", info)
+			case *grpcErrProtobuf.ErrDetail:
+				log.Printf("erros detail: %v:%v\n", info.GetKey(), info.GetMsg())
 			default:
 				log.Printf("Unexpected type: %s", info)
 			}
 		}
 		os.Exit(1)
 	}
-	log.Printf("Greeting: %s", r.Message)
+	log.Printf("成功Greeting: %s", r.Message)
 }

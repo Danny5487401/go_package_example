@@ -1,0 +1,9 @@
+syntax = "proto3";
+option go_package = "07_grpc_error/proto;grpcErrProtobuf";
+package proto;
+
+
+message errDetail {
+  string key = 1;  //
+  string msg = 2;  // 这里可以写一些业务信息:为用户可读的信息，可作为用户提示内容
+}
