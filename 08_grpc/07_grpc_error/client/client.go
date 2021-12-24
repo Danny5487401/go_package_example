@@ -6,12 +6,12 @@ import (
 	"flag"
 	"fmt"
 	grpcErrProtobuf "go_grpc_example/08_grpc/07_grpc_error/proto"
+	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"log"
 	"os"
 	"time"
 
 	pb "go_grpc_example/08_grpc/01_grpc_helloworld/proto"
-	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/status"
 )

@@ -28,7 +28,7 @@ func main() {
 ```
 
 ## gRPC网络传输的Error
-![](.error_images/error_transfer_in_grpc.png)
+![](.error_images/error_transfer_in_grpc.png)     
 我们客户端在获取到gRPC的error的时候，是否可以使用上文说的官方errors.Is进行判断呢。
 如果我们直接使用该方法，通过判断error地址是否相等，是无法做到的。原因是因为我们在使用gRPC的时候，在远程调用过程中，客户端获取的服务端返回的error，在tcp传递的时候实际上是一串文本。
 客户端拿到这个文本，是要将其反序列化转换为error，在这个反序列化的过程中，其实是new了一个新的error地址，这样就无法判断error地址是否相等。
@@ -48,7 +48,6 @@ func main() {
 
 为了方便理解，我们抓个包，看下error具体的报文情况。
 ![](.error_images/error_packets_in_grpc.png)
-
 
 
 ## grpc status包
