@@ -48,7 +48,7 @@ Note: 最高位为1代表后面7位仍然表示数字，否则为0，后面7位�
 protobuf 采取的解决方式：使用 sint32/sint64 类型表示负数，通过先采用 Zigzag 编码，将正数、负数和0都映射到无符号数，最后再采用varints编码。
 
 
-编码
+编码encode
 ```go
 const maxVarintBytes = 10 // maximum length of a varint
 
@@ -78,7 +78,7 @@ func EncodeVarint(x uint64) []byte {
 }
 ```
 
-解码
+解码decode
 ```go
 func DecodeVarint(buf []byte) (x uint64, n int) {
 	for shift := uint(0); shift < 64; shift += 7 {
@@ -103,6 +103,7 @@ func DecodeVarint(buf []byte) (x uint64, n int) {
 ```
 
 ## 使用
+参考目录：github.com/golang/protobuf@v1.5.2/internal/testprotos
 ### 基本定义
 ```protobuf
 option go_package = "{out_path};out_go_package"; // 前一个参数用于指定生成文件的位置，后一个参数指定生成的 .go 文件的 package
@@ -143,7 +144,8 @@ import "proto/dir_import/component.proto";
 ```protobuf
 option go_package = "proto/dir_import;proto";
 ```
-所以最终生成目录为--go_out+go_package= go_grpc_example/08_grpc/proto/dir_import
+所以最终生成目录为--go_out+go_package= go_grpc_example/08_grpc/proto/dir_import.   
+生成的文件名: 规则是filename.pb.go
 
 Note:  可以通过参数 --go_opt=paths=source_relative 来指定使用绝对路径，从而忽略掉 proto 文件中的 go_package 路径，直接生成在 –go_out 指定的路径
 
@@ -175,25 +177,163 @@ Note:包含的插件有 csharp、java、js、objectivec、php、python、ruby等
 
 ### protoc-gen-go
 ![](.proto_images/protoc_gen_go_files.png)   
+地址：https://github.com/golang/protobuf/tree/master/protoc-gen-go  v1.5.2
 原生protoc并不包含Go版本的插件,protoc-gen-go是protobuf编译插件系列中的Go版本。
 由于protoc-gen-go是Go写的，所以安装它变得很简单，只需要运行 go get -u github.com/golang/protobuf/protoc-gen-go
 
 #### protoc-gen-go 源码目录分析
-main包
+```css
+│  main.go                               // main 函数，与 protoc 进程交互、 代码生成过程。写自己 protoc 插件时，通常会完全拷贝其内容
+│
+├─descriptor                             // 一个 proto 文件中的所有信息，通过 descriptor.proto 来定义
+│      descriptor.pb.go
+│    
+│
+├─generator                              // proto 协议类生成过程。这个部分可以复用。generator 中定义了插件的方式，让你扩展自己的代码
+│  │  generator.go // 包含了大部分由protobuf原生结构到Go语言文件的渲染方法，其中 func (g *Generator) P(str ...interface{}) 这个方法会把渲染输出到generator的output（generator匿名嵌套了bytes.Buffer，因此有Buffer的方法）。
+│  │  name_test.go // 测试，主要包含generator中名称相关方法的测试。
+│  │
+│  └─internal
+│      |  工具类，略
+│
+├─grpc                                   // grpc service 定义过程，grpc 相关定义、函数。也是如何编写自己逻辑的参考例子
+│      grpc.go //与generator相似，但是包含了很多生成grpc相关方法的方法，比如渲染转译protobuf中定义的rpc方法（在generator中不包含，其默认不转译service的定义）
+│
+├─plugin                                 // 与 protoc 进程数据交互的数据格式定义
+│      plugin.pb.go //包含plugin的描述文件（.proto文件及其对应的Go编译文件），其中proto文件来自于proto库
+│ 
+│   
+│
+└─
 
-- doc.go 主要是说明。
-- link_grpc.go 显式引用protoc-gen-go/grpc包，触发grpc的init函数。
-- main.go 代码不到50行，初始generator，并调用generator相应的方输出protobuf的Go语言文件。
+```
+1. main.go
+```go
+func main(){
+	// ...
+   protogen.Options{
+      ParamFunc:         flags.Set,
+      ImportRewriteFunc: importRewriteFunc,
+   }.Run(func(gen *protogen.Plugin) error {
+   	//...
+})
+}
+```
+实际的run函数
+```go
+func run(opts Options, f func(*Plugin) error) error {
+	if len(os.Args) > 1 {
+		return fmt.Errorf("unknown argument %q (this program should be run by protoc, not directly)", os.Args[1])
+	}
+	// protoc会把二进制写入stdin ,然后protoc-gen-go获取数据
+	in, err := ioutil.ReadAll(os.Stdin)
+	if err != nil {
+		return err
+	}
+	// 解析数据到CodeGeneratorRequest{}
+	req := &pluginpb.CodeGeneratorRequest{}
+	if err := proto.Unmarshal(in, req); err != nil {
+		return err
+	}
+	gen, err := opts.New(req)
+	if err != nil {
+		return err
+	}
+	if err := f(gen); err != nil {
+		// Errors from the plugin function are reported by setting the
+		// error field in the CodeGeneratorResponse.
+		//
+		// In contrast, errors that indicate a problem in protoc
+		// itself (unparsable input, I/O errors, etc.) are reported
+		// to stderr.
+		gen.Error(err)
+	}
+	// 生成的数据填充到CodeGeneratorResponse
+	resp := gen.Response()
+	
+	// 转化成二进制数据
+	out, err := proto.Marshal(resp)
+	if err != nil {
+		return err
+	}
+	// protoc-gen-go写入stdout,protoc获取二进制数据
+	if _, err := os.Stdout.Write(out); err != nil {
+		return err
+	}
+	return nil
+}
+```
 
-- generator.go 包含了大部分由protobuf原生结构到Go语言文件的渲染方法，其中 func (g *Generator) P(str ...interface{}) 这个方法会把渲染输出到generator的output（generator匿名嵌套了bytes.Buffer，因此有Buffer的方法）。
-name_test.go 测试，主要包含generator中名称相关方法的测试。
+3. descriptor/descriptor.pb.go
+```go
+// Code generated by protoc-gen-go. DO NOT EDIT.
+// source: github.com/golang/protobuf/protoc-gen-go/descriptor/descriptor.proto
 
-- grpc.go 与generator相似，但是包含了很多生成grpc相关方法的方法，比如渲染转译protobuf中定义的rpc方法（在generator中不包含，其默认不转译service的定义）
-descriptor 包含protobuf的描述文件（.proto文件及其对应的Go编译文件），其中proto文件来自于proto库
+package descriptor
+```
+protoc-gen-go依赖descriptor.pb.go代码实现编译
+descriptor/descriptor.pb.go依赖protoc-gen-go生成
 
-- plugin 包含plugin的描述文件（.proto文件及其对应的Go编译文件），其中proto文件来自于proto库
+2. generator/generator.go  
+plugin插件接口定义 
+```go
+// A Plugin provides functionality to add to the output during Go code generation,
+// such as to produce RPC stubs.
+type Plugin interface {
+	Name() string   // 插件名字
 
+	Init(g *Generator)  // 初始化函数，保存到Generator对象中
 
+	Generate(file *FileDescriptor) // 生成自己逻辑代码，
+
+	GenerateImports(file *FileDescriptor) // 生成自己需要引入的头文件
+}
+func RegisterPlugin(p Plugin) {
+   plugins = append(plugins, p)
+}
+```
+Note:对应的grpc/grpc.go就是对应的实现  
+
+```go
+func init() {
+	generator.RegisterPlugin(new(grpc))
+}
+```
+
+Generator结构体定义
+```go
+// Generator is the type whose methods generate the output, stored in the associated response structure.
+type Generator struct {
+	*bytes.Buffer
+
+	Request  *plugin.CodeGeneratorRequest  // 请求
+	Response *plugin.CodeGeneratorResponse // 回应
+
+	Param             map[string]string // 命令行参数
+	PackageImportPath string            // Go import path of the package we're generating code for
+	ImportPrefix      string            // String to prefix to imported package file names.
+	ImportMap         map[string]string // Mapping from .proto file name to import path
+
+	Pkg map[string]string // The names under which we import support packages
+
+	outputImportPath GoImportPath                   // Package we're generating code for.
+	allFiles         []*FileDescriptor              // All files in the tree
+	allFilesByName   map[string]*FileDescriptor     // All files by filename.
+	genFiles         []*FileDescriptor              // 生成的文件
+	file             *FileDescriptor                // 现在解析的文件
+	packageNames     map[GoImportPath]GoPackageName // Imported package names in the current file.
+	usedPackages     map[GoImportPath]bool          // Packages used in current file.
+	usedPackageNames map[GoPackageName]bool         // Package names used in the current file.
+	addedImports     map[GoImportPath]bool          // Additional imports to emit.
+	typeNameToObject map[string]Object              // Key is a fully-qualified name in input syntax.
+	init             []string                       // Lines to emit in the init function.
+	indent           string
+	pathType         pathType // How to generate output filenames.
+	writeOutput      bool
+	annotateCode     bool                                       // 注释是否保存
+	annotations      []*descriptor.GeneratedCodeInfo_Annotation // annotations to store
+}
+```
 
 ### protoc-gen-god的替代版本:gogoprotobuf
 
