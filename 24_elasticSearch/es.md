@@ -23,101 +23,43 @@
 1. 副本为分片或节点失败提供了高可用性。为此，需要注意的是，一个副本的分片不会分配在同一个节点作为原始的或主分片，副本是从主分片那里复制过来的。
 2. 副本允许用户扩展你的搜索量或吞吐量，因为搜索可以在所有副本上并行执行
 
-## 索引简介
-对于日志或指标（metric）类时序性强的ES索引，因为数据量大，并且写入和查询大多都是近期时间内的数据。
 
-    我们可以采用hot-warm-cold架构将索引数据切分成hot/warm/cold的索引。hot索引负责最新数据的读写，可使用内存存储；
-    warm索引负责较旧数据的读取，可使用内存或SSD存储；cold索引很少被读取，可使用大容量磁盘存储
+## 存储架构
+### 写入流程
+![](.es_images/es_write_process.png)
+写入吞吐能力是大数据场景下的一项核心指标，用户对大数据产品的要求不光是要存的下，还要写得快。
+这里首先介绍Elasticsearch的实时写入链路设计：在Elasticsearch的每一个Shard中，写入流程分为两部分，先写入Lucene，再写入TransLog。
+写入请求到达Shard后，先写Lucene内存索引，此时数据还在内存里面，接着去写TransLog，写完TransLog后，刷新TransLog数据到磁盘上，写磁盘成功后，请求返回给用户。
 
-### ES从6.7版本推出了索引生命周期管理（Index Lifecycle Management ，简称ILM)机制，能帮我们自动管理一个索引策略（Policy）下索引集群的生命周期。
-![Log 文档在 Elasticsearch 中生命周期](img/.es_images/logs_lifecycle.png)
-索引生命周期由五个阶段（phases）组成：hot，warm，cold，frozen 及 delete。
+这里有几个关键点，一是把写Lucene放在了最前面，主要是防止用户的写入请求包含“非法”的数据。
+二是写Lucene索引后，并不是可被搜索的，需要通过refresh把内存的对象转成完整的Segment后，然后再次reopen后才能被搜索，这个refresh时间间隔是用户可设定的。
 
-* Hot：索引可写入，也可查询。你可能 rollover 一个 alias 从而每两个星期就生成一个新的索引，避免太大的索引数据。在这个阶段你可以做导入数据，并允许繁重的搜索
-* Warm：索引不可写入，但可查询。你可能把索引变成 read-only，并把索引保留于这个阶段一个星期。在这个阶段，不可以导入数据，但是可以进行适度的搜索
-* Cold：索引不可写入，但很少被查询，查询的慢点也可接受。你可能 freeze 索引，并减少 replica 的数量，并保留于这个阶段三个星期。在这个阶段，不可以导入数据，但是可以进行极其少量的搜索，
-* Delete：索引可被安全的删除.你可以删除超过6个星期的索引数据以节省成本
-
-ILM 由一些策略（policies）组成，而这些策略可以触发一些 actions。这些 actions 可以为
-
-| 动作action | 描述 |
-| ------ | ------ |
-|rollover       | 创建一个新的索引，基于数据的时间跨度，大小及文档的多少       |     
-|shrink       |减少 primary shards 的数目       |     
-|force merge       |合并 shard 的 segments      |
-|freeze       |针对鲜少使用的索引进行冻结以节省内存      |
-|delete       |永久地删除一个索引      | 
+可以看出Lucene索引并没有写入实时可见的能力，所以Elasticsearch是一个近实时（Near Real Time）的系统。
+最后是每隔一段比较长的时间，比如30分钟后，Lucene会把内存中生成的新Segment刷新到磁盘上，刷新后索引文件已经持久化了，历史的TransLog就没用了，才会清空掉旧的TransLog。
 
 
-#### 操作
-建立 ILM policy
-```json
-// PUT _ilm/policy/logs_policy
-{
-  "policy": {
-    "phases": {
-      "hot": {
-        "min_age": "0ms",
-        "actions": {
-          "rollover": {
-            "max_size": "50gb",
-            "max_age": "30d",
-            "max_docs": 10000
-          },
-          "set_priority": {
-            "priority": 100
-          }
-        }
-      },
-      "delete": {
-        "min_age": "90d",
-        "actions": {
-          "delete": {}
-        }
-      }
-    }
-  }
-}
+Segment完全就是Lucene索引的存储格式，Lucene索引在倒排文件上的存储毋庸置疑是做到极致的，Lucene索引同时也提供了行存、列存等不同格式的原数据存储。
+Elasticsearch默认都会把原数据存两份，一份在行存里，一份在列存里。Elasticsearch会根据查询的pattern，选择扫描的合适的存储文件。
 
-```
-这里定义的一个 policy 意思是：
 
-- 如果一个 index 的大小超过 50GB，那么自动 rollover
-- 如果一个 index 日期已在30天前创建索引后，那么自动 rollover
-- 如果一个 index 的文档数超过10000，那么也会自动 rollover
-- 当一个 index 创建的时间超过90天，那么也自动删除
+## 查询架构
 
-设置 Index template
-```json
-//PUT _template/datastream_template
-{
-  "index_patterns": ["logs*"],                 
-  "settings": {
-    "number_of_shards": 1,
-    "number_of_replicas": 1,
-    "index.lifecycle.name": "logs_policy", 
-    "index.routing.allocation.require.data": "hot",
-    "index.lifecycle.rollover_alias": "logs"    
-  }
-}
-```
+### 计算引擎
+Elasticsearch的搜索引擎支持三种不同模式的搜索方式：query_and_fetch，query_then_fetch，dfs_query_then_fetch。
 
-这里的意思是所有以 logs 开头的 index 都需要遵循这个规律。这里定义了 rollover 的 alias 为 “logs”。这在我们下面来定义。
-同时也需要注意的是 "index.routing.allocation.require.data": "hot"。这个定义了我们需要 indexing 的 node 的属性是 hot。
-请看一下我们上面的 policy 里定义的有一个叫做 phases 里的，它定义的是 "hot"。在这里我们把所有的 logs* 索引都置于 hot 属性的 node 里。
-在实际的使用中，hot 属性的 index 一般用作 indexing。我们其实还可以定义一些其它 phase，比如 warm，这样可以把我们的用作搜索的 index 置于 warm 的节点中。
+第一种模式很简单，每个分布式节点独立搜索然后把得到的结果返回给客户端，
 
-定义 Index alias
-```json
-//PUT logs-000001
-{
-  "aliases": {
-    "logs": {
-      "is_write_index": true
-    }
-  }
-}
-```
-在这里定义了一个叫做 logs 的 alias，它指向 logs-00001 索引。注意这里的 is_write_index 为 true。如果有 rollover 发生时，这个alias会自动指向最新 rollover 的 index。
+第二种模式是每个分布式存储节点先搜索到各自TopN的记录Id和对应的score，汇聚到查询请求节点后做重排得到最终的TopN结果，最后再请求存储节点去拉取明细数据。
+这里设计成两轮请求的目的就是尽量减少拉取明细的数量，也就是磁盘扫描的次数。
 
+最后一种方式是为了均衡各个存储节点打分的标准，先统计全局的TF（Term Frequency）和DF（Document Frequency），再进行query_then_fetch。
+Elasticsearch的搜索引擎完全不具备数据库计算引擎的流式处理能力，它是完全回合制的request-response数据处理。
+当用户需要返回的数据量很大时，就很容易出现查询失败，或者触发GC。一般来说Elasticsearch的搜索引擎能力上限就是两阶段的查询，像多表关联这种查询是完全超出其能力上限的。
+
+### 数据扫描
+Elasticsearch的数据扫描主要发生在query和fetch阶段。
+其中query阶段主要是扫描Lucene的索引文件获取查询命中的DocId，也包括扫描列存文件进行聚合计算。
+而fetch阶段主要是点查Lucene索引中的行存文件读取明细结果。表达式计算和聚合计算在两个阶段都有可能发生，其计算逻辑都是以行为单位进行运算。
+
+总的来说Elasticsearch的数据扫描和计算都没有向量化的能力，而且是以二级索引结果为基础，当二级索引返回的命中行数特别大时（涉及大量数据的分析查询），其搜索引擎就会暴露出数据处理能力不足的短板
 

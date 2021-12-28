@@ -144,8 +144,9 @@
 - 1 [Config配置加载包](23_micro/01ConfigTest/config.md)
 
 ## [ 第二十四章 搜索引擎es](24_elasticSearch/es.md)
+- [es索引及索引生命周期管理](24_elasticSearch/es_index.md)
 - 1 官方包
-- 2 oliver包
+- 2 第三方包oliver
   - 2.1 V6版本 
   - 2.2 V7版本 
 
