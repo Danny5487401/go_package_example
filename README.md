@@ -6,7 +6,7 @@
 - 3 json_rpc
 - 4 http_rpc
 ## [第一章 服务注册中心consul](01_consul/consul.md)
-- consul架构
+- [consul架构](01_consul/consul.md)
 - [Raft协议](01_consul/raft.md)
 - [raft在consul实现](01_consul/raft_in_consul.md)
 - 1 服务注册，过滤，获取
@@ -39,6 +39,7 @@
   - 2.1 主从连接
   - 2.2 调用mysql函数
   - 2.3 事务处理
+  - 2.4 crud
 ## 第六章 获取对外可用IP和端口
 ## 第七章 Gin前端form验证器
 - 1 错误英转中
@@ -113,10 +114,10 @@
       - 物理机和虚拟机
       - 容器环境
     - cpu,mem,disk
-## 第十五章 分布式事务
+## [第十五章 分布式事务](15_distributed_transaction/distributed_transaction.md)
 - 1 两阶段提交2pc
 ## 第十六章 数据复制
-- 1 copier(不同类型数据复制)
+- 1 [copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
 ## 第十七章 数据加解密
 - 1 phpserialize
 ## 第十八章 日志收集项目 log_collect

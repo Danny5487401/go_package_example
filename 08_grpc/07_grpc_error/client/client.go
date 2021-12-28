@@ -7,13 +7,13 @@ import (
 	"fmt"
 	grpcErrProtobuf "go_grpc_example/08_grpc/07_grpc_error/proto"
 	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
+	"google.golang.org/grpc/status"
 	"log"
 	"os"
 	"time"
 
 	pb "go_grpc_example/08_grpc/01_grpc_helloworld/proto"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/status"
 )
 
 var addr = flag.String("addr", "localhost:50052", "the address to connect to")
@@ -37,10 +37,10 @@ func main() {
 	defer cancel()
 	r, err := c.SayHello(ctx, &pb.HelloRequest{Name: "world"})
 	if err != nil {
-		// 默认返回的是status.Error
+		//// 默认返回的是status.Error
 		fmt.Printf("错误是%+v\n", err.Error())
-
-		// 比FromError更加友好
+		//
+		//// 比FromError更加友好
 		s := status.Convert(err)
 		fmt.Printf("code:%v，msg：%v\n", s.Code(), s.Message())
 		for _, d := range s.Details() {
@@ -48,7 +48,7 @@ func main() {
 			case *epb.QuotaFailure:
 				log.Printf("Quota failure: %s\n", info)
 			case *grpcErrProtobuf.ErrDetail:
-				log.Printf("erros detail: %v:%v\n", info.GetKey(), info.GetMsg())
+				log.Printf("errors detail: %v:%v\n", info.GetKey(), info.GetMsg())
 			default:
 				log.Printf("Unexpected type: %s", info)
 			}

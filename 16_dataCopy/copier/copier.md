@@ -1,6 +1,6 @@
-#copier源码分析
+# copier源码分析
 
-##静态参数
+## 静态参数
 ```go
 // These flags define options for tag handling
 const (
@@ -18,28 +18,28 @@ const (
 )
 ```
 
-##整体设计思路
+## 整体设计思路
 
-    1.不可寻址和Invalid的数据直接报错或者返回
+1.不可寻址和Invalid的数据直接报错或者返回
 
-    2.判断两个数据结构是不是map，进行map的处理
-    
-    3.数组与结构体的处理，按照类型进行数据遍历
-    
-        a.循环所有字段，解析tag
-        
-        b.判断是否忽略不复制，不复制则跳过
-        
-        c.根据字段名进行赋值
-        
-        d.根据方法名（同名）进行赋值
-        
-        5.赋值成功之后设置本字段的赋值成功标识
-        
-        6.循环所有标签，判断不满足“must”标签的情况，进行相应处理
+2.判断两个数据结构是不是map，进行map的处理
 
-##辅助方法说明
-###1.获取实际的Type和Value
+3.数组与结构体的处理，按照类型进行数据遍历
+
+- 1. 循环所有字段，解析tag
+
+- 2. 判断是否忽略不复制，不复制则跳过
+
+- 3. 根据字段名进行赋值
+
+- 4. 根据方法名（同名）进行赋值
+
+- 5. 赋值成功之后设置本字段的赋值成功标识
+
+- 6. 循环所有标签，判断不满足“must”标签的情况，进行相应处理
+
+## 辅助方法说明
+### 1.获取实际的Type和Value
 在go中，如果一个参数是 *Struct类型的，也就是指针类型，当用这个方法去调用方法获取结构体属性的时候会报错，
 比如我这边通过一个指针类型去调用FieldByName方法，就会出现下面的错误：
 ```go
@@ -67,8 +67,8 @@ func indirectType(reflectType reflect.Type) reflect.Type {
 	return reflectType
 
 ```
-###2.Tag处理
-    1、解析tag字符串
+### 2.Tag处理
+1. 解析tag字符串
 ```go
 // parseTags Parses struct tags and returns uint8 bit flags.
 func parseTags(tag string) (flags uint8) {
@@ -86,7 +86,7 @@ func parseTags(tag string) (flags uint8) {
 	return
 }
 ```
-    2、解析Field对应的tag，获得每个字段对应的tag条件
+2. 解析Field对应的tag，获得每个字段对应的tag条件
 ```go
 // getBitFlags Parses struct tags for bit flags.
 func getBitFlags(toType reflect.Type) map[string]uint8 {
@@ -107,7 +107,7 @@ func getBitFlags(toType reflect.Type) map[string]uint8 {
 	return flags
 }
 ```
-    3.获取结构体Field切片
+3. 获取结构体Field切片
 
 ```go
 //read note 根据结构体类型，获取结构体对应的Field切片，注意这边的【Anonymous】表示的匿名变量，匿名变量的Field这边需要特殊处理
@@ -131,7 +131,7 @@ func deepFields(reflectType reflect.Type) []reflect.StructField {
 	return fields
 }
 ```
-    4. 检查结构体复制结果
+4. 检查结构体复制结果
 ```go
 // checkBitFlags Checks flags for error or panic conditions.
 func checkBitFlags(flagsList map[string]uint8) (err error) {
@@ -154,20 +154,20 @@ func checkBitFlags(flagsList map[string]uint8) (err error) {
 	return
 }
 ```
-    5.对结构体进行设值
+5. 对结构体进行设值
 处理步骤
 ![](.copier_images/struct_set_value_process.png)
 
-    a.处理非零值的情况
-        *如果Result字段是指针类型（前置处理）
+    1. 处理非零值的情况
+        * 如果Result字段是指针类型（前置处理）
             Origin字段是指针类型，并且为nil，直接设置Result字段为nil，返回
             Result字段是nil，赋值初值(包含结构体和指针的处理)
-        *类型转换处理
+        * 类型转换处理
             如果Origin类型可以转换为Result类型，进行结构体赋值
             如果Result是sql.Scanner类型，调用Scan方法
             如果Origin是指针类型，调用set(Result,Origin.Elem())方法，注意这边指针需要调用.Elem方法（递归）
             返回false
-    b.零值的情况直接返回true
+    2. 零值的情况直接返回true
 ```go
 func set(to, from reflect.Value) bool {
  
@@ -216,8 +216,8 @@ func set(to, from reflect.Value) bool {
 }
 ```
 
-##copy主方法copier(toValue, fromValue, opt)说明
-###参数说明
+## copy主方法copier(toValue, fromValue, opt)说明
+### 参数说明
 ```go
 	var (
 		isSlice bool
@@ -226,18 +226,18 @@ func set(to, from reflect.Value) bool {
 		to      = indirect(reflect.ValueOf(toValue))
 	)
 ```
-###两个类型都是map的处理
+### 两个类型都是map的处理
 流程
 
-    1、判断key的类型是否可以转换，如果不能转换直接返回
-    
-    2、如果Result对应的Map为空，则初始化
-    
-    3、循环遍历Map的所有key，先复制key，如果复制失败则跳过该字段
-    
-    4、复制value，如果复制失败则跳过该字段（这边的复制key的复制是不一样的,因为key是不可变的，value需要再调用Copy进行复制）
-    
-    5、如果上面的复制操作都成功了，则对map进行key到value的映射
+1. 判断key的类型是否可以转换，如果不能转换直接返回
+
+2. 如果Result对应的Map为空，则初始化
+
+3. 循环遍历Map的所有key，先复制key，如果复制失败则跳过该字段
+
+4. 复制value，如果复制失败则跳过该字段（这边的复制key的复制是不一样的,因为key是不可变的，value需要再调用Copy进行复制）
+
+5. 如果上面的复制操作都成功了，则对map进行key到value的映射
 ```go
 //read note from和to都是map
 	if fromType.Kind() == reflect.Map && toType.Kind() == reflect.Map {
@@ -271,7 +271,7 @@ func set(to, from reflect.Value) bool {
 		}
 	}
 ```
-###只有一个类型是结构体的处理
+### 只有一个类型是结构体的处理
     如果被复制的结构或者复制的结构有一个不是struct，则直接返回，不进行处理
 ```go
 	if fromType.Kind() != reflect.Struct || toType.Kind() != reflect.Struct {
@@ -279,7 +279,7 @@ func set(to, from reflect.Value) bool {
 		return
 	}
 ```
-###判断数组设置标识
+### 判断数组设置标识
     上面的操作已经把map和非结构体的情况处理掉，下面就是结构体\结构体数组的处理。
     
     这边要先设置对应的标识，isSlice是用来标识Result是不是数组的，所以这边会设置对应的标识，并且获取数组对应的长度
@@ -294,15 +294,15 @@ func set(to, from reflect.Value) bool {
 ```
 根据amount进行循环处理
 
-    1、通过isSlice标识，获取对应的Origin结构体数据，如果是数组则根据index获取，否则直接使用Origin
-    
-    2、获取字段对应的Field的tag，递归处理
-    
-    3、复制处理
-    
-    4、通过isSlice标识，对复制之后的结果进行处理
-    
-    5、通过map进行状态的校验
+1. 通过isSlice标识，获取对应的Origin结构体数据，如果是数组则根据index获取，否则直接使用Origin
+
+2. 获取字段对应的Field的tag，递归处理
+
+3. 复制处理
+
+4. 通过isSlice标识，对复制之后的结果进行处理
+
+5. 通过map进行状态的校验
 第一个步骤的代码如下，这边的处理就是根据index进行当前处理的结构体数据的获取：
 ```go
 	//read note 循环被复制的切片的长度
