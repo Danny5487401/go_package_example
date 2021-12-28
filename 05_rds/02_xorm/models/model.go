@@ -65,9 +65,9 @@ type UserActiveRecord struct {
 // UserActive 用户活跃天数表 user_active
 type UserActive struct {
 	Id         int64 `xorm:"'id' notnull pk autoincr" mapstructure:"id"`
-	Uid        int64 `xorm:"'uid' bigint notnull DEFAULT(0) unique(uid) comment('用户Id')"` // UNIQUE KEY `UQE_user_active_uid` (`uid`)  UQE_表名_括号内文字(uid)
-	TotalDays  int64 `xorm:"'total_days' int(5) notnull DEFAULT(0) comment('总天数')"`
-	LatestDate int64 `xorm:"'latest_date' int(6) notnull DEFAULT(0) comment('上次更新的活跃日期')"`
-	CreatedAt  int64 `xorm:"'created_at'  int(10) DEFAULT(0) notnull created"`
-	UpdatedAt  int64 `xorm:"'updated_at'  int(10) DEFAULT(0) notnull updated"`
+	Uid        int64 `xorm:"'uid' bigint notnull DEFAULT(0) unique(uid) comment('用户Id')" mapstructure:"uid"` // UNIQUE KEY `UQE_user_active_uid` (`uid`)  UQE_表名_括号内文字(uid)
+	TotalDays  int64 `xorm:"'total_days' int(5) notnull DEFAULT(0) comment('总天数')" mapstructure:"total_days"`
+	LatestDate int64 `xorm:"'latest_date' int(6) notnull DEFAULT(0) comment('上次更新的活跃日期')" mapstructure:"latest_date"`
+	CreatedAt  int64 `xorm:"'created_at'  int(10) DEFAULT(0) notnull created" mapstructure:"created_at"`
+	UpdatedAt  int64 `xorm:"'updated_at'  int(10) DEFAULT(0) notnull updated" mapstructure:"updated_at"`
 }
