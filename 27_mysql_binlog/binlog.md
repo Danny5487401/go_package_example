@@ -40,28 +40,30 @@ purge master logs before '2019-03-09 14:00:00';
 # 删除指定日志文件
 purge master logs to 'master.000003';
 ```
-查看bin_log格式
-![](.binlog_images/binlog_format.png)
+查看bin_log格式:   
+![](.binlog_images/binlog_format.png) 
 
-获取binlog文件列表
-![](.binlog_images/binlog_array.png)
+获取binlog文件列表:   
+![](.binlog_images/binlog_array.png)   
 
-查看当前正在写入的binlog文件
-![](.binlog_images/current_master_log.png)
+查看当前正在写入的binlog文件:    
+![](.binlog_images/current_master_log.png)  
+![](.binlog_images/show_master_status.png)
+GTID即全局事务ID (global transaction identifier)
 
 查看指定binlog文件的内容
 - 只查看第一个binlog文件的内容
 show binlog events;
 
 - 查看具体一个binlog文件的内容 （in 后面为binlog的文件名）
-show binlog events in 'binlog.000003';
+show binlog events in 'binlog.000003';   
 ![](.binlog_images/binlog_content.png)
 
-查看master上的binlog
-![](.binlog_images/master_logs.png)
+查看master上的binlog   
+![](.binlog_images/master_logs.png)   
 
 查看log过期时间
-![](.binlog_images/log_expire_day.png)
+![](.binlog_images/log_expire_day.png)    
 设置binlog文件保存事件，过期删除，单位天
 set global expire_logs_days=3;
 

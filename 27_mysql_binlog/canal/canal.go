@@ -1,22 +1,31 @@
-package canal
+package main
 
 import (
 	"fmt"
 	"github.com/go-mysql-org/go-mysql/canal"
 	"github.com/go-mysql-org/go-mysql/schema"
 	"github.com/json-iterator/go"
+	"os"
+	"os/signal"
 	"reflect"
 	"runtime/debug"
 	"strings"
-	"testing"
+	"syscall"
 	"time"
 )
 
-func TestBinLog(t *testing.T) {
+func main() {
 	go binLogListener()
 	// placeholder for your handsome code
-	time.Sleep(5 * time.Minute)
-	fmt.Print("Thx for watching")
+	//合建chan
+	c := make(chan os.Signal)
+	//监听所有信号
+	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGUSR1, syscall.SIGUSR2)
+	//阻塞直到有信号传入
+	fmt.Println("启动")
+	s := <-c
+	fmt.Println("退出信号", s)
+
 }
 
 type User struct {
@@ -38,10 +47,12 @@ func (User) SchemaName() string {
 func binLogListener() {
 	c, err := getDefaultCanal()
 	if err == nil {
-		coords, err := c.GetMasterPos()
+		// 获取主机master位置 SHOW MASTER STATUS
+		mysqlPos, err := c.GetMasterPos()
 		if err == nil {
+			// 设置处理函数,需要在启动canal前注册
 			c.SetEventHandler(&binlogHandler{})
-			c.RunFrom(coords)
+			c.RunFrom(mysqlPos)
 		}
 	}
 }
@@ -51,7 +62,6 @@ func getDefaultCanal() (*canal.Canal, error) {
 	cfg.User = "root"
 	cfg.Password = "chuanzhi"
 	cfg.Flavor = "mysql"
-	cfg.Dump.ExecutionPath = ""
 
 	// FLUSH TABLES WITH READ LOCK简称(FTWRL)，该命令主要用于备份工具获取一致性备份(数据与binlog位点匹配)。
 	// 由于FTWRL总共需要持有两把全局的MDL锁，并且还需要关闭所有表对象，因此这个命令的杀伤性很大，执行命令时容易导致库hang住
