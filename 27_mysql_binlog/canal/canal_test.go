@@ -53,6 +53,10 @@ func getDefaultCanal() (*canal.Canal, error) {
 	cfg.Flavor = "mysql"
 	cfg.Dump.ExecutionPath = ""
 
+	// FLUSH TABLES WITH READ LOCK简称(FTWRL)，该命令主要用于备份工具获取一致性备份(数据与binlog位点匹配)。
+	// 由于FTWRL总共需要持有两把全局的MDL锁，并且还需要关闭所有表对象，因此这个命令的杀伤性很大，执行命令时容易导致库hang住
+	cfg.Dump.SkipMasterData = true
+
 	return canal.NewCanal(cfg)
 }
 

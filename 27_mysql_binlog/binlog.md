@@ -1,5 +1,11 @@
 # mysql的binlog二进制日志((归档日志)
 
+## MySQL的主从复制
+![](.binlog_images/mysql_master_to_slave.png)
+1. master将改变记录到二进制日志(binary log)中（这些记录叫做二进制日志事件，binary log events，可以通过show binlog events进行查看）；
+2. slave将master的binary log events拷贝到它的中继日志(relay log)；
+3. slave重做中继日志中的事件，将改变反映它自己的数据
+
 ## 常用的Binlog操作命令
 ```shell
 # 是否启用binlog日志
