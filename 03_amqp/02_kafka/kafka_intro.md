@@ -1,6 +1,7 @@
 # Kafka
 建议参考阿里文档：https://help.aliyun.com/document_detail/68166.html?spm=a2c4g.11186623.6.760.4d62203aT0ks10#title-k03-if4-cs8:
 ## 一. 基本概念
+![](.kafka_intro_images/kafka_structure.png)
 	服务端：Broker相当于Kafka的服务端，你可以理解为是队列存在的地方，生产者把消息发送到Broker中，消费者从Broker中获取消息
 	客户端:生产者与消费者
 1. producer： 消息生产者，发布消息到 kafka 集群的终端或服务。

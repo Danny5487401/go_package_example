@@ -22,7 +22,10 @@ var (
 func main() {
 	flag.Parse()
 	// Set up a connection to the server.
-	conn, err := grpc.Dial(*addr, grpc.WithInsecure())
+	opts := make([]grpc.DialOption, 0)
+	opts = append(opts, grpc.WithInsecure())                               // 不安全链接
+	opts = append(opts, grpc.WithBlock(), grpc.WithTimeout(time.Second*2)) // 保证连接上,连接不上会一直阻塞，加个时间限制
+	conn, err := grpc.DialContext(context.Background(), *addr, opts...)
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
