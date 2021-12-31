@@ -1,4 +1,4 @@
-#Client源码分析
+# Client源码分析
 因为gRPC没有提供服务注册，服务发现的功能，所以需要开发者自己编写服务发现的逻辑：也就是Resolver——解析器。
 
 在得到了解析的结果，也就是一连串的IP地址之后，需要对其中的IP进行选择，也就是Balancer
@@ -40,7 +40,7 @@ type ClientConn struct {
 }
 ```
 
-##一. grpc.Dial 方法实际上是对于 grpc.DialContext 的封装，区别在于 ctx 是直接传入 context.Background。
+## 一. grpc.Dial 方法实际上是对于 grpc.DialContext 的封装，区别在于 ctx 是直接传入 context.Background。
 
 首先要做的就是调用Dial或DialContext函数来初始化一个clientConn对象，而resolver是这个连接对象的一个重要的成员，
 所以我们首先看一看clientConn对象创建过程中，resolver是怎么设置进去的。
@@ -176,14 +176,14 @@ func (ccr *ccResolverWrapper) UpdateState(s resolver.State) error {
 
     其主要功能是创建与给定目标的客户端连接，其承担了以下职责
 
-    1.初始化 ClientConn
-    2.初始化（基于进程 LB）负载均衡配置
-    3.初始化 channelz
-    4.初始化重试规则和客户端一元/流式拦截器
-    5.初始化协议栈上的基础信息
-    6.相关 context 的超时控制
-    7.初始化并解析地址信息
-    8.创建与服务端之间的连接
+1. 初始化 ClientConn
+2. 初始化（基于进程 LB）负载均衡配置
+3. 初始化 channelz
+4. 初始化重试规则和客户端一元/流式拦截器
+5. 初始化协议栈上的基础信息
+6. 相关 context 的超时控制
+7. 初始化并解析地址信息
+8. 创建与服务端之间的连接
 
 我们可以有几个核心方法一直在等待/处理信号
 ```go
@@ -193,7 +193,7 @@ func (ac *addrConn) createTransport(addr resolver.Address, copts transport.Conne
 func (ac *addrConn) getReadyTransport()
 ```
 
-##二. 实例化
+## 二. 实例化
 ```go
 type GreeterClient interface {
 	// Sends a greeting
@@ -209,13 +209,13 @@ func NewGreeterClient(cc *grpc.ClientConn) GreeterClient {
 	return &greeterClient{cc}
 }
 ```
-##三. 调用
+## 三. 调用
 
 底层http2连接对应的是一个grpc的stream，而stream的创建有两种方式
 
-	1.一种就是我们主动去创建一个stream池，这样当有请求需要发送时，我们可以直接使用我们创建好的stream，
+1. 一种就是我们主动去创建一个stream池，这样当有请求需要发送时，我们可以直接使用我们创建好的stream，
 
-	2.除了我们自己创建，我们使用protoc为我们生成的客户端接口里，也会为我们实现stream的创建，也就是说这个完全是可以不用我们自己费心的
+2. 除了我们自己创建，我们使用protoc为我们生成的客户端接口里，也会为我们实现stream的创建，也就是说这个完全是可以不用我们自己费心的
 
 ```go
 // Invoke sends the RPC request on the wire and returns after response is
@@ -253,7 +253,7 @@ cs.SendMsg：发送 RPC 请求出去，但其并不承担等待响应的功能�
 cs.RecvMsg：阻塞等待接受到的 RPC 方法响应结果。
 */
 ```
-##四。关闭链接
+## 四。关闭链接
 ```go
 
 func (cc *ClientConn) Close() error {
@@ -284,9 +284,9 @@ func (cc *ClientConn) Close() error {
 ```
 该方法会取消 ClientConn 上下文，同时关闭所有底层传输。涉及如下
 
-	* Context Cancel
-	* 清空并关闭客户端连接
-	* 清空并关闭解析器连接
-	* 清空并关闭负载均衡连接
-	* 添加跟踪引用
-	* 移除当前通道信息
+* Context Cancel
+* 清空并关闭客户端连接
+* 清空并关闭解析器连接
+* 清空并关闭负载均衡连接
+* 添加跟踪引用
+* 移除当前通道信息

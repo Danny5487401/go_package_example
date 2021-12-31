@@ -1,4 +1,4 @@
-#grpc源码分析
+# grpc源码分析
 ```go
 // UnimplementedGreeterServer can be embedded to have forward compatible implementations.
 type UnimplementedGreeterServer struct {
@@ -13,7 +13,7 @@ func (*UnimplementedGreeterServer) SayHello(context.Context, *HelloRequest) (*He
 
 但是，我们通常要强制server在编译期就必须实现对应的方法，所以生产中建议不嵌入。
 
-一。grpc.NewServer()分析
+一. grpc.NewServer()分析
 ```go
 func NewServer(opt ...ServerOption) *Server {
     opts := defaultServerOptions
@@ -36,12 +36,13 @@ func NewServer(opt ...ServerOption) *Server {
 }
 ```
 
-	1。入参为选项参数options
-	2。自带一组defaultServerOptions，最大发送size、最大接收size、连接超时、发送缓冲、接收缓冲
-	3，s.cv = sync.NewCond(&s.mu) 条件锁，用于关闭连接
-	4。全局参数 EnableTraciing ，会调用golang.org/x/net/trace 这个包
+1. 入参为选项参数options
+2. 自带一组defaultServerOptions，最大发送size、最大接收size、连接超时、发送缓冲、接收缓冲
+3. s.cv = sync.NewCond(&s.mu) 条件锁，用于关闭连接
+4. 全局参数 EnableTraciing ，会调用golang.org/x/net/trace 这个包
 
-二。注册
+
+二. 注册
 ```go
 func RegisterGreeterServer(s *grpc.Server, srv GreeterServer) {
     s.RegisterService(&_Greeter_serviceDesc, srv)
@@ -63,16 +64,16 @@ var _Greeter_serviceDesc = grpc.ServiceDesc{
     Metadata: "01_grpc_helloworld/proto/helloworld.proto",  //元数据，是一个描述数据属性的东西
 }
 ```
-三。s.Serve(lis)
+三. s.Serve(lis)
 
-	1.listener 放到内部的map中
-	2.for循环，进行tcp连接，这一部分和http源码中的ListenAndServe极其类似
-	3.在协程中进行handleRawConn
-	4.将tcp连接封装对应的creds认证信息
-	5.新建newHTTP2Transport传输层连接
-	6.在协程中进行serveStreams，而http1这里为阻塞的
-	7.函数HandleStreams中参数为2个函数，前者为处理请求，后者用于trace
-	8.进入handleStream，前半段被拆为service，后者为method，通过map查找
-	9.method在processUnaryRPC处理，stream在processStreamingRPC处理，这两块内部就比较复杂了，涉及到具体的算法，以后有时间细读
+1. listener 放到内部的map中
+2. for循环，进行tcp连接，这一部分和http源码中的ListenAndServe极其类似
+3. 在协程中进行handleRawConn
+4. 将tcp连接封装对应的creds认证信息
+5. 新建newHTTP2Transport传输层连接
+6. 在协程中进行serveStreams，而http1这里为阻塞的
+7. 函数HandleStreams中参数为2个函数，前者为处理请求，后者用于trace
+8. 进入handleStream，前半段被拆为service，后者为method，通过map查找
+9. method在processUnaryRPC处理，stream在processStreamingRPC处理，这两块内部就比较复杂了，涉及到具体的算法，以后有时间细读
 
 
