@@ -24,7 +24,7 @@ func main() {
 
 func testRedisBase() {
 
-	ExampleClient_String()
+	//ExampleClient_String()
 	//ExampleClient_List()
 	//ExampleClient_Hash()
 	//ExampleClient_Set()
@@ -33,7 +33,7 @@ func testRedisBase() {
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
 	//ExampleClient_Tx() // 事物pipeline
-	//ExampleClient_Script()
+	ExampleClient_Script()
 	//ExampleClient_PubSub()
 
 }
@@ -424,6 +424,7 @@ func ExampleClient_Tx() {
 }
 
 func ExampleClient_Script() {
+	// 脚本意思：成功获取键的话，执行操作
 	IncrByXX := redis.NewScript(`
         if redis.call("GET", KEYS[1]) ~= false then
             return redis.call("INCRBY", KEYS[1], ARGV[1])
@@ -434,6 +435,7 @@ func ExampleClient_Script() {
 	n, err := IncrByXX.Run(redisdb, []string{"xx_counter"}, 2).Result()
 	fmt.Println(n, err)
 
+	// 设置值
 	err = redisdb.Set("xx_counter", "40", 0).Err()
 	if err != nil {
 		panic(err)

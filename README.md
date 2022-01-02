@@ -166,5 +166,7 @@
   - 1.1 标准库sql操作clickHouse
   - 1.2 扩展包sqlx操作clickHouse
 
+## 第二十九章 分布式锁
+- 1 redis实现
 
 
