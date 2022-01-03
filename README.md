@@ -11,10 +11,14 @@
 - [raft在consul实现](01_consul/raft_in_consul.md)
 - 1 服务注册，过滤，获取
 - 2 [分布式锁(consul实现方式)](01_consul/distributed_lock.md)
-## [第二章 日志库zap使用及源码分析](02_zap/zap.md)
-- 1 控制台输出
-- 2 文件输出
-- 3 并发安全logger
+## 第二章 日志库
+- 1 [zerolog](02_log/01_zerolog/zerolog.md)
+- 2 [zap使用及源码分析](02_log/02_zap/zap.md)
+  - 2.1 控制台输出
+  - 2.2 文件输出
+  - 2.3 并发安全logger
+  - 2.4 配合日志归档库lumberjack库实现定制化log
+
 ## 第三章 消息队列
 - 1 [rabbitmq](03_amqp/01_rabbitmq/introduction.md)
   - 1.1 消费者：推拉模式
