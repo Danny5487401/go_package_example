@@ -3,7 +3,8 @@
 .PHONY: proto
 proto:
 # 加@不打印shell
-	@protoc --proto_path=. --go_out=. ./proto/dir_import/*.proto
+	#protoc --proto_path=. --go_out=. --go-grpc_out=. ./proto/dir_import/*.proto
+	protoc --proto_path=. --go_out=plugins=grpc:. ./proto/dir_import/*.proto
 
 # --------------------------------
 # error生成：08_grpc/07_grpc_error

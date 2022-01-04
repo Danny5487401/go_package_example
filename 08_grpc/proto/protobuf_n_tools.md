@@ -1,5 +1,7 @@
 # Protobuf
-Protocol buffers 是一种语言无关、平台无关的可扩展机制或者说是数据交换格式，用于序列化结构化数据。与 XML、JSON 相比，Protocol buffers 序列化后的码流更小、速度更快、操作更简单。
+![](.proto_images/proto_optimize.png)    
+Protocol buffers 是一种语言无关、平台无关的可扩展机制或者说是数据交换格式，用于序列化结构化数据。
+与 XML、JSON 相比，Protocol buffers 序列化后的码流更小、速度更快、操作更简单。
 ## v2 和 v3 主要区别
 * 删除原始值字段的字段存在逻辑
 * 删除 required 字段
@@ -20,7 +22,7 @@ Varint 是一种紧凑的表示数字的方法。它用一个或多个字节来�
 
 Varint 中的每个字节（最后一个字节除外）都设置了最高有效位（msb），这一位表示还会有更多字节出现。每个字节的低 7 位用于以 7 位组的形式存储数字的二进制补码表示，最低有效组首位
 
-编码方式
+编码方式：
 
 1. 转换为二进制表示
 2. 每个字节保留后7位，去掉最高位
@@ -126,12 +128,13 @@ Note: Goland proto插件展示问题，需要手动添加路径，不添加也�
 ![](.proto_images/goland_protobuf_display_fix.png)
 
 ### 生成protobuf
+参考scripts脚本
 ```makefile
 .PHONY: proto
 proto:
-	protoc --proto_path=. --go_out=. ./proto/dir_import/*.proto
+	protoc --proto_path=. --go_out=. --go-grpc_out=. ./proto/dir_import/*.proto
 ```
-解释：
+
 1) --proto_path =.  指定在当前目录(go_grpc_example/08_grpc)寻找 import 的文件
 ```protobuf
 // 08_grpc/proto/dir_import/computer.proto
@@ -156,13 +159,45 @@ Note:  可以通过参数 --go_opt=paths=source_relative 来指定使用绝对�
 Note: 当然也可以一个一个编译，只要把相关文件都编译好即可。
 
 
-## protobuf优化
-![](.proto_images/proto_optimize.png)
+#### 插件解析
+![](.protobuf_n_tools_images/protoc-gen-go_protoc-gen-go-grpc.png)  
+```makefile
+.PHONY: proto1
+proto1:
+	protoc --proto_path=. --go_out=. --go-grpc_out=. ./proto/dir_import/*.proto
+	
+.PHONY: proto2
+proto2:	
+	protoc --proto_path=. --go_out=plugins=grpc:. ./proto/dir_import/*.proto
+```
+- go_out 对应 protoc-gen-go 插件；
+- go-grpc_out 对应 protoc-gen-go-grpc 插件
+
+总结:
+1. 插件名字：*_out 对应 protoc-gen-* 插件.
+2. 当使用参数 --go_out=plugins=grpc:xxx 生成时，生成的文件 *.pb.go 包含消息序列化代码和 gRPC 代码。
+3. 当使用参数 --go_out=xxx --go-grpc_out=xxx 生成时，会生成两个文件 *.pb.go 和 *._grpc.pb.go ，它们分别是消息序列化代码和 gRPC 代码.
+
 
 ### wiretype     
 ![](.proto_images/wire_type.png)
 
 ## 工具
+- protoc v3.18.1
+- protoc-gen-go v1.27.1
+- protoc-gen-go-grpc v1.1.0
+- grpc v1.41.0
+- protobuf v1.27.1
+
+查看版本
+```shell
+
+protoc-gen-go-grpc --version
+# protoc-gen-go-grpc 1.2.0
+
+
+```
+
 ### protoc
 ![](.proto_images/protoc_process.png)   
 protoc是protobuf文件（.proto）的编译器，可以借助这个工具把 .proto 文件转译成各种编程语言对应的源码，包含数据类型定义、调用接口等。
@@ -335,7 +370,15 @@ type Generator struct {
 }
 ```
 
-### protoc-gen-god的替代版本:gogoprotobuf
+### protoc-gen-go-grpc
+安装参考
+```shell
+git clone -b v1.30.0 https://github.com/grpc/grpc-go  
+cd cmd/protoc-gen-go-grpc  
+go install .
+```
+
+### protoc-gen-go的替代版本:gogoprotobuf
 
 在go中使用protobuf，有两个可选用的包goprotobuf（go官方出品）和gogoprotobuf。gogoprotobuf完全兼容google protobuf，
 它生成的代码质量和编解码性能均比goprotobuf高一些。
@@ -352,8 +395,7 @@ go get github.com/gogo/protobuf/protoc-gen-gofast
 #生成
 protoc --gofast_out=. myproto.proto
 ```
-## 生成方式
-参考scripts脚本
+
 
 ## 生成的protobuf.pb.go源码分析
 ```go
