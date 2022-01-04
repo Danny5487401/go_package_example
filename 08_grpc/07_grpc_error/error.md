@@ -120,3 +120,22 @@ type Status struct {
 	Details []*anypb.Any `protobuf:"bytes,3,rep,name=details,proto3" json:"details,omitempty"`
 }
 ```
+
+### Code:fRPC的错误码
+* OK 正常
+* Canceled 客户端取消
+* Unknown 未知
+* InvalidArgument 未知参数
+* DeadlineExceeded 超时
+* NotFound 未找到资源
+* AlreadyExists 资源已经创建
+* PermissionDenied 权限不足
+* ResourceExhausted 资源耗尽
+* FailedPrecondition 前置条件不满足
+* Aborted 异常退出
+* OutOfRange 超出范围
+* Unimplemented 未实现方法
+* Internal 内部问题
+* Unavailable 不可用状态
+* DataLoss 数据丢失
+* Unauthenticated 未认证

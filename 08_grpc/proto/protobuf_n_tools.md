@@ -398,6 +398,20 @@ protoc --gofast_out=. myproto.proto
 
 
 ## 生成的protobuf.pb.go源码分析
+CodeC：定义了Marshal和Unmarshal的接口，在grpc底层实现是proto
+```go
+import (
+	"github.com/gogo/protobuf/proto"
+)
+
+type Codec interface {
+	Marshal(v interface{}) ([]byte, error)
+	Unmarshal(data []byte, v interface{}) error
+	String() string
+}
+```
+
+proto.Message类型
 ```go
 //message接口
 type Message = protoiface.MessageV1

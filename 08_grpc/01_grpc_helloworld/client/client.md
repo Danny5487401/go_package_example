@@ -23,7 +23,7 @@ type ClientConn struct {
 	mu              sync.RWMutex
 	resolverWrapper *ccResolverWrapper
 	sc              *ServiceConfig
-	conns           map[*addrConn]struct{}
+	conns           map[*addrConn]struct{}    //是一个map，所以实际可能有多个tcp连接
 	// Keepalive parameter can be updated if a GoAway is received.
 	mkp             keepalive.ClientParameters
 	curBalancerName string
@@ -174,7 +174,7 @@ func (ccr *ccResolverWrapper) UpdateState(s resolver.State) error {
 ```
 总结
 
-    其主要功能是创建与给定目标的客户端连接，其承担了以下职责
+其主要功能是创建与给定目标的客户端连接，其承担了以下职责：
 
 1. 初始化 ClientConn
 2. 初始化（基于进程 LB）负载均衡配置
