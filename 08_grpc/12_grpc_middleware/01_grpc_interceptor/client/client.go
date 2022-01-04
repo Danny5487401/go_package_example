@@ -5,7 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"go_grpc_example/08_grpc/06_grpc_interceptor/proto"
+	"go_grpc_example/08_grpc/12_grpc_middleware/01_grpc_interceptor/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"io/ioutil"

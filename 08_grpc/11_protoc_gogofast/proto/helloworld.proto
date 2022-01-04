@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = ".;proto"; // 当前路径  名字叫proto
+option go_package = "11_protoc_gogofast/proto;helloworld";
 
 // The greeting service definition.
 service Greeter {

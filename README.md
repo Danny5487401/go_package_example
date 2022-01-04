@@ -1,5 +1,6 @@
 # go_grpc_example
 ![grpc](./img/golang.jpeg)
+- [MakeFile介绍](makefile.md)
 ## 第零章 rpc实现选项
 - 1 手动实现rpc
 - 2 手动实现stub
@@ -49,26 +50,28 @@
 - 1 错误英转中
 - 2 前端数据校验
 ## [第八章 GRPC编程 ](08_grpc/grpc.md)
-- [MakeFile介绍](08_grpc/makefile.md)
-- [protobuf介绍](08_grpc/proto/proto.md)
+- [protobuf及工具介绍](08_grpc/proto/protobuf_n_tools.md)
   - 引入其他proto文件
   - 编码原理
+  - protoc,protoc-gen-go,protoc-gen-go-grpc,protoc-gen-gofast等工具
+  
 - 1  HelloWorld入门
   - 1.1 [客户端Grpc源码](08_grpc/01_grpc_helloworld/client/client.md)
   - 1.2 [服务端Grpc源码](08_grpc/01_grpc_helloworld/server/server.md)
-- 2  元数据metada
+- 2  元数据metadata
 - 3  流式GRPC
 - 4  protobuf的jsonpb包序列化和反序列化
 - 5  负载均衡 
 - 6  拦截器 
-- 7  grpc错误抛出与捕获 
+- [7  grpc错误抛出与捕获](08_grpc/07_grpc_error/error.md)
 - 8  auth认证 
-- 9  proto字段验证器 
-- 10 grpc网关-直接对外http服务 
+- 9  Grpc插件-proto字段验证器 
+- 10 Grpc插件-grpc网关直接对外http服务 
 - 11 Grpc插件-gogoprotobuf
-- 12 GRPC生态中间件
+- 12 GRPC生态中间件(拦截器扩展)
 - 13 channelz调试
 - 14 multiplex多路复用
+- 15 自定义grpc插件
 ## 第九章 Nosql非关系型数据库
 - 1 MongoDB
   - [mongo和mysql储存引擎及内存结构](09_Nosql/01_mongo/mongo.md)
