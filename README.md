@@ -58,10 +58,14 @@
 - 1  HelloWorld入门
   - 1.1 [客户端Grpc源码](08_grpc/01_grpc_helloworld/client/client.md)
   - 1.2 [服务端Grpc源码](08_grpc/01_grpc_helloworld/server/server.md)
-- 2  元数据metadata
+- 2  [context中的元数据metadata](08_grpc/02_metadata/grpc_context.md)
 - 3  流式GRPC
 - 4  protobuf的jsonpb包序列化和反序列化
-- 5  负载均衡 
+- 5  负载均衡
+  - 5.1 [客户端(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver.md)
+    - 第三方consul实现Resolver接口和Builder接口
+    - 自定义实现Resolver接口和Builder接口
+  - 5.2 服务端
 - 6  拦截器 
 - [7  grpc错误抛出与捕获](08_grpc/07_grpc_error/error.md)
 - 8  auth认证 

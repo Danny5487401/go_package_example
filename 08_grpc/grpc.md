@@ -1,26 +1,26 @@
 # Grpc
 参考使用连接：https://github.com/grpc/grpc-go/tree/master/examples/features
 
-## RTT
+## RTT(Round Trip Time)
 ![](.intro_images/RTT.png)
 
-    RTT (Round Trip Time)
-    Round trip time for a packet
-    rtt = recvtime - sendtime
+解释：Round trip time for a packet
+
+公式： rtt = recvtime - sendtime
 
 ## http1.1
 ![](.intro_images/http1.1.png)
 
-    Head-of-Line Blocking (No Pipelining) 
-    一个连接同一时间只能处理一个请求
-    如果当前请求阻塞，那么该连接就无法复用
+* Head-of-Line Blocking (No Pipelining) 
+* 一个连接同一时间只能处理一个请求
+* 如果当前请求阻塞，那么该连接就无法复用
 
 ![](.intro_images/http_pipeline.png)
 
-    *未完全解决head of line blocking 
-    *fifo原则, 需要等待最后的响应
-    *多数http proxy不支持
-    *多数浏览器默认关闭 h1.1 pipeline
+* 未完全解决head of line blocking 
+* fifo原则, 需要等待最后的响应
+* 多数http proxy不支持
+* 多数浏览器默认关闭 h1.1 pipeline
 
 ## http2.0
 ![](.intro_images/http1.1VShttp2.0.png)
@@ -31,11 +31,11 @@
 - 流控
 - 优先级
 - 服务端推送
-定义    
+### 定义    
 ![](.intro_images/definition.png)
-二进制分帧层    
+### 二进制分帧层    
 ![](.intro_images/binary_frame.png)
-多路复用multiplex   
+### 多路复用multiplex   
 ![](.intro_images/multi_routes.png)
 ![](.intro_images/multi_routes2.png)
 
@@ -43,13 +43,13 @@
 - 并行交错地发送多个响应，响应之间互不干扰。
 - 使用一个连接并行发送多个请求和响应。
   
-frame      
+### frame      
 ![](.intro_images/frame.png)
 
-frame types类型     
+#### frame types类型     
 ![](.intro_images/frame_type.png)
 
-1. Magic
+1. Magic:
 Magic 帧的主要作用是建立 HTTP/2 请求的前言。在 HTTP/2 中，要求两端都要发送一个连接前言，作为对所使用协议的最终确认，并确定 HTTP/2 连接的初始设置，客户端和服务端各自发送不同的连接前言。
 
 Magic 帧是客户端的前言之一，内容为 PRI * HTTP/2.0\r\n\r\nSM\r\n\r\n，以确定启用 HTTP/2 连接。
@@ -78,10 +78,10 @@ DATA 帧的主要作用是装填主体信息，是数据帧
 7. GOAWAY停止
     
 
-header frame  
+#### header frame  
 ![](.intro_images/header_frame.png)
 
-data frame
+#### data frame
 ![](.intro_images/data_frame.png)
 
 # http3.0
@@ -89,16 +89,16 @@ data frame
 
 
 ## grpc分类
-1. unary
+### 1. unary
 ![](.intro_images/unary.png)
 
-2. client streaming
+### 2. client streaming
 ![](.intro_images/client_streaming.png)    
 
-3. server streaming
+### 3. server streaming
 ![](.intro_images/server_streaming.png)
 
-4. bidi streaming   
+### 4. bidi streaming   
 ![](.intro_images/bidi_streaming.png)
 
 ## 拦截器
