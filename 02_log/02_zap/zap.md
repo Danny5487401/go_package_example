@@ -37,29 +37,60 @@ User does not exist 是消息， 而 uid 是字段
 
 ## 源码分析
 
-结构体logger
+### 结构体logger
 ```go
 type Logger struct {
-	core zapcore.Core
+	core zapcore.Core  //定义了输出日志核心接口
 
 	development bool
-	addCaller   bool
+	addCaller   bool //是否输出调用者的信息
 	onFatal     zapcore.CheckWriteAction // default is WriteThenFatal
 
 	name        string
-	errorOutput zapcore.WriteSyncer
+	errorOutput zapcore.WriteSyncer // 错误输出终端，注意区别于zapcore中的输出，这里一般是指做运行过程中，发生错误记录日志（如：参数错误，未定义错误等），默认是os.Stderr
 
-	addStack zapcore.LevelEnabler
+	addStack zapcore.LevelEnabler //需要记录stack信息的日志级别
 
-	callerSkip int
+	callerSkip int //调用者的层级：用于指定记录哪个调用者信息
 }
 ```
+Note: 定义了与输出相关的基本信息，比如：name，stack，core等，我们可以看到这些属性都是不对外公开的，所以不能直接初始化结构体.
+zap为我们提供了New，Build两种方式来初始化Logger。除了core以外，其他的都可以通过Option来设置。
 
 
-1. 初始化    
+### 1. 初始化    
 zap提供了两类构造Logger的方式，一类是使用了建造者模式的Build方法，一类是接收Option参数的New方法，这两类方法提供的能力完全相同，只是给用户提供了不同的选择
 
-配置结构体
+
+
+```go
+logger,_ := zap.NewDevelopment()  //开发环境
+```
+#### 1. 第一种：建造者模式分析
+```go
+//开发环境下的Logger
+func NewDevelopment(options ...Option) (*Logger, error) {
+    return NewDevelopmentConfig().Build(options...)
+}
+//生产环境下的Logger
+func NewProduction(options ...Option) (*Logger, error) {
+    return NewProductionConfig().Build(options...)
+}
+//测试环境下的Logger
+func NewExample(options ...Option) *Logger {
+    encoderCfg := zapcore.EncoderConfig{
+        MessageKey:     "msg",
+        LevelKey:       "level",
+        NameKey:        "logger",
+        EncodeLevel:    zapcore.LowercaseLevelEncoder,
+        EncodeTime:     zapcore.ISO8601TimeEncoder,
+        EncodeDuration: zapcore.StringDurationEncoder,
+    }
+    core := zapcore.NewCore(zapcore.NewJSONEncoder(encoderCfg), os.Stdout, DebugLevel)
+    return New(core).WithOptions(options...)
+}
+```
+不同的构造方式，唯一不同的就是Config.
 ```go
 
 //Config这个结构体每个字段都有json和yaml的标注, 也就是说这些配置不仅仅可以在代码中赋值，也可以从配置文件中直接反序列化得到
@@ -79,27 +110,58 @@ type Config struct {
 	//实现的效果是在1s的时间单位内，如果某个日志级别下同样内容的日志输出数量超过了Initial的数量，
 	//那么超过之后，每隔Thereafter的数量，才会再输出一次。是一个对日志输出的保护功能
 	Sampling *SamplingConfig `json:"sampling" yaml:"sampling"`
+	
 	// 用来指定日志的编码器，也就是用户在调用日志打印接口时，zap内部使用什么样的编码器将日志信息编码为日志条目，日志的编码也是日志组件的一个重点。
 	// 默认支持两种配置，json和console，用户可以自行实现自己需要的编码器并注册进日志组件，实现自定义编码的能力
 	Encoding string `json:"encoding" yaml:"encoding"`
-	// EncoderConfig sets options for the chosen encoder. See
-	// zapcore.EncoderConfig for details.
+	
+
+	// 定义了输出样式
 	EncoderConfig zapcore.EncoderConfig `json:"encoderConfig" yaml:"encoderConfig"`
+	
 	// 用来指定日志的输出路径，不过这个路径不仅仅支持文件路径和标准输出，还支持其他的自定义协议，
 	//当然如果要使用自定义协议，也需要使用RegisterSink方法先注册一个该协议对应的工厂方法，该工厂方法实现了Sink接口
 	OutputPaths []string `json:"outputPaths" yaml:"outputPaths"`
+	
 	// 与OutputPaths类似，不过用来指定的是错误日志的输出，不过要注意，这个错误日志不是业务的错误日志，
 	// 而是zap中出现的内部错误，将会被定向到这个路径下.
 	ErrorOutputPaths []string `json:"errorOutputPaths" yaml:"errorOutputPaths"`
-	// InitialFields is a collection of fields to add to the root logger.
+	
+	// 初始化的Fields，每行日志都会爱上这些Field
 	InitialFields map[string]interface{} `json:"initialFields" yaml:"initialFields"`
 }
 ```
-
+zapcore.EncoderConfig
 ```go
-logger,_ := zap.NewDevelopment()  //开发环境
+type EncoderConfig struct {
+    //*Key：设置的是在结构化输出时，value对应的key
+    MessageKey    string `json:"messageKey" yaml:"messageKey"`
+    LevelKey      string `json:"levelKey" yaml:"levelKey"`
+    TimeKey       string `json:"timeKey" yaml:"timeKey"`
+    NameKey       string `json:"nameKey" yaml:"nameKey"`
+    CallerKey     string `json:"callerKey" yaml:"callerKey"`
+    StacktraceKey string `json:"stacktraceKey" yaml:"stacktraceKey"`
+    //日志的结束符
+    LineEnding    string `json:"lineEnding" yaml:"lineEnding"`
+    
+    //Level的输出样式，比如 大小写，颜色等
+    EncodeLevel    LevelEncoder    `json:"levelEncoder" yaml:"levelEncoder"`
+    
+    //日志时间的输出样式
+    EncodeTime     TimeEncoder     `json:"timeEncoder" yaml:"timeEncoder"`
+    
+    //消耗时间的输出样式
+    EncodeDuration DurationEncoder `json:"durationEncoder" yaml:"durationEncoder"`
+    
+    //Caller的输出样式，比如 全名称，短名称
+    EncodeCaller   CallerEncoder   `json:"callerEncoder" yaml:"callerEncoder"`
+    
+    // Unlike the other primitive type encoders, EncodeName is optional. The
+    // zero value falls back to FullNameEncoder.
+    EncodeName NameEncoder `json:"nameEncoder" yaml:"nameEncoder"`
+}
 ```
-- 第一种：建造者模式分析
+那开发环境进行讲解
 ```go
 // 初始化
 func NewDevelopment(options ...Option) (*Logger, error) {
@@ -113,13 +175,13 @@ func NewDevelopmentConfig() Config {
 		Level:            NewAtomicLevelAt(DebugLevel),
 		Development:      true,
 		Encoding:         "console",
-		EncoderConfig:    NewDevelopmentEncoderConfig(),
+		EncoderConfig:    NewDevelopmentEncoderConfig(), //序列化配置
 		OutputPaths:      []string{"stderr"},
 		ErrorOutputPaths: []string{"stderr"},
 	}
 }
 
-// 压缩配置
+// 序列化配置
 func NewDevelopmentEncoderConfig() zapcore.EncoderConfig {
 	return zapcore.EncoderConfig{
 		// Keys can be anything except the empty string.
@@ -185,8 +247,175 @@ func (cfg Config) openSinks() (zapcore.WriteSyncer, zapcore.WriteSyncer, error) 
 }
 ```
 
+#### 2. 第二种: 自定义的new方法
+```go
+func New(core zapcore.Core, options ...Option) *Logger {
+	if core == nil {
+		return NewNop()
+	}
+	log := &Logger{
+		core:        core,
+		errorOutput: zapcore.Lock(os.Stderr),
+		addStack:    zapcore.FatalLevel + 1,
+	}
+	return log.WithOptions(options...)
+}
+```
+option
+```go
+// An Option configures a Logger.
+type Option interface {
+	apply(*Logger)
+}
 
-3. 打印案例
+// optionFunc wraps a func so it satisfies the Option interface.
+type optionFunc func(*Logger)
+
+func (f optionFunc) apply(log *Logger) {
+	f(log)
+}
+
+// 以下是实现option
+//设置成开发模式
+func Development() Option {
+    return optionFunc(func(log *Logger) {
+        log.development = true
+    })
+}
+//自定义错误输出路径
+func ErrorOutput(w zapcore.WriteSyncer) Option {
+    return optionFunc(func(log *Logger) {
+        log.errorOutput = w
+    })
+}
+//Logger的结构化字段，每条日志都会打印这些Filed信息
+func Fields(fs ...Field) Option {
+    return optionFunc(func(log *Logger) {
+        log.core = log.core.With(fs)
+    })
+}
+//日志添加调用者信息
+func AddCaller() Option {
+    return WithCaller(true)
+}
+func WithCaller(enabled bool) Option {
+    return optionFunc(func(log *Logger) {
+        log.addCaller = enabled
+    })
+}
+
+//设置skip，用户runtime.Caller的参数
+func AddCallerSkip(skip int) Option {
+    return optionFunc(func(log *Logger) {
+        log.callerSkip += skip
+    })
+}
+
+//设置stack
+func AddStacktrace(lvl zapcore.LevelEnabler) Option {
+    return optionFunc(func(log *Logger) {
+        log.addStack = lvl
+    })
+}
+```
+zap还为我们添加了hook，让我们在每次打印日志的时候，可以调用hook方法：比如可以统计打印日志的次数、统计打印字段等.
+```go
+func Hooks(hooks ...func(zapcore.Entry) error) Option {
+    return optionFunc(func(log *Logger) {
+        log.core = zapcore.RegisterHooks(log.core, hooks...)
+    })
+}
+```
+
+### zapcore
+zapcore是一个接口，之所以定义成接口，是因为zap需要提供不同的实现，做到接口与实现解耦，充分体现了面向接口编程的设计思路。
+```go
+type Core interface {
+    //level接口：是用来根据日志级别判断日志是否应该输出
+    LevelEnabler
+
+    //添加结构化字段的方法
+    With([]Field) Core
+    
+    //从对象池取出CheckedEntry对象，并关联输出实体entry和core信息
+    Check(Entry, *CheckedEntry) *CheckedEntry
+    
+    //写入日志的方法
+    Write(Entry, []Field) error
+    
+    //刷新到终端的方法
+    Sync() error
+}
+```
+实现
+![](.zap_images/zap_core_realized.png)
+
+初始化
+```go
+// NewCore creates a Core that writes logs to a WriteSyncer.
+func NewCore(enc Encoder, ws WriteSyncer, enab LevelEnabler) Core {
+	return &ioCore{
+		LevelEnabler: enab,
+		enc:          enc,
+		out:          ws,
+	}
+}
+
+type ioCore struct {
+	LevelEnabler //继承 Enabled(Level) bool方法
+	enc Encoder // zapcore.NewConsoleEncoder 非结构化日志,zapcore.NewJSONEncoder 结构化日志
+    out WriteSyncer
+}
+```
+
+为了线程问题，我们在里面可以看到大量的clone方法，这一点值得我们借鉴
+```go
+func (c *ioCore) With(fields []Field) Core {
+    clone := c.clone()
+    addFields(clone.enc, fields)
+    return clone
+}
+func (c *ioCore) clone() *ioCore {
+    return &ioCore{
+        LevelEnabler: c.LevelEnabler,
+        enc:          c.enc.Clone(),
+        out:          c.out,
+    }
+}
+```
+
+hooked提供钩子方法
+```go
+type hooked struct {
+    Core  //组合了其他的Core，比如：multiCore，ioCore等
+    funcs []func(Entry) error //钩子方法，在Write时，会调用该方法
+}
+
+func (h *hooked) Write(ent Entry, _ []Field) error {
+    var err error
+    for i := range h.funcs {
+        err = multierr.Append(err, h.funcs[i](ent))
+    }
+    return err
+}
+```
+
+使用
+```go
+logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.WarnLevel), zap.Hooks(func(entry zapcore.Entry) error {//定义钩子函数
+        fmt.Println("hooked called")
+        return nil
+    })) 
+//打印日志
+logger.Info("logger", zap.String("name", "修华师"))
+
+// 结果
+// {"level":"INFO","ts":"2020-05-18 15:20:56","file":"test/main.go:35","msg":"logger","name":"修华师"}
+//hooked called
+```
+
+
+### 打印案例
 ```go
 logger.Error("logger", zap.String("name", "修华师"))
 ```
