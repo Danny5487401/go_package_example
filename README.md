@@ -18,7 +18,7 @@
   - 2.1 控制台输出
   - 2.2 文件输出
   - 2.3 并发安全logger
-  - 2.4 配合日志归档库lumberjack库实现定制化log
+  - [2.4 zap(配合lumberjack库或go-file-rotatelogs库)实现定制化log日志归档](02_log/02_zap/04_customized_log/lumberjack.md)
 
 ## 第三章 消息队列
 - 1 [rabbitmq](03_amqp/01_rabbitmq/introduction.md)

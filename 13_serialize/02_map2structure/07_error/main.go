@@ -18,14 +18,15 @@ type Person struct {
 
 func main() {
 	m := map[string]interface{}{
-		"name":   123,            //与定义的类型不一致
-		"age":    "bad value",    //与定义的类型不一致
-		"emails": []int{1, 2, 3}, //与定义的类型不一致
+		"name":   123,            //string->int
+		"age":    "bad value",    //int->string
+		"emails": []int{1, 2, 3}, //[]string->[]int
 	}
 
 	var p Person
 	err := mapstructure.Decode(m, &p)
 	if err != nil {
-		fmt.Println(err.Error())
+		fmt.Println("转换格式错误", err.Error())
+
 	}
 }
