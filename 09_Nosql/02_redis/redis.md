@@ -143,26 +143,29 @@ auto-aof-rewrite-percentage 80
 
     aof文件大小比起上次重写时的大小,增长率80%时,执行aof重写
 
-Redis集群特点
+## Redis集群特点
 
-    1. 多个redis节点网络互联，数据共享  
-    2. 所有的节点都是一主一从（也可以是一主多从），其中从不提供服务，仅作为备用  
-    3. 不支持同时处理多个key（如MSET/MGET），因为redis需要把key均匀分布在各个节点上，
-    并发量很高的情况下同时创建key-value会降低性能并导致不可预测的行为  
-    4. 支持在线增加、删除节点  
-    5. 客户端可以连任何一个主节点进行读写
+1. 多个redis节点网络互联，数据共享  
+2. 所有的节点都是一主一从（也可以是一主多从），其中从不提供服务，仅作为备用  
+3. 不支持同时处理多个key（如MSET/MGET），因为redis需要把key均匀分布在各个节点上，并发量很高的情况下同时创建key-value会降低性能并导致不可预测的行为  
+4. 支持在线增加、删除节点  
+5. 客户端可以连任何一个主节点进行读写
 
-集群方案
+## 集群方案
 
 ![](.redis_images/codis_vs_cluster.png)
 
-    1. vip多线程版本 twemproxy(Twitter开源)
-    2. codis
-
+1. vip多线程版本 twemproxy(Twitter开源)
+2. codis   
 ![](.redis_images/codis.png)
 
-    3. redis cluster
+3. redis cluster    
 ![](.redis_images/redis_cluster.png)
+
+
+###  redis cluster 的哈希槽为啥16384个
+![](.redis_images/redis_cluster_slot_with_author_answers.png)
+
 
 ## 高并发缓存
 ![](.redis_images/high_concurrency_buffer.png)
