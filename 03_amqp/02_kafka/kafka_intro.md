@@ -119,86 +119,90 @@
     - 4.12. 若 delete.topic.enable=true 且Delete Topic Patch(/admin/delete_topics)中有值，则删除相应的Topic。
 
 ## 五. 消费者
-- 5.1 kafka 提供了两套 consumer API：
-    - a.  The high-level Consumer API
-    - b.  The SimpleConsumer API   
+1. kafka 提供了两套 consumer API：
+- a.  The high-level Consumer API
+- b.  The SimpleConsumer API   
   
-    具体描述
-      - 5.1.1 使用 high-level consumer API 可以是多线程的应用,注意事项
-          - a. 如果消费线程大于 partition 数量，则有些线程将收不到消息
-          - b. 如果 partition 数量大于线程数，则有些线程多收到多个 partition 的消息
-          - c. 如果一个线程消费多个 partition，则无法保证你收到的消息的顺序，而一个 partition 内的消息是有序的
-      - 5.1.2 SimpleConsumer API,对 partition 有更多的控制权，那就应该使用
-          - a. 多次读取一个消息
-          - b. 只消费一个 partition 中的部分消息
-          - c. 使用事务来保证一个消息仅被消费一次
+具体描述
+- 5.1.1 使用 high-level consumer API 可以是多线程的应用,注意事项
+    - a. 如果消费线程大于 partition 数量，则有些线程将收不到消息
+    - b. 如果 partition 数量大于线程数，则有些线程多收到多个 partition 的消息
+    - c. 如果一个线程消费多个 partition，则无法保证你收到的消息的顺序，而一个 partition 内的消息是有序的
+- 5.1.2 SimpleConsumer API,对 partition 有更多的控制权，那就应该使用
+    - a. 多次读取一个消息
+    - b. 只消费一个 partition 中的部分消息
+    - c. 使用事务来保证一个消息仅被消费一次
       
-          使用此 API 时，partition、offset、broker、leader 等对你不再透明，需要自己去管理。你需要做大量的额外工作：
-          - a. 必须在应用程序中跟踪 offset，从而确定下一条应该消费哪条消息
-          - b. 应用程序需要通过程序获知每个 Partition 的 leader 是谁
-          - c. 需要处理 leader 的变更
-      
-          SimpleConsumer API 的一般流程如下
-          - 1. 查找到一个“活着”的 broker，并且找出每个 partition 的 leader
-          - 2. 找出每个 partition 的 follower
-          - 3. 定义好请求，该请求应该能描述应用程序需要哪些数据
-          - 4. fetch 数据
-          - 5. 识别 leader 的变化，并对之作出必要的响应
-- 5.2 消费组   
-        其实在Kafka中，消费者是以消费者组的形式对外消费的。   
-        原因：   
-            我们作一个假设，假设没有消费者组这种概念，我们现在有10个消费者订阅了同一个主题，那么当这个主题有新的消息之后，我们这10个消费者是不是应该去“抢消息”进行消费呢？  
-    1. 这是一种浪费资源的表现。所以消费者组，也可以认为是一种更加合理分配资源，进行负载均衡的设计。
-            假设有5个消费者属于同一个消费者组，这个消费者组订阅了一个具有10个分区的主题，那么组内的每一个消费者，都会负责处理2个分区的消息
-  
-    2. 消费者组的设计还能够令我们很方便的横向扩展系统的消费能力。设想一下在我们发觉系统中消息堆积越来越多，消费速度跟不上生产速度的时候，只需要新增消费者，
-            并且将这个消费者划入原来的消费者组中，Kafka会自动调整组内消费者对分区的分配，这个过程称为《重平衡》。
-  
-    3. kafka 的分配单位是 partition。每个 consumer 都属于一个 group，一个 partition 只能被同一个 group 内的一个 consumer 所消费
-            （也就保障了一个消息只能被 group 内的一个 consumer 所消费），但是多个 group 可以同时消费这个 partition
-  
-    4. Kafka还支持多个消费者组订阅同一个主题，这样，相同的消息将被发送到所有订阅了这个主题的消费者组中。
-              注意：我们说到了同一分区只能被同一个消费者消费，但是这个说法的前提是这些消费者位于同一个消费者组。也就是说，不同消费者组内的消费者，是可以消费同一个主题分区的
-  
-- 5.3 消费方式   
-        consumer 采用 pull 模式从 broker 中读取数据。
-        push 模式很难适应消费速率不同的消费者，因为消息发送速率是由 broker 决定的。它的目标是尽可能以最快速度传递消息，
-        但是这样很容易造成 consumer 来不及处理消息，典型的表现就是拒绝服务以及网络拥塞。而 pull 模式则可以根据 consumer 的消费能力以适当的速率消费消息。
-        对于 Kafka 而言，pull 模式更合适，它可简化 broker 的设计，consumer 可自主控制消费消息的速率，同时 consumer 可以自己控制消费方式——即可批量消费也可逐条消费，同时还能选择不同的提交方式从而实现不同的传输语义
-- 5.4 消费保证consumer delivery guarantee  
-        如果将 consumer 设置为 autocommit，consumer 一旦读到数据立即自动 commit。如果只讨论这一读取消息的过程，那 Kafka 确保了 Exactly once。
-        但实际使用中应用程序并非在 consumer 读取完数据就结束了，而是要进行进一步处理，而数据处理与 commit 的顺序在很大程度上决定了consumer delivery guarantee
-    - a. 读完消息先 commit 再处理消息。
-            这种模式下，如果 consumer 在 commit 后还没来得及处理消息就 crash 了，下次重新开始工作后就无法读到刚刚已提交而未处理的消息，这就对应于 At most once
-    - b. 读完消息先处理再 commit。
-            这种模式下，如果在处理完消息之后 commit 之前 consumer crash 了，下次重新开始工作时还会处理刚刚未 commit 的消息，实际上该消息已经被处理过了。这就对应于 At least once。
-    - c. 如果一定要做到 Exactly once，就需要协调 offset 和实际操作的输出。
-            精典的做法是引入两阶段提交。如果能让 offset 和操作输入存在同一个地方，会更简洁和通用。这种方式可能更好，因为许多输出系统可能不支持两阶段提交。
-            比如，consumer 拿到数据后可能把数据放到 HDFS，如果把最新的 offset 和数据本身一起写到 HDFS，那就可以保证数据的输出和 offset 的更新要么都完成，要么都不完成，
-            间接实现 Exactly once。（目前就 high-level API而言，offset 是存于Zookeeper 中的，无法存于HDFS，而SimpleConsuemr API的 offset 是由自己去维护的，可以将之存于 HDFS 中）
+使用此 API 时，partition、offset、broker、leader 等对你不再透明，需要自己去管理。你需要做大量的额外工作：
 
-- 5.5 消费者重平衡consumer rebalance    
-        定义：某个消费组内的消费者就如何消费某个主题的所有分区达成一个共识的过程   
-        但是这个过程对Kafka的吞吐率影响是巨大的，因为这个过程有点像GC中的STW（世界停止），在Rebalance的时候，所有的消费者只能去做重平衡这一件事情，不能消费任何的消息。
-        下面我们来说说哪些情况可能会导致Rebalance：
-  1. 组内成员数量发生了变化
-  2. 订阅主题的数量发生了变化
-  3. 订阅主题的分区数量发生了变化     
+- a. 必须在应用程序中跟踪 offset，从而确定下一条应该消费哪条消息
+- b. 应用程序需要通过程序获知每个 Partition 的 leader 是谁
+- c. 需要处理 leader 的变更
+      
+SimpleConsumer API 的一般流程如下
+  - 1. 查找到一个“活着”的 broker，并且找出每个 partition 的 leader
+  - 2. 找出每个 partition 的 follower
+  - 3. 定义好请求，该请求应该能描述应用程序需要哪些数据
+  - 4. fetch 数据
+  - 5. 识别 leader 的变化，并对之作出必要的响应
+
+2. 消费组   
+          其实在Kafka中，消费者是以消费者组的形式对外消费的。   
+          原因：   
+              我们作一个假设，假设没有消费者组这种概念，我们现在有10个消费者订阅了同一个主题，那么当这个主题有新的消息之后，我们这10个消费者是不是应该去“抢消息”进行消费呢？  
+      1. 这是一种浪费资源的表现。所以消费者组，也可以认为是一种更加合理分配资源，进行负载均衡的设计。
+              假设有5个消费者属于同一个消费者组，这个消费者组订阅了一个具有10个分区的主题，那么组内的每一个消费者，都会负责处理2个分区的消息
   
-    而且在Rebalance的时候，假设有消费者退出了，导致多出了一些分区，Kafka并不是把这几个多出来的分区分配给原来的那些消费者，而是所有的消费者一起参与重新分配所有的分区
-    当有新的消费者加入的时候，也不是原本的每个消费者分出一些分区给新的消费者，而是所有的消费者一起参与重新分配所有的分区。
-    这样的分配策略听起来就很奇怪且影响效率，但是没有办法。
-    不过社区新推出了StickyAssignor（粘性分配）策略，就可以做到我们上面假设的情况，但是目前还存在一些bug    
-    - a. 将目标 topic 下的所有 partition 排序，存于PT
-    - b. 对某 consumer group 下所有 consumer 排序，存于 CG，第 i 个consumer 记为 Ci
-    - c. N=size(PT)/size(CG)，向上取整
-    - d. 解除 Ci 对原来分配的 partition 的消费权（i从0开始）
-    - e. 将第i*N到（i+1）*N-1个 partition 分配给 Ci
+      2. 消费者组的设计还能够令我们很方便的横向扩展系统的消费能力。设想一下在我们发觉系统中消息堆积越来越多，消费速度跟不上生产速度的时候，只需要新增消费者，
+              并且将这个消费者划入原来的消费者组中，Kafka会自动调整组内消费者对分区的分配，这个过程称为《重平衡》。
+  
+      3. kafka 的分配单位是 partition。每个 consumer 都属于一个 group，一个 partition 只能被同一个 group 内的一个 consumer 所消费
+              （也就保障了一个消息只能被 group 内的一个 consumer 所消费），但是多个 group 可以同时消费这个 partition
+  
+      4. Kafka还支持多个消费者组订阅同一个主题，这样，相同的消息将被发送到所有订阅了这个主题的消费者组中。
+                注意：我们说到了同一分区只能被同一个消费者消费，但是这个说法的前提是这些消费者位于同一个消费者组。也就是说，不同消费者组内的消费者，是可以消费同一个主题分区的
+  
+3. 消费方式   
+            consumer 采用 pull 模式从 broker 中读取数据。
+            push 模式很难适应消费速率不同的消费者，因为消息发送速率是由 broker 决定的。它的目标是尽可能以最快速度传递消息，
+            但是这样很容易造成 consumer 来不及处理消息，典型的表现就是拒绝服务以及网络拥塞。而 pull 模式则可以根据 consumer 的消费能力以适当的速率消费消息。
+            对于 Kafka 而言，pull 模式更合适，它可简化 broker 的设计，consumer 可自主控制消费消息的速率，同时 consumer 可以自己控制消费方式——即可批量消费也可逐条消费，同时还能选择不同的提交方式从而实现不同的传输语义
+4. 消费保证consumer delivery guarantee  
+            如果将 consumer 设置为 autocommit，consumer 一旦读到数据立即自动 commit。如果只讨论这一读取消息的过程，那 Kafka 确保了 Exactly once。
+            但实际使用中应用程序并非在 consumer 读取完数据就结束了，而是要进行进一步处理，而数据处理与 commit 的顺序在很大程度上决定了consumer delivery guarantee
+        - a. 读完消息先 commit 再处理消息。
+                这种模式下，如果 consumer 在 commit 后还没来得及处理消息就 crash 了，下次重新开始工作后就无法读到刚刚已提交而未处理的消息，这就对应于 At most once
+        - b. 读完消息先处理再 commit。
+                这种模式下，如果在处理完消息之后 commit 之前 consumer crash 了，下次重新开始工作时还会处理刚刚未 commit 的消息，实际上该消息已经被处理过了。这就对应于 At least once。
+        - c. 如果一定要做到 Exactly once，就需要协调 offset 和实际操作的输出。
+                精典的做法是引入两阶段提交。如果能让 offset 和操作输入存在同一个地方，会更简洁和通用。这种方式可能更好，因为许多输出系统可能不支持两阶段提交。
+                比如，consumer 拿到数据后可能把数据放到 HDFS，如果把最新的 offset 和数据本身一起写到 HDFS，那就可以保证数据的输出和 offset 的更新要么都完成，要么都不完成，
+                间接实现 Exactly once。（目前就 high-level API而言，offset 是存于Zookeeper 中的，无法存于HDFS，而SimpleConsuemr API的 offset 是由自己去维护的，可以将之存于 HDFS 中）
+
+5. 消费者重平衡consumer rebalance    
+
+定义：某个消费组内的消费者就如何消费某个主题的所有分区达成一个共识的过程,
+但是这个过程对Kafka的吞吐率影响是巨大的，因为这个过程有点像GC中的STW（世界停止），在Rebalance的时候，所有的消费者只能去做重平衡这一件事情，不能消费任何的消息。 
+下面我们来说说哪些情况可能会导致Rebalance：
+
+      1. 组内成员数量发生了变化
+      2. 订阅主题的数量发生了变化
+      3. 订阅主题的分区数量发生了变化     
+  
+而且在Rebalance的时候，假设有消费者退出了，导致多出了一些分区，Kafka并不是把这几个多出来的分区分配给原来的那些消费者，而是所有的消费者一起参与重新分配所有的分区
+当有新的消费者加入的时候，也不是原本的每个消费者分出一些分区给新的消费者，而是所有的消费者一起参与重新分配所有的分区。
+这样的分配策略听起来就很奇怪且影响效率，但是没有办法。
+不过社区新推出了StickyAssignor（粘性分配）策略，就可以做到我们上面假设的情况，但是目前还存在一些bug    
+- a. 将目标 topic 下的所有 partition 排序，存于PT
+- b. 对某 consumer group 下所有 consumer 排序，存于 CG，第 i 个consumer 记为 Ci
+- c. N=size(PT)/size(CG)，向上取整
+- d. 解除 Ci 对原来分配的 partition 的消费权（i从0开始）
+- e. 将第i*N到（i+1）*N-1个 partition 分配给 Ci
   
 ## 六. 注意事项  
-- 6.1 producer 无法发布消息到 broker（奇怪也没有抛错）   
-     解决方式：server.properties 配置   
-    advertised.listeners 是 broker 给 producer 和 consumer 连接使用的，如果没有设置，就使用 listeners，而如果 host_name 没有设置的话，就使用 java.net.InetAddress.getCanonicalHostName() 方法返回的主机名
+1. producer 无法发布消息到 broker（奇怪也没有抛错）   
+解决方式：server.properties 配置   
+advertised.listeners 是 broker 给 producer 和 consumer 连接使用的，如果没有设置，就使用 listeners，而如果 host_name 没有设置的话，就使用 java.net.InetAddress.getCanonicalHostName() 方法返回的主机名
 
 ## 七. 位移主题   
 在Kafka中的主题名称是__consumer_offsets。因为位移主题也是一个主题。
@@ -226,4 +230,11 @@
    手动提交又分为同步提交和异步提交两种提交方式。
    1. 同步提交会直到消息被写入了位移主题，才会返回，这样是安全的，但是可能造成的问题是TPS降低。
    2. 异步提交是触发了提交这个操作，就会返回。这样速度是很快的，但是可能会造成提交失败的情况
+
+## 八. 安全认证
+1. GSSAPI： 使用的Kerberos认证，可以集成目录服务，比如AD。从Kafka0.9版本开始支持
+2. PLAIN： 使用简单用户名和密码形式。从Kafka0.10版本开始支持
+3. SCRAM： 主要解决PLAIN动态更新问题以及安全机制，从Kafka0.10.2开始支持
+4. OAUTHBEARER： 基于OAuth 2认证框架，从Kafka2.0版本开始支持
+
 
