@@ -146,7 +146,7 @@
 ## [第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify)](21_viper/viper.md)
 - 1 获取本地文件内容
 - [2 监听文件变化(fsnotify)](21_viper/02_fsnotify/fsnotify.md)
-- 3 远程读取nacos配置
+- [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
 ## 第二十二章 ETCD
 - 1 CRUD及watch
 - 2 [读和写流程分析](22_etcd/etcd_read_n_write.md)

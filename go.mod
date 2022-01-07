@@ -14,9 +14,9 @@ require (
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/elastic/go-elasticsearch/v7 v7.16.0
 	github.com/elliotchance/phpserialize v1.3.1
-	github.com/envoyproxy/protoc-gen-validate v0.1.0
+	github.com/envoyproxy/protoc-gen-validate v0.6.2
 	github.com/frankban/quicktest v1.11.3 // indirect
-	github.com/fsnotify/fsnotify v1.4.9
+	github.com/fsnotify/fsnotify v1.5.1
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-mysql-org/go-mysql v1.3.0
@@ -28,21 +28,20 @@ require (
 	github.com/go-redis/redis/v8 v8.11.0
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/protobuf v1.5.2
-	github.com/golang/snappy v0.0.3 // indirect
 	github.com/gomodule/redigo v1.8.4
 	github.com/google/wire v0.5.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
-	github.com/hashicorp/consul/api v1.9.1
+	github.com/hashicorp/consul/api v1.12.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/jinzhu/copier v0.3.2
 	github.com/jinzhu/gorm v1.9.16
 	github.com/jmoiron/sqlx v1.3.3
-	github.com/json-iterator/go v1.1.11
+	github.com/json-iterator/go v1.1.12
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/mbobakov/grpc-consul-resolver v1.4.3
 	github.com/micro/go-micro v1.18.0
-	github.com/mitchellh/mapstructure v1.4.1
+	github.com/mitchellh/mapstructure v1.4.3
 	github.com/nacos-group/nacos-sdk-go v1.0.7
 	github.com/nacos-group/nacos-sdk-go/v2 v2.0.0-Beta.1
 	github.com/natefinch/lumberjack v2.0.0+incompatible
@@ -53,9 +52,10 @@ require (
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rs/zerolog v1.26.1
+	github.com/sagikazarmark/crypt v0.4.0 // indirect
 	github.com/shirou/gopsutil v3.20.11+incompatible
 	github.com/spf13/cobra v0.0.5
-	github.com/spf13/viper v1.8.1
+	github.com/spf13/viper v1.9.0
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.7.0
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
@@ -66,11 +66,11 @@ require (
 	go.uber.org/zap v1.17.0
 	golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	google.golang.org/genproto v0.0.0-20210729151513-df9385d47c1b
-	google.golang.org/grpc v1.39.0
+	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa
+	google.golang.org/grpc v1.43.0
 	google.golang.org/grpc/examples v0.0.0-20211103202053-3b94303f3754
 	google.golang.org/protobuf v1.27.1
-	gopkg.in/ini.v1 v1.62.0
+	gopkg.in/ini.v1 v1.63.2
 	xorm.io/builder v0.3.8
 	xorm.io/xorm v1.1.0
 )
