@@ -27,7 +27,7 @@ func main() {
 	)
 
 	// 配置服务器地址
-	addr := []string{`http://106.14.35.115:9200`}
+	addr := []string{`http://tencent.danny.games:9200/`}
 	// 配置http数据传输
 	transport := &http.Transport{
 		MaxIdleConnsPerHost:   10,

@@ -1,16 +1,18 @@
 # ElasticSearch
 ## es架构
-![](./img/distribution.png)
+![](.img/distribution.png)
 ## es倒排索引原理
-![](./img/inverted_index.png)
-## CRUD增删改查
-![](./img/crud.png)
+![](.img/inverted_index.png)
+默认情况下，Elasticsearch 在文档中的所有字段上构建一个反向索引，指向该字段所在的 Elasticsearch 文档。
+也就是说在每个 Elasticsearch 的 Lucene里，有一个位置存放这个 inverted index。如果你的索引包含包含五个全文字段的文档，你将有五个反向索引。
 
+## CRUD增删改查
+![](.img/crud.png)
 
 ## VS 关系型数据库
-![](./img/es_n_mysql.png)
+![](.img/es_n_mysql.png)
 ### Document 文档
-![](img/.es_images/document.png)
+![](.img/.es_images/document.png)
 Elasticsearch 是面向文档的，这意味着你索引或搜索的最小数据单元是文档.
 文档通常是数据的 JSON 表示形式。
 -  它是独立的。文档包含字段（名称）及其值。
@@ -38,18 +40,18 @@ Elasticsearch 具有 schema-less 的能力，这意味着无需显式指定如�
 在默认的情况下是 _doc。在未来8.0的版本中，type 将被彻底删除。
 
 ### index
-![](img/.es_images/es_index.png)
+![](.img/.es_images/es_index.png)
 
 在 Elasticsearch 中，索引是文档的集合。
 
-![](img/.es_images/es_index_in_lucene.png)
+![](.img/.es_images/es_index_in_lucene.png)
 Elasticsearch 起源于 Apache Lucene 。一个 Elasticsearch 的 index 分布于一个或多长 shard 之中，而每个 shard 相应于一个 Aache Lucene 的 index。
 每个 Index 一个或许多的 documents 组成，并且这些 document 可以分布于不同的 shard 之中。
 
 
 
 ## 集群cluster
-![](img/.es_images/cluster_es.png)
+![](.img/.es_images/cluster_es.png)
 ### Shards分片
 索引可以存储大量的数据，这些数据可能超过单个节点的硬件限制。例如，十亿个文件占用磁盘空间1TB的单指标可能不适合对单个节点的磁盘或可能太慢服务仅从单个节点的搜索请求。
 为了解决这个问题，Elasticsearch 提供了将索引划分成多份的能力，这些份就叫做分片（shard）.
@@ -68,10 +70,10 @@ Elasticsearch 起源于 Apache Lucene 。一个 Elasticsearch 的 index 分布�
 
 
 一个 shard 的性能会随着它的大下而改变  
-![](img/.es_images/shard_performance.png)
+![](.img/.es_images/shard_performance.png)
 如上图所示，我们建议 50G 为索引的大小以求得最好的性能。在我们实际的 Beats 的使用中，默认的 ILM 索引大小就是 50G。
 
-![](img/.es_images/shard_replicas_example.png)
+![](.img/.es_images/shard_replicas_example.png)
 上图表示的是一个 index 有5个 shard 及1个 replica.
 
 ### Replicas副本
@@ -92,7 +94,7 @@ PUT my_index/_settings
 ```
 
 我们可以通过如下的接口来获得一个 index 的健康情况：
-![](img/.es_images/index_health.png)
+![](.img/.es_images/index_health.png)
 shard 健康
 
 - 红色：集群中未分配至少一个主分片
@@ -100,7 +102,7 @@ shard 健康
 - 绿色：分配所有分片
 
 ### node
-![](img/.es_images/node_purpose.png)
+![](.img/.es_images/node_purpose.png)
 根据 node 的作用，可以分为如下的几种
 * master-eligible：可以作为主 node。一旦成为主 node，它可以管理整个 cluster 的设置及变化：创建，更新，删除 index；添加或删除 node；为 node 分配 shard
 
@@ -109,7 +111,7 @@ shard 健康
 * ingest: 数据接入（比如 pipepline)
 
 * machine learning (Gold/Platinum License)
-![](img/.es_images/node_config.png)
+![](.img/.es_images/node_config.png)
 你也可以让一个 node 做专有的功能及角色。如果配置文件（Elasticsearch.yml）上面 node 配置参数没有任何配置，那么我们可以认为这个 node 是作为一个 coordination node。
 在这种情况下，它可以接受外部的请求，并转发到相应的节点来处理。针对 master node，有时我们需要设置 cluster.remote.connect: false。
 
@@ -117,13 +119,13 @@ shard 健康
 这种情况为了避免脑裂情况发生。它通常可以使用一个 CPU 性能较低的 node 来担当。
 
 数据节点和集群的关系(适用于 Elastic Stack 7.9 发布版以前)：
-![](img/.es_images/data_node_n_cluster.png)
+![](.img/.es_images/data_node_n_cluster.png)
 
 
 
 ## 存储架构
 ### 写入流程
-![](.es_images/es_write_process.png)
+![](.img/.es_images/es_write_process.png)
 写入吞吐能力是大数据场景下的一项核心指标，用户对大数据产品的要求不光是要存的下，还要写得快。
 这里首先介绍Elasticsearch的实时写入链路设计：在Elasticsearch的每一个Shard中，写入流程分为两部分，先写入Lucene，再写入TransLog。
 写入请求到达Shard后，先写Lucene内存索引，此时数据还在内存里面，接着去写TransLog，写完TransLog后，刷新TransLog数据到磁盘上，写磁盘成功后，请求返回给用户。

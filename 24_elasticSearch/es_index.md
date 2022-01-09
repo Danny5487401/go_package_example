@@ -5,7 +5,7 @@
     warm索引负责较旧数据的读取，可使用内存或SSD存储；cold索引很少被读取，可使用大容量磁盘存储
 
 ## ES从6.7版本推出了索引生命周期管理（Index Lifecycle Management ，简称ILM)机制，能帮我们自动管理一个索引策略（Policy）下索引集群的生命周期。
-![Log 文档在 Elasticsearch 中生命周期](img/.es_images/logs_lifecycle.png)
+![Log 文档在 Elasticsearch 中生命周期](.img/.es_images/logs_lifecycle.png)
 索引生命周期由五个阶段（phases）组成：hot，warm，cold，frozen 及 delete。
 
 * Hot：索引可写入，也可查询。你可能 rollover 一个 alias 从而每两个星期就生成一个新的索引，避免太大的索引数据。在这个阶段你可以做导入数据，并允许繁重的搜索
