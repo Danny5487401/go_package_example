@@ -154,6 +154,51 @@ func (l *Logger) millRun() {
 - 如果millCh中没有元素，自然可以写入，并使得millRun读到，开始调用millRunOnce方法；
 - 如果有元素，不能写入，那么就说明在millRun方法中还在执行millRunOnce方法，那也就没必要写入了，直接走default分支结束就好。
 
+创建文件
+```go
+// /Users/xiaxin/go/pkg/mod/github.com/natefinch/lumberjack@v2.0.0+incompatible/lumberjack.go
+func (l *Logger) openNew() error {
+	// 创建全目录
+	err := os.MkdirAll(l.dir(), 0744)
+	if err != nil {
+		return fmt.Errorf("can't make directories for new logfile: %s", err)
+	}
+    //判断老文件是否存在
+	name := l.filename()
+	mode := os.FileMode(0644)
+	info, err := os_Stat(name)
+	if err == nil {
+        // 如果存在
+		// Copy the mode off the old logfile.
+		mode = info.Mode()
+		// move the existing file
+		// 调用backupName函数，生成老的日志文件被分割后的文件名
+		newname := backupName(name, l.LocalTime)
+		// 重命名旧文件
+		if err := os.Rename(name, newname); err != nil {
+			return fmt.Errorf("can't rename log file: %s", err)
+		}
+
+		// this is a no-op anywhere but linux
+		if err := chown(name, info); err != nil {
+			return err
+		}
+	}
+
+	// 无论是否存在老文件，下来都要创建新文件，并重置Logger对象的文件句柄和已输出大小。
+	// we use truncate here because this should only get called when we've moved
+	// the file ourselves. if someone else creates the file in the meantime,
+	// just wipe out the contents.
+	f, err := os.OpenFile(name, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, mode)
+	if err != nil {
+		return fmt.Errorf("can't open new logfile: %s", err)
+	}
+	l.file = f
+	l.size = 0
+	return nil
+}
+```
+文件rotate
 ```go
 func (l *Logger) rotate() error {
 	// 1.关闭原有的文件句柄

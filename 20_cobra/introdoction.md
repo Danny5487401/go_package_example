@@ -1,6 +1,9 @@
 # Cobra
 Cobra 是一个非常实用(流行)的golang包，很多优秀的开源应用都在使用它，包括 Docker 和 Kubernetes 等，
-它提供了简单的接口来创建命令行程序。同时，Cobra 也是一个应用程序，用来生成应用框架，从而开发以 Cobra 为基础的应用
+它提供了简单的接口来创建命令行程序。同时，Cobra 也是一个应用程序，用来生成应用框架，从而开发以 Cobra 为基础的应用。
+![](.introdoction_images/cobra_menu.png)  
+
+在cobra中，所有的命令会组成一个树的结构，必然有一个根命令，我们应用的每次执行，都是从这个根命令开始的，官方文档也说过，基于cobra的应用的main包中的代码是很简单的，几乎没有额外的操作，仅有的操作其实就是执行我们的根命令。
 ## 主要功能
 * 简易的子命令行模式，如 app server， app fetch 等等
 * 完全兼容 posix 命令行模式
@@ -70,3 +73,15 @@ cobra add parse -p showCmd
 ```shell script
 $ go build -o time main.go
 ``` 
+
+
+## 执行流程
+```go
+func Execute() {
+  rootCmd.Execute()
+}
+func (c *Command) Execute() error {
+	_, err := c.ExecuteC()
+	return err
+}
+```

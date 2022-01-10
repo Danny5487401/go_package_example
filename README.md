@@ -170,7 +170,7 @@
 
 ## 第二十七章 Mysql的binlog
 - [binlog](27_mysql_binlog/binlog.md)
-- canal
+- [canal使用及源码分析](27_mysql_binlog/canal/canal.md)
 
 ## 第二十八章 OLAP(Online Analytical Processing联机分析处理)
 - 1 [列数据库ClickHouse](28_OLAP/01_clickHouse/clickHouse.md)

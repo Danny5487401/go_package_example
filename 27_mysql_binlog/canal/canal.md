@@ -107,6 +107,110 @@ Canal和DTS客户端
 - 消息的Schema很弱，所有消息的Schema均相同，客户端需要提前知道各个表消息的Schema与各字段的上下文才能正确消费
 
 
+## go-mysql@v1.3.0/canal源码分析
+
+实际处理的handler
+```go
+// /Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/handler.go
+package canal
+
+import (
+	"github.com/go-mysql-org/go-mysql/mysql"
+	"github.com/go-mysql-org/go-mysql/replication"
+)
+
+type EventHandler interface {
+	OnRotate(roateEvent *replication.RotateEvent) error
+	// OnTableChanged is called when the table is created, altered, renamed or dropped.
+	// You need to clear the associated data like cache with the table.
+	// It will be called before OnDDL.
+	OnTableChanged(schema string, table string) error
+	OnDDL(nextPos mysql.Position, queryEvent *replication.QueryEvent) error
+	OnRow(e *RowsEvent) error
+	OnXID(nextPos mysql.Position) error
+	OnGTID(gtid mysql.GTIDSet) error
+	// OnPosSynced Use your own way to sync position. When force is true, sync position immediately.
+	OnPosSynced(pos mysql.Position, set mysql.GTIDSet, force bool) error
+	String() string
+}
+
+type DummyEventHandler struct {
+}
+
+func (h *DummyEventHandler) OnRotate(*replication.RotateEvent) error          { return nil }
+func (h *DummyEventHandler) OnTableChanged(schema string, table string) error { return nil }
+func (h *DummyEventHandler) OnDDL(nextPos mysql.Position, queryEvent *replication.QueryEvent) error {
+	return nil
+}
+func (h *DummyEventHandler) OnRow(*RowsEvent) error                                { return nil }
+func (h *DummyEventHandler) OnXID(mysql.Position) error                            { return nil }
+func (h *DummyEventHandler) OnGTID(mysql.GTIDSet) error                            { return nil }
+func (h *DummyEventHandler) OnPosSynced(mysql.Position, mysql.GTIDSet, bool) error { return nil }
+
+func (h *DummyEventHandler) String() string { return "DummyEventHandler" }
+
+// `SetEventHandler` registers the sync handler, you must register your
+// own handler before starting Canal.
+func (c *Canal) SetEventHandler(h EventHandler) {
+	c.eventHandler = h
+}
+
+```
+
+
+### 流程分析
+```go
+
+```
+开始调用
+```go
+// /Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/canal.go
+// RunFrom will sync from the binlog position directly, ignore mysqldump.
+func (c *Canal) RunFrom(pos mysql.Position) error {
+	c.master.Update(pos)
+
+	return c.Run()
+}
+func (c *Canal) Run() error {
+    return c.run()
+}
+func (c *Canal) run() error {
+    // ...
+    
+    if !c.dumped {
+        c.dumped = true
+        // 开始dump数据
+        err := c.tryDump()
+        close(c.dumpDoneCh)
+        
+    if err != nil {
+        log.Errorf("canal dump mysql err: %v", err)
+        return errors.Trace(err)
+        }
+    }
+    //...
+}
+
+// Dump all data from MySQL master `mysqldump`, ignore sync binlog.
+func (c *Canal) Dump() error {
+	if c.dumped {
+		return errors.New("the method Dump can't be called twice")
+	}
+	c.dumped = true
+	defer close(c.dumpDoneCh)
+	return c.dump()
+}
+```
+```go
+// /Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/dump.go
+func (c *Canal) dump() error {
+	//...
+	if err := c.dumper.DumpAndParse(h); err != nil {}
+	// ...
+}
+```
+
+
 
 
 

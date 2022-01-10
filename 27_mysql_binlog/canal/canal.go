@@ -70,6 +70,7 @@ func getDefaultCanal() (*canal.Canal, error) {
 	return canal.NewCanal(cfg)
 }
 
+// 自定义二进制处理的handler
 type binlogHandler struct {
 	canal.DummyEventHandler // Dummy handler from external lib
 	BinlogParser            // Our custom helper
