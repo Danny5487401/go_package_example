@@ -93,6 +93,83 @@ Note:
     因此，如果你有很大的事务，为了保证事务的完整性，不可能做切换日志的动作，只能将该事务的日志都记录到当前日志文件中，直到事务结束，
     你可能会看到binlog文件大于 max_binlog_size 的情况。
 
+## GTID在binlog中的结构
+![](.binlog_images/gtid_in_binlog.png)
+
+- GTID event 结构
+![](.binlog_images/gtid_event_structure.png)
+
+
+- Previous_gtid_log_event
+Previous_gtid_log_event 在每个binlog 头部都会有每次binlog rotate的时候存储在binlog头部Previous-GTIDs在binlog中只会存储在这台机器上执行过的所有binlog，不包括手动设置gtid_purged值。
+换句话说，如果你手动set global gtid_purged=xx； 那么xx是不会记录在Previous_gtid_log_event中的。
+
+- GTID和Binlog之间的关系是怎么对应的呢? 如何才能找到GTID=? 对应的binlog文件呢？
+
+
+    假设有4个binlog: bin.001,bin.002,bin.003,bin.004
+    bin.001 : Previous-GTIDs=empty; binlog_event有: 1-40
+    bin.002 : Previous-GTIDs=1-40; binlog_event有: 41-80
+    bin.003 : Previous-GTIDs=1-80; binlog_event有: 81-120
+    bin.004 : Previous-GTIDs=1-120; binlog_event有: 121-160
+    
+    假设现在我们要找GTID=$A，那么MySQL的扫描顺序为:
+    - 从最后一个binlog开始扫描（即: bin.004）
+    - bin.004的Previous-GTIDs=1-120，如果$A=140 > Previous-GTIDs,那么肯定在bin.004中
+    - bin.004的Previous-GTIDs=1-120，如果$A=88 包含在Previous-GTIDs中,那么继续对比上一个binlog文件 bin.003,然后再循环前面2个步骤，直到找到为止.
+
+### GTID相关参数
+![](.binlog_images/gtid_params.png)
+![](.binlog_images/open_gtid_in_cnf.png)
+
+### GTID的工作原理
+从服务器连接到主服务器之后，把自己执行过的GTID (Executed_Gtid_Set: 即已经执行的事务编码)<SQL线程> 、获取到的GTID (Retrieved_Gtid_Set: 即从库已经接收到主库的事务编号) <IO线程>发给主服务器，
+主服务器把从服务器缺少的GTID及对应的transactions发过去补全即可。当主服务器挂掉的时候，找出同步最成功的那台从服务器，直接把它提升为主即可。
+如果硬要指定某一台不是最新的从服务器提升为主， 先change到同步最成功的那台从服务器， 等把GTID全部补全了，就可以把它提升为主了。
+
+GTID是MySQL 5.6的新特性，可简化MySQL的主从切换以及Failover。
+GTID用于在binlog中唯一标识一个事务。当事务提交时，MySQL Server在写binlog的时候，会先写一个特殊的Binlog Event，类型为GTID_Event，指定下一个事务的GTID，然后再写事务的Binlog。
+主从同步时GTID_Event和事务的Binlog都会传递到从库，从库在执行的时候也是用同样的GTID写binlog，这样主从同步以后，就可通过GTID确定从库同步到的位置了。
+也就是说，无论是级联情况，还是一主多从情况，都可以通过GTID自动找点儿，而无需像之前那样通过File_name和File_position找点儿了。
+
+简而言之，GTID的工作流程为：
+- master更新数据时，会在事务前产生GTID，一同记录到binlog日志中。
+- slave端的i/o 线程将变更的binlog，写入到本地的relay log中。
+- sql线程从relay log中获取GTID，然后对比slave端的binlog是否有记录。
+- 如果有记录，说明该GTID的事务已经执行，slave会忽略。
+- 如果没有记录，slave就会从relay log中执行该GTID的事务，并记录到binlog。
+- 在解析过程中会判断是否有主键，如果没有就用二级索引，如果没有就用全部扫描
+
+### GTID优缺点
+GTID的优点
+-  一个事务对应一个唯一ID，一个GTID在一个服务器上只会执行一次;
+-  GTID是用来代替传统复制的方法，GTID复制与普通复制模式的最大不同就是不需要指定二进制文件名和位置;
+-  减少手工干预和降低服务故障时间，当主机挂了之后通过软件从众多的备机中提升一台备机为主机;
+
+GTID复制是怎么实现自动同步，自动对应位置的呢？
+比如这样一个主从架构：ServerC <-----ServerA ----> ServerB
+即一个主数据库ServerA，两个从数据库ServerB和ServerC
+
+当主机ServerA 挂了之后 ，此时ServerB执行完了所有从ServerA 传过来的事务，ServerC 延时一点。这个时候需要把 ServerB 提升为主机 ，Server C 继续为备机；当ServerC 链接ServerB 之后,首先在自己的二进制文件中找到从ServerA 传过来的最新的GTID，然后将这个GTID 发送到ServerB ,ServerB 获得这个GTID之后,就开始从这个GTID的下一个GTID开始发送事务给ServerC。这种自我寻找复制位置的模式减少事务丢失的可能性以及故障恢复的时间。
+
+GTID的缺点(限制)
+-  不支持非事务引擎;
+-  不支持create table ... select 语句复制(主库直接报错);(原理: 会生成两个sql, 一个是DDL创建表SQL, 一个是insert into 插入数据的sql; 由于DDL会导致自动提交, 所以这个sql至少需要两个GTID, 但是GTID模式下, 只能给这个sql生成一个GTID)
+-  不允许一个SQL同时更新一个事务引擎表和非事务引擎表;
+-  在一个复制组中，必须要求统一开启GTID或者是关闭GTID;
+-  开启GTID需要重启 (mysql5.7除外);
+-  开启GTID后，就不再使用原来的传统复制方式;
+-  对于create temporary table 和 drop temporary table语句不支持;
+-  不支持sql_slave_skip_counter;
+
+
+
+## binlog dump
+最开始的时候，MySQL只支持一种binlog dump方式，也就是指定binlog filename + position，向master发送COM_BINLOG_DUMP命令。
+在发送dump命令的时候，我们可以指定flag为BINLOG_DUMP_NON_BLOCK，这样master在没有可发送的binlog event之后，就会返回一个EOF package。
+不过通常对于slave来说，一直把连接挂着可能更好，这样能更及时收到新产生的binlog event。
+在MySQL 5.6之后，支持了另一种dump方式，也就是GTID dump，通过发送COM_BINLOG_DUMP_GTID命令实现，需要带上的是相应的GTID信息.
+
 ## Binlog 的日志格式
 记录在二进制日志中的事件的格式取决于二进制记录格式。支持三种格式类型：
 
