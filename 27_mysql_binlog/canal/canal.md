@@ -142,9 +142,13 @@ func (h *DummyEventHandler) OnTableChanged(schema string, table string) error { 
 func (h *DummyEventHandler) OnDDL(nextPos mysql.Position, queryEvent *replication.QueryEvent) error {
 	return nil
 }
+// 实际处理行数据，官方推荐用这个 
+// 原因：You must use ROW format for binlog, full binlog row image is preferred, because we may meet some errors when primary key changed in update for minimal or noblob row image
 func (h *DummyEventHandler) OnRow(*RowsEvent) error                                { return nil }
 func (h *DummyEventHandler) OnXID(mysql.Position) error                            { return nil }
 func (h *DummyEventHandler) OnGTID(mysql.GTIDSet) error                            { return nil }
+
+// 更新position
 func (h *DummyEventHandler) OnPosSynced(mysql.Position, mysql.GTIDSet, bool) error { return nil }
 
 func (h *DummyEventHandler) String() string { return "DummyEventHandler" }
@@ -165,12 +169,27 @@ func (c *Canal) SetEventHandler(h EventHandler) {
 开始调用
 ```go
 // /Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/canal.go
+
 // RunFrom will sync from the binlog position directly, ignore mysqldump.
 func (c *Canal) RunFrom(pos mysql.Position) error {
 	c.master.Update(pos)
 
 	return c.Run()
 }
+```
+Note：RunFrom 会更改master的position
+```go
+// /Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/master.go
+func (m *masterInfo) Update(pos mysql.Position) {
+	log.Debugf("update master position %s", pos)
+
+	m.Lock()
+	m.pos = pos
+	m.Unlock()
+}
+```
+
+```go
 func (c *Canal) Run() error {
     return c.run()
 }
@@ -207,6 +226,34 @@ func (c *Canal) dump() error {
 	//...
 	if err := c.dumper.DumpAndParse(h); err != nil {}
 	// ...
+}
+```
+
+
+binlog处理:/Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/dump.go
+```go
+
+func (h *dumpParseHandler) Data(db string, table string, values []string) error {
+	if err := h.c.ctx.Err(); err != nil {
+		return err
+	}
+
+	tableInfo, err := h.c.GetTable(db, table)
+	if err != nil {
+		e := errors.Cause(err)
+		if e == ErrExcludedTable ||
+			e == schema.ErrTableNotExist ||
+			e == schema.ErrMissingTableMeta {
+			return nil
+		}
+		log.Errorf("get %s.%s information err: %v", db, table, err)
+		return errors.Trace(err)
+	}
+    // ...
+
+	events := newRowsEvent(tableInfo, InsertAction, [][]interface{}{vs}, nil)
+	// 写完调用自定义的事件OnRow方法
+	return h.c.eventHandler.OnRow(events)
 }
 ```
 

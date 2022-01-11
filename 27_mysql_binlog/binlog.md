@@ -1,4 +1,6 @@
 # mysql的binlog二进制日志((归档日志)
+当前测试版本：5.7
+![](.binlog_images/mysql_version.png)
 
 ## MySQL的主从复制
 ![](.binlog_images/mysql_master_to_slave.png)
@@ -48,19 +50,50 @@ purge master logs to 'master.000003';
 
 查看当前正在写入的binlog文件:    
 ![](.binlog_images/current_master_log.png)  
-![](.binlog_images/show_master_status.png)
-GTID即全局事务ID (global transaction identifier)
+
+
+![](.binlog_images/show_master_status.png)    
+```sql
+show master status;
+```  
+GTID即全局事务ID (global transaction identifier),在整个复制架构中GTID 是不变化的,即使在多个连环主从中也不会变。
+
+GTID实际上是由UUID+TID (即transactionId)组成的。其中UUID(即server_uuid) 产生于auto.conf文件(cat /data/mysql/data/auto.cnf)，是一个MySQL实例的唯一标识。
+TID代表了该实例上已经提交的事务数量，并且随着事务提交单调递增，所以GTID能够保证每个MySQL实例事务的执行（不会重复执行同一个事务，并且会补全没有执行的事务）。
+GTID在一组复制中，全局唯一。
+
+比如：
+GTID:7286f791-125d-11e9-9a9c-0050568843f8:1-362
+- UUID:7286f791-125d-11e9-9a9c-0050568843f8
+- transactionId:1-362
+
 
 查看指定binlog文件的内容
 - 只查看第一个binlog文件的内容
+```sql
 show binlog events;
+```
+
 
 - 查看具体一个binlog文件的内容 （in 后面为binlog的文件名）
-show binlog events in 'binlog.000003';   
 ![](.binlog_images/binlog_content.png)
+```sql
+show binlog events in 'binlog.000003';
+```
+插入一条数据的时候:
+![](.binlog_images/binlog_content_when_inserting.png)
+更新一条数据的时候（对比是否开启gtid）:
+![](.binlog_images/binlog_content_when_updating.png)
+![](.binlog_images/binlog_content_when_updating_with_gtid.png)
+
+
 
 查看master上的binlog   
+```sql
+show master logs;
+```
 ![](.binlog_images/master_logs.png)   
+
 
 查看log过期时间
 ![](.binlog_images/log_expire_day.png)    
@@ -92,6 +125,11 @@ Note:
     事务被写入到binlog的一个块中，所以它不会在几个二进制日志之间被拆分。
     因此，如果你有很大的事务，为了保证事务的完整性，不可能做切换日志的动作，只能将该事务的日志都记录到当前日志文件中，直到事务结束，
     你可能会看到binlog文件大于 max_binlog_size 的情况。
+
+# GTID
+检查gtid是否开启
+![](.binlog_images/is_gtid_on.png)
+![](.binlog_images/gtid_params.png)
 
 ## GTID在binlog中的结构
 ![](.binlog_images/gtid_in_binlog.png)

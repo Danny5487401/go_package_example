@@ -53,6 +53,7 @@ require (
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rs/zerolog v1.26.1
 	github.com/sagikazarmark/crypt v0.4.0 // indirect
+	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414 // indirect
 	github.com/shirou/gopsutil v3.20.11+incompatible
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.9.0

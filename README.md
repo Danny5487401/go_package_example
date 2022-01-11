@@ -169,7 +169,7 @@
 -  1 CRUD在web服务中
 
 ## 第二十七章 Mysql的binlog
-- [binlog](27_mysql_binlog/binlog.md)
+- [binlog,gtid介绍](27_mysql_binlog/binlog.md)
 - [canal使用及源码分析](27_mysql_binlog/canal/canal.md)
 
 ## 第二十八章 OLAP(Online Analytical Processing联机分析处理)
