@@ -163,9 +163,6 @@ func (c *Canal) SetEventHandler(h EventHandler) {
 
 
 ### 流程分析
-```go
-
-```
 开始调用
 ```go
 // /Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/canal.go
@@ -219,8 +216,7 @@ func (c *Canal) Dump() error {
 	defer close(c.dumpDoneCh)
 	return c.dump()
 }
-```
-```go
+
 // /Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/dump.go
 func (c *Canal) dump() error {
 	//...
@@ -228,6 +224,59 @@ func (c *Canal) dump() error {
 	// ...
 }
 ```
+
+dumper需要处理的逻辑
+```go
+// DumpAndParse: Dump MySQL and parse immediately
+func (d *Dumper) DumpAndParse(h ParseHandler) error {
+	r, w := io.Pipe()
+
+	done := make(chan error, 1)
+	go func() {
+		// 实际解析
+		err := Parse(r, h, !d.masterDataSkipped)
+		_ = r.CloseWithError(err)
+		done <- err
+	}()
+
+	err := d.Dump(w)
+	_ = w.CloseWithError(err)
+
+	err = <-done
+
+	return errors.Trace(err)
+}
+```
+```go
+///Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/dump/parser.go
+func Parse(r io.Reader, h ParseHandler, parseBinlogPos bool) error {
+	rb := bufio.NewReaderSize(r, 1024*16)
+
+	var db string
+	var binlogParsed bool
+
+	for {
+        // ...
+
+		if m := valuesExp.FindAllStringSubmatch(line, -1); len(m) == 1 {
+			table := m[0][1]
+
+			values, err := parseValues(m[0][2])
+			if err != nil {
+				return errors.Errorf("parse values %v err", line)
+			}
+
+			// 数据处理
+			if err = h.Data(db, table, values); err != nil && err != ErrSkip {
+				return errors.Trace(err)
+			}
+		}
+	}
+
+	return nil
+}
+```
+
 
 
 binlog处理:/Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/dump.go
