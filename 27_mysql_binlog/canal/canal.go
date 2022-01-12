@@ -6,7 +6,7 @@ import (
 	"github.com/go-mysql-org/go-mysql/schema"
 	mysqlDriver "github.com/go-sql-driver/mysql"
 	"github.com/json-iterator/go"
-	"log"
+	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"reflect"
@@ -17,6 +17,8 @@ import (
 )
 
 func main() {
+	logger, _ := zap.NewDevelopment()
+	zap.ReplaceGlobals(logger)
 	go binLogListener()
 	// placeholder for your handsome code
 	//合建chan
@@ -25,7 +27,7 @@ func main() {
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGUSR1, syscall.SIGUSR2)
 	//阻塞直到有信号传入
 	s := <-c
-	fmt.Println("退出信号", s)
+	zap.S().Info("退出信号", s)
 
 }
 
@@ -49,14 +51,14 @@ func (MasterSlaveTable) SchemaName() string {
 func binLogListener() {
 	c, err := getDefaultCanal()
 	if err != nil {
-		log.Println("启动失败", err.Error())
+		zap.S().Infof("启动失败%v", err.Error())
 		return
 	}
 
 	// 获取主机master位置 SHOW MASTER STATUS
 	mysqlPos, err := c.GetMasterPos()
 	if err == nil {
-		log.Println("当前位置", mysqlPos)
+		zap.S().Infof("当前位置%v", mysqlPos)
 		// 设置处理函数,需要在启动canal前注册
 		c.SetEventHandler(&binlogHandler{})
 		c.RunFrom(mysqlPos)
@@ -64,7 +66,8 @@ func binLogListener() {
 
 }
 func getDefaultCanal() (*canal.Canal, error) {
-	connStr := "root:chuanzhi@tcp(106.14.35.115:3307)/masterSlaveDB?charset=utf8mb4"
+	// 使用从库地址
+	connStr := "root:123456@tcp(106.14.35.115:3308)/masterSlaveDB?charset=utf8mb4"
 	dsn, err := mysqlDriver.ParseDSN(connStr)
 	if err != nil {
 		return nil, err
