@@ -6,6 +6,7 @@ import (
 	"github.com/go-mysql-org/go-mysql/schema"
 	mysqlDriver "github.com/go-sql-driver/mysql"
 	"github.com/json-iterator/go"
+	"log"
 	"os"
 	"os/signal"
 	"reflect"
@@ -23,48 +24,55 @@ func main() {
 	//监听所有信号
 	signal.Notify(c, os.Interrupt, os.Kill, syscall.SIGUSR1, syscall.SIGUSR2)
 	//阻塞直到有信号传入
-	fmt.Println("启动")
 	s := <-c
 	fmt.Println("退出信号", s)
 
 }
 
-type User struct {
-	Id      int       `gorm:"column:id"`
-	Name    string    `gorm:"column:name"`
-	Status  string    `gorm:"column:status"`
-	Created time.Time `gorm:"column:created"`
+type MasterSlaveTable struct {
+	Id          int64     `xorm:"id notnull pk autoincr" `   // 如果field名称为Id而且类型为int64并且没有定义tag，则会被xorm视为主键，并且拥有自增属性。
+	Description string    `xorm:"description comment('描述')"` // string类型默认映射为varchar(255)
+	Name        string    `xorm:"'usr_name' notnull varchar(25) comment('用户名')" `
+	CreatedAt   int64     `xorm:"created"` // 记住重复写created,第一个为column标签并且加单引号，不加单引号为tag，添加数据会自动更新
+	UpdatedAt   time.Time `xorm:"'updated_at' updated"`
 }
 
 // 表名，大小写不敏感
-func (User) TableName() string {
-	return "User"
+func (MasterSlaveTable) TableName() string {
+	return "master_slave_table"
 }
 
 // 数据库名称，大小写不敏感
-func (User) SchemaName() string {
-	return "master_test"
+func (MasterSlaveTable) SchemaName() string {
+	return "masterSlaveDB"
 }
 func binLogListener() {
 	c, err := getDefaultCanal()
-	if err == nil {
-		// 获取主机master位置 SHOW MASTER STATUS
-		mysqlPos, err := c.GetMasterPos()
-		if err == nil {
-			// 设置处理函数,需要在启动canal前注册
-			c.SetEventHandler(&binlogHandler{})
-			c.RunFrom(mysqlPos)
-		}
+	if err != nil {
+		log.Println("启动失败", err.Error())
+		return
 	}
+
+	// 获取主机master位置 SHOW MASTER STATUS
+	mysqlPos, err := c.GetMasterPos()
+	if err == nil {
+		log.Println("当前位置", mysqlPos)
+		// 设置处理函数,需要在启动canal前注册
+		c.SetEventHandler(&binlogHandler{})
+		c.RunFrom(mysqlPos)
+	}
+
 }
 func getDefaultCanal() (*canal.Canal, error) {
-	connStr := "root:chuanzhi@tcp(106.14.35.11:3307)/masterSlaveDB?charset=utf8mb4"
+	connStr := "root:chuanzhi@tcp(106.14.35.115:3307)/masterSlaveDB?charset=utf8mb4"
 	dsn, err := mysqlDriver.ParseDSN(connStr)
 	if err != nil {
 		return nil, err
 	}
 
 	cfg := canal.NewDefaultConfig()
+	cfg.HeartbeatPeriod = 20 * time.Millisecond
+	cfg.ReadTimeout = time.Second * 30
 	cfg.Addr = dsn.Addr
 	cfg.User = dsn.User
 	cfg.Password = dsn.Passwd
@@ -73,7 +81,7 @@ func getDefaultCanal() (*canal.Canal, error) {
 	// 指定database
 	cfg.Dump.TableDB = dsn.DBName
 	// 指定表
-	cfg.IncludeTableRegex = []string{"^master_slave_table$"}
+	cfg.IncludeTableRegex = []string{"^user"}
 	cfg.Charset = "utf8mb4"
 
 	// FLUSH TABLES WITH READ LOCK简称(FTWRL)，该命令主要用于备份工具获取一致性备份(数据与binlog位点匹配)。
@@ -97,31 +105,37 @@ func (h *binlogHandler) OnRow(e *canal.RowsEvent) error {
 	}()
 
 	// base value for canal.DeleteAction or canal.InsertAction
+	// 删除和插入时的基本值
 	var n = 0
 	var k = 1
 
+	// 更新时候的基本值
 	if e.Action == canal.UpdateAction {
 		n = 1
 		k = 2
 	}
 
 	for i := n; i < len(e.Rows); i += k {
-
+		// 所有监听的数据库+表名
 		key := strings.ToLower(e.Table.Schema + "." + e.Table.Name)
-		key2 := strings.ToLower(User{}.SchemaName() + "." + User{}.TableName())
+
+		// 需要业务监听的数据库+表名
+		key2 := strings.ToLower(MasterSlaveTable{}.SchemaName() + "." + MasterSlaveTable{}.TableName())
 		switch key {
 		case key2:
-			user := User{}
-			h.GetBinLogData(&user, e, i)
+			masterSlaveTableInfo := MasterSlaveTable{}
+			// 写入到结构体数据
+			h.GetBinLogData(&masterSlaveTableInfo, e, i)
 			switch e.Action {
 			case canal.UpdateAction:
-				oldUser := User{}
-				h.GetBinLogData(&oldUser, e, i-1)
-				fmt.Printf("User %d name changed from %s to %s\n", user.Id, oldUser.Name, user.Name)
+				// 获取旧数据
+				oldMasterSlaveTableInfo := MasterSlaveTable{}
+				h.GetBinLogData(&oldMasterSlaveTableInfo, e, i-1)
+				fmt.Printf("masterSlaveTableInfo %d name changed from %s to %s\n", masterSlaveTableInfo.Id, oldMasterSlaveTableInfo.Name, masterSlaveTableInfo.Name)
 			case canal.InsertAction:
-				fmt.Printf("User %d is created with name %s\n", user.Id, user.Name)
+				fmt.Printf("masterSlaveTableInfo %d is created with name %s\n", masterSlaveTableInfo.Id, masterSlaveTableInfo.Name)
 			case canal.DeleteAction:
-				fmt.Printf("User %d is deleted with name %s\n", user.Id, user.Name)
+				fmt.Printf("masterSlaveTableInfo %d is deleted with name %s\n", masterSlaveTableInfo.Id, masterSlaveTableInfo.Name)
 			default:
 				fmt.Printf("Unknown action")
 			}
