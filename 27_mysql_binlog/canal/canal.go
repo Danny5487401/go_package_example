@@ -67,7 +67,7 @@ func binLogListener() {
 }
 func getDefaultCanal() (*canal.Canal, error) {
 	// 使用从库地址
-	connStr := "root:123456@tcp(106.14.35.115:3308)/masterSlaveDB?charset=utf8mb4"
+	connStr := "root:123456@tcp(106.14.35.115:3309)/masterSlaveDB?charset=utf8mb4"
 	dsn, err := mysqlDriver.ParseDSN(connStr)
 	if err != nil {
 		return nil, err
@@ -79,17 +79,19 @@ func getDefaultCanal() (*canal.Canal, error) {
 	cfg.Addr = dsn.Addr
 	cfg.User = dsn.User
 	cfg.Password = dsn.Passwd
-	cfg.Flavor = "mysql"
-
+	cfg.Flavor = "mysql" // 默认 "mysql" ，可以指定 "mariadb"
+	// 指定当前执行的mysqldump路径，不用写
+	//cfg.Dump.ExecutionPath = "/usr/local/mysql/bin/mysqldump"
+	cfg.Dump.ExecutionPath = "" //ignore mysqldump, use binlog only
 	// 指定database
 	cfg.Dump.TableDB = dsn.DBName
 	// 指定表
-	cfg.IncludeTableRegex = []string{"^user"}
+	//cfg.IncludeTableRegex = []string{".*master_slave_table.*"}
 	cfg.Charset = "utf8mb4"
 
 	// FLUSH TABLES WITH READ LOCK简称(FTWRL)，该命令主要用于备份工具获取一致性备份(数据与binlog位点匹配)。
 	// 由于FTWRL总共需要持有两把全局的MDL锁，并且还需要关闭所有表对象，因此这个命令的杀伤性很大，执行命令时容易导致库hang住
-	cfg.Dump.SkipMasterData = true
+	//cfg.Dump.SkipMasterData = true
 
 	return canal.NewCanal(cfg)
 }
