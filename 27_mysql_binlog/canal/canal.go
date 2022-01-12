@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/go-mysql-org/go-mysql/canal"
 	"github.com/go-mysql-org/go-mysql/schema"
+	mysqlDriver "github.com/go-sql-driver/mysql"
 	"github.com/json-iterator/go"
 	"os"
 	"os/signal"
@@ -57,11 +58,23 @@ func binLogListener() {
 	}
 }
 func getDefaultCanal() (*canal.Canal, error) {
+	connStr := "root:chuanzhi@tcp(106.14.35.11:3307)/masterSlaveDB?charset=utf8mb4"
+	dsn, err := mysqlDriver.ParseDSN(connStr)
+	if err != nil {
+		return nil, err
+	}
+
 	cfg := canal.NewDefaultConfig()
-	cfg.Addr = fmt.Sprintf("%s:%d", "106.14.35.115", 3307)
-	cfg.User = "root"
-	cfg.Password = "chuanzhi"
+	cfg.Addr = dsn.Addr
+	cfg.User = dsn.User
+	cfg.Password = dsn.Passwd
 	cfg.Flavor = "mysql"
+
+	// 指定database
+	cfg.Dump.TableDB = dsn.DBName
+	// 指定表
+	cfg.IncludeTableRegex = []string{"^master_slave_table$"}
+	cfg.Charset = "utf8mb4"
 
 	// FLUSH TABLES WITH READ LOCK简称(FTWRL)，该命令主要用于备份工具获取一致性备份(数据与binlog位点匹配)。
 	// 由于FTWRL总共需要持有两把全局的MDL锁，并且还需要关闭所有表对象，因此这个命令的杀伤性很大，执行命令时容易导致库hang住

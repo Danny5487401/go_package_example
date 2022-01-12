@@ -220,8 +220,14 @@ func (c *Canal) Dump() error {
 // /Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/dump.go
 func (c *Canal) dump() error {
 	//...
+	// 解析binlog
 	if err := c.dumper.DumpAndParse(h); err != nil {}
 	// ...
+	// 更新position
+	if err := c.eventHandler.OnPosSynced(pos, c.master.GTIDSet(), true); err != nil {
+        return errors.Trace(err)
+    }
+    //...
 }
 ```
 
