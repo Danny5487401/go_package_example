@@ -284,7 +284,6 @@ func Parse(r io.Reader, h ParseHandler, parseBinlogPos bool) error {
 ```
 
 
-
 binlog处理:/Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/dump.go
 ```go
 
@@ -312,6 +311,7 @@ func (h *dumpParseHandler) Data(db string, table string, values []string) error 
 }
 ```
 
+处理后的event结构体
 
 
 

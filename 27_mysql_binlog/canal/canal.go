@@ -32,11 +32,12 @@ func main() {
 }
 
 type MasterSlaveTable struct {
-	Id          int64     `xorm:"id notnull pk autoincr" `   // 如果field名称为Id而且类型为int64并且没有定义tag，则会被xorm视为主键，并且拥有自增属性。
-	Description string    `xorm:"description comment('描述')"` // string类型默认映射为varchar(255)
-	Name        string    `xorm:"'usr_name' notnull varchar(25) comment('用户名')" `
-	CreatedAt   int64     `xorm:"created"` // 记住重复写created,第一个为column标签并且加单引号，不加单引号为tag，添加数据会自动更新
-	UpdatedAt   time.Time `xorm:"'updated_at' updated"`
+	// 后面的tag为自定义的tag
+	Id          int64  `gorm:"column:id" `
+	Description string `gorm:"column:description"`
+	Name        string `gorm:"column:usr_name" `
+	CreatedAt   int64  `gorm:"column:created_at"`
+	//UpdatedAt   time.Time `gorm:"column:updated_at"`
 }
 
 // 表名，大小写不敏感
@@ -66,8 +67,8 @@ func binLogListener() {
 
 }
 func getDefaultCanal() (*canal.Canal, error) {
-	// 使用从库地址
-	connStr := "root:123456@tcp(106.14.35.115:3309)/masterSlaveDB?charset=utf8mb4"
+	// 使用主库地址，并且应该开启row模式，而不是mixed模式
+	connStr := "root:chuanzhi@tcp(106.14.35.115:3307)/masterSlaveDB?charset=utf8mb4"
 	dsn, err := mysqlDriver.ParseDSN(connStr)
 	if err != nil {
 		return nil, err
@@ -105,16 +106,17 @@ type binlogHandler struct {
 func (h *binlogHandler) OnRow(e *canal.RowsEvent) error {
 	defer func() {
 		if r := recover(); r != nil {
-			fmt.Print(r, " ", string(debug.Stack()))
+			fmt.Print("出现解析错误", r, " ", string(debug.Stack()))
 		}
 	}()
+	//Row是一个切片
 
 	// base value for canal.DeleteAction or canal.InsertAction
-	// 删除和插入时的基本值
+	// 删除和插入时的基本值，len(Rows)只有1
 	var n = 0
 	var k = 1
 
-	// 更新时候的基本值
+	// 当更新时，	Rows是一个二元数组，第一个为旧数值，第二个为新值
 	if e.Action == canal.UpdateAction {
 		n = 1
 		k = 2
@@ -138,6 +140,7 @@ func (h *binlogHandler) OnRow(e *canal.RowsEvent) error {
 				h.GetBinLogData(&oldMasterSlaveTableInfo, e, i-1)
 				fmt.Printf("masterSlaveTableInfo %d name changed from %s to %s\n", masterSlaveTableInfo.Id, oldMasterSlaveTableInfo.Name, masterSlaveTableInfo.Name)
 			case canal.InsertAction:
+				// 插入时有可能没有指定id
 				fmt.Printf("masterSlaveTableInfo %d is created with name %s\n", masterSlaveTableInfo.Id, masterSlaveTableInfo.Name)
 			case canal.DeleteAction:
 				fmt.Printf("masterSlaveTableInfo %d is deleted with name %s\n", masterSlaveTableInfo.Id, masterSlaveTableInfo.Name)
@@ -154,6 +157,7 @@ func (h *binlogHandler) String() string {
 	return "binlogHandler"
 }
 
+// 需要自定义解析
 type BinlogParser struct{}
 
 func (m *BinlogParser) GetBinLogData(element interface{}, e *canal.RowsEvent, n int) error {
@@ -164,6 +168,7 @@ func (m *BinlogParser) GetBinLogData(element interface{}, e *canal.RowsEvent, n 
 	t := s.Type()
 	num := t.NumField()
 	for k := 0; k < num; k++ {
+		// 解析后的格式是map["COLUMN"]= "值"
 		parsedTag := parseTagSetting(t.Field(k).Tag)
 		name := s.Field(k).Type().Name()
 
@@ -305,6 +310,7 @@ func (m *BinlogParser) getBinlogIdByName(e *canal.RowsEvent, name string) int {
 func parseTagSetting(tags reflect.StructTag) map[string]string {
 	settings := map[string]string{}
 	for _, str := range []string{tags.Get("sql"), tags.Get("gorm")} {
+		// 切割
 		tags := strings.Split(str, ";")
 		for _, value := range tags {
 			v := strings.Split(value, ":")

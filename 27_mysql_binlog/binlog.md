@@ -243,7 +243,25 @@ ps:新版本的MySQL中对row level模式也被做了优化，并不是所有的
 ### 3. mixed
 从5.1.8版本开始，MySQL提供了Mixed格式，实际上就是Statement与Row的结合。
 
-在Mixed模式下，一般的语句修改使用statment格式保存binlog，如一些函数，statement无法完成主从复制的操作，则采用row格式保存binlog，MySQL会根据执行的每一条具体的sql语句来区分对待记录的日志形式，也就是在Statement和Row之间选择一种
+在Mixed模式下，一般的语句修改使用statement格式保存binlog，如一些函数，statement无法完成主从复制的操作，则采用row格式保存binlog，
+MySQL会根据执行的每一条具体的sql语句来区分对待记录的日志形式，也就是在Statement和Row之间选择一种.
+
+
+1. 查看binlog格式
+![](.binlog_images/binlog_format.png)
+```sql
+show variables like 'binlog_format'
+```
+```sql
+SET GLOBAL binlog_format = 'ROW';
+```
+需要重启后才能生效
+```sql
+
+SET SESSION binlog_format = 'ROW';
+```
+
+表示对当前的环境生效，但是一旦重启服务，这个就失效了。
 
 
 
