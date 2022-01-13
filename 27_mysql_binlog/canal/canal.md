@@ -108,8 +108,10 @@ Canal和DTS客户端
 
 
 ## go-mysql@v1.3.0/canal源码分析
+![](.canal_images/canal_func_relation.png)
 
 实际处理的handler
+
 ```go
 // /Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/handler.go
 package canal
@@ -134,6 +136,7 @@ type EventHandler interface {
 	String() string
 }
 
+// DummyEventHandler 默认实现
 type DummyEventHandler struct {
 }
 
@@ -142,11 +145,12 @@ func (h *DummyEventHandler) OnTableChanged(schema string, table string) error { 
 func (h *DummyEventHandler) OnDDL(nextPos mysql.Position, queryEvent *replication.QueryEvent) error {
 	return nil
 }
+
 // 实际处理行数据，官方推荐用这个 
 // 原因：You must use ROW format for binlog, full binlog row image is preferred, because we may meet some errors when primary key changed in update for minimal or noblob row image
-func (h *DummyEventHandler) OnRow(*RowsEvent) error                                { return nil }
-func (h *DummyEventHandler) OnXID(mysql.Position) error                            { return nil }
-func (h *DummyEventHandler) OnGTID(mysql.GTIDSet) error                            { return nil }
+func (h *DummyEventHandler) OnRow(*RowsEvent) error     { return nil }
+func (h *DummyEventHandler) OnXID(mysql.Position) error { return nil }
+func (h *DummyEventHandler) OnGTID(mysql.GTIDSet) error { return nil }
 
 // 更新position
 func (h *DummyEventHandler) OnPosSynced(mysql.Position, mysql.GTIDSet, bool) error { return nil }
@@ -163,6 +167,76 @@ func (c *Canal) SetEventHandler(h EventHandler) {
 
 
 ### 流程分析
+
+初始化canal结构体
+```go
+func NewCanal(cfg *Config) (*Canal, error) {
+	c := new(Canal)
+	c.cfg = cfg
+
+	c.ctx, c.cancel = context.WithCancel(context.Background())
+
+	c.dumpDoneCh = make(chan struct{})
+	// 使用默认事件处理器，不处理
+	c.eventHandler = &DummyEventHandler{}
+	c.parser = parser.New()
+	c.tables = make(map[string]*schema.Table)
+	if c.cfg.DiscardNoMetaRowEvent {
+		c.errorTablesGetTime = make(map[string]time.Time)
+	}
+	c.master = &masterInfo{}
+
+	c.delay = new(uint32)
+
+	var err error
+
+	// 全量数据dumper
+	if err = c.prepareDumper(); err != nil {
+		return nil, errors.Trace(err)
+	}
+
+	// 增量数据binlogSyncer
+	if err = c.prepareSyncer(); err != nil {
+		return nil, errors.Trace(err)
+	}
+
+	// 检查binlog格式，必须row格式
+	if err := c.checkBinlogRowFormat(); err != nil {
+		return nil, errors.Trace(err)
+	}
+
+	// init 表过滤器
+	if n := len(c.cfg.IncludeTableRegex); n > 0 {
+		c.includeTableRegex = make([]*regexp.Regexp, n)
+		for i, val := range c.cfg.IncludeTableRegex {
+			reg, err := regexp.Compile(val)
+			if err != nil {
+				return nil, errors.Trace(err)
+			}
+			c.includeTableRegex[i] = reg
+		}
+	}
+
+	if n := len(c.cfg.ExcludeTableRegex); n > 0 {
+		c.excludeTableRegex = make([]*regexp.Regexp, n)
+		for i, val := range c.cfg.ExcludeTableRegex {
+			reg, err := regexp.Compile(val)
+			if err != nil {
+				return nil, errors.Trace(err)
+			}
+			c.excludeTableRegex[i] = reg
+		}
+	}
+
+	if c.includeTableRegex != nil || c.excludeTableRegex != nil {
+		c.tableMatchCache = make(map[string]bool)
+	}
+
+	return c, nil
+}
+```
+
+
 开始调用
 ```go
 // /Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/canal.go
@@ -193,6 +267,7 @@ func (c *Canal) Run() error {
 func (c *Canal) run() error {
     // ...
     
+	
     if !c.dumped {
         c.dumped = true
         // 开始dump数据
@@ -204,8 +279,19 @@ func (c *Canal) run() error {
         return errors.Trace(err)
         }
     }
-    //...
+    
+    // 开始监听增量数据
+    if err := c.runSyncBinlog(); err != nil {
+        if errors.Cause(err) != context.Canceled {
+            log.Errorf("canal start sync binlog err: %v", err)
+            return errors.Trace(err)
+        }
+    }
 }
+```
+
+1. 一次数据
+```go
 
 // Dump all data from MySQL master `mysqldump`, ignore sync binlog.
 func (c *Canal) Dump() error {
@@ -282,7 +368,58 @@ func Parse(r io.Reader, h ParseHandler, parseBinlogPos bool) error {
 	return nil
 }
 ```
+2.增量数据
+```go
+func (c *Canal) runSyncBinlog() error {
+	s, err := c.startSyncer()
+	if err != nil {
+		return err
+	}
 
+	savePos := false
+	force := false
+
+	// The name of the binlog file received in the fake rotate event.
+	// It must be preserved until the new position is saved.
+	fakeRotateLogName := ""
+
+	for {
+		ev, err := s.GetEvent(c.ctx)
+		if err != nil {
+			return errors.Trace(err)
+		}
+        // ...
+        
+		switch e := ev.Event.(type) {
+		case *replication.RotateEvent:
+			pos.Name = string(e.NextLogName)
+			pos.Pos = uint32(e.Position)
+			log.Infof("rotate binlog to %s", pos)
+			savePos = true
+			force = true
+			if err = c.eventHandler.OnRotate(e); err != nil {
+				return errors.Trace(err)
+			}
+		case *replication.RowsEvent:
+			// we only focus row based event
+			err = c.handleRowsEvent(ev)
+			if err != nil {
+				e := errors.Cause(err)
+				// if error is not ErrExcludedTable or ErrTableNotExist or ErrMissingTableMeta, stop canal
+				if e != ErrExcludedTable &&
+					e != schema.ErrTableNotExist &&
+					e != schema.ErrMissingTableMeta {
+					log.Errorf("handle rows event at (%s, %d) error %v", pos.Name, curPos, err)
+					return errors.Trace(err)
+				}
+			}
+			continue
+			// ...
+	}
+
+	return nil
+}
+```
 
 binlog处理:/Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/dump.go
 ```go

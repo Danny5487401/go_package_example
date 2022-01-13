@@ -83,7 +83,7 @@ func getDefaultCanal() (*canal.Canal, error) {
 	cfg.Flavor = "mysql" // 默认 "mysql" ，可以指定 "mariadb"
 	// 指定当前执行的mysqldump路径，不用写
 	//cfg.Dump.ExecutionPath = "/usr/local/mysql/bin/mysqldump"
-	cfg.Dump.ExecutionPath = "" //ignore mysqldump, use binlog only
+	cfg.Dump.ExecutionPath = "" //ignore mysqldump, use binlog only,代表只有增量
 	// 指定database
 	cfg.Dump.TableDB = dsn.DBName
 	// 指定表
