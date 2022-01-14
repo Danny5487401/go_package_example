@@ -410,6 +410,7 @@ func (c *Canal) runSyncBinlog() error {
 			}
 		case *replication.RowsEvent:
 			// we only focus row based event
+			// 我们主要关注行数据变化
 			err = c.handleRowsEvent(ev)
 			if err != nil {
 				e := errors.Cause(err)
@@ -427,7 +428,36 @@ func (c *Canal) runSyncBinlog() error {
 
 	return nil
 }
+
+func (c *Canal) handleRowsEvent(e *replication.BinlogEvent) error {
+	ev := e.Event.(*replication.RowsEvent)
+
+	// Caveat: table may be altered at runtime.
+	schema := string(ev.Table.Schema)
+	table := string(ev.Table.Table)
+
+	// 根据之前定义的表过滤器进行过滤
+	t, err := c.GetTable(schema, table)
+	if err != nil {
+		return err
+	}
+	var action string
+	switch e.Header.EventType {
+	case replication.WRITE_ROWS_EVENTv1, replication.WRITE_ROWS_EVENTv2:
+		action = InsertAction
+	case replication.DELETE_ROWS_EVENTv1, replication.DELETE_ROWS_EVENTv2:
+		action = DeleteAction
+	case replication.UPDATE_ROWS_EVENTv1, replication.UPDATE_ROWS_EVENTv2:
+		action = UpdateAction
+	default:
+		return errors.Errorf("%s not supported now", e.Header.EventType)
+	}
+	events := newRowsEvent(t, action, ev.Rows, e.Header)
+	return c.eventHandler.OnRow(events)
+}
 ```
+
+
 
 binlog处理:/Users/xiaxin/go/pkg/mod/github.com/go-mysql-org/go-mysql@v1.3.0/canal/dump.go
 ```go
