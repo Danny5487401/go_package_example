@@ -103,6 +103,7 @@ type binlogHandler struct {
 	BinlogParser            // Our custom helper
 }
 
+// //监听数据记录
 func (h *binlogHandler) OnRow(e *canal.RowsEvent) error {
 	defer func() {
 		if r := recover(); r != nil {

@@ -122,17 +122,25 @@ import (
 )
 
 type EventHandler interface {
+	// 当产生新的binlog日志后触发(在达到内存的使用限制后（默认为 1GB），会开启另一个文件，每个新文件的名称后都会有一个增量。
 	OnRotate(roateEvent *replication.RotateEvent) error
-	// OnTableChanged is called when the table is created, altered, renamed or dropped.
-	// You need to clear the associated data like cache with the table.
-	// It will be called before OnDDL.
+
+
+	// 创建、更改、重命名或删除表时触发，通常会需要清除与表相关的数据，如缓存。在ddl前触发
 	OnTableChanged(schema string, table string) error
+	// (删除当前表再新建一个一模一样的表结构)
 	OnDDL(nextPos mysql.Position, queryEvent *replication.QueryEvent) error
+	
+	// 监听数据记录
+
 	OnRow(e *RowsEvent) error
 	OnXID(nextPos mysql.Position) error
 	OnGTID(gtid mysql.GTIDSet) error
+	
 	// OnPosSynced Use your own way to sync position. When force is true, sync position immediately.
+	// //监听binlog日志的变化文件与记录的位置
 	OnPosSynced(pos mysql.Position, set mysql.GTIDSet, force bool) error
+	
 	String() string
 }
 
