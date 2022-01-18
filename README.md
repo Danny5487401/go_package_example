@@ -65,6 +65,7 @@
   - 5.1 [客户端(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver.md)
     - 第三方consul实现Resolver接口和Builder接口
     - 自定义实现Resolver接口和Builder接口
+    - 自定义实现nacos服务注册与发现
   - 5.2 服务端
 - 6  拦截器 
 - [7  grpc错误抛出与捕获](08_grpc/07_grpc_error/error.md)
