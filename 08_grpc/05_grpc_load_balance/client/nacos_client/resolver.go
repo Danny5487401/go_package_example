@@ -40,10 +40,13 @@ func (r *NacosResolver) doResolve(opts resolver.ResolveNowOptions) {
 			continue
 		}
 
-		addrs = append(addrs, resolver.Address{
+		addr := resolver.Address{
 			Addr:       fmt.Sprintf("%s:%d", inst.Ip, inst.Port),
 			ServerName: fmt.Sprintf("instance-%d", i+1),
-		})
+		}
+
+		addr.Attributes = addr.Attributes.WithValues("weight", int(inst.Weight)) //考虑权重并纳入cc的状态中
+		addrs = append(addrs, addr)
 	}
 
 	if len(addrs) == 0 {
