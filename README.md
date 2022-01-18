@@ -62,7 +62,7 @@
 - 3  流式GRPC
 - 4  protobuf的jsonpb包序列化和反序列化
 - 5  负载均衡
-  - 5.1 [客户端(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver.md)
+  - 5.1 [客户端(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver_n_balancer.md)
     - 第三方consul实现Resolver接口和Builder接口
     - 自定义实现Resolver接口和Builder接口
     - 自定义实现nacos服务注册与发现
@@ -157,7 +157,10 @@
 
 ## [ 第二十四章 搜索引擎es](24_elasticSearch/es.md)
 - [es索引及索引生命周期管理](24_elasticSearch/es_index.md)
-- 1 官方包
+- [1 官方包](24_elasticSearch/official_pkg/go_elasticseach.md)
+  - 1.1 批量写入Bulk
+  - 1.2 es日志
+  - 1.3 并发批量BulkIndexer
 - 2 第三方包oliver
   - 2.1 V6版本 
   - 2.2 V7版本 
