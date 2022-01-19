@@ -26,7 +26,8 @@ service Greeter {
 }
 
 message HelloRequest {
-  string name = 1;
+  string name = 1 [(interceptor.default_string) = "gopher"];
+  int32 age = 2[(interceptor.default_int) = 10];
 }
 
 message HelloReply {

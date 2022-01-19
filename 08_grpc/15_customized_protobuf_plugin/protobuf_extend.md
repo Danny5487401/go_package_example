@@ -46,4 +46,48 @@ extend google.protobuf.MethodOptions {
 extend google.protobuf.ServiceOptions {
   ...
 }
+
+extend google.protobuf.FieldOptions {
+  ...
+}
+```
+
+proto3 定义
+```protobuf
+
+syntax = "proto3";
+
+package main;
+
+import "google/protobuf/descriptor.proto";
+
+extend google.protobuf.FieldOptions {
+    string default_string = 50000;
+    int32 default_int = 50001;
+}
+
+message Message {
+    string name = 1 [(default_string) = "gopher"];
+    int32 age = 2[(default_int) = 10];
+}
+```
+其中成员后面的方括号内部的就是扩展语法。重新生成Go语言代码，里面会包含扩展选项相关的元信息
+```go
+var E_DefaultString = &proto.ExtensionDesc{
+    ExtendedType:  (*descriptor.FieldOptions)(nil),
+    ExtensionType: (*string)(nil),
+    Field:         50000,
+    Name:          "main.default_string",
+    Tag:           "bytes,50000,opt,name=default_string,json=defaultString",
+    Filename:      "helloworld.proto",
+}
+
+var E_DefaultInt = &proto.ExtensionDesc{
+    ExtendedType:  (*descriptor.FieldOptions)(nil),
+    ExtensionType: (*int32)(nil),
+    Field:         50001,
+    Name:          "main.default_int",
+    Tag:           "varint,50001,opt,name=default_int,json=defaultInt",
+    Filename:      "helloworld.proto",
+}
 ```

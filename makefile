@@ -33,8 +33,9 @@ error:
 .PHONY: plugin
 plugin:
 	# 第一步：message不生成grpc文件
-	protoc --proto_path=. --go_out=.  ./08_grpc/15_customized_protobuf_plugin/plugin_protobuf/*.proto
-	protoc --proto_path=. --go_out=.  ./08_grpc/15_customized_protobuf_plugin/helloworld_protobuf/*.proto
+	protoc --proto_path=. --go_out=.  --go-grpc_out=.  ./08_grpc/15_customized_protobuf_plugin/plugin_protobuf/*.proto
+	protoc --proto_path=. --go_out=. --go-grpc_out=.  ./08_grpc/15_customized_protobuf_plugin/helloworld_protobuf/*.proto
+	# 	需要手动修改pb文件的引入 _ "go_grpc_example/08_grpc/15_customized_protobuf_plugin/plugin_protobuf"
 
 
 

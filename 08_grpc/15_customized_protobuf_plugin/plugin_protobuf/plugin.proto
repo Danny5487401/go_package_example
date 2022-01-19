@@ -6,13 +6,25 @@ option go_package = "08_grpc/15_customized_protobuf_plugin/plugin_protobuf;plugi
 
 import "google/protobuf/descriptor.proto";
 
+
+
+// service扩展
+extend google.protobuf.ServiceOptions {
+  optional ServiceHandler service_handler = 63501;
+}
+
+// 方法扩展
 extend google.protobuf.MethodOptions {
   optional MethodHandler method_handler = 63500;
 }
 
-extend google.protobuf.ServiceOptions {
-  optional ServiceHandler service_handler = 63501;
+
+
+extend google.protobuf.FieldOptions {
+  string default_string = 50000;
+  int32 default_int = 50001;
 }
+
 
 message MethodHandler {
   optional string authorization = 1; // login token
@@ -25,3 +37,5 @@ message ServiceHandler {
   optional string whitelist = 2;     // ip whitelist
   optional bool logger = 3;          // logger
 }
+
+
