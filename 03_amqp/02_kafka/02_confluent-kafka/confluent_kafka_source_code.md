@@ -1,4 +1,9 @@
 # confluent-kafka源码分析
+底层使用c库
+
+## C库参考链接
+配置链接： https://github.com/edenhill/librdkafka/blob/master/CONFIGURATION.md
+源码链接： https://github.com/edenhill/librdkafka
 
 ## 生产者
 结构体
