@@ -100,7 +100,7 @@
 - 1 assert断言
 - 2 mock测试替身
 - 3 suite测试套件
-## [第十三章 序列化反序列化](13_serialize/serialize.md)
+## [第十三章 序列化反序列化-包含标准库源码分析](13_serialize/serialize.md)
 - 1 Jsoniter(完全兼容标准库json，性能较好)
   - 1.1 序列化
     - 结构体成员为基本类型,嵌套结构体，及tag标签使用
@@ -110,15 +110,15 @@
     - json字符串数组
     - json.RawMessage二次反序列化
 - 2 mapstructure使用（性能低但是方便）
-  - 无tag标签
-  - 带tag标签
-  - embeded内嵌
-  - 字段保留
-  - 省略字段
-  - 元数据
-  - 错误
-  - 弱解析
-  - 自定义解析器
+  - 2.1 无tag标签
+  - 2.2 带tag标签
+  - 2.3 embeded内嵌
+  - 2.4 字段保留
+  - 2.5 省略字段
+  - 2.6 元数据
+  - 2.7 错误
+  - 2.8 弱解析
+  - 2.9 自定义解析器
 ## 第十四章 系统监控
   - 1 systemstat包(适合linux系统，已断更)
   - 2 [gopsutil](14_system_monitor/02_gopsutil/gopsutil.md)
