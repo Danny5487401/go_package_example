@@ -24,6 +24,8 @@ func main() {
 
 	// Delivery report handler for produced messages
 	go func() {
+		// 必须消费events，默认100 万
+		// You will need to read from the Events() channel to know if messages were successfully sent, and free any per-message state the client keeps for the application.
 		for e := range p.Events() {
 			switch ev := e.(type) {
 			case *kafka.Message:
