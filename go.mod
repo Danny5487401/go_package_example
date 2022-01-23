@@ -12,6 +12,7 @@ require (
 	github.com/alibaba/sentinel-golang v1.0.2
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
 	github.com/armon/go-metrics v0.3.10 // indirect
+	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/cespare/xxhash/v2 v2.1.2 // indirect
 	github.com/confluentinc/confluent-kafka-go v1.7.0
@@ -64,6 +65,7 @@ require (
 	github.com/rs/zerolog v1.26.1
 	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
 	github.com/shirou/gopsutil v3.20.11+incompatible
+	github.com/sony/sonyflake v1.0.0
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.9.0
 	github.com/streadway/amqp v1.0.0

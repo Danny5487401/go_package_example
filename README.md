@@ -190,6 +190,14 @@
   - 1.2 扩展包sqlx操作clickHouse
 
 ## 第二十九章 分布式锁
-- 1 redis实现
+- [1 redis实现](29_distributed_lock/01_redis_distributed_lock/main.go)
+
+## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
+
+## [第三十一章 分布式Id](31_distributed_Id/distribued_id.md)
+- 雪花算法
+  - bwmarrin/snowflake库
+  - SonyFlake(解决时间回拨问题)
+
 
 
