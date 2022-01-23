@@ -135,4 +135,67 @@ Hystrix在以下几种情况下会走降级逻辑：
 - 执行construct()或run()抛出异常
 - 熔断器打开导致命令短路
 - 命令的线程池和队列或信号量的容量超额，命令被拒绝
-- 命令执行超时- 
+- 命令执行超时
+
+
+## Go-hystrix源码
+![](.hystrix_images/hystrix_func.png)
+```go
+func Do(name string, run runFunc, fallback fallbackFunc) error {
+	runC := func(ctx context.Context) error {
+		return run()
+	}
+	var fallbackC fallbackFuncC
+	if fallback != nil {
+		fallbackC = func(ctx context.Context, err error) error {
+			return fallback(err)
+		}
+	}
+	return DoC(context.Background(), name, runC, fallbackC)
+}
+```
+
+DoC
+```go
+func DoC(ctx context.Context, name string, run runFuncC, fallback fallbackFuncC) error {
+	done := make(chan struct{}, 1)
+
+	r := func(ctx context.Context) error {
+		err := run(ctx)
+		if err != nil {
+			return err
+		}
+
+		done <- struct{}{}
+		return nil
+	}
+
+	f := func(ctx context.Context, e error) error {
+		err := fallback(ctx, e)
+		if err != nil {
+			return err
+		}
+
+		done <- struct{}{}
+		return nil
+	}
+
+	var errChan chan error
+	if fallback == nil {
+		errChan = GoC(ctx, name, r, nil)
+	} else {
+		errChan = GoC(ctx, name, r, f)
+	}
+
+	select {
+	case <-done:
+		return nil
+	case err := <-errChan:
+		return err
+	}
+}
+```
+
+其实方法Do和Go方法内部都是调用了hystrix.GoC方法
+
+

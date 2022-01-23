@@ -8,6 +8,7 @@ require (
 	github.com/HdrHistogram/hdrhistogram-go v1.1.0 // indirect
 	github.com/Shopify/sarama v1.19.0
 	github.com/StackExchange/wmi v0.0.0-20210224194228-fe8f1750fd46 // indirect
+	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/alibaba/sentinel-golang v1.0.2
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
 	github.com/armon/go-metrics v0.3.10 // indirect
@@ -17,7 +18,6 @@ require (
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/elastic/go-elasticsearch/v7 v7.16.0
-	github.com/elastic/go-elasticsearch/v8 v8.0.0-alpha
 	github.com/elliotchance/phpserialize v1.3.1
 	github.com/envoyproxy/protoc-gen-validate v0.6.2
 	github.com/fatih/color v1.13.0 // indirect
