@@ -148,7 +148,7 @@
 - [2 Hystrix](19_fuse_currentLimiting_degradation/02_hystrix/hystrix.md)
   - [2.1 客户端](19_fuse_currentLimiting_degradation/02_hystrix/client/client.go)
   - [2.2 服务端](19_fuse_currentLimiting_degradation/02_hystrix/server/server.go)
-- [2 Hystrix](19_fuse_currentLimiting_degradation/hystrix.md)
+
 ## 第二十章 [命令行框架Cobra](20_cobra/introdoction.md)
 - 1 介绍及功能使用
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
