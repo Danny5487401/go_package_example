@@ -1,6 +1,7 @@
 # 使用Hystrix解决同步等待的雪崩问题
 
-Hystrix [hɪst'rɪks]，中文含义是豪猪，因其背上长满棘刺，从而拥有了自我保护的能力。本文所说的Hystrix是Netflix开源的一款容错框架，同样具有自我保护能力
+Hystrix [hɪst'rɪks]，中文含义是豪猪，因其背上长满棘刺，从而拥有了自我保护的能力。
+本文所说的Hystrix是Netflix开源的一款容错框架，同样具有自我保护能力.
 
 ## Hystrix设计目标：
 
@@ -140,62 +141,428 @@ Hystrix在以下几种情况下会走降级逻辑：
 
 ## Go-hystrix源码
 ![](.hystrix_images/hystrix_func.png)
+
+配置熔断规则，否则将使用默认配置。可以调用的方法
+```go
+func Configure(cmds map[string]CommandConfig)
+func ConfigureCommand(name string, config CommandConfig)
+```
+1. 定义依赖于外部系统的应用程序逻辑 - runFunc
+2. 和服务中断期间执行的逻辑代码 - fallbackFunc
+
 ```go
 func Do(name string, run runFunc, fallback fallbackFunc) error {
-	runC := func(ctx context.Context) error {
-		return run()
-	}
-	var fallbackC fallbackFuncC
-	if fallback != nil {
-		fallbackC = func(ctx context.Context, err error) error {
-			return fallback(err)
-		}
-	}
-	return DoC(context.Background(), name, runC, fallbackC)
+    runC := func(ctx context.Context) error {
+        return run()
+    }
+    var fallbackC fallbackFuncC
+    if fallback != nil {
+        fallbackC = func(ctx context.Context, err error) error {
+        return fallback(err)
+    }
+    }
+    return DoC(context.Background(), name, runC, fallbackC)
 }
 ```
 
 DoC
 ```go
 func DoC(ctx context.Context, name string, run runFuncC, fallback fallbackFuncC) error {
-	done := make(chan struct{}, 1)
+    done := make(chan struct{}, 1)
+    
+    r := func(ctx context.Context) error {
+        err := run(ctx)
+        if err != nil {
+            return err
+    }
 
-	r := func(ctx context.Context) error {
-		err := run(ctx)
-		if err != nil {
-			return err
-		}
+    done <- struct{}{}
+    return nil
+    }
 
-		done <- struct{}{}
-		return nil
-	}
-
-	f := func(ctx context.Context, e error) error {
-		err := fallback(ctx, e)
-		if err != nil {
-			return err
-		}
-
-		done <- struct{}{}
-		return nil
-	}
-
-	var errChan chan error
-	if fallback == nil {
-		errChan = GoC(ctx, name, r, nil)
-	} else {
-		errChan = GoC(ctx, name, r, f)
-	}
-
-	select {
-	case <-done:
-		return nil
-	case err := <-errChan:
-		return err
-	}
+    f := func(ctx context.Context, e error) error {
+        err := fallback(ctx, e)
+        if err != nil {
+            return err
+    }
+    
+    done <- struct{}{}
+        return nil
+    }
+    
+    var errChan chan error
+    if fallback == nil {
+        errChan = GoC(ctx, name, r, nil)
+    } else {
+        errChan = GoC(ctx, name, r, f)
+    }
+    
+    select {
+    case <-done:
+        return nil
+    case err := <-errChan:
+        return err
+    }
 }
 ```
 
 其实方法Do和Go方法内部都是调用了hystrix.GoC方法
+```go
+func GoC(ctx context.Context, name string, run runFuncC, fallback fallbackFuncC) chan error {
+    cmd := &command{
+        run:      run,
+        fallback: fallback,
+        start:    time.Now(),
+        errChan:  make(chan error, 1),
+        finished: make(chan bool, 1),
+    }
 
+    // dont have methods with explicit params and returns
+    // let data come in and out naturally, like with any closure
+    // explicit error return to give place for us to kill switch the operation (fallback)
+    
+    // 得到断路器，不存在则创建
+    circuit, _, err := GetCircuit(name)
+    if err != nil {
+        cmd.errChan <- err
+        return cmd.errChan
+    }
+    cmd.circuit = circuit
+    // 使用sync.NewCond创建一个条件变量，用来协调通知你可以归还令牌了
+    ticketCond := sync.NewCond(cmd)
+    ticketChecked := false
+    // When the caller extracts error from returned errChan, it's assumed that
+    // the ticket's been returned to executorPool. Therefore, returnTicket() can
+    // not run after cmd.errorWithFallback().
+    // 返还ticket
+    returnTicket := func() {
+        cmd.Lock()
+        // Avoid releasing before a ticket is acquired.
+        for !ticketChecked {
+            ticketCond.Wait()
+        }
+        cmd.circuit.executorPool.Return(cmd.ticket)
+        cmd.Unlock()
+    }
+    // Shared by the following two goroutines. It ensures only the faster
+    // goroutine runs errWithFallback() and reportAllEvent().
+    returnOnce := &sync.Once{}
+    //  上报执行状态
+    reportAllEvent := func() {
+        err := cmd.circuit.ReportEvent(cmd.events, cmd.start, cmd.runDuration)
+        if err != nil {
+            log.Printf(err.Error())
+            }
+        }
 
+    go func() {
+        defer func() { cmd.finished <- true }()
+        
+        // Circuits get opened when recent executions have shown to have a high error rate.
+        // Rejecting new executions allows backends to recover, and the circuit will allow
+        // new traffic when it feels a healthly state has returned.
+        // 查看断路器是否已打开
+        if !cmd.circuit.AllowRequest() {
+            cmd.Lock()
+            // It's safe for another goroutine to go ahead releasing a nil ticket.
+            ticketChecked = true
+            ticketCond.Signal()
+            cmd.Unlock()
+            returnOnce.Do(func() {
+                returnTicket()
+                cmd.errorWithFallback(ctx, ErrCircuitOpen)
+                reportAllEvent()
+            })
+        return
+    }
+
+    // As backends falter, requests take longer but don't always fail.
+    //
+    // When requests slow down but the incoming rate of requests stays the same, you have to
+    // run more at a time to keep up. By controlling concurrency during these situations, you can
+    // shed load which accumulates due to the increasing ratio of active commands to incoming requests.
+    cmd.Lock()
+    select {
+    // 获取ticket 如果得不到就限流
+    case cmd.ticket = <-circuit.executorPool.Tickets:
+        ticketChecked = true
+        ticketCond.Signal()
+        cmd.Unlock()
+    default:
+        ticketChecked = true
+        ticketCond.Signal()
+        cmd.Unlock()
+        returnOnce.Do(func() {
+            returnTicket()
+            cmd.errorWithFallback(ctx, ErrMaxConcurrency)
+            reportAllEvent()
+    })
+    return
+    }
+    // 执行我们自已的方法，并上报执行信息
+    runStart := time.Now()
+    runErr := run(ctx)
+    returnOnce.Do(func() {
+        defer reportAllEvent()
+        cmd.runDuration = time.Since(runStart)
+        returnTicket()
+        if runErr != nil {
+            cmd.errorWithFallback(ctx, runErr)
+            return
+        }
+        cmd.reportEvent("success")
+    })
+    }()
+    // 等待context是否被结束，或执行者超时，并上报
+    go func() {
+        timer := time.NewTimer(getSettings(name).Timeout)
+        defer timer.Stop()
+    
+        select {
+        case <-cmd.finished:
+        // returnOnce has been executed in another goroutine
+        case <-ctx.Done():
+            returnOnce.Do(func() {
+            returnTicket()
+            cmd.errorWithFallback(ctx, ctx.Err())
+            reportAllEvent()
+            })
+            return
+        case <-timer.C:
+            returnOnce.Do(func() {
+            returnTicket()
+            cmd.errorWithFallback(ctx, ErrTimeout)
+            reportAllEvent()
+            })
+            return
+        }
+    }()
+    
+    return cmd.errChan
+}
+```
+
+command的数据结构：
+```go
+type command struct {
+    sync.Mutex
+    
+    ticket      *struct{} //用来做最大并发量控制，这个就是一个令牌
+    start       time.Time //记录command执行的开始时间
+    errChan     chan error  // 记录command执行错误
+    finished    chan bool  //标志command执行结束，用来做协程同步
+    circuit     *CircuitBreaker  //存储熔断器相关信息
+    run         runFuncC  // 应用程序
+    fallback    fallbackFuncC //应用程序执行失败后要执行的函数
+    runDuration time.Duration //记录command执行消耗时间
+    events      []string //events主要是存储事件类型信息，比如执行成功的success，或者失败的timeout、context_canceled等
+}
+```
+熔断器结构
+```go
+type CircuitBreaker struct {
+    Name                   string  //熔断器的名字，其实就是创建的command名字
+    open                   bool //判断熔断器是否打开的标志
+    forceOpen              bool //手动触发熔断器的开关，单元测试使用
+    mutex                  *sync.RWMutex //使用读写锁保证并发安全
+    openedOrLastTestedTime int64 //记录上一次打开熔断器的时间，因为要根据这个时间和SleepWindow时间来做恢复尝试
+    
+    executorPool *executorPool //用来做流量控制，因为我们有一个最大并发量控制，就是根据这个来做的流量控制，每次请求都要获取令牌
+    metrics      *metricExchange //用来上报执行状态的事件，通过它把执行状态信息存储到实际熔断器执行各个维度状态 (成功次数，失败次数，超时……) 的数据集合中。
+}
+```
+
+获取熔断器
+```go
+func GetCircuit(name string) (*CircuitBreaker, bool, error) {
+    circuitBreakersMutex.RLock()
+    _, ok := circuitBreakers[name]
+    if !ok {
+        circuitBreakersMutex.RUnlock()
+        circuitBreakersMutex.Lock()
+        defer circuitBreakersMutex.Unlock()
+        // because we released the rlock before we obtained the exclusive lock,
+        // we need to double check that some other thread didn't beat us to
+        // creation.
+        if cb, ok := circuitBreakers[name]; ok {
+        return cb, false, nil
+        }
+    // 初始化熔断器
+        circuitBreakers[name] = newCircuitBreaker(name)
+    } else {
+        defer circuitBreakersMutex.RUnlock()
+    }
+    
+    return circuitBreakers[name], !ok, nil
+}
+```
+创建熔断器
+```go
+// newCircuitBreaker creates a CircuitBreaker with associated Health
+func newCircuitBreaker(name string) *CircuitBreaker {
+    c := &CircuitBreaker{}
+    c.Name = name
+    c.metrics = newMetricExchange(name) // 统计信息
+    c.executorPool = newExecutorPool(name)  // 限流器
+    c.mutex = &sync.RWMutex{}
+
+return c
+}
+```
+创建统计控制器
+```go
+func newMetricExchange(name string) *metricExchange {
+    m := &metricExchange{}
+    m.Name = name
+    
+    m.Updates = make(chan *commandExecution, 2000)
+    m.Mutex = &sync.RWMutex{}
+    m.metricCollectors = metricCollector.Registry.InitializeMetricCollectors(name)
+    m.Reset()
+    
+    go m.Monitor()
+    
+    return m
+}
+```
+
+```go
+package metricCollector
+
+import (
+	"sync"
+	"time"
+)
+
+// Registry is the default metricCollectorRegistry that circuits will use to
+// collect statistics about the health of the circuit.
+var Registry = metricCollectorRegistry{
+	lock: &sync.RWMutex{},
+	registry: []func(name string) MetricCollector{
+		newDefaultMetricCollector,
+	},
+}
+
+type metricCollectorRegistry struct {
+	lock     *sync.RWMutex
+	registry []func(name string) MetricCollector
+}
+func newDefaultMetricCollector(name string) MetricCollector {
+	m := &DefaultMetricCollector{}
+	m.mutex = &sync.RWMutex{}
+	m.Reset()
+	return m
+}
+```
+
+统计控制器:
+每一个 Command 都会有一个默认统计控制器，当然也可以添加多个自定义的控制器。默认的统计控制器DefaultMetricCollector保存着熔断器的所有状态，调用次数，失败次数，被拒绝次数等等
+```go
+type DefaultMetricCollector struct {
+    mutex *sync.RWMutex
+    
+    numRequests *rolling.Number
+    errors      *rolling.Number
+    
+    successes               *rolling.Number
+    failures                *rolling.Number
+    rejects                 *rolling.Number
+    shortCircuits           *rolling.Number
+    timeouts                *rolling.Number
+    contextCanceled         *rolling.Number
+    contextDeadlineExceeded *rolling.Number
+    
+    fallbackSuccesses *rolling.Number
+    fallbackFailures  *rolling.Number
+    totalDuration     *rolling.Timing
+    runDuration       *rolling.Timing
+}
+
+```
+
+rolling.Number
+![](.hystrix_images/rolling_num.png)
+```go
+type Number struct {
+    Buckets map[int64]*numberBucket // Key保存的是当前时间
+    Mutex   *sync.RWMutex
+}
+type numberBucket struct {
+    Value float64
+}
+```
+如何保证只保存 10 秒内的数据的。每一次对熔断器的状态进行修改时，Number都要先得到当前的时间(秒级)的Bucket不存在则创建。
+```go
+func (r *Number) getCurrentBucket() *numberBucket {
+    now := time.Now().Unix()
+    var bucket *numberBucket
+    var ok bool
+    
+    if bucket, ok = r.Buckets[now]; !ok {
+        bucket = &numberBucket{}
+        r.Buckets[now] = bucket
+    }
+    
+    return bucket
+}
+```
+修改完后去掉 10 秒外的数据
+```go
+func (r *Number) removeOldBuckets() {
+    now := time.Now().Unix() - 10
+    
+    for timestamp := range r.Buckets {
+        // TODO: configurable rolling window
+        if timestamp <= now {
+            delete(r.Buckets, timestamp)
+        }
+    }
+}
+```
+
+### 流量控制
+用了一个简单的令牌算法，能得到令牌的就可以执行后继的工作，执行完后要返还令牌。得不到令牌就拒绝，
+拒绝后调用用户设置的callback方法，如果没有设置就不执行。结构体executorPool就是hystrix-go 流量控制的具体实现。字段Max就是每秒最大的并发值。
+
+```go
+type executorPool struct {
+    Name    string
+    Metrics *poolMetrics
+    Max     int
+    Tickets chan *struct{}
+}
+```
+```go
+func newExecutorPool(name string) *executorPool {
+	p := &executorPool{}
+	p.Name = name
+	p.Metrics = newPoolMetrics(name)
+	p.Max = getSettings(name).MaxConcurrentRequests
+
+	p.Tickets = make(chan *struct{}, p.Max)
+	for i := 0; i < p.Max; i++ {
+		p.Tickets <- &struct{}{}
+	}
+
+	return p
+}
+```
+
+### 流量控制上报状态
+Metrics 他用于统计执行数量，比如：执行的总数量,最大的并发数
+```go
+func (p *executorPool) Return(ticket *struct{}) {
+	if ticket == nil {
+		return
+	}
+
+	p.Metrics.Updates <- poolMetricsUpdate{
+		activeCount: p.ActiveCount(),
+	}
+	p.Tickets <- ticket
+}
+// 使用的ticket
+func (p *executorPool) ActiveCount() int {
+    return p.Max - len(p.Tickets)
+}
+```

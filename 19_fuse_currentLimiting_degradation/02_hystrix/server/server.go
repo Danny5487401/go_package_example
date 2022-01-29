@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/afex/hystrix-go/hystrix"
+	"net"
 	"net/http"
 	"time"
 )
@@ -70,6 +71,13 @@ func main() {
 		RequestVolumeThreshold: 20,                   // 一个统计窗口 10 秒内请求数量。达到这个请求数量后才去判断是否要开启熔断
 		ErrorPercentThreshold:  30,                   // 错误百分比，请求数量大于等于 RequestVolumeThreshold 并且错误率到达这个百分比后就会启动熔断
 	})
+	// dashboard 可视化 hystrix 的上报信息
+	hystrixStreamHandler := hystrix.NewStreamHandler()
+	hystrixStreamHandler.Start()
+	go http.ListenAndServe(net.JoinHostPort("", "81"), hystrixStreamHandler)
 
 	http.ListenAndServe(":8090", &Handle{})
 }
+
+// dashboard我使用的是`docker`版
+// docker run -d -p 8888:9002 --name hystrix-dashboard mlabouardy/hystrix-dashboard:latest
