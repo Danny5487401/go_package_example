@@ -28,12 +28,12 @@ func testRedisBase() {
 	//ExampleClient_List()
 	//ExampleClient_Hash()
 	//ExampleClient_Set()
-	//ExampleClient_SortSet()
+	ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
 	//ExampleClient_Tx() // 事物pipeline
-	ExampleClient_Script()
+	//ExampleClient_Script()
 	//ExampleClient_PubSub()
 
 }
@@ -244,12 +244,12 @@ func ExampleClient_SortSet() {
 	log.Println("ZAddNX", ret, err)
 
 	//获取指定成员score
-	score, err := redisdb.ZScore("sortset_test1", "a_200").Result()
+	score, err := redisdb.ZScore("sortset_test", "a_200").Result()
 
 	if err == redis.Nil {
 		fmt.Printf("ZScore键或者member不存在:%v\n", err)
 	}
-	if err != nil {
+	if err != nil && err != redis.Nil {
 		fmt.Println("错误是", err)
 		return
 	}
@@ -257,7 +257,11 @@ func ExampleClient_SortSet() {
 
 	//获取制定成员的索引
 	index, err := redisdb.ZRank("sortset_test", "a_1").Result()
-	log.Println("ZRank", index, err)
+	if err != nil && err != redis.Nil {
+		fmt.Println("错误是", err)
+	}
+
+	log.Println("ZRank", index)
 	// 返回有序集合中指定成员的排名，有序集成员按分数值递减(从大到小)排序
 	index, err = redisdb.ZRevRank("sortset_test", "a_99").Result()
 	log.Println("ZRevRank", index, err)
@@ -267,16 +271,29 @@ func ExampleClient_SortSet() {
 	log.Println("SCard", count, err)
 
 	//返回有序集合指定区间内的成员
-	rets, err := redisdb.ZRange("sortset_test", 10, 20).Result()
-	log.Println(rets, err)
+	rets, err := redisdb.ZRange("sortset_test", 0, -1).Result()
+	if err != nil && err != redis.Nil {
+		fmt.Println("错误是", err)
+		return
+	}
+	log.Println("ZRange结果:", rets)
 
 	//返回有序集合指定区间内的成员分数从高到低
 	rets, err = redisdb.ZRevRange("sortset_test", 10, 20).Result()
-	log.Println(rets, err)
+	if err != nil && err != redis.Nil {
+		fmt.Println("错误是", err)
+		return
+	}
+
+	log.Println("ZRevRange结果:", rets)
 
 	//指定分数区间的成员列表
 	rets, err = redisdb.ZRangeByScore("sortset_test", &redis.ZRangeBy{Min: "(30", Max: "(50", Offset: 1, Count: 10}).Result()
-	log.Println(rets, err)
+	if err != nil && err != redis.Nil {
+		fmt.Println("错误是", err)
+		return
+	}
+	log.Println("ZRangeByScore结果:", rets)
 }
 
 //用来做基数统计的算法，HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定 的、并且是很小的。
@@ -396,6 +413,7 @@ func ExampleClient_Tx() {
 	//
 	// using one rdb-server roundtrip.
 	cmders, err := pipe.Exec()
+
 	fmt.Println(incr.Val(), boolCmd.Val(), stringCmd.Val(), err)
 	for _, cmder := range cmders {
 		switch cmd := cmder.(type) {
