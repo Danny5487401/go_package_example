@@ -6,12 +6,14 @@
 - 2 手动实现stub
 - 3 json_rpc
 - 4 http_rpc
+
 ## [第一章 服务注册中心consul](01_consul/consul.md)
 - [consul架构](01_consul/consul.md)
 - [Raft协议](01_consul/raft.md)
 - [raft在consul实现](01_consul/raft_in_consul.md)
 - 1 服务注册，过滤，获取
 - 2 [分布式锁(consul实现方式)](01_consul/distributed_lock.md)
+
 ## 第二章 日志库
 - 1 [zerolog](02_log/01_zerolog/zerolog.md)
 - 2 [zap使用及源码分析](02_log/02_zap/zap.md)
@@ -32,9 +34,11 @@
 - 3 rocketmq
   - 3.1 消费者：简单消费,延迟消费
   - 3.2 生产者：简单消息，延迟消息，事务消息
+
 ## 第四章 [服务注册及配置文件中心Nacos](04_nacos/nacos.md)
 - 1 获取配置及监听文件变化
 - 2 服务注册，监听，获取
+
 ## 第五章 关系型数据库
 - [go-mysql-driver插件源码分析](05_rds/go_mysql_driver.md)
 - 1 GORM
@@ -45,10 +49,13 @@
   - 2.2 调用mysql函数
   - 2.3 事务处理
   - 2.4 crud
+
 ## 第六章 获取对外可用IP和端口
+
 ## 第七章 Gin前端form验证器
 - 1 错误英转中
 - 2 前端数据校验
+
 ## [第八章 GRPC编程 ](08_grpc/grpc.md)
 - [protobuf及工具介绍](08_grpc/proto/protobuf_n_tools.md)
   - 引入其他proto文件
@@ -77,6 +84,7 @@
 - 13 channelz调试
 - 14 multiplex多路复用
 - 15 自定义grpc插件
+
 ## 第九章 Nosql非关系型数据库
 - 1 MongoDB
   - [mongo和mysql储存引擎及内存结构](09_Nosql/01_mongo/mongo.md)
@@ -89,17 +97,22 @@
     - 2.2.2 连接初始化及命令执行流程
     - 2.2.3 protocol协议封装
     - 2.2.4 批处理pipeline分析
+
 ## 第十章 链路追踪(Distributed Tracing)
 - 1 Jaeger
   - 1.1 结合XORM
   - 1.2 结合redis
+
+
 ## 第十一章 依赖注入
 - 1 dig依赖注入及http服务分层 
 - 2 wire依赖注入
+
 ## 第十二章 测试框架testify(gin使用)
 - 1 assert断言
 - 2 mock测试替身
 - 3 suite测试套件
+
 ## [第十三章 序列化反序列化-包含标准库源码分析](13_serialize/serialize.md)
 - 1 Jsoniter(完全兼容标准库json，性能较好)
   - 1.1 序列化
@@ -119,6 +132,7 @@
   - 2.7 错误
   - 2.8 弱解析
   - 2.9 自定义解析器
+
 ## 第十四章 系统监控
   - 1 systemstat包(适合linux系统，已断更)
   - 2 [gopsutil](14_system_monitor/02_gopsutil/gopsutil.md)
@@ -126,15 +140,20 @@
       - 物理机和虚拟机
       - 容器环境
     - cpu,mem,disk
+    
 ## [第十五章 分布式事务](15_distributed_transaction/distributed_transaction.md)
 - 1 两阶段提交2pc
+
 ## 第十六章 数据复制
 - 1 [copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
+
 ## 第十七章 数据加解密
 - 1 phpserialize
+
 ## 第十八章 日志收集项目 log_collect
 - 1 动态选择文件
 - 2 文件内容读取发送
+
 ## [第十九章 熔断,限流及降级](19_fuse_currentLimiting_degradation/rate_limit.md)
 - [0 熔断，降级，限流(官方包x/time/rate)](19_fuse_currentLimiting_degradation/00_tokenBucket/time_rate.md)
 - 1 Sentinel
@@ -152,10 +171,12 @@
 ## 第二十章 [命令行框架Cobra](20_cobra/introdoction.md)
 - 1 介绍及功能使用
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
+
 ## [第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify)](21_viper/viper.md)
 - 1 获取本地文件内容
 - [2 监听文件变化(fsnotify)](21_viper/02_fsnotify/fsnotify.md)
 - [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
+
 ## 第二十二章 ETCD
 - 1 CRUD及watch
 - 2 [读和写流程分析](22_etcd/etcd_read_n_write.md)
