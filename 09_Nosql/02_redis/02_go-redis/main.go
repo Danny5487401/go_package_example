@@ -26,7 +26,7 @@ func testRedisBase() {
 
 	//ExampleClient_String()
 	//ExampleClient_List()
-	//ExampleClient_Hash()
+	ExampleClient_Hash()
 	//ExampleClient_Set()
 	ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
@@ -270,8 +270,9 @@ func ExampleClient_SortSet() {
 	count, err := redisdb.ZCard("sortset_test").Result()
 	log.Println("SCard", count, err)
 
-	//返回有序集合指定区间内的成员
-	rets, err := redisdb.ZRange("sortset_test", 0, -1).Result()
+	//返回有序集合指定区间内的成员-- 包括分数
+	var rets []string
+	rets, err = redisdb.ZRange("sortset_test", 0, -1).Result()
 	if err != nil && err != redis.Nil {
 		fmt.Println("错误是", err)
 		return
@@ -279,13 +280,13 @@ func ExampleClient_SortSet() {
 	log.Println("ZRange结果:", rets)
 
 	//返回有序集合指定区间内的成员分数从高到低
-	rets, err = redisdb.ZRevRange("sortset_test", 10, 20).Result()
+	var rsp []redis.Z
+	rsp, err = redisdb.ZRevRangeWithScores("sortset_test", 0, -1).Result()
 	if err != nil && err != redis.Nil {
 		fmt.Println("错误是", err)
 		return
 	}
-
-	log.Println("ZRevRange结果:", rets)
+	log.Println("ZRevRange结果:", rsp)
 
 	//指定分数区间的成员列表
 	rets, err = redisdb.ZRangeByScore("sortset_test", &redis.ZRangeBy{Min: "(30", Max: "(50", Offset: 1, Count: 10}).Result()
