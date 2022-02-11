@@ -16,17 +16,16 @@ func GetOutboundIP() (ip string, err error) {
 	}
 	defer conn.Close()
 	localAddr := conn.LocalAddr().(*net.UDPAddr)
-	fmt.Println(localAddr.String())
+	fmt.Println("IP加端口完整信息：", localAddr.String())
 	fmt.Println("对外Ip是", localAddr.IP, "对外Port是", localAddr.Port)
 	ip = strings.Split(localAddr.IP.String(), ":")[0]
 	return
 }
 
 func main() {
-	ip, err := GetOutboundIP()
+	_, err := GetOutboundIP()
 	if err != nil {
 		fmt.Println(err.Error())
 		return
 	}
-	fmt.Println(ip)
 }

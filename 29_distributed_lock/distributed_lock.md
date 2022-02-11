@@ -29,6 +29,7 @@ end
 
 ### 集群场景
 ![](.distributed_lock_images/cluster_redis.png)
+
 设集群有N个redis节点，那么，redlock算法约定，任意应用实例在半数以上（N/2 + 1）的redis节点上执行set成功，就认为当前应用实例成功持有锁.
 
 这里面有几个问题需要考虑：网络延迟、超时处理、节点宕机、新增节点
