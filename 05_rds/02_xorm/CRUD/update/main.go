@@ -24,6 +24,7 @@ func main() {
 	affected, err = eg.Where("usr_name=?", "joy").Cols("description").Update(data5)
 	if err != nil {
 		fmt.Println("选择部分字段错误", err.Error())
+		return
 	}
 	fmt.Println("影响的行数", affected)
 

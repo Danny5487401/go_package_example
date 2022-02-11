@@ -70,14 +70,12 @@ require (
 	github.com/spf13/viper v1.9.0
 	github.com/streadway/amqp v1.0.0
 	github.com/stretchr/testify v1.7.0
-	github.com/stvp/tempredis v0.0.0-20181119212430-b82af8480203
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/yoyofxteam/nacos-viper-remote v0.4.0
 	go.mongodb.org/mongo-driver v1.5.3
 	go.uber.org/dig v1.11.0
 	go.uber.org/zap v1.17.0
-	golang.org/x/exp v0.0.0-20200224162631-6cc2880d07d6
 	golang.org/x/sys v0.0.0-20211210111614-af8b64212486 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa

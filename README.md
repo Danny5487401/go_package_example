@@ -211,7 +211,7 @@
   - 1.2 扩展包sqlx操作clickHouse
 
 ## 第二十九章 分布式锁
-- [1 redis实现](29_distributed_lock/01_redis_distributed_lock/main.go)
+- [1 redsync(redis官方推荐的go版本分布式锁实现)](29_distributed_lock/01_redis_distributed_lock/main.go)
 
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
 
