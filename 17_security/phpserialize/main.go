@@ -18,21 +18,27 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"github.com/elliotchance/phpserialize"
+	"net/url"
 )
 
 const (
 	cookieValidationKey = "123456"
 )
 
-var key = "age"
-var value = "18"
+var originalKey = "age"
+var originalValue = "20180727145408c577269dfdec32b86e2c2ea283a7b77a01f3ba4ac8a4fd2a"
 
 func main() {
 	// 加密
-	encodeStr := Encode(key, value)
-	fmt.Printf("加密后的数据是%v\n", encodeStr)
+
+	encodeStr := Encode(originalKey, originalValue)
+	cookieStr := url.QueryEscape(encodeStr)
+
+	fmt.Printf("加密后的cookie数据是%v\n", cookieStr)
+	cookieStr, _ = url.QueryUnescape(cookieStr)
+
 	// 解密
-	k, v := Decode(encodeStr)
+	k, v := Decode(cookieStr)
 	fmt.Printf("原始数据是%v：%v", k, v)
 }
 
@@ -46,7 +52,6 @@ func Encode(key, value string) (encodeStr string) {
 	mac.Write(data)
 	hash := fmt.Sprintf("%x", mac.Sum(nil))
 	value = hash + string(data)
-	fmt.Println(value)
 	return value
 }
 
@@ -66,12 +71,14 @@ func Decode(encodeStr string) (key, value string) {
 	mac2 := hmac.New(sha256.New, []byte(cookieValidationKey))
 	_, _ = mac2.Write([]byte(pureData))
 	if hash != fmt.Sprintf("%x", mac2.Sum(nil)) {
+		fmt.Printf("数据不符合\n")
 		return
 	}
 	// 解密后的数据
 	var data map[interface{}]interface{}
 	err := phpserialize.Unmarshal([]byte(pureData), &data)
 	if err != nil {
+		fmt.Printf("反序列化数据错误%v", err.Error())
 		return
 	}
 	for k1, v := range data {
