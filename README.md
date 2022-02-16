@@ -169,7 +169,7 @@
 - 1 [copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
 
 ## 第十七章 数据加解密
-- 1 phpserialize
+- [1 phpserialize序列化函数配合hmac算法加密](17_security/phpserialize/main.go)
 
 ## 第十八章 日志收集项目 log_collect
 - 1 动态选择文件
