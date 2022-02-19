@@ -1,6 +1,6 @@
 # go_grpc_example
 
-![grpc](./img/golang.jpeg)
+![grpc](img/golang.jpeg)
 
 - [MakeFile介绍](makefile.md)
 
