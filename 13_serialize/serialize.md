@@ -3,8 +3,68 @@
 ## Go 原生 encoding/json
 使用 json.Unmarshal 和 json.Marshal 函数，可以轻松将 JSON 格式的二进制数据反序列化到指定的 Go 结构体中，以及将 Go 结构体序列化为二进制流。
 而对于未知结构或不确定结构的数据，则支持将二进制反序列化到 map[string]interface{} 类型中，使用 KV 的模式进行数据的存取
-json特性
+
+特性：
 json 包解析的是一个 JSON 数据，而 JSON 数据既可以是对象（object），也可以是数组（array），同时也可以是字符串（string）、数值（number）、布尔值（boolean）以及空值（null）。
+
+### 序列化
+
+问题：map是无序的，每次取出key/value的顺序都可能不一致，但map转json的顺序是不是也是无序的吗？
+
+结论：map转json是有序的，按照ASCII码升序排列key。
+
+```go
+type mapEncoder struct {
+   elemEnc encoderFunc
+}
+
+func (me mapEncoder) encode(e *encodeState, v reflect.Value, opts encOpts) {
+   if v.IsNil() {//为nil时，返回null
+      e.WriteString("null")
+      return
+   }
+   e.WriteByte('{')
+
+   // Extract and sort the keys.
+   keys := v.MapKeys()//获取map中的所有keys
+   sv := make([]reflectWithString, len(keys))
+   for i, v := range keys {
+      sv[i].v = v
+      if err := sv[i].resolve(); err != nil {//处理key，尤其是非string（int/uint）类型的key转string
+         e.error(&MarshalerError{v.Type(), err})
+      }
+   }
+   //排序，升序，直接比较字符串
+   sort.Slice(sv, func(i, j int) bool { return sv[i].s < sv[j].s })
+
+   for i, kv := range sv {
+      if i > 0 {
+         e.WriteByte(',')
+      }
+      e.string(kv.s, opts.escapeHTML)
+      e.WriteByte(':')
+      me.elemEnc(e, v.MapIndex(kv.v), opts)
+   }
+   e.WriteByte('}')
+}
+
+func newMapEncoder(t reflect.Type) encoderFunc {
+   switch t.Key().Kind() {
+   case reflect.String,
+      reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
+      reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+   default:
+      if !t.Key().Implements(textMarshalerType) {
+         return unsupportedTypeEncoder
+      }
+   }
+   me := mapEncoder{typeEncoder(t.Elem())}
+   return me.encode
+}
+
+```
+
+### 反序列化
 ```go
 var s string
 err := json.Unmarshal([]byte(`"Hello, world!"`), &s)
