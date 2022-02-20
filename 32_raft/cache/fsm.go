@@ -44,6 +44,7 @@ func (f *FSM) Restore(serialized io.ReadCloser) error {
 }
 
 /*
+有限状态机需要实现的接口
 type FSM interface {
 	Apply log is invoked once a log entry is committed.
 	It returns a value which will be made available in the

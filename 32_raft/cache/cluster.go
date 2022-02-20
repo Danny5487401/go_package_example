@@ -62,6 +62,9 @@ func NewRaftNode(opts *Options, ctx *StCachedContext) (*RaftNodeInfo, error) {
 		Level:  hclog.Info,
 		Output: &logbuf,
 	})
+	// 模拟第一次启动一个节点情况
+	raftConfig.HeartbeatTimeout = 1 * time.Second
+	raftConfig.ElectionTimeout = 1 * time.Second
 
 	// 需要两个条件同时满足才会生成和保存一次快照，默认config里面配置的条件比较高
 	// SnapshotInterval指每间隔多久生成一次快照
@@ -89,16 +92,19 @@ func NewRaftNode(opts *Options, ctx *StCachedContext) (*RaftNodeInfo, error) {
 		Ctx: ctx,
 		Log: log.New(os.Stderr, "FSM: ", log.Ldate|log.Ltime),
 	}
+	// 存储快照信息，对于stcache来说，就是存储当前的所有的kv数据
 	snapshotStore, err := raft.NewFileSnapshotStore(opts.dataDir, 1, os.Stderr)
 	if err != nil {
 		return nil, err
 	}
 
+	// 存储raft log
 	logStore, err := raftboltdb.NewBoltStore(filepath.Join(opts.dataDir, "Raft-Log.bolt"))
 	if err != nil {
 		return nil, err
 	}
 
+	// 存储节点状态信息
 	stableStore, err := raftboltdb.NewBoltStore(filepath.Join(opts.dataDir, "Raft-stable.bolt"))
 	if err != nil {
 		return nil, err
@@ -125,7 +131,7 @@ func NewRaftNode(opts *Options, ctx *StCachedContext) (*RaftNodeInfo, error) {
 	return &RaftNodeInfo{Raft: raftNode, fsm: fsm, LeaderNotifyCh: leaderNotifyCh}, nil
 }
 
-// joinRaftCluster joins a node to Raft cluster
+// JoinRaftCluster  加入raft集群
 func JoinRaftCluster(opts *Options) error {
 	// 后续的节点启动的时候需要加入集群，启动的时候指定第一个节点的地址，并发送请求加入集群，这里我们定义成直接通过http请求
 

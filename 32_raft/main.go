@@ -26,6 +26,7 @@ func main() {
 	}
 	st.Log.Printf("http server listen:%s", l.Addr())
 
+	// http业务服务器
 	logger := log.New(os.Stderr, "httpserver: ", log.Ldate|log.Ltime)
 	httpServer := cache.NewHttpServer(ctx, logger)
 	st.Hs = httpServer
@@ -33,12 +34,12 @@ func main() {
 		http.Serve(l, httpServer.Mux)
 	}()
 
-	raft, err := cache.NewRaftNode(st.Opts, ctx)
+	// raft 节点启动
+	raftNode, err := cache.NewRaftNode(st.Opts, ctx)
 	if err != nil {
 		st.Log.Fatal(fmt.Sprintf("new raft node failed:%v", err))
 	}
-	st.Raft = raft
-
+	st.Raft = raftNode
 	if st.Opts.JoinAddress != "" {
 		err = cache.JoinRaftCluster(st.Opts)
 		if err != nil {
@@ -58,6 +59,18 @@ func main() {
 				st.Log.Println("become follower, close write api")
 				st.Hs.SetWriteFlag(false)
 			}
+
 		}
 	}
 }
+
+// 运行 cd 32_raft
+// go build -o main main.go
+// ./main -bootstrap true -node node1
+// 测试数据
+// 写： curl "http://127.0.0.1:6000/set?key=name&value=danny"
+// 读： curl "http://127.0.0.1:6000/get?key=name"
+// ./main -join 127.0.0.1:6000 -Raft 127.0.0.1:7001 -http 127.0.0.1:6001 -node node2
+// ./main -join 127.0.0.1:6000 -Raft 127.0.0.1:7002 -http 127.0.0.1:6002 -node node3
+// 读： curl "http://127.0.0.1:6001/get?key=name"
+// 读： curl "http://127.0.0.1:6002/get?key=name"

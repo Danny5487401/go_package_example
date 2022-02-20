@@ -1,5 +1,7 @@
 # raft协议
 
+官方参考链接：https://raft.github.io/#implementations
+
 ## 背景：如何避免单点故障
 
 为了解决单点问题，软件系统工程师引入了数据复制技术，实现多副本。通过数据复制方案，一方面我们可以提高服务可用性，避免单点故障。
@@ -51,3 +53,66 @@ raft的理论基础是Replicated State Machine，Replicated State Machine需要�
 
 一定会存在更高任期的新 Leader 日志中、各个节点的状态机应用的任意位置的日志条目内容应一样.
 
+
+### 1. 选举
+
+- 选举过程图1（单个节点视角）
+![](.raft_images/election_from_own_view.png)
+  
+- 选举过程图2（整体视角）
+![](.raft_images/election_in_whole_view.png)
+  
+监听事件-->源码实现
+
+```go
+func (r *Raft) run() {
+	for {
+		// Check if we are doing a shutdown
+		select {
+		case <-r.shutdownCh:
+			// Clear the leader to prevent forwarding
+			r.setLeader("")
+			return
+		default:
+		}
+
+		switch r.getState() {
+		case Follower:
+			r.runFollower()
+		case Candidate:
+			r.runCandidate()
+		case Leader:
+			r.runLeader()
+		}
+	}
+}
+```
+  
+
+### 2. 日志复制
+
+日志格式：term + index + cmd + type，对应源码
+
+```go
+// /Users/python/go/pkg/mod/github.com/hashicorp/raft@v1.3.5/log.go
+type Log struct {
+	// Index holds the index of the log entry.
+	Index uint64
+
+	// Term holds the election term of the log entry.
+	Term uint64
+
+	// Type holds the type of the log entry.
+	Type LogType
+
+	// Data holds the log entry's type-specific data.
+	Data []byte
+	
+	// ....
+}
+```
+
+![](.raft_images/raft_log_info.png)
+
+详细流程 
+![](.raft_images/raft_whole_process.png)
