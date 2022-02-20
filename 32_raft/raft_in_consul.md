@@ -1,4 +1,6 @@
 # raft协议在consul中应用
+hashicorp/raft是raft协议的一种golang实现，由hashicorp公司实现并开源，已经在consul等软件中使用。
+它封装了raft协议的leader选举、log同步等底层实现，基于它能够相对比较容易的构建强一致性的分布式系统.
 
 ## 源码分析(v1.9.11) 
 
