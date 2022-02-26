@@ -24,9 +24,8 @@
 ## [第一章 服务注册中心consul](01_consul/consul.md)
 
 - [consul架构](01_consul/consul.md)
-- [Raft协议](01_consul/raft.md)
-- [raft在consul实现](01_consul/raft_in_consul.md)
 - [分布式锁-->consul实现)](01_consul/distributed_lock.md)
+  
 - [1 服务注册，过滤，获取](01_consul/main.go)
 
 ## 第二章 日志库
@@ -273,7 +272,13 @@
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
 
 ## [第三十一章 分布式Id](31_distributed_Id/distribued_id.md)
-
 - 雪花算法
   - [bwmarrin/snowflake库](31_distributed_Id/snowflake/main.go)
   - [SonyFlake(解决时间回拨问题)](31_distributed_Id/sony_snowflake/main.go)
+  
+## [第三十二章 多副本常用的技术方案及Raft协议](32_raft/raft.md)
+  - [raft在consul实现](32_raft/raft_in_consul.md)
+  - [raft在etcd实现](32_raft/raft_in_etcd.md)
+  - [raft调试应用](32_raft/main.go)
+
+
