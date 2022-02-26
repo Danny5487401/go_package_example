@@ -173,7 +173,6 @@
   - 2.9 自定义解析器
 
 ## 第十四章 系统监控
-
 - [1 systemstat包(适合linux系统，已断更)](14_system_monitor/01_systemstat/main.go)
 - [2 gopsutil](14_system_monitor/02_gopsutil/gopsutil.md)
   - 进程信息获取
@@ -182,11 +181,13 @@
   - [cpu,mem,disk](14_system_monitor/02_gopsutil/disk_n_cpu_n_mem/main.go)
 
 ## [第十五章 分布式事务](15_distributed_transaction/distributed_transaction.md)
+- Note: 使用DTM的代码作为案例 
+- [1 两阶段提交2pc/XA](15_distributed_transaction/01_2pc_n_3pc/two_phase_commit.md)
+- [2 saga事务](15_distributed_transaction/02_saga/saga.md)
+- [3 TCC事务](15_distributed_transaction/03_tcc/tcc.md)
 
-- 1 两阶段提交2pc
 
 ## 第十六章 数据复制
-
 - 1 [copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
 
 ## 第十七章 数据加解密
