@@ -282,5 +282,5 @@
   - [raft调试应用](32_raft/main.go)
 
 ## 第三十三章 本地缓存
-- go-cache
+- [go-cache](33_local_cache/01_go_cache/go_cache.md)
 
