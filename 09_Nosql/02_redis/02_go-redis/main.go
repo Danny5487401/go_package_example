@@ -26,7 +26,7 @@ func testRedisBase() {
 
 	//ExampleClient_String()
 	//ExampleClient_List()
-	ExampleClient_Hash()
+	//ExampleClient_Hash()
 	//ExampleClient_Set()
 	ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
@@ -272,7 +272,7 @@ func ExampleClient_SortSet() {
 
 	//返回有序集合指定区间内的成员-- 包括分数
 	var rets []string
-	rets, err = redisdb.ZRange("sortset_test", 0, -1).Result()
+	rets, err = redisdb.ZRange("sortset_test", 0, 5).Result()
 	if err != nil && err != redis.Nil {
 		fmt.Println("错误是", err)
 		return
