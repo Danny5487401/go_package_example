@@ -275,10 +275,12 @@
 - 雪花算法
   - [bwmarrin/snowflake库](31_distributed_Id/snowflake/main.go)
   - [SonyFlake(解决时间回拨问题)](31_distributed_Id/sony_snowflake/main.go)
-  
+
 ## [第三十二章 多副本常用的技术方案及Raft协议](32_raft/raft.md)
   - [raft在consul实现](32_raft/raft_in_consul.md)
   - [raft在etcd实现](32_raft/raft_in_etcd.md)
   - [raft调试应用](32_raft/main.go)
 
+## 第三十三章 本地缓存
+- [go-cache](33_local_cache/01_go_cache/go_cache.md)
 
