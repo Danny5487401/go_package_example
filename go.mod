@@ -40,8 +40,10 @@ require (
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
 	github.com/hashicorp/consul/api v1.12.0
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-hclog v1.0.0 // indirect
+	github.com/hashicorp/go-hclog v1.0.0
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
+	github.com/hashicorp/raft v1.3.5
+	github.com/hashicorp/raft-boltdb v0.0.0-20211202195631-7d34b9fb3f42
 	github.com/hpcloud/tail v1.0.0
 	github.com/jinzhu/copier v0.3.2
 	github.com/jinzhu/gorm v1.9.16
@@ -60,6 +62,7 @@ require (
 	github.com/olivere/elastic v6.2.35+incompatible
 	github.com/olivere/elastic/v7 v7.0.26
 	github.com/opentracing/opentracing-go v1.2.0
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pierrec/lz4 v2.6.0+incompatible // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20201227073835-cf1acfcdf475 // indirect
 	github.com/rs/zerolog v1.26.1

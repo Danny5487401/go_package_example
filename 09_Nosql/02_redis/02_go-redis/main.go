@@ -28,13 +28,31 @@ func testRedisBase() {
 	//ExampleClient_List()
 	//ExampleClient_Hash()
 	//ExampleClient_Set()
-	ExampleClient_SortSet()
+	//ExampleClient_SortSet()
 	//ExampleClient_HyperLogLog()
 	//ExampleClient_CMD()
 	//ExampleClient_Scan()
 	//ExampleClient_Tx() // 事物pipeline
 	//ExampleClient_Script()
 	//ExampleClient_PubSub()
+	exampleClient_BitMap()
+
+}
+func exampleClient_BitMap() {
+	log.Println("ExampleClient_BitMap starts")
+	defer log.Println("ExampleClient_BitMap ends")
+	var uid int64 = 1000
+	var uid2 int64 = 1001
+	date := time.Now().Format("20060102")
+	mapKey := date + "bitest"
+	affected, err := redisdb.SetBit(mapKey, uid, 1).Result()
+	if err != nil {
+		log.Println("设置bitmap失败")
+		return
+	}
+	log.Println("bitmap成功应该返回0 ", affected)
+	log.Println(redisdb.GetBit(mapKey, uid).Result())
+	log.Println(redisdb.GetBit(mapKey, uid2).Result())
 
 }
 
@@ -142,13 +160,14 @@ func ExampleClient_Hash() {
 	if err == redis.Nil {
 		fmt.Println("不存在")
 	}
-	log.Println("rets:", ret, err)
+	log.Println("hget 的rets:", ret)
 
 	rets, err := redisdb.HMGet("hash_test", "name", "sex").Result()
 	if err != nil {
 		fmt.Println("HMGet的错误是", err.Error())
+		return
 	}
-	log.Println("rets:", rets, err)
+	log.Println("rets:", rets, err) //结果只有对应的结果，如danny,1
 
 	//成员
 	retAll, err := redisdb.HGetAll("hash_test").Result()

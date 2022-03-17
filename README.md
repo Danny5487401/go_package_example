@@ -24,9 +24,8 @@
 ## [第一章 服务注册中心consul](01_consul/consul.md)
 
 - [consul架构](01_consul/consul.md)
-- [Raft协议](01_consul/raft.md)
-- [raft在consul实现](01_consul/raft_in_consul.md)
 - [分布式锁-->consul实现)](01_consul/distributed_lock.md)
+  
 - [1 服务注册，过滤，获取](01_consul/main.go)
 
 ## 第二章 日志库
@@ -99,7 +98,6 @@
 - 3  流式GRPC
 - 4  protobuf的jsonpb包序列化和反序列化
 - 5  负载均衡
-
   - 5.1 [客户端(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver_n_balancer.md)
     - 第三方consul实现Resolver接口和Builder接口
     - 自定义实现Resolver接口和Builder接口
@@ -118,8 +116,8 @@
 
 ## 第九章 Nosql非关系型数据库
 
-- 1 MongoDB
-  - [mongo和mysql储存引擎及内存结构](09_Nosql/01_mongo/mongo.md)
+- [1 MongoDB](09_Nosql/01_mongo/mongo.md)
+  - [mongo和mysql对比：储存引擎及内存结构](09_Nosql/01_mongo/nosql_vs_rds.md)
   - 1.1 增删改查
 - 2 [Redis(协议，原理，数据结构分析)](09_Nosql/02_redis/redis.md)
   - [redis底层数据结构对象源码分析](09_Nosql/02_redis/redis_obj.md)
@@ -130,7 +128,7 @@
     - [2.2.3 protocol协议封装](09_Nosql/02_redis/02_go-redis/go-redis_protocol.md)
     - [2.2.4 批处理pipeline分析](09_Nosql/02_redis/02_go-redis/go-redis_pipeline.md)
 
-## 第十章 链路追踪(Distributed Tracing)
+## [第十章 链路追踪(Distributed Tracing)](10_distributed_tracing/introduction.md)
 
 - 1 Jaeger
   - [1.1 结合XORM](10_distributed_tracing/01_jaeger/02_jaeger_application/01_jaeger_xorm/main_test.go)
@@ -162,18 +160,17 @@
     - [json字符串数组](13_serialize/01_jsoniter/Unmarshal/jsonArray/main.go)
     - [json.RawMessage二次反序列化](13_serialize/01_jsoniter/Unmarshal/RawMessage/main.go)
 - 2 mapstructure使用（性能低但是方便）
-  - 2.1 无tag标签
-  - 2.2 带tag标签
-  - 2.3 embeded内嵌
-  - 2.4 字段保留
-  - 2.5 省略字段
-  - 2.6 元数据
-  - 2.7 错误
-  - 2.8 弱解析
-  - 2.9 自定义解析器
+  - [2.1 无tag标签](13_serialize/02_map2structure/01_without_tag/main.go)
+  - [2.2 带tag标签mapstructure](13_serialize/02_map2structure/02_tag/main.go)
+  - [2.3 embeded内嵌标签squash](13_serialize/02_map2structure/03_embeded/main.go)
+  - [2.4 未映射字段保留标签remain](13_serialize/02_map2structure/04_remain/main.go)
+  - [2.5 省略字段标签omitempty](13_serialize/02_map2structure/05_omitempty/main.go)
+  - [2.6 元数据展示源数据未映射字段](13_serialize/02_map2structure/06_metadata/main.go)
+  - [2.7 错误](13_serialize/02_map2structure/07_error/main.go)
+  - [2.8 弱解析](13_serialize/02_map2structure/08_weekDecode/main.go)
+  - [2.9 自定义解析器](13_serialize/02_map2structure/09_decoder/main.go)
 
 ## 第十四章 系统监控
-
 - [1 systemstat包(适合linux系统，已断更)](14_system_monitor/01_systemstat/main.go)
 - [2 gopsutil](14_system_monitor/02_gopsutil/gopsutil.md)
   - 进程信息获取
@@ -182,11 +179,13 @@
   - [cpu,mem,disk](14_system_monitor/02_gopsutil/disk_n_cpu_n_mem/main.go)
 
 ## [第十五章 分布式事务](15_distributed_transaction/distributed_transaction.md)
+- Note: 使用DTM的代码作为案例 
+- [1 两阶段提交2pc/XA](15_distributed_transaction/01_2pc_n_3pc/two_phase_commit.md)
+- [2 saga事务](15_distributed_transaction/02_saga/saga.md)
+- [3 TCC事务](15_distributed_transaction/03_tcc/tcc.md)
 
-- 1 两阶段提交2pc
 
 ## 第十六章 数据复制
-
 - 1 [copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
 
 ## 第十七章 数据加解密
@@ -213,7 +212,7 @@
   - [2.1 客户端](19_fuse_currentLimiting_degradation/02_hystrix/client/client.go)
   - [2.2 服务端](19_fuse_currentLimiting_degradation/02_hystrix/server/server.go)
 
-## 第二十章 [命令行框架Cobra](20_cobra/introdoction.md)
+## [第二十章 命令行框架Cobra](20_cobra/introdoction.md)
 
 - 1 介绍及功能使用
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
@@ -244,7 +243,7 @@
   - 2.1 V6版本
   - 2.2 V7版本
 
-## 第二十五章 监控sentry
+## [第二十五章 监控sentry](25_sentry/sentry.md)
 
 - [结合gin使用](25_sentry/gin/main.go)
 
@@ -272,7 +271,15 @@
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
 
 ## [第三十一章 分布式Id](31_distributed_Id/distribued_id.md)
-
 - 雪花算法
   - [bwmarrin/snowflake库](31_distributed_Id/snowflake/main.go)
   - [SonyFlake(解决时间回拨问题)](31_distributed_Id/sony_snowflake/main.go)
+
+## [第三十二章 多副本常用的技术方案及Raft协议](32_raft/raft.md)
+  - [raft在consul实现](32_raft/raft_in_consul.md)
+  - [raft在etcd实现](32_raft/raft_in_etcd.md)
+  - [raft调试应用](32_raft/main.go)
+
+## 第三十三章 本地缓存
+- [go-cache](33_local_cache/01_go_cache/go_cache.md)
+
