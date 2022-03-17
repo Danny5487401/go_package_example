@@ -1,6 +1,6 @@
 # 映射关系  
 
-# Go与字段类型对应表  
+## Go与字段类型对应表  
 
 |go类型 |映射方法 |xorm类型 |
 |----- |----- |----- |
@@ -19,7 +19,7 @@ cascade struct|	primary key field valu|	BigInt|
 struct	|json.Marshal / json.UnMarshal|	Text|
 Others	|	|Text|
 
-# xorm与数据库类型对照  
+## xorm与数据库类型对照  
 | xorm | mysql | sqlite3 | postgres | 备注 | 
 |-----|-----|------|-----|-----|
 BIT	|BIT	|INTEGER|BIT	|

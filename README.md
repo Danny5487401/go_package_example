@@ -64,8 +64,8 @@
 - 1 GORM
   - 1.1 GORM原理及实现
   - 1.2 连接池使用
-- 2 XORM
-  - 2.1 主从连接
+- [2 XORM](05_rds/02_xorm/xorm.md)
+  - [2.1 主从连接](05_rds/02_xorm/util/util.go)
   - [2.2 调用mysql函数](05_rds/02_xorm/function/sum.go)
   - [2.3 事务处理](05_rds/02_xorm/transaction/transaction.go)
   - 2.4 crud
