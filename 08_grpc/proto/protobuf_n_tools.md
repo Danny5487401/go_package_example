@@ -16,13 +16,18 @@ Protocol buffers 是一种语言无关、平台无关的可扩展机制或者说
 * 引入了新的语言实现（C＃，JavaScript，Ruby，Objective-C）
 
 ## 核心编码原理(包括 Varint 编码、ZigZag编码及 protobuf 特有的 Message Structure 编码结构等)
-### 1. Varint编码:protobuf 编码主要依赖于 Varint 编码。
-原理：
-Varint 是一种紧凑的表示数字的方法。它用一个或多个字节来表示一个数字，值越小的数字使用越少的字节数。这能减少用来表示数字的字节数。
+### 1. Varint编码:protobuf 编码主要依赖于 Varint 编码
 
-Varint 中的每个字节（最后一个字节除外）都设置了最高有效位（msb），这一位表示还会有更多字节出现。每个字节的低 7 位用于以 7 位组的形式存储数字的二进制补码表示，最低有效组首位
+Varint是一种使用一个或多个字节序列化整数的方法，会把整数编码为变长字节。
+对于32位整型数据经过Varint编码后需要1~5个字节，小的数字使用1个byte，大的数字使用5个bytes。64位整型数据编码后占用1~10个字节。
+在实际场景中小数字的使用率远远多于大数字，因此通过Varint编码对于大部分场景都可以起到很好的压缩效果。
 
-编码方式：
+#### 原理
+Varint 中的每个字节（最后一个字节除外）都设置了最高有效位（most significant bit - msb）。
+msb为1则表明后面的字节还是属于当前数据的,如果是0那么这是当前数据的最后一个字节数据
+每个字节的低7位用于以7位为一组存储数字的二进制补码表示，最低有效组在前，或者叫最低有效字节在前。这表明varint编码后数据的字节是按照小端序排列的。
+
+#### 编码方式
 
 1. 转换为二进制表示
 2. 每个字节保留后7位，去掉最高位
@@ -44,12 +49,13 @@ Note: 最高位为1代表后面7位仍然表示数字，否则为0，后面7位�
 解码的过程就是将字节依次取出，去掉最高有效位，因为是小端排序所以先解码的字节要放在低位，
 之后解码出来的二进制位继续放在之前已经解码出来的二进制的高位最后转换为10进制数完成varint编码的解码过程。
 
-缺点： 负数需要10个字节显示（因为计算机定义负数的符号位为数字的最高位）。
+#### 缺点
+负数需要10个字节显示（因为计算机定义负数的符号位为数字的最高位）。
 具体是先将负数是转成了long类型，再进行varint编码，这就是占用10个字节的原因了。
 
 protobuf 采取的解决方式：使用 sint32/sint64 类型表示负数，通过先采用 Zigzag 编码，将正数、负数和0都映射到无符号数，最后再采用varints编码。
 
-
+#### github.com/golang/protobuf/proto源码
 编码encode
 ```go
 const maxVarintBytes = 10 // maximum length of a varint
@@ -79,6 +85,8 @@ func EncodeVarint(x uint64) []byte {
 	return buf[0:n]
 }
 ```
+- 0x7F的二进制表示是0111 1111 ，所以x & 0x7F 与操作时，得到x二进制表示的最后7个bit位（前面的bit位通过与0做位与运算都被舍弃了）
+- 0x80 的二进制表示是 1000 0000 ，所以 0x80 | uint8(x&0x7F)是在取出的x的后7个bit位前加上1（msb）
 
 解码decode
 ```go
@@ -103,6 +111,110 @@ func DecodeVarint(buf []byte) (x uint64, n int) {
 	return 0, 0
 }
 ```
+
+
+### 2. ZigZag编码
+ZigZag 是将符号数统一映射到无符号号数的一种编码方案，具体映射函数为：
+```
+Zigzag(n) = (n << 1) ^ (n >> 31), n 为 sint32 时
+
+Zigzag(n) = (n << 1) ^ (n >> 63), n 为 sint64 时
+```
+![](.protobuf_n_tools_images/zigZag_encode.png)
+
+
+### 3.  Message Structure 编码
+protocol buffer 中 message 是一系列键值对。message 的二进制版本只是使用字段号(field’s number 和 wire_type)作为 key。
+每个字段的名称和声明类型只能在解码端通过引用消息类型的定义（即 .proto 文件）来确定。这一点也是人们常常说的 protocol buffer 比 JSON，XML 安全一点的原因，
+如果没有数据结构描述 .proto 文件，拿到数据以后是无法解析成正常的数据的。
+
+1. wire_type
+![](.protobuf_n_tools_images/wire_type_info.png)
+
+2. Tag
+key 是使用该字段的 field_number 与wire_type 取|(或运算)后的值，field_number 是定义 proto 文件时使用的 tag 序号
+```go
+(field_number << 3)|wire_type
+```
+左移3位是因为wire_type最大取值为5，需要占3个bit，这样左移+或运算之后得到的结果就是，高位为field_number，低位为wire_type。
+
+比如下面这个 message
+```protobuf
+message Test {
+  required int32 a = 1;
+} 
+```
+field_number=1，wire_type=0，按照公式计算（1«3|0） ,结果就是 1000。
+
+低三位 000 表示wire_type = 0；
+
+高位 1 表示 field_number = 1。
+
+再使用 Varints 编码后结果就是 08
+
+### 4. Signed Integers 编码
+Google Protocol Buffer 定义了 sint32 这种类型，采用 zigzag 编码。将所有整数映射成无符号整数，然后再采用 varint 编码方式编码，这样，绝对值小的整数，编码后也会有一个较小的 varint 编码值。
+
+### 5. Non-varint Numbers
+
+Non-varint 数字比较简单，double 、fixed64 的 wire_type 为 1，在解析时告诉解析器，该类型的数据需要一个 64 位大小的数据块即可。同理，float 和 fixed32 的 wire_type 为5，给其 32 位数据块即可。两种情况下，都是高位在后，低位在前。
+
+说 Protocol Buffer 压缩数据没有到极限，原因就在这里，因为并没有压缩 float、double 这些浮点类型。
+
+### 6.  字符串
+wire_type 类型为 2 的数据，是一种指定长度的编码方式：key + length + content，
+key 的编码方式是统一的，length 采用 varints 编码方式，content 就是由 length 指定长度的 Bytes。
+
+```protobuf
+message Test2 {
+  optional string b = 2;
+}
+```
+设置该值为"testing"，二进制格式查看：
+```shell
+12 07 74 65 73 74 69 6e 67
+```
+- 12 07 74 65 73 74 69 6e 67是“testing”的 UTF8 代码。
+- 12-->按照公式计算（2«3|2)=12
+- 07-->长度为7
+
+
+### 7. 嵌入式 message
+```shell
+message Test3 {
+  optional Test1 c = 3;
+}
+```
+设置字段为整数150，编码后的字节为：
+```shell
+1a 03 08 96 01
+```
+- 08 96 01 这三个代表的是 150
+- 1a ->按照公式计算（3«3|2)=12
+- 3 -> length 为 3，代表后面有 3 个字节，即 08 96 01
+
+### 8. Packed Repeated Fields
+在 proto3 中 Repeated 字段默认就是以这种方式处理。对于 packed repeated 字段，如果 message 中没有赋值，则不会出现在编码后的数据中。
+否则的话，该字段所有的元素会被打包到单一一个 key-value 对中，且它的 wire_type=2，长度确定。
+```shell
+message Test4 {
+  repeated int32 d = 4 [packed=true];
+}
+```
+构造一个 Test4 字段，并且设置 repeated 字段 d 3个值：3，270和86942，编码后：
+```shell
+22 // tag 0010 0010(field number 010 0 = 4, wire type 010 = 2)
+
+06 // payload size (设置的length = 6 bytes)
+ 
+03 // first element (varint 3)
+ 
+8E 02 // second element (varint 270)
+ 
+9E A7 05 // third element (varint 86942)
+```
+形成了 Tag - Length - Value - Value - Value …… 对。
+
 
 ## 使用
 参考目录：github.com/golang/protobuf@v1.5.2/internal/testprotos
