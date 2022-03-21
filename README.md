@@ -34,7 +34,7 @@
 - 2 [zap使用及源码分析](02_log/02_zap/zap.md)
   - 2.1 控制台输出
   - 2.2 文件输出
-  - 2.3 并发安全logger
+  - [2.3 并发安全logger](02_log/02_zap/03_concurrency_safe/main.go)
   - [2.4 zap(配合lumberjack库或go-file-rotatelogs库)实现定制化log日志归档](02_log/02_zap/04_customized_log/lumberjack.md)
 
 ## 第三章 消息队列

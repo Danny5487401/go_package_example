@@ -8,8 +8,8 @@ zap 每打印1条日志，至少需要2次内存分配:
 
    zap 通过 sync.Pool 提供的对象池，复用了大量可以复用的对象，避开了 gc 这个大麻烦
 ## zap结构
-![](zap_structure.png)
-![](zap_structure2.png)
+![](.zap_images/zap_structure.png)
+![](.zap_images/zap_structure2.png)
 通过 zap 打印一条结构化的日志大致包含5个过程：
 
 1. 分配日志 Entry: 创建整个结构体，此时虽然没有传参(fields)进来，但是 fields 参数其实创建了
