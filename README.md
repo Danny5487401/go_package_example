@@ -184,16 +184,13 @@
 - 1 [copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
 
 ## 第十七章 数据加解密
-
 - 1 phpserialize
 
-## 第十八章 日志收集项目 log_collect
-
+## [第十八章 日志收集项目 log_collect](18_log_collect/log_collect.md)
 - 1 动态选择文件
 - 2 文件内容读取发送
 
 ## [第十九章 熔断,限流及降级](19_fuse_currentLimiting_degradation/rate_limit.md)
-
 - [0 熔断，降级，限流(官方包x/time/rate)](19_fuse_currentLimiting_degradation/00_tokenBucket/time_rate.md)
 - 1 Sentinel
   - 1.1 基于流量QPS控制
@@ -208,27 +205,22 @@
   - [2.2 服务端](19_fuse_currentLimiting_degradation/02_hystrix/server/server.go)
 
 ## [第二十章 命令行框架Cobra](20_cobra/introdoction.md)
-
 - 1 介绍及功能使用
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
 
 ## [第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify)](21_viper/viper.md)
-
 - 1 获取本地文件内容
 - [2 监听文件变化(fsnotify)](21_viper/02_fsnotify/fsnotify.md)
 - [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
 
 ## 第二十二章 ETCD
-
 - 1 CRUD及watch
 - 2 [读和写流程分析](22_etcd/etcd_read_n_write.md)
 
 ## 第二十三章 Go-Micro框架 (不推荐使用)
-
 - 1 [Config配置加载包](23_micro/01ConfigTest/config.md)
 
 ## [ 第二十四章 搜索引擎es](24_elasticSearch/es.md)
-
 - [es索引及索引生命周期管理](24_elasticSearch/es_index.md)
 - [1 官方包](24_elasticSearch/official_pkg/go_elasticseach.md)
   - 1.1 批量写入Bulk
@@ -248,20 +240,17 @@
 - [1 CRUD在web服务中](26_neo4j/main.go)
 
 ## 第二十七章 Mysql的binlog
-
 - [binlog,gtid介绍](27_mysql_binlog/binlog.md)
 - [canal使用及源码分析](27_mysql_binlog/canal/canal.md)
 
 ## 第二十八章 OLAP(Online Analytical Processing联机分析处理)
-
-- 1 [列数据库ClickHouse](28_OLAP/01_clickHouse/clickHouse.md)
+- [1 列数据库ClickHouse](28_OLAP/01_clickHouse/clickHouse.md)
   - [1.1 标准库sql操作clickHouse](28_OLAP/01_clickHouse/01_database_sql/main.go)
   - [1.2 扩展包sqlx操作clickHouse](28_OLAP/01_clickHouse/02_sqlx/main.go)
   - [go-clickHouse源码分析](28_OLAP/01_clickHouse/go-clickHouse.md)
 
 ## 第二十九章 分布式锁
-
-- [1 redsync(redis官方推荐的go版本分布式锁实现)](29_distributed_lock/01_redis_distributed_lock/main.go)
+- [1 redsync(redis官方推荐的go版本分布式锁实现)](29_distributed_lock/distributed_lock.md)
 
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
 
@@ -273,8 +262,10 @@
 ## [第三十二章 多副本常用的技术方案及Raft协议](32_raft/raft.md)
   - [raft在consul实现](32_raft/raft_in_consul.md)
   - [raft在etcd实现](32_raft/raft_in_etcd.md)
-  - [raft调试应用](32_raft/main.go)
+  - [使用hashicorp/raft调试应用](32_raft/main.go)
 
-## 第三十三章 本地缓存
-- [go-cache](33_local_cache/01_go_cache/go_cache.md)
+## [第三十三章 多副本常用的技术方案及Paxos协议](33_paxos/paxos.md)
+## 第三十四章 本地缓存
+- [1 go-cache源码分析及性能分析](34_local_cache/01_go_cache/go_cache.md)
+
 
