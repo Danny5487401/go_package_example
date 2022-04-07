@@ -220,11 +220,9 @@
   - 2.2 V7版本
 
 ## [第二十五章 监控sentry](25_sentry/sentry.md)
-
 - [结合gin使用](25_sentry/gin/main.go)
 
 ## [第二十六章 图数据库Neo4j](26_neo4j/neo4j.md)
-
 - [cypher语句](26_neo4j/cypher.md)
 - [1 CRUD在web服务中](26_neo4j/main.go)
 
@@ -238,7 +236,7 @@
   - [1.2 扩展包sqlx操作clickHouse](28_OLAP/01_clickHouse/02_sqlx/main.go)
   - [go-clickHouse源码分析](28_OLAP/01_clickHouse/go-clickHouse.md)
 
-## 第二十九章 分布式锁
+## 第二十九章 分布式锁]
 - [1 redsync(redis官方推荐的go版本分布式锁实现)](29_distributed_lock/distributed_lock.md)
 
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
@@ -254,7 +252,8 @@
   - [使用hashicorp/raft调试应用](32_raft/main.go)
 
 ## [第三十三章 多副本常用的技术方案及Paxos协议](33_paxos/paxos.md)
-## 第三十四章 本地缓存
+## [第三十四章 本地缓存](34_local_cache/cache.md)
 - [1 go-cache源码分析及性能分析](34_local_cache/01_go_cache/go_cache.md)
+- [2 free-cache源码分析及性能分析](34_local_cache/02_free_cache/free_cache.md)
 
 
