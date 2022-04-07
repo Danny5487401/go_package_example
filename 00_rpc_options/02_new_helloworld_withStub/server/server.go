@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go_grpc_example/00_rpc_options/02_new_helloworld_withStub/handler"
-	"go_grpc_example/00_rpc_options/02_new_helloworld_withStub/server_proxy"
+	"go_package_example/00_rpc_options/02_new_helloworld_withStub/handler"
+	"go_package_example/00_rpc_options/02_new_helloworld_withStub/server_proxy"
 	"net"
 	"net/rpc"
 )

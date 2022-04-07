@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"go_grpc_example/08_grpc/05_grpc_load_balance/proto"
+	"go_package_example/08_grpc/05_grpc_load_balance/proto"
 	"log"
 
 	_ "github.com/mbobakov/grpc-consul-resolver" // It's important  consul实现了下面的两个接口

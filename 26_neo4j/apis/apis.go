@@ -2,7 +2,7 @@ package apis
 
 import (
 	"github.com/gin-gonic/gin"
-	"go_grpc_example/26_neo4j/models"
+	"go_package_example/26_neo4j/models"
 	"log"
 	"net/http"
 )

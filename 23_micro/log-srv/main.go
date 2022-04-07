@@ -8,7 +8,7 @@ package main
 //	"github.com/micro/go-plugins/broker/rabbitmq"
 //	_ "github.com/micro/go-plugins/broker/rabbitmq"
 //
-//	proto "go_grpc_example/23_micro/proto/log"
+//	proto "go_package_example/23_micro/proto/log"
 //)
 //
 //type Sub struct {

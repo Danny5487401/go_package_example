@@ -4,7 +4,7 @@ package main
 //import (
 //	"context"
 //	"github.com/micro/go-micro/web"
-//	"go_grpc_example/23_micro/proto/sum"
+//	"go_package_example/23_micro/proto/sum"
 //	"net/http"
 //	"strconv"
 //)

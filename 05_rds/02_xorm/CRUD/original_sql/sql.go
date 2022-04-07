@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go_grpc_example/05_rds/02_xorm/util"
+	"go_package_example/05_rds/02_xorm/util"
 	"time"
 
 	// 注意引入，否则会空指针

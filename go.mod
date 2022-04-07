@@ -1,6 +1,6 @@
-module go_grpc_example
+module go_package_example
 
-go 1.15
+go 1.16
 
 require (
 	bitbucket.org/bertimus9/systemstat v0.0.0-20180207000608-0eeff89b0690
@@ -15,6 +15,7 @@ require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/cenkalti/backoff/v4 v4.1.2
 	github.com/confluentinc/confluent-kafka-go v1.7.0
+	github.com/coocood/freecache v1.2.1
 	github.com/dustin/go-humanize v1.0.0
 	github.com/eapache/go-resiliency v1.2.0 // indirect
 	github.com/elastic/go-elasticsearch/v7 v7.16.0

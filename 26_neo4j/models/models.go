@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	"go_grpc_example/26_neo4j/database"
+	"go_package_example/26_neo4j/database"
 	"log"
 	"strconv"
 )

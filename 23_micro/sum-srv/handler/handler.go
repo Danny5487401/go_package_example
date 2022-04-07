@@ -1,8 +1,8 @@
 package handler
 
 import (
-	"go_grpc_example/23_micro/proto/sum"
-	"go_grpc_example/23_micro/sum-srv/service"
+	"go_package_example/23_micro/proto/sum"
+	"go_package_example/23_micro/sum-srv/service"
 
 	"context"
 )

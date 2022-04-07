@@ -2,9 +2,9 @@ package handler
 
 import (
 	"context"
-	"go_grpc_example/23_micro/prime-srv/service"
+	"go_package_example/23_micro/prime-srv/service"
 
-	"go_grpc_example/23_micro/proto/prime"
+	"go_package_example/23_micro/proto/prime"
 )
 
 type handler struct {

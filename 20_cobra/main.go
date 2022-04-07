@@ -15,7 +15,7 @@ limitations under the License.
 */
 package main
 
-import "go_grpc_example/20_cobra/cmd"
+import "go_package_example/20_cobra/cmd"
 
 func main() {
 	cmd.Execute()

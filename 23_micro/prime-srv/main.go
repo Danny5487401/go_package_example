@@ -5,8 +5,8 @@ package main
 //	"github.com/micro/go-micro"
 //	"github.com/micro/go-micro/util/log"
 //
-//	"go_grpc_example/23_micro/prime-srv/handler"
-//	"go_grpc_example/23_micro/proto/prime"
+//	"go_package_example/23_micro/prime-srv/handler"
+//	"go_package_example/23_micro/proto/prime"
 //)
 //
 ///*

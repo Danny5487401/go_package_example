@@ -1,11 +1,10 @@
-# go_grpc_example
+# go_package_example(Go常用包)
 
 ![grpc](img/golang.jpeg)
 
-- [MakeFile介绍](makefile.md)
+## [MakeFile介绍](makefile.md)
 
 ## 第零章 rpc实现选项
-
 - 1 手动实现rpc
   - [客户端](00_rpc_options/00_helloworld_without_stub/client/client.go)
   - [服务端](00_rpc_options/00_helloworld_without_stub/server/server.go)
@@ -22,14 +21,12 @@
   - [服务端](00_rpc_options/04_http_rpc_test/server/server.go)
 
 ## [第一章 服务注册中心consul](01_consul/consul.md)
-
 - [consul架构](01_consul/consul.md)
 - [分布式锁-->consul实现)](01_consul/distributed_lock.md)
   
 - [1 服务注册，过滤，获取](01_consul/main.go)
 
 ## 第二章 日志库
-
 - 1 [zerolog](02_log/01_zerolog/zerolog.md)
 - 2 [zap使用及源码分析](02_log/02_zap/zap.md)
   - 2.1 控制台输出
@@ -38,7 +35,6 @@
   - [2.4 zap(配合lumberjack库或go-file-rotatelogs库)实现定制化log日志归档](02_log/02_zap/04_customized_log/lumberjack.md)
 
 ## 第三章 消息队列
-
 - 1 [rabbitmq](03_amqp/01_rabbitmq/introduction.md)
   - 1.1 消费者：推拉模式
   - 1.1 生产者
@@ -52,7 +48,6 @@
   - 3.2 生产者：简单消息，延迟消息，事务消息
 
 ## [第四章 服务注册及配置文件中心Nacos](04_nacos/nacos.md)
-
 - 1 [获取配置及监听文件变化](04_nacos/config_center/main.go)
 - 2 服务注册，监听，获取
   - [V1版本](04_nacos/service_center/v1/main.go)
@@ -110,7 +105,6 @@
 - [15 自定义grpc插件](08_grpc/15_customized_protobuf_plugin/protobuf_extend.md)
 
 ## 第九章 Nosql非关系型数据库
-
 - [1 MongoDB](09_Nosql/01_mongo/mongo.md)
   - [mongo和mysql对比：储存引擎及内存结构](09_Nosql/01_mongo/nosql_vs_rds.md)
   - 1.1 增删改查
@@ -124,13 +118,11 @@
     - [2.2.4 批处理pipeline分析](09_Nosql/02_redis/02_go-redis/go-redis_pipeline.md)
 
 ## [第十章 链路追踪(Distributed Tracing)](10_distributed_tracing/introduction.md)
-
 - 1 Jaeger
   - [1.1 结合XORM](10_distributed_tracing/01_jaeger/02_jaeger_application/01_jaeger_xorm/main_test.go)
   - [1.2 结合redis](10_distributed_tracing/01_jaeger/02_jaeger_application/02_jaeger_redis/hook.go)
 
 ## 第十一章 依赖注入
-
 - [1 dig依赖注入及http服务分层](11_dependency_injection/00_dig/dig.go)
 - 2 wire依赖注入
   - 不使用wire现状
@@ -139,13 +131,11 @@
   - wire使用-带参数初始化
 
 ## [第十二章 测试框架testify(gin使用)](12_testify/testify.md)
-
 - [1 assert断言](12_testify/01_assert/calculate_test.go)
 - [2 mock测试替身](12_testify/02_mock/main_test.go)
 - [3 suite测试套件](12_testify/03_suite/suite_test.go)
 
 ## [第十三章 序列化反序列化-包含标准库源码分析](13_serialize/serialize.md)
-
 - 1 Jsoniter(完全兼容标准库json，性能较好)
   - 1.1 序列化
     - [结构体成员为基本类型,嵌套结构体，及tag标签使用](13_serialize/01_jsoniter/Marshal/Basic/main.go)
@@ -178,7 +168,6 @@
 - [1 两阶段提交2pc/XA](15_distributed_transaction/01_2pc_n_3pc/two_phase_commit.md)
 - [2 saga事务](15_distributed_transaction/02_saga/saga.md)
 - [3 TCC事务](15_distributed_transaction/03_tcc/tcc.md)
-
 
 ## 第十六章 数据复制
 - 1 [copier(不同类型数据复制)](16_dataCopy/copier/copier.md)

@@ -8,7 +8,7 @@ import (
 
 //tail的基础使用
 func main() {
-	fileName := "/Users/python/Desktop/go_grpc_example/log_collect/logAgent/read_log/log.txt"
+	fileName := "/Users/python/Desktop/go_package_example/log_collect/logAgent/read_log/log.txt"
 	Tails, err := tail.TailFile(fileName, tail.Config{
 		ReOpen:    true,                                 //是否重新打开
 		Follow:    true,                                 //是否跟随

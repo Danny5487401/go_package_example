@@ -227,7 +227,7 @@ package import; // 表示当前 protobuf 文件属于 import包，这个package�
 ### 1. 引入其他proto文件
 ```shell
 pwd 
-# /Users/xiaxin/Desktop/go_grpc_example
+# /Users/xiaxin/Desktop/go_package_example
 cd 08_grpc
 ```
 目录结构   
@@ -247,19 +247,19 @@ proto:
 	protoc --proto_path=. --go_out=. --go-grpc_out=. ./proto/dir_import/*.proto
 ```
 
-1) --proto_path =.  指定在当前目录(go_grpc_example/08_grpc)寻找 import 的文件
+1) --proto_path =.  指定在当前目录(go_package_example/08_grpc)寻找 import 的文件
 ```protobuf
 // 08_grpc/proto/dir_import/computer.proto
 import "proto/dir_import/component.proto";
 ```
-所以最终会去找 go_grpc_example/08_grpc/proto/dir_import/component.proto
+所以最终会去找 go_package_example/08_grpc/proto/dir_import/component.proto
 
 2）–go_out=.
-指定将生成文件放在当前目录( go_grpc_example/08_grpc)，同时因为 proto 文件中也指定了目录为protobuf/import,具体如下：
+指定将生成文件放在当前目录( go_package_example/08_grpc)，同时因为 proto 文件中也指定了目录为protobuf/import,具体如下：
 ```protobuf
 option go_package = "proto/dir_import;proto";
 ```
-所以最终生成目录为--go_out+go_package= go_grpc_example/08_grpc/proto/dir_import.   
+所以最终生成目录为--go_out+go_package= go_package_example/08_grpc/proto/dir_import.   
 生成的文件名: 规则是filename.pb.go
 
 Note:  可以通过参数 --go_opt=paths=source_relative 来指定使用绝对路径，从而忽略掉 proto 文件中的 go_package 路径，直接生成在 –go_out 指定的路径

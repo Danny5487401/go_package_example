@@ -26,7 +26,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/util"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 
-	"go_grpc_example/04_nacos/service_center/v2/server"
+	"go_package_example/04_nacos/service_center/v2/server"
 )
 
 func main() {

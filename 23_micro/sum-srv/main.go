@@ -14,9 +14,9 @@ package main
 //	"github.com/micro/go-micro/server"
 //	"github.com/micro/go-micro/util/log"
 //
-//	logProto "go_grpc_example/23_micro/proto/log"
-//	"go_grpc_example/23_micro/proto/sum"
-//	"go_grpc_example/23_micro/sum-srv/handler"
+//	logProto "go_package_example/23_micro/proto/log"
+//	"go_package_example/23_micro/proto/sum"
+//	"go_package_example/23_micro/sum-srv/handler"
 //
 //	"context"
 //)

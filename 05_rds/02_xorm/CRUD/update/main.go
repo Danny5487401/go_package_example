@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
-	"go_grpc_example/05_rds/02_xorm/models"
-	"go_grpc_example/05_rds/02_xorm/util"
+	"go_package_example/05_rds/02_xorm/models"
+	"go_package_example/05_rds/02_xorm/util"
 	// 注意引入，否则会空指针
 	_ "github.com/go-sql-driver/mysql"
 )
