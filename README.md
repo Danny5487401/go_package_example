@@ -82,12 +82,12 @@
   - 编码原理
   - protoc,protoc-gen-go,protoc-gen-go-grpc,protoc-gen-gofast等工具
 - 1  HelloWorld入门
-  - 1.1 [客户端Grpc源码](08_grpc/01_grpc_helloworld/client/client.md)
-  - 1.2 [服务端Grpc源码](08_grpc/01_grpc_helloworld/server/server.md)
+  - [1.1 客户端Grpc源码](08_grpc/01_grpc_helloworld/client/client.md)
+  - [1.2 服务端Grpc源码](08_grpc/01_grpc_helloworld/server/server.md)
 - 2  [context中的元数据metadata](08_grpc/02_metadata/grpc_context.md)
 - 3  流式GRPC
 - 4  protobuf的jsonpb包序列化和反序列化
-- 5  负载均衡
+- [5  负载均衡](08_grpc/05_grpc_load_balance/load_balance.md)
   - 5.1 [客户端(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver_n_balancer.md)
     - 第三方consul实现Resolver接口和Builder接口
     - 自定义实现Resolver接口和Builder接口
