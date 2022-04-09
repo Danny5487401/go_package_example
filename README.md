@@ -203,13 +203,14 @@
 - [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
 
 ## 第二十二章 ETCD
-- 1 CRUD及watch
-- 2 [读和写流程分析](22_etcd/etcd_read_n_write.md)
+- [读和写流程分析](22_etcd/etcd_read_n_write.md)
+- [1 基本操作CRUD及watch监听](22_etcd/01_CRUD/main.go)
+
 
 ## 第二十三章 Go-Micro框架 (不推荐使用)
-- 1 [Config配置加载包](23_micro/01ConfigTest/config.md)
+- [1 Config配置加载包](23_micro/01ConfigTest/config.md)
 
-## [ 第二十四章 搜索引擎es](24_elasticSearch/es.md)
+## [第二十四章 搜索引擎es](24_elasticSearch/es.md)
 - [es索引及索引生命周期管理](24_elasticSearch/es_index.md)
 - [1 官方包](24_elasticSearch/official_pkg/go_elasticseach.md)
   - 1.1 批量写入Bulk

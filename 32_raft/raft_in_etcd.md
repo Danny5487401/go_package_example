@@ -1,7 +1,7 @@
 # raft应用-->etcd
 
 ## 1. etcd Leader 选举原理
-![](../22_etcd/img/election_process.png)
+![](../22_etcd/.etcd_read_n_write_images/election_process.png)
 假设集群总共 3 个节点，A 节点为 Leader，B、C 节点为 Follower.  
 如上 Leader 选举图右边部分所示，当 Leader 节点异常后，Follower 节点会接收 Leader 的心跳消息超时，当超时时间大于竞选超时时间后，它们会进入 Candidate 状态.
 etcd 默认心跳间隔时间（heartbeat-interval）是 100ms， 默认竞选超时时间（election timeout）是 1000ms， 你需要根据实际部署环境、业务场景适当调优，
@@ -22,7 +22,7 @@ C 节点收到 Follower B 节点竞选 Leader 消息后，这时候可能会出�
     是无法获得集群 Leader 地位的，发起的选举无效且对集群稳定性有伤害
 
 如何避免以上场景中的无效的选举呢？
-![](../22_etcd/img/prevote.png)
+![](../22_etcd/.etcd_read_n_write_images/prevote.png)
 
     在 etcd 3.4 中，etcd 引入了一个 PreVote 参数（默认 false），可以用来启用 PreCandidate 状态解决此问题，如下图所示。
     Follower 在转换成 Candidate 状态前，先进入 PreCandidate 状态，不自增任期号， 发起预投票。若获得集群多数节点认可，
@@ -30,7 +30,7 @@ C 节点收到 Follower B 节点竞选 Leader 消息后，这时候可能会出�
 
 
 ## 2.日志复制
-![](../22_etcd/img/raft_log_process.png)
+![](../22_etcd/.etcd_read_n_write_images/raft_log_process.png)
 
     首先 Leader 收到 client 的请求后，etcdserver 的 KV 模块会向 Raft 模块提交一个 put hello 为 world 提案消息（流程图中的序号 2 流程）， 
     它的消息类型是 MsgProp.
@@ -44,7 +44,7 @@ C 节点收到 Follower B 节点竞选 Leader 消息后，这时候可能会出�
 
 2. 日志条目什么时候才会追加到稳定的 Raft 日志中呢？Raft 模块负责持久化吗？
 
-![日志图1](../22_etcd/img/raft_log.png)
+![日志图1](../22_etcd/.etcd_read_n_write_images/raft_log.png)
 1. 第一个疑问
 
 Leader 会维护两个核心字段来追踪各个 Follower 的进度信息，一个字段是 NextIndex， 它表示 Leader 发送给 Follower 节点的下一个日志条目索引。
@@ -70,7 +70,7 @@ etcdserver 模块通过 channel 从 Raft 模块获取到 Ready 结构后（流�
 各个 Follower 收到追加日志条目（MsgApp）消息，并通过安全检查后，它会持久化消息到 WAL 日志中，并将消息追加到 Raft 日志存储，
 随后会向 Leader 回复一个应答追加日志条目（MsgAppResp）的消息，告知 Leader 当前已复制的日志最大索引（流程图中的序号 6 流程）。
 
-![日志图2](../22_etcd/img/raft_log2.png)
+![日志图2](../22_etcd/.etcd_read_n_write_images/raft_log2.png)
 Leader 收到应答追加日志条目（MsgAppResp）消息后，会将 Follower 回复的已复制日志最大索引更新到跟踪 Follower 进展的 Match Index 字段，
 如下面的日志图 2 中的 Follower C MatchIndex 为 6，Follower A 为 5，日志图 2 描述的是 hello 日志条目提交后的各节点 Raft 日志状态。
 
