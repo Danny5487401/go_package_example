@@ -1,6 +1,6 @@
 module go_package_example
 
-go 1.16
+go 1.17
 
 require (
 	bitbucket.org/bertimus9/systemstat v0.0.0-20180207000608-0eeff89b0690
@@ -77,18 +77,19 @@ require (
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/yoyofxteam/nacos-viper-remote v0.4.0
+	go.etcd.io/etcd/client/v3 v3.5.2
 	go.mongodb.org/mongo-driver v1.5.3
 	go.uber.org/dig v1.11.0
 	go.uber.org/zap v1.17.0
 	golang.org/x/sys v0.0.0-20211210111614-af8b64212486 // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	google.golang.org/genproto v0.0.0-20211208223120-3a66f561d7aa
-	google.golang.org/grpc v1.43.0
-	google.golang.org/grpc/examples v0.0.0-20211103202053-3b94303f3754
+	google.golang.org/grpc v1.40.0
+	google.golang.org/grpc/examples v0.0.0-20220408224156-ebd098392a8b
 	google.golang.org/protobuf v1.27.1
 	gopkg.in/ini.v1 v1.63.2
 	xorm.io/builder v0.3.8
 	xorm.io/xorm v1.1.0
 )
 
-replace google.golang.org/grpc => google.golang.org/grpc v1.32.0
+//replace google.golang.org/grpc => google.golang.org/grpc v1.29.0
