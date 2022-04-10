@@ -40,7 +40,7 @@ func main() {
 	}
 	fmt.Println("[get value] success")
 	for _, ev := range resp.Kvs {
-		fmt.Printf("键值对是%s:%s,创建版本%v,修改的次数%v，修改版本%v\n", ev.Key, ev.Value, ev.CreateRevision, ev.Version, ev.ModRevision)
+		fmt.Printf("键值对是%s:%s,创建版本%v,修改的次数%v，最后一次修改时版本%v\n", ev.Key, ev.Value, ev.CreateRevision, ev.Version, ev.ModRevision)
 	}
 
 	//// watch 操作 ，获取key的变化
