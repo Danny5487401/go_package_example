@@ -88,7 +88,7 @@
 - 3  流式GRPC
 - 4  protobuf的jsonpb包序列化和反序列化
 - [5  负载均衡](08_grpc/05_grpc_load_balance/load_balance.md)
-  - 5.1 [客户端(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver_n_balancer.md)
+  - [5.1 客户端负载均衡(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver_n_balancer.md)
     - 第三方consul实现Resolver接口和Builder接口
     - 自定义实现Resolver接口和Builder接口
     - 自定义实现nacos服务注册与发现
@@ -203,7 +203,7 @@
 - [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
 
 ## 第二十二章 ETCD
-- [读和写流程分析](22_etcd/etcd_read_n_write.md)
+- [服务端server--读和写流程分析](22_etcd/etcd_read_n_write.md)
 - [1 基本操作CRUD及watch监听](22_etcd/01_CRUD/main.go)
 
 
@@ -237,7 +237,7 @@
   - [1.2 扩展包sqlx操作clickHouse](28_OLAP/01_clickHouse/02_sqlx/main.go)
   - [go-clickHouse源码分析](28_OLAP/01_clickHouse/go-clickHouse.md)
 
-## 第二十九章 分布式锁]
+## 第二十九章 分布式锁
 - [1 redsync(redis官方推荐的go版本分布式锁实现)](29_distributed_lock/distributed_lock.md)
 
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)

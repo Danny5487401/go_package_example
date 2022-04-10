@@ -90,8 +90,8 @@ func Get(scheme string) Builder {
 ```
 
 
-# 负载均衡
-![](.builder_n_resolver_n_balancer_images/balancer_process.png)
+## 负载均衡
+![](.builder_n_resolver_images/balancer_process.png)
 - 首先要注册一个名为"my_weighted_round_robin"的balancer Builder:wrrBuilder，该Builder由base包的NewBalancerBuilder构建；
 - base包的NewBalancerBuilder函数需要传入一个PickerBuilder实现，于是我们需要自定义一个返回Picker接口实现的PickerBuilder。
 - grpc.Dial调用时传入一个WithBalancerName("my_weighted_round_robin")，grpc通过balancer Name从已注册的balancer builder中选出我们实现的wrrBuilder，并调用wrrBuilder创建Picker：wrrPicker。

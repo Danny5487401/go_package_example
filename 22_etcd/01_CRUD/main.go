@@ -26,13 +26,13 @@ func main() {
 	defer cli.Close()
 
 	// put 操作
-	//ctx, cancel := context.WithTimeout(context.Background(),time.Second)
-	//rsp ,err := cli.Put(ctx,"etcd_danny_key","etcd_value")
-	//cancel()
-	//if err != nil{
-	//	fmt.Printf("[put etcd  ] failed:%v\n",err)
-	//}
-	//fmt.Printf("[put etcd  ] success,rsp :%v\n",rsp)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	rsp, err := cli.Put(ctx, "etcd_danny_key", "etcd_value")
+	cancel()
+	if err != nil {
+		fmt.Printf("[put etcd  ] failed:%v\n", err)
+	}
+	fmt.Printf("[put etcd  ] success,rsp :%v\n", rsp)
 
 	// get 操作
 	ctx2, cancel := context.WithTimeout(context.Background(), time.Second)
@@ -49,11 +49,11 @@ func main() {
 	}
 
 	// watch 操作 ，获取key的变化
-	//watChan := cli.Watch(context.Background(), "etcd_key")
-	//for wResp := range watChan {
-	//	for _, ev := range wResp.Events {
-	//		fmt.Printf("变化后的Type:%s Key:%s Value:%s\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
-	//	}
-	//}
+	watChan := cli.Watch(context.Background(), "etcd_key")
+	for wResp := range watChan {
+		for _, ev := range wResp.Events {
+			fmt.Printf("变化后的Type:%s Key:%s Value:%s\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
+		}
+	}
 
 }

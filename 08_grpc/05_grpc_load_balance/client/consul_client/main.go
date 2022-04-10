@@ -18,7 +18,7 @@ func main() {
 
 		//grpc.WithBalancerName() 已经弃用的方法
 		//关于serverConfig https://github.com/grpc/grpc/blob/master/doc/service_config.md
-		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`),
+		grpc.WithDefaultServiceConfig(`{"loadBalancingPolicy": "round_robin"}`), //json格式
 	)
 	if err != nil {
 		log.Fatal(err)
