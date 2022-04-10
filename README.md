@@ -249,10 +249,11 @@
 
 ## [第三十二章 多副本常用的技术方案及Raft协议](32_raft/raft.md)
   - [raft在consul实现](32_raft/raft_in_consul.md)
-  - [raft在etcd实现](32_raft/raft_in_etcd.md)
-  - [使用hashicorp/raft调试应用](32_raft/main.go)
+  - [raft在etcd实现原理分析](32_raft/raft_in_etcd.md)
+  - [1 使用hashicorp/raft调试应用](32_raft/main.go)
 
 ## [第三十三章 多副本常用的技术方案及Paxos协议](33_paxos/paxos.md)
+
 ## [第三十四章 本地缓存](34_local_cache/cache.md)
 - [1 go-cache源码分析及性能分析](34_local_cache/01_go_cache/go_cache.md)
 - [2 free-cache源码分析及性能分析](34_local_cache/02_free_cache/free_cache.md)
