@@ -204,6 +204,9 @@
 
 ## 第二十二章 ETCD
 - [服务端server--读和写流程分析](22_etcd/etcd_read_n_write.md)
+- [服务端server--鉴权分析](22_etcd/ectd_auth.md)
+- [服务端server--mvcc并发控制](22_etcd/etcd_mvcc.md)
+- [服务端server--watch机制](22_etcd/03_watch/etcd_watch.md)
 - [1 基本操作CRUD及watch监听](22_etcd/01_CRUD/main.go)
 
 
