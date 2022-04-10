@@ -43,12 +43,4 @@ func main() {
 		fmt.Printf("键值对是%s:%s,创建版本%v,修改的次数%v，最后一次修改时版本%v\n", ev.Key, ev.Value, ev.CreateRevision, ev.Version, ev.ModRevision)
 	}
 
-	//// watch 操作 ，获取key的变化
-	//watChan := cli.Watch(context.Background(), "etcd_key")
-	//for wResp := range watChan {
-	//	for _, ev := range wResp.Events {
-	//		fmt.Printf("变化后的Type:%s Key:%s Value:%s\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
-	//	}
-	//}
-
 }
