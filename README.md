@@ -2,8 +2,6 @@
 
 ![grpc](img/golang.jpeg)
 
-## [MakeFile介绍](makefile.md)
-
 ## 第零章 rpc实现选项
 - 1 手动实现rpc
   - [客户端](00_rpc_options/00_helloworld_without_stub/client/client.go)
@@ -76,9 +74,11 @@
 - [2 前端数据校验](07_gin_form_validator/simpleForm/main.go)
 
 ## [第八章 GRPC编程 ](08_grpc/grpc.md)
+- [MakeFile介绍](08_grpc/makefile.md)
+  - [makefile在protobuf中应用](08_grpc/makefile)
 - [grpc前置知识：http知识介绍](08_grpc/http.md)
-- [protobuf及工具介绍](08_grpc/proto/protobuf_n_tools.md)
-  - 引入其他proto文件
+- [protobuf及工具介绍](08_grpc/16_import_proto/protobuf_n_tools.md)
+  - 引入其他proto文件,支持编译多个proto文件
   - 编码原理
   - protoc,protoc-gen-go,protoc-gen-go-grpc,protoc-gen-gofast等工具
 - 1  HelloWorld入门
@@ -97,7 +97,7 @@
 - [7  grpc错误抛出与捕获](08_grpc/07_grpc_error/error.md)
 - 8  auth认证
 - 9  Grpc插件-proto字段验证器
-- 10 Grpc插件-grpc网关直接对外http服务
+- [10 Grpc插件-grpc网关直接对外http服务-->etcd中应用](08_grpc/10_grpc_gateway/grpc_gateway.md)
 - 11 Grpc插件-gogoprotobuf
 - 12 GRPC生态中间件(拦截器扩展)
 - 13 channelz调试

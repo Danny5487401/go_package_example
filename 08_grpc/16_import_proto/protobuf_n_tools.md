@@ -282,8 +282,11 @@ proto1:
 proto2:	
 	protoc --proto_path=. --go_out=plugins=grpc:. ./proto/dir_import/*.proto
 ```
+- proto_path或者-I ：指定 import 路径，可以指定多个参数，编译时按顺序查找，不指定时默认查找当前目录
+- go_opt：指定参数，比如--go_opt=paths=source_relative就是表明生成文件输出使用相对路径。
 - go_out 对应 protoc-gen-go 插件；
 - go-grpc_out 对应 protoc-gen-go-grpc 插件
+- path/to/file.proto ：被编译的 .proto 文件放在最后面
 
 总结:
 1. 插件名字：*_out 对应 protoc-gen-* 插件.

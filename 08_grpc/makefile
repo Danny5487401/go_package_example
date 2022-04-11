@@ -1,5 +1,5 @@
+# makefile 给 以下grpc使用
 
-# 以下grpc使用
 # 学习：08_grpc/01_grpc_helloworld
 .PHONY: helloworld
 helloworld:
@@ -14,11 +14,18 @@ helloworld:
 gogofast:
 	protoc --gofast_out=plugins=grpc:. ./08_grpc/11_protoc_gogofast/proto/*.proto
 
+
+.PHONY: grpcgateway
+grpcgateway:
+	protoc  --proto_path=. --go_out=. --go-grpc_out=.  ./10_grpc_gateway/proto/google/api/*.proto
+	protoc --proto_path=. --go_out=. --go-grpc_out=.  --grpc-gateway_out=.  ./10_grpc_gateway/proto/helloworld/*.proto
+
+
 # 学习生成protobuf 使用：08_grpc/proto
-.PHONY: proto
-proto:
+.PHONY: dir_import_proto
+dir_import_proto:
 # 加@不打印shell
-	protoc --proto_path=. --go_out=. --go-grpc_out=. ./08_grpc/proto/dir_import/*.proto
+	protoc --proto_path=. --go_out=. --go-grpc_out=. ./16_import_proto/dir_import/*.proto
 	#protoc --proto_path=. --go_out=plugins=grpc:. ./08_grpc/proto/dir_import/*.proto
 
 # --------------------------------
