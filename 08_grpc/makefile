@@ -10,9 +10,9 @@ helloworld:
   #1.protoc-gen-gogo：和protoc-gen-go生成的文件差不多，性能也几乎一样(稍微快一点点)
   #2.protoc-gen-gofast：生成的文件更复杂，性能也更高(快5-7倍)
 #go get github.com/gogo/protobuf/protoc-gen-gofast
-.PHONY: gogofast
-gogofast:
-	protoc --gofast_out=plugins=grpc:. ./08_grpc/11_protoc_gogofast/proto/*.proto
+.PHONY: gofast
+gofast:
+	protoc --gofast_out=plugins=grpc:. ./11_protoc_gogofast/proto/*.proto
 
 
 .PHONY: grpcgateway
