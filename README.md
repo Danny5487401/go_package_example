@@ -93,7 +93,7 @@
     - 自定义实现Resolver接口和Builder接口
     - 自定义实现nacos服务注册与发现
   - 5.2 服务端
-- 6  拦截器
+- [6  retry机制](08_grpc/06_grpc_retry/retry.md)
 - [7  grpc错误抛出与捕获](08_grpc/07_grpc_error/error.md)
 - 8  auth认证
 - 9  Grpc插件-proto字段验证器
