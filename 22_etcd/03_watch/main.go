@@ -16,11 +16,12 @@ func main() {
 		return
 	}
 
-	// watch 操作 ，获取key的变化
-	watChan := cli.Watch(context.Background(), "etcd_key")
-	for wResp := range watChan {
-		for _, ev := range wResp.Events {
-			fmt.Printf("变化后的Type:%s Key:%s Value:%s\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
+	// watch 操作 ，获取key的变化,需要自己关闭退出
+	watChan := cli.Watch(context.Background(), "etcd_key", clientv3.WithPrefix())
+
+	for wresp := range watChan {
+		for _, ev := range wresp.Events {
+			fmt.Printf("%s %q : %q\n", ev.Type, ev.Kv.Key, ev.Kv.Value)
 		}
 	}
 
