@@ -208,6 +208,7 @@
 - [服务端server--mvcc并发控制](22_etcd/etcd_mvcc.md)
 - [服务端server--watch机制](22_etcd/03_watch/etcd_watch.md)
 - [1 基本操作CRUD及watch监听](22_etcd/01_CRUD/main.go)
+- [2 boltdb基本操作及在etcd中的源码分析](22_etcd/04_boltdb/boltdb.md)
 
 
 ## 第二十三章 Go-Micro框架 (不推荐使用)
