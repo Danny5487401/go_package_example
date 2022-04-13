@@ -242,7 +242,7 @@
   - [go-clickHouse源码分析](28_OLAP/01_clickHouse/go-clickHouse.md)
 
 ## 第二十九章 分布式锁
-- [1 redsync(redis官方推荐的go版本分布式锁实现)](29_distributed_lock/distributed_lock.md)
+- [1 redsync(RedLock 算法官方实现)](29_distributed_lock/distributed_lock.md)
 
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
 

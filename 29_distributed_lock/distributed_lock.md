@@ -7,10 +7,10 @@
 
 
 ## 实现分布式锁方案
+redis锁、zookeeper锁,etcd锁
 
-这里介绍常见两种：redis锁、zookeeper锁
-## redis实现
-### 单点场景
+## 1. redis实现
+### 主备版的 Redis 服务，至少具备一个 Slave 节点--采用了主备异步复制协议
 #### 加锁
 各节点通过set key value nx ex即可，如果set执行成功，则表明加锁成功，否则失败，其中value为随机串，用来判断是否是当前应用实例加的锁；nx用来判断该key是否存在以实现排他特性，ex用来指定锁的过期时间，避免死锁。
 
@@ -26,7 +26,7 @@ end
 ```
 如果redis采用了主备的部署方式，存在一种场景，master上set成功后宕机，而set的key没有来得及同步到slave的话，会存在不一致的场景，可以通过redis持久化和fsync=always的方式来保持一致，但是有性能损耗。
 
-### 集群场景
+### RedLock 算法-->Redis 作者为了解决 SET key value [EX] 10 [NX]命令实现分布式锁不安全的问题
 ![](.distributed_lock_images/cluster_redis.png)
 
 设集群有N个redis节点，那么，redlock算法约定，任意应用实例在半数以上（N/2 + 1）的redis节点上执行set成功，就认为当前应用实例成功持有锁.
@@ -181,3 +181,107 @@ func (m *Mutex) UnlockContext(ctx context.Context) (bool, error) {
 
 #### multierror库
 在actOnPoolsAsync方法中，在处理所有redis节点的返回时，引用了multierror库，这个库自定义了Error结构，用于保存多个error，当你的处理过程中在多个位置可能会返回不同error信息，但是返回值又只有一个error时，可以通过multierror.Append方法将这些error合成一个返回。内部创建了一个[]error来保存这些error，保留了层层弹栈返回时，各层的错误信息。代码很少但却很实用
+
+
+
+## 2. ZooKeeper 分布式锁
+ZooKeeper 也是一个典型的分布式元数据存储服务，它的分布式锁实现基于 ZooKeeper 的临时节点和顺序特性。
+
+临时节点具备数据自动删除的功能。当 client 与 ZooKeeper 连接和 session 断掉时，相应的临时节点就会被删除。
+
+ZooKeeper 也提供了 Watch 特性可监听 key 的数据变化
+
+使用 Zookeeper 加锁的伪代码如下
+```shell
+
+Lock
+1 n = create(l + “/lock-”, EPHEMERAL|SEQUENTIAL)
+2 C = getChildren(l, false)
+3 if n is lowest znode in C, exit
+4 p = znode in C ordered just before n
+5 if exists(p, true) wait for watch event
+6 goto 2
+Unlock
+1 delete(n)
+```
+
+### 3. ectd分布式锁
+相比 Redis 基于主备异步复制导致锁的安全性问题，etcd 是基于 Raft 共识算法实现的，一个写请求需要经过集群多数节点确认。
+因此一旦分布式锁申请返回给 client 成功后，它一定是持久化到了集群多数节点上，不会出现 Redis 主备异步复制可能导致丢数据的问题，具备更高的安全性。
+
+
+#### Lease 与锁的活性
+
+通过事务实现原子的检查 key 是否存在、创建 key 后，我们确保了分布式锁的安全性、互斥性。那么 etcd 是如何确保锁的活性呢? 
+
+也就是发生任何故障，都可避免出现死锁呢？
+
+Lease 就是一种活性检测机制，它提供了检测各个客户端存活的能力。你的业务 client 需定期向 etcd 服务发送"特殊心跳"汇报健康状态，
+若你未正常发送心跳，并超过和 etcd 服务约定的最大存活时间后，就会被 etcd 服务移除此 Lease 和其关联的数据。
+
+```shell
+
+txn := client.Txn(ctx).If(v3.Compare(v3.CreateRevision(k), "=", 0))
+txn = txn.Then(v3.OpPut(k, val, v3.WithLease(s.Lease())))
+txn = txn.Else(v3.OpGet(k))
+resp, err := txn.Commit()
+if err != nil {
+    return err
+}
+```
+
+#### Watch 与锁的可用性
+
+当一个持有锁的 client crash 故障后，其他 client 如何快速感知到此锁失效了，快速获得锁呢，最大程度降低锁的不可用时间呢？
+
+答案是 Watch 特性。
+
+```shell
+
+var wr v3.WatchResponse
+wch := client.Watch(cctx, key, v3.WithRev(rev))
+for wr = range wch {
+   for _, ev := range wr.Events {
+      if ev.Type == mvccpb.DELETE {
+         return nil
+      }
+   }
+}
+```
+
+
+#### etcd 自带的 concurrency 包
+etcd 社区提供了一个名为 concurrency 包帮助你更简单、正确地使用分布式锁、分布式选举。
+
+1. 首先通过 concurrency.NewSession 方法创建 Session，本质是创建了一个 TTL 为 10 的 Lease。
+
+2. 其次得到 session 对象后，通过 concurrency.NewMutex 创建了一个 mutex 对象，包含 Lease、key prefix 等信息。
+   
+3. 然后通过 mutex 对象的 Lock 方法尝试获取锁。
+   
+4. 最后使用结束，可通过 mutex 对象的 Unlock 方法释放锁。
+
+```go
+
+cli, err := clientv3.New(clientv3.Config{Endpoints: endpoints})
+if err != nil {
+   log.Fatal(err)
+}
+defer cli.Close()
+// create two separate sessions for lock competition
+s1, err := concurrency.NewSession(cli, concurrency.WithTTL(10))
+if err != nil {
+   log.Fatal(err)
+}
+defer s1.Close()
+m1 := concurrency.NewMutex(s1, "/my-lock/")
+// acquire lock for s1
+if err := m1.Lock(context.TODO()); err != nil {
+   log.Fatal(err)
+}
+fmt.Println("acquired lock for s1")
+if err := m1.Unlock(context.TODO()); err != nil {
+   log.Fatal(err)
+}
+fmt.Println("released lock for s1")
+```

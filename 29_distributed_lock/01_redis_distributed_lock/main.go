@@ -12,7 +12,6 @@ import (
 )
 
 func main() {
-
 	client := goredislib.NewClient(&goredislib.Options{
 		Addr:     "106.14.35.115:6379",
 		DB:       2,
