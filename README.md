@@ -241,8 +241,9 @@
   - [1.2 扩展包sqlx操作clickHouse](28_OLAP/01_clickHouse/02_sqlx/main.go)
   - [go-clickHouse源码分析](28_OLAP/01_clickHouse/go-clickHouse.md)
 
-## 第二十九章 分布式锁
-- [1 redsync(RedLock 算法官方实现)](29_distributed_lock/distributed_lock.md)
+## [第二十九章 分布式锁及源码分析](29_distributed_lock/distributed_lock.md)
+- [1 redsync(RedLock 算法官方实现)](29_distributed_lock/01_redis_distributed_lock/main.go)
+- [2 etcd实现分布式锁](29_distributed_lock/02_etcd_distributed_lock/main.go)
 
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
 

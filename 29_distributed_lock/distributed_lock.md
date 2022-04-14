@@ -285,3 +285,173 @@ if err := m1.Unlock(context.TODO()); err != nil {
 }
 fmt.Println("released lock for s1")
 ```
+
+#### 源码
+在调用NewSession方法时候实际上是初始化了一个用户指定行为的租约（行为可以是指定ttl，或者复用其他的lease等），并异步进行keepalive。
+```go
+func NewSession(client *v3.Client, opts ...SessionOption) (*Session, error) {
+	ops := &sessionOptions{ttl: defaultSessionTTL, ctx: client.Ctx()}
+	for _, opt := range opts {
+		opt(ops)
+	}
+    // 没有则生成租约Id
+	id := ops.leaseID
+	if id == v3.NoLease {
+		resp, err := client.Grant(ops.ctx, int64(ops.ttl))
+		if err != nil {
+			return nil, err
+		}
+		id = resp.ID
+	}
+
+	// 异步进行keepalive
+	ctx, cancel := context.WithCancel(ops.ctx)
+	keepAlive, err := client.KeepAlive(ctx, id)
+	if err != nil || keepAlive == nil {
+		cancel()
+		return nil, err
+	}
+
+	donec := make(chan struct{})
+	s := &Session{client: client, opts: ops, id: id, cancel: cancel, donec: donec}
+
+	// keep the lease alive until client error or cancelled context
+	go func() {
+		defer close(donec)
+		for range keepAlive {
+			// eat messages until keep alive channel closes
+		}
+	}()
+
+	return s, nil
+}
+
+```
+
+```go
+type Mutex struct {
+    s *Session //保存的租约相关的信息
+
+    pfx   string //锁的名称，key的前缀
+    myKey string //锁完整的key
+    myRev int64  //自己的版本号
+    hdr   *pb.ResponseHeader
+}
+
+func NewMutex(s *Session, pfx string) *Mutex {
+    return &Mutex{s, pfx + "/", "", -1, nil}
+}
+```
+NewMutex实际上创建了一个锁的数据结构，该结构可以保存一些锁的信息，入参的“mutex-prefix”只是一个key的前缀，还有后续要创建的完整key，revision等信息。
+
+上锁Lock
+```go
+func (m *Mutex) Lock(ctx context.Context) error {
+	// 尝试获取锁
+    resp, err := m.tryAcquire(ctx)
+    if err != nil {
+        return err
+    }
+    //ownerKey就是当前持有锁的值
+    ownerKey := resp.Responses[1].GetResponseRange().Kvs
+    //如果ownerKey的长度为0或者持有者的Revision与自己的Revision相同，说明自己持有锁，可以直接返回，并对共享资源进行操作
+    if len(ownerKey) == 0 || ownerKey[0].CreateRevision == m.myRev {
+        m.hdr = resp.Header
+        return nil
+    }
+    ......
+    //等待锁的释放
+    client := m.s.Client()
+    _, werr := waitDeletes(ctx, client, m.pfx, m.myRev-1)
+    if werr != nil {
+        m.Unlock(client.Ctx())
+        return werr
+    }
+    //确保session没有过期
+    gresp, werr := client.Get(ctx, m.myKey)
+    if werr != nil {
+        m.Unlock(client.Ctx())
+        return werr
+    }
+
+    if len(gresp.Kvs) == 0 {
+        return ErrSessionExpired
+    }
+    m.hdr = gresp.Header
+
+    return nil
+}
+
+
+func (m *Mutex) tryAcquire(ctx context.Context) (*v3.TxnResponse, error) {
+    s := m.s
+    client := m.s.Client()
+    //完整key是前缀名称加租约ID，由于不同进程生成的不同租约，所以锁互不相同
+    m.myKey = fmt.Sprintf("%s%x", m.pfx, s.Lease())
+    //cmp通过比较createRevision是否为0判断当前的key是不是第一次创建
+    cmp := v3.Compare(v3.CreateRevision(m.myKey), "=", 0)
+    //put会把key绑定上租约并存储
+    put := v3.OpPut(m.myKey, "", v3.WithLease(s.Lease()))
+    //get会获取当前key的值
+    get := v3.OpGet(m.myKey)
+    //getOwner是通过前缀来范围查找，WithFirstCreate()筛选出当前存在的最小revision对应的值
+    getOwner := v3.OpGet(m.pfx, v3.WithFirstCreate()...)
+    resp, err := client.Txn(ctx).If(cmp).Then(put, getOwner).Else(get, getOwner).Commit()
+    if err != nil {
+        return nil, err
+    }
+    //将该事务的revision赋值到锁的myRev字段
+    m.myRev = resp.Header.Revision
+    if !resp.Succeeded {
+        m.myRev = resp.Responses[0].GetResponseRange().Kvs[0].CreateRevision
+    }
+    return resp, nil
+}
+```
+在获取锁的时候，通过事务操作来尝试加锁。
+
+如果当前的key是第一次创建，则将key绑定租约并存储，否则获取当前的key详细信息。getOwner通过前缀来进行查找最小revision对应的值，
+目的是获取当前锁的持有者（如果最小Revision的key释放锁，则该key会被删除，所以最小Revision的key就是当前锁的持有者）。
+
+!resp.Succeeded代表key不是第一次创建，则之前执行的是get操作，获取该key创建时候的revision并赋值到锁的myRev字段。
+
+waitDeletes：如果没有获得锁，就需要等待前面锁的释放了，这里主要用到watch机制。
+```go
+func waitDelete(ctx context.Context, client *v3.Client, key string, rev int64) error {
+    cctx, cancel := context.WithCancel(ctx)
+    defer cancel()
+
+    var wr v3.WatchResponse
+    //通过Revsion来watch key，也就是前一个锁
+    wch := client.Watch(cctx, key, v3.WithRev(rev))
+    for wr = range wch {
+        for _, ev := range wr.Events {
+             //监听Delete事件
+            if ev.Type == mvccpb.DELETE {
+                return nil
+            }
+        }
+    }
+    if err := wr.Err(); err != nil {
+        return err
+    }
+    if err := ctx.Err(); err != nil {
+        return err
+    }
+    return fmt.Errorf("lost watcher waiting for delete")
+}
+```
+
+
+UnLock：解锁操作会直接删除对应的kv，这会触发下一个锁的获取。
+```go
+func (m *Mutex) Unlock(ctx context.Context) error {
+    client := m.s.Client()
+    if _, err := client.Delete(ctx, m.myKey); err != nil {
+        return err
+    }
+    m.myKey = "\x00"
+    m.myRev = -1
+    return nil
+}
+```
