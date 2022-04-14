@@ -209,46 +209,11 @@ Unlock
 相比 Redis 基于主备异步复制导致锁的安全性问题，etcd 是基于 Raft 共识算法实现的，一个写请求需要经过集群多数节点确认。
 因此一旦分布式锁申请返回给 client 成功后，它一定是持久化到了集群多数节点上，不会出现 Redis 主备异步复制可能导致丢数据的问题，具备更高的安全性。
 
-
-#### Lease 与锁的活性
-
-通过事务实现原子的检查 key 是否存在、创建 key 后，我们确保了分布式锁的安全性、互斥性。那么 etcd 是如何确保锁的活性呢? 
-
-也就是发生任何故障，都可避免出现死锁呢？
-
-Lease 就是一种活性检测机制，它提供了检测各个客户端存活的能力。你的业务 client 需定期向 etcd 服务发送"特殊心跳"汇报健康状态，
-若你未正常发送心跳，并超过和 etcd 服务约定的最大存活时间后，就会被 etcd 服务移除此 Lease 和其关联的数据。
-
-```shell
-
-txn := client.Txn(ctx).If(v3.Compare(v3.CreateRevision(k), "=", 0))
-txn = txn.Then(v3.OpPut(k, val, v3.WithLease(s.Lease())))
-txn = txn.Else(v3.OpGet(k))
-resp, err := txn.Commit()
-if err != nil {
-    return err
-}
-```
-
-#### Watch 与锁的可用性
-
-当一个持有锁的 client crash 故障后，其他 client 如何快速感知到此锁失效了，快速获得锁呢，最大程度降低锁的不可用时间呢？
-
-答案是 Watch 特性。
-
-```shell
-
-var wr v3.WatchResponse
-wch := client.Watch(cctx, key, v3.WithRev(rev))
-for wr = range wch {
-   for _, ev := range wr.Events {
-      if ev.Type == mvccpb.DELETE {
-         return nil
-      }
-   }
-}
-```
-
+- Lease 机制：即租约机制（TTL，Time To Live），Etcd 可以为存储的 Key-Value 对设置租约，当租约到期，Key-Value 将失效删除；同时也支持续约续期（KeepAlive）
+- Revision 机制：每个 key 带有一个 Revision 属性值，Etcd 每进行一次事务对应的全局 Revision 值都会加一，因此每个 Key 对应的 Revision 属性值都是全局唯一的。通过比较 Revision 的大小就可以知道进行写操作的顺序。在实现分布式锁时，多个程序同时抢锁，根据 Revision 值大小依次获得锁，可以避免惊群效应，实现公平锁 
+  
+- Prefix 机制：即前缀机制（或目录机制）。可以根据前缀（目录）获取该目录下所有的 Key 及对应的属性（包括 Key、Value 以及 Revision 等）
+- Watch 机制：即监听机制，Watch 机制支持 Watch 某个固定的 Key，也支持 Watch 一个目录前缀（前缀机制），当被 Watch 的 Key 或目录发生变化，客户端将收到通知
 
 #### etcd 自带的 concurrency 包
 etcd 社区提供了一个名为 concurrency 包帮助你更简单、正确地使用分布式锁、分布式选举。
@@ -288,6 +253,22 @@ fmt.Println("released lock for s1")
 
 #### 源码
 在调用NewSession方法时候实际上是初始化了一个用户指定行为的租约（行为可以是指定ttl，或者复用其他的lease等），并异步进行keepalive。
+
+```go
+const defaultSessionTTL = 60	//session 的默认 TTL 是 60s
+
+// Session represents a lease kept alive for the lifetime of a client.
+// Fault-tolerant applications may use sessions to reason about liveness.
+type Session struct {
+	client *v3.Client		// 包含一个 clientv3 客户端
+	opts   *sessionOptions
+	id     v3.LeaseID		//lease 租约
+	//s.Lease() 是一个 64 位的整数值，Etcd v3 引入了 lease（租约）的概念
+	//concurrency 包基于 lease 封装了 session，每一个客户端都有自己的 lease，也就是说每个客户端都有一个唯一的 64 位整形值
+	cancel context.CancelFunc	//context
+	donec  <-chan struct{}		//
+}
+```
 ```go
 func NewSession(client *v3.Client, opts ...SessionOption) (*Session, error) {
 	ops := &sessionOptions{ttl: defaultSessionTTL, ctx: client.Ctx()}
@@ -333,8 +314,8 @@ type Mutex struct {
     s *Session //保存的租约相关的信息
 
     pfx   string //锁的名称，key的前缀
-    myKey string //锁完整的key
-    myRev int64  //自己的版本号
+    myKey string //锁完整的key，当前持有锁的客户端的 leaseid 值（完整 Key 的组成为 pfx+"/"+leaseid）
+    myRev int64  //revision，理解为当前持有锁的 Revision（修改数） 编号 或者是 CreateRevision
     hdr   *pb.ResponseHeader
 }
 
@@ -352,15 +333,15 @@ func (m *Mutex) Lock(ctx context.Context) error {
     if err != nil {
         return err
     }
-    //ownerKey就是当前持有锁的值
+    //ownerKey 获取当前实际拿到锁的KEY
     ownerKey := resp.Responses[1].GetResponseRange().Kvs
     //如果ownerKey的长度为0或者持有者的Revision与自己的Revision相同，说明自己持有锁，可以直接返回，并对共享资源进行操作
     if len(ownerKey) == 0 || ownerKey[0].CreateRevision == m.myRev {
         m.hdr = resp.Header
         return nil
     }
-    ......
-    //等待锁的释放
+    // 走到这里代表没有获得锁，需要等待之前的锁被释放，即 CreateRevision 小于当前 CreateRevision 的 kv 被删除
+    // 阻塞等待 Owner 释放锁
     client := m.s.Client()
     _, werr := waitDeletes(ctx, client, m.pfx, m.myRev-1)
     if werr != nil {
@@ -394,8 +375,9 @@ func (m *Mutex) tryAcquire(ctx context.Context) (*v3.TxnResponse, error) {
     put := v3.OpPut(m.myKey, "", v3.WithLease(s.Lease()))
     //get会获取当前key的值
     get := v3.OpGet(m.myKey)
-    //getOwner是通过前缀来范围查找，WithFirstCreate()筛选出当前存在的最小revision对应的值
+    //getOwner获取当前锁的真正持有者，是通过前缀来范围查找，WithFirstCreate()筛选出当前存在的最小revision对应的值
     getOwner := v3.OpGet(m.pfx, v3.WithFirstCreate()...)
+    // Txn 事务，判断 cmp 的条件是否成立，成立执行 Then，不成立执行 Else，最终执行 Commit()
     resp, err := client.Txn(ctx).If(cmp).Then(put, getOwner).Else(get, getOwner).Commit()
     if err != nil {
         return nil, err
@@ -408,6 +390,31 @@ func (m *Mutex) tryAcquire(ctx context.Context) (*v3.TxnResponse, error) {
     return resp, nil
 }
 ```
+options
+```go
+// WithFirstCreate gets the key with the oldest creation revision in the request range.
+func WithFirstCreate() []OpOption { return withTop(SortByCreateRevision, SortAscend) }
+
+// withTop gets the first key over the get's prefix given a sort order
+func withTop(target SortTarget, order SortOrder) []OpOption {
+   return []OpOption{WithPrefix(), WithSort(target, order), WithLimit(1)}
+}
+
+// WithPrefix enables 'Get', 'Delete', or 'Watch' requests to operate
+// on the keys with matching prefix. For example, 'Get(foo, WithPrefix())'
+// can return 'foo1', 'foo2', and so on.
+func WithPrefix() OpOption {
+	// 返回所有满足 prefix 匹配的 key-value，和 etcdctl get key --prefix 功能一样
+   return func(op *Op) {
+      if len(op.key) == 0 {
+         op.key, op.end = []byte{0}, []byte{0}
+         return
+      }
+      op.end = getPrefix(op.key)
+   }
+}
+```
+
 在获取锁的时候，通过事务操作来尝试加锁。
 
 如果当前的key是第一次创建，则将key绑定租约并存储，否则获取当前的key详细信息。getOwner通过前缀来进行查找最小revision对应的值，
@@ -415,7 +422,26 @@ func (m *Mutex) tryAcquire(ctx context.Context) (*v3.TxnResponse, error) {
 
 !resp.Succeeded代表key不是第一次创建，则之前执行的是get操作，获取该key创建时候的revision并赋值到锁的myRev字段。
 
-waitDeletes：如果没有获得锁，就需要等待前面锁的释放了，这里主要用到watch机制。
+waitDeletes 模拟了一种公平的先来后到的排队逻辑，等待所有当前比当前 key 的 revision 小的 key 被删除后，锁释放后才返回。
+![](.distributed_lock_images/wait_deletes_process.png)
+```go
+func waitDeletes(ctx context.Context, client *v3.Client, pfx string, maxCreateRev int64) (*pb.ResponseHeader, error) {
+	getOpts := append(v3.WithLastCreate(), v3.WithMaxCreateRev(maxCreateRev))
+	for {
+		resp, err := client.Get(ctx, pfx, getOpts...)
+		if err != nil {
+			return nil, err
+		}
+		if len(resp.Kvs) == 0 {
+			return resp.Header, nil
+		}
+		lastKey := string(resp.Kvs[0].Key)
+		if err = waitDelete(ctx, client, lastKey, resp.Header.Revision); err != nil {
+			return nil, err
+		}
+	}
+}
+```
 ```go
 func waitDelete(ctx context.Context, client *v3.Client, key string, rev int64) error {
     cctx, cancel := context.WithCancel(ctx)
@@ -441,6 +467,9 @@ func waitDelete(ctx context.Context, client *v3.Client, key string, rev int64) e
     return fmt.Errorf("lost watcher waiting for delete")
 }
 ```
+
+TryLock:TryLock比Lock，多调用了一个waitDeletes 函数，这个函数模拟了一种公平的先来后到的排队逻辑，
+等待所有当前比当前 key 的 revision 小的 key 被删除后，锁释放后才返回。
 
 
 UnLock：解锁操作会直接删除对应的kv，这会触发下一个锁的获取。
