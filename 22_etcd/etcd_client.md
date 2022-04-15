@@ -2,7 +2,13 @@
 
 
 ## rpc定义的proto文件
-ETCD核心模块：KV,Watch,Lease,Cluster,Maintenance,Auth
+ETCD核心模块：
+- KV:创建、更新、获取和删除键值对。
+- Watch:，监视键的更改。
+- Lease:实现键值对过期，客户端用来续租、保持心跳。
+- Cluster
+- Maintenance
+- Auth
 
 ```protobuf
 // /Users/python/go/pkg/mod/go.etcd.io/etcd/api/v3@v3.5.2/etcdserverpb/rpc.proto
@@ -71,20 +77,18 @@ service KV {
   }
 }
 
-service Watch {
-  // Watch watches for events happening or that have happened. Both input and output
-  // are streams; the input stream is for creating and canceling watchers and the output
-  // stream sends events. One watch RPC can watch on multiple key ranges, streaming events
-  // for several watches at once. The entire event history can be watched starting from the
-  // last compaction revision.
-  rpc Watch(stream WatchRequest) returns (stream WatchResponse) {
-      option (google.api.http) = {
-        post: "/v3/watch"
-        body: "*"
-    };
-  }
-}
 ```
+
+proto 文件是定义服务端和客户端通信接口的标准。包括
+- 客户端该传什么样的参数
+
+- 服务端该返回什么参数
+
+- 客户端该怎么调用
+
+- 是阻塞还是非阻塞
+
+- 是同步还是异步
 
 ## 连接配置
 ```go
@@ -153,7 +157,71 @@ type Config struct {
 
 ```
 
+### 响应头
+etcd API 的所有响应都有一个附加的响应标头，其中包括响应的集群元数据：
+```protobuf
+type ResponseHeader struct {
+	// cluster_id is the ID of the cluster which sent the response.
+    //产生响应的集群的 ID。
+	ClusterId uint64 `protobuf:"varint,1,opt,name=cluster_id,json=clusterId,proto3" json:"cluster_id,omitempty"`
+	// member_id is the ID of the member which sent the response.
+    //产生响应的成员的 ID。
+    //应用服务可以通过 Cluster_ID 和 Member_ID 字段来确保，当前与之通信的正是预期的那个集群或者成 
+    // 员。
+	MemberId uint64 `protobuf:"varint,2,opt,name=member_id,json=memberId,proto3" json:"member_id,omitempty"`
+	// revision is the key-value store revision when the request was applied.
+	// For watch progress responses, the header.revision indicates progress. All future events
+	// recieved in this stream are guaranteed to have a higher revision number than the
+	// header.revision number.
+    //产生响应时键值存储的修订版本号。
+    //应用服务可以使用修订号字段来获得当前键值存储库最新的修订号。应用程序指定历史修订版以进行查询，如果希望在请求时知道最新修订版，此功能特别有用。
+	Revision int64 `protobuf:"varint,3,opt,name=revision,proto3" json:"revision,omitempty"`
+	// raft_term is the raft term when the request was applied.
+    //产生响应时，成员的 Raft 称谓。
+    //应用服务可以使用 Raft_Term 来检测集群何时完成一个新的 leader 选举。
+	RaftTerm             uint64   `protobuf:"varint,4,opt,name=raft_term,json=raftTerm,proto3" json:"raft_term,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+```
+
 ## 初始化
+客户端结构体
+```go
+ 
+// Client provides and manages an etcd v3 client session.
+type Client struct {
+	Cluster      // 向集群里增加 etcd 服务端节点之类，属于管理员操作。
+	KV           //我们主要使用的功能，即操作 K-V。
+	Lease        //租约相关操作，比如申请一个 TTL=10 秒的租约。
+	Watcher      //观察订阅，从而监听最新的数据变化。
+	Auth         //管理 etcd 的用户和权限，属于管理员操作。
+	Maintenance  //维护 etcd，比如主动迁移 etcd 的 leader 节点，属于管理员操作。
+ 
+	conn *grpc.ClientConn
+ 
+	cfg      Config
+	creds    grpccredentials.TransportCredentials
+	resolver *resolver.EtcdManualResolver
+	mu       *sync.RWMutex
+ 
+	ctx    context.Context
+	cancel context.CancelFunc
+ 
+	// Username is a user name for authentication.
+	Username string
+	// Password is a password for authentication.
+	Password        string
+	authTokenBundle credentials.Bundle
+ 
+	callOpts []grpc.CallOption
+ 
+	lgMu *sync.RWMutex
+	lg   *zap.Logger
+}
+```
+
 ```go
 func newClient(cfg *Config) (*Client, error) {
     // ... 
@@ -296,3 +364,13 @@ func (c *Client) dialSetupOpts(creds grpccredentials.TransportCredentials, dopts
 }
 
 ```
+
+## KV 查询 Get
+```go
+Get(ctx context.Context, key string, opts ...OpOption) (*GetResponse, error)
+```
+OpOption 为可选的函数传参，
+- 传参为WithRange(end)时，Get 将返回 [key，end) 范围内的键；
+- 传参为 WithFromKey() 时，Get 返回大于或等于 key 的键；
+- 当通过 rev> 0 传递 WithRev(rev) 时，Get 查询给定修订版本的键；如果压缩了所查找的修订版本，则返回请求失败，并显示 ErrCompacted。
+- 传递 WithLimit(limit) 时，返回的 key 数量受 limit 限制；传参为 WithSort 时，将对键进行排序。

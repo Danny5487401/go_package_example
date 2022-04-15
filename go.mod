@@ -87,6 +87,7 @@ require (
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/yoyofxteam/nacos-viper-remote v0.4.0
+	go.etcd.io/bbolt v1.3.3
 	go.etcd.io/etcd/client/v3 v3.5.2
 	go.mongodb.org/mongo-driver v1.5.3
 	go.uber.org/dig v1.11.0

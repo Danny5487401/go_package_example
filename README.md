@@ -168,6 +168,7 @@
 - [1 两阶段提交2pc/XA](15_distributed_transaction/01_2pc_n_3pc/two_phase_commit.md)
 - [2 saga事务](15_distributed_transaction/02_saga/saga.md)
 - [3 TCC事务](15_distributed_transaction/03_tcc/tcc.md)
+- [4 etcd的STM](15_distributed_transaction/04_stm/stm.md)
 
 ## 第十六章 数据复制
 - 1 [copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
@@ -209,6 +210,7 @@
 - [服务端server--watch机制](22_etcd/03_watch/etcd_watch.md)
 - [1 基本操作CRUD及watch监听](22_etcd/01_CRUD/main.go)
 - [2 boltdb基本操作及在etcd中的源码分析](22_etcd/04_boltdb/boltdb.md)
+- [3 bbolt改善boldb](22_etcd/05_bbolt/bbolt.md)
 
 
 ## 第二十三章 Go-Micro框架 (不推荐使用)

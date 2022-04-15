@@ -53,6 +53,10 @@ type meta struct {
 	checksum uint64 // 校验码
 }
 
+// bucket represents the on-file representation of a bucket.
+// This is stored as the "value" of a bucket key. If the bucket is small enough,
+// then its root page can be stored inline in the "value", after the bucket
+// header. 内联bucket, the "root" 为 0.
 type bucket struct {
 	root     pgid   // root 表示该 bucket 根节点的 page id
 	sequence uint64 // monotonically incrementing, used by NextSequence()
@@ -73,15 +77,16 @@ freelist 页面 ID(freelist)、总的页面数量 (pgid)、上一次写事务 ID
 ![](.boltdb_images/hex_data.png)
 上图中十六进制输出的是 db 文件的 page 0 页结构，左边第一列表示此行十六进制内容对应的文件起始地址，每行 16 个字节。
 
-结合 page 磁盘页和 meta page 数据结构我们可知，第一行前 8 个字节描述 pgid(忽略第一列) 是 0。
+结合 page 磁盘页和 meta page 数据结构我们可知，
+- 第一行前 8 个字节描述 pgid(忽略第一列) 是 0。
 接下来 2 个字节描述的页类型， 其值为 0x04 表示 meta page， 说明此页的数据存储的是 meta page 内容，因此 ptr 开始的数据存储的是 meta page 内容。
 
-第二行首先含有一个 4 字节的 magic number(0xED0CDAED)，通过它来识别当前文件是否 boltdb.
+- 第二行首先含有一个 4 字节的 magic number(0xED0CDAED)，通过它来识别当前文件是否 boltdb.
 接下来是四个字节描述 boltdb 的版本号 0x2,
 然后是四个字节的 page size 大小，0x1000 表示 4096 个字节，
 四个字节的 flags 为 0。
 
-第三行对应的就是meta page 的 root bucket 结构（16 个字节），它描述了 boltdb 的 root bucket 信息，比如一个 db 中有哪些 bucket， bucket 里面的数据存储在哪里。
+- 第三行对应的就是meta page 的 root bucket 结构（16 个字节），它描述了 boltdb 的 root bucket 信息，比如一个 db 中有哪些 bucket， bucket 里面的数据存储在哪里。
 root bucket 指向的 page id 为 4。我们可以通过如下 bbolt pages 命令看看各个 page 类型和元素数量，从下图结果可知，4 号页面为 leaf page。
 ```shell
 
@@ -97,7 +102,7 @@ ID       TYPE       ITEMS  OVRFLW
 ```
 
 
-第四行中前面的 8 个字节，0x3 表示 freelist 页面 ID，此页面记录了 db 当前哪些页面是空闲的。后面 8 个字节，0x6 表示当前 db 总的页面数。
+- 第四行中前面的 8 个字节，0x3 表示 freelist 页面 ID，此页面记录了 db 当前哪些页面是空闲的。后面 8 个字节，0x6 表示当前 db 总的页面数。
 ```shell
 
 $ ./bbolt page  ./infra1.etcd/member/snap/db 3
@@ -111,7 +116,7 @@ Overflow: 0
 5
 ```
 
-第五行前面的 8 个字节，0x1a 表示上一次的写事务 ID，后面的 8 个字节表示校验码，用于检测文件是否损坏.
+- 第五行前面的 8 个字节，0x1a 表示上一次的写事务 ID，后面的 8 个字节表示校验码，用于检测文件是否损坏.
 
 
 ### leaf page
@@ -129,27 +134,37 @@ type leafPageElement struct {
 	vsize uint32
 }
 ```
+bbolt为每一个key-value对分配一个leafPageElement结构体，会保存在文件中。注意，leafPageElement并不包含真实的数key-value数据，它只是一些辅助信息，其中flags是标志信息，通常为0，
+
+当前节点的所有leafPageElement会保存在连续的空间内。紧接其后的就是真实的key-value数据了。如果页面后面还有剩余空间，那就只能浪费了，别的节点无法利用。
+
 - 当 flag 为 bucketLeafFlag(0x01) 时，表示存储的是 bucket 数据，否则存储的是 key-value 数据，
   leafPageElement 它含有 key-value 的读取偏移量，key-value 大小，根据偏移量和 key-value 大小，我们就可以方便地从 leaf page 中解析出所有 key-value 对。
 
 - 当存储的是 bucket 数据的时候，key 是 bucket 名称，value 则是 bucket 结构信息。
   bucket 结构信息含有 root page 信息，通过 root page（基于 B+ tree 查找算法），你可以快速找到你存储在这个 bucket 下面的 key-value 数据所在页面。
+  
 
 每个子 bucket 至少需要一个 page 来存储其下面的 key-value 数据，如果子 bucket 数据量很少，就会造成磁盘空间的浪费。
 实际上 boltdb 实现了 inline bucket，在满足一些条件限制的情况下，可以将小的子 bucket 内嵌在它的父亲叶子节点上，友好的支持了大量小 bucket
+
+Note: 一个节点内的所有key-value数据是按key升序排列的。因为对于bbolt来说，所有的key、value都是[]byte，所以是用bytes.Compare来比较key的大小。
 
 ### branch page
 ![](.boltdb_images/branch_page_structure.png)
 ![](.boltdb_images/branche_structure1.png)
 
-boltdb 使用了 B+ tree 来高效管理所有子 bucket 和 key-value 数据，因此它可以支持大量的 bucket 和 key-value，只不过 B+ tree 的根节点不再直接指向 leaf page，而是 branch page 索引节点页。
+
 ```go
 type branchPageElement struct {
-	pos   uint32 // key 的读取偏移量
-	ksize uint32 // key 大小
+	pos   uint32 // pos是key的真实存储位置相对于该branchPageElement结构体的偏移。
+	ksize uint32 // key的长度，单位为字节
 	pgid  pgid // 子节点的 page id
 }
 ```
+只包含有key数据集合，没有value。每一个key是其指向的下一级节点的第一个key值(这就意味着其所指向的下一级节点中的所有key值都大于或等于该key)
+
+当前节点的所有branchPageElement会保存在连续的空间内。紧接其后的就是真实的key数据了。同样，如果页面后面还有剩余空间，那就只能浪费了，别的节点无法利用。
 
 根据偏移量和 key 大小，我们就可以方便地从 branch page 中解析出所有 key，然后二分搜索匹配 key，
 获取其子节点 page id，递归搜索，直至从 bucketLeafFlag 类型的 leaf page 中找到目的 bucket name。
@@ -221,6 +236,12 @@ type freelist struct {
 	cache   map[pgid]bool   // fast lookup of all free and pending page ids.
 }
 ```
+
+![](.boltdb_images/freelist_structure1.png)
+
+第三个页面(编号为2)的页面用来保存这些空闲页面的ID。flag:0x10表示当前页面用于保存空闲页面的ID。count表示空闲页面的数量。如果空闲页面很多，一个页面保存不下，就会申请几个连续的页面来保存；这时就要用到字段overflow了。
+
+假设总共需要3个连续的页面的空间来保存所有的空闲页面ID，那么pgid就是第一个页面的ID，overflow的值就是2；例如pgid的值是6，那么就是编号为6、7、8的这三个页面。
 
 ### Open函数
 ```go
@@ -363,7 +384,7 @@ func (b *Bucket) CreateBucket(key []byte) (*Bucket, error) {
 
 ```
 
-查找
+利用B+树查询
 ```go
 func (c *Cursor) seek(seek []byte) (key []byte, value []byte, flags uint32) {
     // ..
@@ -403,8 +424,7 @@ func (c *Cursor) search(key []byte, pgid pgid) {
 	}
 	c.searchPage(key, p)
 }
-```
-```go
+
 // nsearch searches the leaf node on the top of the stack for a key.
 func (c *Cursor) nsearch(key []byte) {
 	e := &c.stack[len(c.stack)-1]
