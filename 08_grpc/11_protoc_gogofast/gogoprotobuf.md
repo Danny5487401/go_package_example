@@ -1,5 +1,5 @@
 # gogo/protobuf
-生成 Golang 代码的插件 protoc-gen-go」，这个插件其实是 golang 官方提供的 一个 Protobuf api 实现。
+生成 Golang 代码的插件 protoc-gen-go，这个插件其实是 golang 官方提供的 一个 Protobuf api 实现。
 
 而gogo/protobuf是基于 golang/protobuf 的一个增强版实现。
 
