@@ -95,11 +95,13 @@
   - 5.2 服务端
 - [6  retry机制](08_grpc/06_grpc_retry/retry.md)
 - [7  grpc错误抛出与捕获](08_grpc/07_grpc_error/error.md)
-- 8  auth认证
+- [8  auth自定义认证](08_grpc/08_grpc_token_auth/credentials.md)
 - 9  Grpc插件-proto字段验证器
 - [10 Grpc插件-grpc网关直接对外http服务-->etcd中应用](08_grpc/10_grpc_gateway/grpc_gateway.md)
 - [11 Grpc插件-gogo/protobuf](08_grpc/11_protoc_gogofast/gogoprotobuf.md)
-- 12 GRPC生态中间件(拦截器扩展)
+- [12 GRPC生态中间件(拦截器扩展)](08_grpc/12_grpc_middleware/01_grpc_interceptor/server/server.go)
+  - 实现基于 CA 的 TLS 证书认证
+  - go-grpc-middleware实现多个中间间：异常保护，日志
 - 13 channelz调试
 - 14 multiplex多路复用
 - [15 自定义grpc插件](08_grpc/15_customized_protobuf_plugin/protobuf_extend.md)

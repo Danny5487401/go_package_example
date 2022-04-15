@@ -82,12 +82,12 @@ func GetTLSCredentialsByCA() credentials.TransportCredentials {
 		log.Fatalf("ioutil.ReadFile err: %v", err)
 	}
 
-	//尝试解析所传入的 PEM 编码的证书
+	// 尝试解析所传入的 PEM 编码的证书
 	if ok := certPool.AppendCertsFromPEM(ca); !ok {
 		log.Fatalf("certPool.AppendCertsFromPEM err")
 	}
 
-	//构建基于 TLS 的 TransportCredentials 选项
+	// 构建基于 TLS 的 TransportCredentials 选项
 	c := credentials.NewTLS(&tls.Config{
 		//tls.Config：Config 结构用于配置 TLS 客户端或服务器
 		Certificates: []tls.Certificate{cert}, //Certificates：设置证书链，允许包含一个或多个
@@ -97,7 +97,18 @@ func GetTLSCredentialsByCA() credentials.TransportCredentials {
 	return c
 }
 
-//日志拦截器
+/*
+ClientAuth：要求必须校验客户端的证书。可以根据实际情况选用以下参数：
+const (
+    NoClientCert ClientAuthType = iota
+    RequestClientCert
+    RequireAnyClientCert
+    VerifyClientCertIfGiven
+    RequireAndVerifyClientCert
+)
+*/
+
+// 日志拦截器
 func LoggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	log.Printf("gRPC method: %s, %v", info.FullMethod, req)
 	resp, err := handler(ctx, req)

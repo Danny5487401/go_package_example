@@ -19,6 +19,7 @@ func (c CustomCredential) GetRequestMetadata(ctx context.Context, uri ...string)
 }
 
 func (c CustomCredential) RequireTransportSecurity() bool {
+	// 不需要基于 TLS 认证进行安全传输
 	return false
 }
 
