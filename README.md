@@ -201,8 +201,8 @@
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
 
 ## [第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify)](21_viper/viper.md)
-- 1 获取本地文件内容
-- [2 监听文件变化(fsnotify)](21_viper/02_fsnotify/fsnotify.md)
+- [1 viper获取本地文件内容](21_viper/01_read_n_watch_config/main.go)
+- [2 监听文件变化(fsnotify)原理分析](21_viper/02_fsnotify/fsnotify.md)
 - [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
 
 ## 第二十二章 ETCD
