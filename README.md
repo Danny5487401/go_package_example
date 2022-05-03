@@ -216,7 +216,7 @@
 
 
 ## 第二十三章 Go-Micro框架 (不推荐使用)
-- [1 Config配置加载包](23_micro/01ConfigTest/config.md)
+- [1 Config配置加载包](23_micro/01_Config/config.md)
 
 ## [第二十四章 搜索引擎es](24_elasticSearch/es.md)
 - [es索引及索引生命周期管理](24_elasticSearch/es_index.md)
@@ -266,5 +266,8 @@
 ## [第三十四章 本地缓存](34_local_cache/cache.md)
 - [1 go-cache源码分析及性能分析](34_local_cache/01_go_cache/go_cache.md)
 - [2 free-cache源码分析及性能分析](34_local_cache/02_free_cache/free_cache.md)
+
+
+## [第三十五章 sonar静态代码质量分析-涉及与golangci-lint对比使用](35_sonar/sonar.md)
 
 

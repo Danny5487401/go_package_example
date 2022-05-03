@@ -16,12 +16,12 @@ func main() {
 	// 配置来源
 	jsonSource := file.NewSource(
 		//从文件中读取
-		file.WithPath("23_micro/01ConfigTest/config/config.json"),
+		file.WithPath("23_micro/01_Config/config/config.json"),
 		//指定json编码器
 		source.WithEncoder(json.NewEncoder()))
 
 	yamlSource := file.NewSource( //从文件中读取
-		file.WithPath("23_micro/01ConfigTest/config/config.yaml"),
+		file.WithPath("23_micro/01_Config/config/config.yaml"),
 		//指定json编码器
 		source.WithEncoder(yaml.NewEncoder()))
 

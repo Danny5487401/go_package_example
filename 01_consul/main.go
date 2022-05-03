@@ -77,7 +77,7 @@ func main() {
 	}
 
 	// 注册服务
-	err = Register("192.168.16.111", 8022, "user_web", []string{
+	err = Register("tencent.danny.games", 8022, "user_web", []string{
 		"danny_shop", "user_web",
 	}, "user_web_id")
 	if err != nil {
