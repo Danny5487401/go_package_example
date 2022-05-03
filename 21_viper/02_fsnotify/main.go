@@ -7,7 +7,8 @@ import (
 )
 
 func main() {
-	watcher, err := fsnotify.NewWatcher() // 初始化一个空的watcher
+	// 初始化一个 文件/目录 监听器
+	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		log.Fatal(err)
 	}
