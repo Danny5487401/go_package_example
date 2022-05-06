@@ -42,10 +42,6 @@ sonar是一款静态代码质量分析工具，支持Java、Python、PHP、JavaS
 
 ## 搭建服务端
 ![](.sonar_images/sonar_establish.png)
-```shell
-docker run --name db -e POSTGRES_USER=sonar -e POSTGRES_PASSWORD=sonar -d postgres
-docker run --name sq --link db -e SONARQUBE_JDBC_URL=jdbc:postgresql://db:5432/sonar -p 9000:9000 -d docker.io/lu566/sonarqube-zh:7.7
-```
 
 login: admin
 password: admin
@@ -197,3 +193,4 @@ golangci-lint run -c .golangci.yaml ./...
 
 ## 参考连接
 1. 官网：https://docs.sonarqube.org/latest/user-guide/concepts/
+2. 服务器搭建：https://icode9.com/content-4-1117481.html
