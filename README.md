@@ -201,8 +201,8 @@
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
 
 ## [第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify)](21_viper/viper.md)
-- 1 获取本地文件内容
-- [2 监听文件变化(fsnotify)](21_viper/02_fsnotify/fsnotify.md)
+- [1 viper获取本地文件内容](21_viper/01_read_n_watch_config/main.go)
+- [2 监听文件变化(fsnotify)原理分析](21_viper/02_fsnotify/fsnotify.md)
 - [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
 
 ## 第二十二章 ETCD
@@ -215,7 +215,7 @@
 - [3 bbolt改善boldb](22_etcd/05_bbolt/bbolt.md)
 
 ## 第二十三章 Go-Micro框架 (不推荐使用)
-- [1 Config配置加载包](23_micro/01ConfigTest/config.md)
+- [1 Config配置加载包](23_micro/01_Config/config.md)
 
 ## [第二十四章 搜索引擎es](24_elasticSearch/es.md)
 - [es索引及索引生命周期管理](24_elasticSearch/es_index.md)
@@ -266,7 +266,9 @@
 - [1 go-cache源码分析及性能分析](34_local_cache/01_go_cache/go_cache.md)
 - [2 free-cache源码分析及性能分析](34_local_cache/02_free_cache/free_cache.md)
 
+## [第三十五章 sonar静态代码质量分析-涉及与golangci-lint对比使用](35_sonar/sonar.md)
 
-## [第三十五章 Proto管理工具Buf](35_buf/buf_intro.md)
+## [第三十六章 Proto管理工具Buf](36_buf/buf_intro.md)
+
 
 
