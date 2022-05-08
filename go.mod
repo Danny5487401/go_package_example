@@ -79,7 +79,7 @@ require (
 	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
 	github.com/shirou/gopsutil v3.20.11+incompatible
 	github.com/sony/sonyflake v1.0.0
-	github.com/spf13/cast v1.4.1 // indirect
+	github.com/spf13/cast v1.4.1
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.8.1
 	github.com/streadway/amqp v1.0.0
