@@ -7,7 +7,10 @@
     </buildTags>
   </component>
   <component name="NewModuleRootManager">
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/00_rpc_options/04_http_rpc_test/.scannerwork" />
+      <excludeFolder url="file://$MODULE_DIR$/.scannerwork" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>

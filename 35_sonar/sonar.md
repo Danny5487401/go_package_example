@@ -41,22 +41,26 @@ sonar是一款静态代码质量分析工具，支持Java、Python、PHP、JavaS
 2. 客户端scanners Java11或则17
 
 ## 搭建服务端
-![](.sonar_images/sonar_establish.png)
+注意版本，早期版本不支持Go,否则会报本地错误
+![](.sonar_images/sonar_error.png)
 
+### 配置项目
+```shell
+[root@k8s-master01 ~]# docker ps -a
+CONTAINER ID   IMAGE                       COMMAND                  CREATED        STATUS        PORTS                                       NAMES
+ddec18b47392   sonarqube:8.9.2-community   "bin/run.sh bin/sona…"   39 hours ago   Up 39 hours   0.0.0.0:9000->9000/tcp, :::9000->9000/tcp   sonarqube
+cce68ee0508a   postgres:11                 "docker-entrypoint.s…"   39 hours ago   Up 39 hours   0.0.0.0:5432->5432/tcp, :::5432->5432/tcp   postgres
+```
+![](.sonar_images/sonar_establish.png)
 login: admin
 password: admin
 
 ## 搭建客户端
-1. 命令行 sonar-scanner
+1. 执行 sonar-scanner，会找本地sonar-project.properties文件
 ```shell
-sonar-scanner \
-  -Dsonar.projectKey=go_package_example \
-  -Dsonar.sources=. \
-  -Dsonar.host.url=http://tencent.danny.games:9000 \
-  -Dsonar.login=admin \
-  -Dsonar.password=admin \
-  -Dsonar.language=go
+sonar-scanner 
 ```
+
 
 
 2. golang插件:sonarqube
