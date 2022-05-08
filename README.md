@@ -127,10 +127,10 @@
 ## 第十一章 依赖注入
 - [1 dig依赖注入及http服务分层](11_dependency_injection/00_dig/dig.go)
 - 2 wire依赖注入
-  - 不使用wire现状
-  - 使用wire优化
-  - wire使用-带err返回
-  - wire使用-带参数初始化
+  - [2.1 不使用wire现状](11_dependency_injection/01_wire/01_without_wire/main.go)
+  - [使用wire优化](11_dependency_injection/01_wire/02_wire)
+  - [wire使用-带err返回](11_dependency_injection/01_wire/03_wire_return_err/wire)
+  - [wire使用-带参数初始化](11_dependency_injection/01_wire/04_wire_pass_params/wire)
 
 ## [第十二章 测试框架testify(gin使用)](12_testify/testify.md)
 - [1 assert断言](12_testify/01_assert/calculate_test.go)
@@ -173,7 +173,7 @@
 - [4 etcd的STM](15_distributed_transaction/04_stm/stm.md)
 
 ## 第十六章 数据复制
-- 1 [copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
+- [1 copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
 
 ## 第十七章 数据加解密
 - 1 phpserialize
@@ -213,7 +213,6 @@
 - [1 基本操作CRUD及watch监听](22_etcd/01_CRUD/main.go)
 - [2 boltdb基本操作及在etcd中的源码分析](22_etcd/04_boltdb/boltdb.md)
 - [3 bbolt改善boldb](22_etcd/05_bbolt/bbolt.md)
-
 
 ## 第二十三章 Go-Micro框架 (不推荐使用)
 - [1 Config配置加载包](23_micro/01ConfigTest/config.md)
@@ -266,5 +265,8 @@
 ## [第三十四章 本地缓存](34_local_cache/cache.md)
 - [1 go-cache源码分析及性能分析](34_local_cache/01_go_cache/go_cache.md)
 - [2 free-cache源码分析及性能分析](34_local_cache/02_free_cache/free_cache.md)
+
+
+## [第三十五章 Proto管理工具Buf](35_buf/buf_intro.md)
 
 
