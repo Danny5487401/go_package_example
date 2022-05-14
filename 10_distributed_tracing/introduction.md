@@ -6,11 +6,11 @@
 两大框架都拥有比较高的开发者群体。为形成统一的技术标准，两大框架最终磨合成立了OpenTelemetry项目，简称otel.
 
 ## 常用的链路追踪系统
-* Skywalking
+* SkyWalking：本土开源的基于字节码注入的调用链分析，以及应用监控分析工具。特点是支持多种插件，UI功能较强，接入端无代码侵入
 * 阿里 鹰眼
-* 大众点评 CAT
-* Twitter Zipkin
-* Naver pinpoint
+* 大众点评 CAT:大众点评开源的基于编码和配置的调用链分析，应用监控分析，日志采集，监控报警等一系列的监控平台工具
+* Twitter Zipkin：目前基于springcloud sleuth得到了广泛的使用，特点是轻量，使用部署简单
+* Naver pinpoint：韩国人开源的基于字节码注入的调用链分析，以及应用监控分析工具。特点是支持多种插件，UI功能强大，接入端无代码侵入
 * Uber Jaeger
 
 ## 链路监控组件要求
@@ -130,7 +130,8 @@ OpenTelemetry的标准协议实现库提供了常用的TextMapPropagator，用�
 
 
 ### OpenTelemetry Baggage
-OpenTelemetry Baggage 是一个简单但通用的键值系统。一旦数据被添加为 Baggage，它就可以被所有下游服务访问。这允许有用的信息，如账户和项目 ID，在事务的后期变得可用，而不需要从数据库中重新获取它们。
+OpenTelemetry Baggage 是一个简单但通用的键值系统。一旦数据被添加为 Baggage，它就可以被所有下游服务访问。
+这允许有用的信息，如账户和项目 ID，在事务的后期变得可用，而不需要从数据库中重新获取它们。
 
 例如，一个使用项目 ID 作为索引的前端服务可以将其作为 Baggage 添加，允许后端服务也通过项目 ID 对其跨度和指标进行索引。
 这信息添加到了http header中，进行上下文传递，因此每增加一个项目都必须被编码为一个头，每增加一个项目都会增加事务中每一个后续网络请求的大小，因此不建议在将大量的非重要的信息添加到Baggage中。
@@ -145,48 +146,6 @@ OpenTelemetry Baggage 是一个简单但通用的键值系统。一旦数据被�
 2. 而另一派则是谷歌作为发起者的 OpenCensus，而且谷歌本身还是最早提出链路追踪概念的公司，后期连微软也加入了 OpenCensus.
 
 
-## OpenTelemetry 诞生
-Opentelemetry 源于 OpenTracing 与 OpenCensus 两大开源社区的合并而来。OpenTracing 在 2016 年由 Ben Sigelman 发起，旨在解决开源 Tracing 实现重复开发监测客户端， 数据模型不统一， Tracing 后端兼容成本高的问题。
-OpenCensus 则是由 Google 内部实践而来，结合了 Tracing 和 Metrics 的监测客户端开源工具包。
-
-由于两大开源社区各自的影响力都不小，而存在两个或多个 Tracing 的标准这个事情本身跟社区组建的主旨相违背。于是两大开源社区一拍即合，成立了 OpenTelemetry。
-
-
-### openTelemetry架构
-![](.introduction_images/opentelemetry_structure.png)
-
-
-### Opentelemetry 项目组成
-四个部分内容
-
-- 跨语言规范说明
-- 收集、转换、转发遥测数据的工具 Collector
-- 各语言监测客户端 API & SDK
-- 自动监测客户端与第三方库 Instrumentation & Contrib
-
-### 1. 收集、转换、转发遥测数据的工具 Collector
-
-从架构层面来说，Collector 有两种模式。
-1. 一种是把 Collector 部署在应用相同的主机内（如 K8S 的 DaemonSet）， 或者部署在应用相同的 Pod 里面 （如 K8S 中的 Sidecar），应用采集到的遥测数据，直接通过回环网络传递给 Collector。这种模式统称为 Agent 模式。
-2. 另一种模式是把 Collector 当作一个独立的中间件，应用把采集到的遥测数据往这个中间件里面传递。这种模式称之为 Gateway 模式。
-
-![](.introduction_images/collector_pipeline.png)
-在 Collector 内部设计中，一套数据的流入、处理、流出的过程称为 pipeline。一个 pipeline 有三部分组件组合而成，它们分别是 receiver/ processor/ exporter。
-
-- receiver
-负责按照对应的协议格式监听接收遥测数据，并把数据转给一个或者多个 processor
-- processor
-负责做遥测数据加工处理，如丢弃数据，增加信息，转批处理等，并把数据传递给下一个 processor 或者传递给一个或多个 exporter
-- exporter
-负责把数据往下一个接收端发送（一般是遥测后端），exporter 可以定义同时从多个不同的 processor 中获取遥测数据
-  
-### 2. 自动监测客户端与第三方库 Instrumentation & Contrib
-如果单纯使用监测客户端 API & SDK 包，许多的操作是需要修改应用代码的。
-如添加 Tracing 监测点，记录字段信息，元数据在进程/服务间传递的装箱拆箱等。这种方式具有代码侵入性，不易解耦，而且操作成本高，增加用户使用门槛。
-这个时候就可以利用公共组件的设计模式或语言特性等来降低用户使用门槛。
-
-利用公共组件的设计模式，例如在 Golang 的 Gin 组件，实现了 Middleware 责任链设计模式。
-我们可以引用 github.com/gin-gonic/gin 库，创建一个 otelgin.Middleware，手动添加到 Middleware 链中，实现 Gin 的快速监测，
 
 
 ## 参考链接

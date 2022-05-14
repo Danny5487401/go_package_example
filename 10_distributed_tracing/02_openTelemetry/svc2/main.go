@@ -14,6 +14,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
@@ -45,7 +46,7 @@ func tracerProvider(url string) error {
 			semconv.SchemaURL,
 			semconv.ServiceNameKey.String(service),
 			attribute.String("environment", environment),
-			attribute.Int64("ID", id),
+			attribute.Int("进程ID", os.Getpid()),
 		)),
 	)
 
@@ -53,7 +54,7 @@ func tracerProvider(url string) error {
 }
 
 func MainHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "hello world")
+	fmt.Fprintln(w, "hello Danny2")
 
 	carrier := propagation.HeaderCarrier{}
 	carrier.Set("trace-id", r.Header.Get("trace-id"))
@@ -88,7 +89,6 @@ func MainHandler(w http.ResponseWriter, r *http.Request) {
 
 	defer span.End()
 
-	// 必须放在span start之后
 	time.Sleep(time.Second * 2)
 }
 
@@ -132,7 +132,6 @@ func MainHandlerWithBaggage(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	var err error
-
 	err = tracerProvider("http://tencent.danny.games:14268/api/traces")
 	if err != nil {
 		log.Fatal(err)

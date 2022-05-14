@@ -19,6 +19,7 @@ func initJaeger() (closer io.Closer, err error) {
 		Disabled:    false,
 		Sampler: &config.SamplerConfig{
 			Type: jaeger.SamplerTypeConst,
+			// 选择合理的采集策略，constant全量采集,probabilist随机采集,rate limiting每秒采集数,remote远程
 			// param的值在0到1之间，设置为1则将所有的Operation输出到Reporter
 			Param: 1,
 		},

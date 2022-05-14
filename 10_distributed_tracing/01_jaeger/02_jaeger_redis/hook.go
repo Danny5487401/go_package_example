@@ -1,4 +1,4 @@
-package redisopentracing
+package redis_jaeger
 
 import (
 	"context"

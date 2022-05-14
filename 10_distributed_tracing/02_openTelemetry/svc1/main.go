@@ -14,14 +14,14 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.7.0"
 	"log"
 	"net/http"
+	"os"
 	"sync"
 	"time"
 )
 
 const (
-	service     = "trace-demo"
+	service     = "trace-sv1"
 	environment = "production"
-	id          = 1
 )
 
 var (
@@ -48,7 +48,7 @@ func MainBaggageHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func MainHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintln(w, "hello world")
+	fmt.Fprintln(w, "hello Danny1")
 
 	fmt.Println("index handler")
 
@@ -74,7 +74,9 @@ func tracerProvider(url string) error {
 
 	// 创建jaeger provider
 	// 可以直接连collector也可以连agent
-	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+	// jaeger可以看到我这边用的是WithCollectorEndpoint，只连jaeger的collector，正常来说是要连jaeger agent的，通过jaeger.WithAgentEndpoint的方法
+	//exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+	exp, err := jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost("tencent.danny.games"), jaeger.WithAgentPort("6831")))
 	if err != nil {
 		return err
 	}
@@ -84,7 +86,7 @@ func tracerProvider(url string) error {
 			semconv.SchemaURL,
 			semconv.ServiceNameKey.String(service),
 			attribute.String("environment", environment),
-			attribute.Int64("ID", id),
+			attribute.Int("进程ID", os.Getpid()),
 		)),
 	)
 	return nil
@@ -195,14 +197,12 @@ func funcBWithBaggage(ctx context.Context) {
 }
 
 func main() {
-
+	// 1. 初始化一个全局的trace provider
 	var err error
-
 	err = tracerProvider("http://tencent.danny.games:14268/api/traces")
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	otel.SetTracerProvider(tp)
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -216,8 +216,9 @@ func main() {
 		}
 	}(ctx)
 
-	http.HandleFunc("/baggage", MainBaggageHandler)
+	// 添加路由
 	http.HandleFunc("/", MainHandler)
+	http.HandleFunc("/baggage", MainBaggageHandler)
 	http.ListenAndServe("127.0.0.1:8060", nil)
 
 }
