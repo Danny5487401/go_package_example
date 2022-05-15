@@ -120,17 +120,19 @@
     - [2.2.4 批处理pipeline分析](09_Nosql/02_redis/02_go-redis/go-redis_pipeline.md)
 
 ## [第十章 链路追踪(Distributed Tracing)](10_distributed_tracing/introduction.md)
-- 1 Jaeger
-  - [1.1 结合XORM](10_distributed_tracing/01_jaeger/02_jaeger_application/01_jaeger_xorm/main_test.go)
-  - [1.2 结合redis](10_distributed_tracing/01_jaeger/02_jaeger_application/02_jaeger_redis/hook.go)
+- [1 Jaeger](10_distributed_tracing/01_jaeger/jaeger.md)
+  - [1.1 结合XORM](10_distributed_tracing/01_jaeger/01_jaeger_xorm/main_test.go)
+  - [1.2 结合redis](10_distributed_tracing/01_jaeger/02_jaeger_redis/hook.go)
+- [2 OpenTelemetry](10_distributed_tracing/02_openTelemetry/openTelemetry.md)
+  - 跨服务组合tracer代码展示:需开启svc1和svc2两个http服务
 
 ## 第十一章 依赖注入
 - [1 dig依赖注入及http服务分层](11_dependency_injection/00_dig/dig.go)
 - 2 wire依赖注入
-  - 不使用wire现状
-  - 使用wire优化
-  - wire使用-带err返回
-  - wire使用-带参数初始化
+  - [2.1 不使用wire现状](11_dependency_injection/01_wire/01_without_wire/main.go)
+  - [使用wire优化](11_dependency_injection/01_wire/02_wire)
+  - [wire使用-带err返回](11_dependency_injection/01_wire/03_wire_return_err/wire)
+  - [wire使用-带参数初始化](11_dependency_injection/01_wire/04_wire_pass_params/wire)
 
 ## [第十二章 测试框架testify(gin使用)](12_testify/testify.md)
 - [1 assert断言](12_testify/01_assert/calculate_test.go)
@@ -173,7 +175,7 @@
 - [4 etcd的STM](15_distributed_transaction/04_stm/stm.md)
 
 ## 第十六章 数据复制
-- 1 [copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
+- [1 copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
 
 ## 第十七章 数据加解密
 - 1 phpserialize
@@ -201,8 +203,8 @@
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
 
 ## [第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify)](21_viper/viper.md)
-- 1 获取本地文件内容
-- [2 监听文件变化(fsnotify)](21_viper/02_fsnotify/fsnotify.md)
+- [1 viper获取本地文件内容](21_viper/01_read_n_watch_config/main.go)
+- [2 监听文件变化(fsnotify)原理分析](21_viper/02_fsnotify/fsnotify.md)
 - [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
 
 ## 第二十二章 ETCD
@@ -214,9 +216,8 @@
 - [2 boltdb基本操作及在etcd中的源码分析](22_etcd/04_boltdb/boltdb.md)
 - [3 bbolt改善boldb](22_etcd/05_bbolt/bbolt.md)
 
-
 ## 第二十三章 Go-Micro框架 (不推荐使用)
-- [1 Config配置加载包](23_micro/01ConfigTest/config.md)
+- [1 Config配置加载包](23_micro/01_Config/config.md)
 
 ## [第二十四章 搜索引擎es](24_elasticSearch/es.md)
 - [es索引及索引生命周期管理](24_elasticSearch/es_index.md)
@@ -266,5 +267,10 @@
 ## [第三十四章 本地缓存](34_local_cache/cache.md)
 - [1 go-cache源码分析及性能分析](34_local_cache/01_go_cache/go_cache.md)
 - [2 free-cache源码分析及性能分析](34_local_cache/02_free_cache/free_cache.md)
+
+## [第三十五章 sonar静态代码质量分析-涉及与golangci-lint对比使用](35_sonar/sonar.md)
+
+## [第三十六章 Proto管理工具Buf](36_buf/buf_intro.md)
+
 
 
