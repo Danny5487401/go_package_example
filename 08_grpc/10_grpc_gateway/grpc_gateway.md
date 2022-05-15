@@ -1,6 +1,6 @@
 # gRPC-Gateway
 
-是Google protocol buffers compiler(protoc)的一个插件。读取 protobuf 定义然后生成反向代理服务器，将 RESTful HTTP API 转换为 gRPC。
+gRPC-Gateway 是Google protocol buffers compiler(protoc)的一个插件。读取 protobuf 定义然后生成反向代理服务器，将 RESTful HTTP API 转换为 gRPC。
 
 换句话说就是将 gRPC 转为 RESTful HTTP API。
 
@@ -10,11 +10,15 @@ etcd v3 改用 gRPC 后为了兼容原来的 API，同时要提供 HTTP/JSON 方
 ## 流程
 ![](.grpc_gateway_images/gateway_process.png)
 
+
 当 HTTP 请求到达 gRPC-Gateway 时，它将 JSON 数据解析为 Protobuf 消息。然后，它使用解析的 Protobuf 消息发出正常的 Go gRPC 客户端请求。
 Go gRPC 客户端将 Protobuf 结构编码为 Protobuf 二进制格式，然后将其发送到 gRPC 服务器。
 
 gRPC 服务器处理请求并以 Protobuf 二进制格式返回响应。
 Go gRPC 客户端将其解析为 Protobuf 消息，并将其返回到 gRPC-Gateway，后者将 Protobuf 消息编码为 JSON 并将其返回给原始客户端。
+
+![](.grpc_gateway_images/grpc_gateway_process.png)  
+gRPC 网关生成的反向代理被水平扩展以在多台机器上运行，并且在这些实例之前使用负载均衡器。单个实例可以托管多个 gRPC 服务的反向代理。
 
 ## 环境准备
 

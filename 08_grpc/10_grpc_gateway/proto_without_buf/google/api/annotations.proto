@@ -16,10 +16,10 @@ syntax = "proto3";
 
 package google.api;
 
-import "10_grpc_gateway/proto/google/api/http.proto";
+import "10_grpc_gateway/proto_without_buf/google/api/http.proto";
 import "google/protobuf/descriptor.proto";
 
-option go_package = "10_grpc_gateway/proto/google/api;annotations";
+option go_package = "go_package_example/08_grpc/10_grpc_gateway/proto_without_buf/google/api;annotations";
 option java_multiple_files = true;
 option java_outer_classname = "AnnotationsProto";
 option java_package = "com.google.api";
