@@ -84,13 +84,16 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.8.1
 	github.com/streadway/amqp v1.0.0
-	github.com/stretchr/testify v1.7.0
+	github.com/stretchr/testify v1.7.1
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/yoyofxteam/nacos-viper-remote v0.4.0
 	go.etcd.io/bbolt v1.3.3
 	go.etcd.io/etcd/client/v3 v3.5.2
 	go.mongodb.org/mongo-driver v1.5.3
+	go.opentelemetry.io/otel v1.7.0
+	go.opentelemetry.io/otel/exporters/jaeger v1.7.0
+	go.opentelemetry.io/otel/sdk v1.7.0
 	go.uber.org/dig v1.11.0
 	go.uber.org/zap v1.17.0
 	golang.org/x/mod v0.5.0 // indirect

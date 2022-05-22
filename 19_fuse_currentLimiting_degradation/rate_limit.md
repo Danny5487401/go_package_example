@@ -16,6 +16,8 @@
 - 程序BUG：修改程序bug、及时释放资源等。
 - 同步等待：资源隔离、MQ解耦、不可用服务调用快速失败等。资源隔离通常指不同服务调用采用不同的线程池；不可用服务调用快速失败一般通过熔断器模式结合超时机制实现
 
+## sentinel vs hystrix
+![](.rate_limit_images/hystrix_vs_sentinel.png)
 
 ## 解决方式
 
@@ -213,9 +215,7 @@ func (h *PeriodLimit) calcExpireSeconds() int {
 }
 ```
 
-
-
-### 4. 令牌桶介绍
+## 4. 令牌桶介绍
 ![](.rate_limit_images/tokenBucket.png)
 
 令牌桶是反向的"漏桶"，它是以恒定的速度往木桶里加入令牌，木桶满了则不再加入令牌。
