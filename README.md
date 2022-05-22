@@ -33,7 +33,7 @@
   - [2.4 zap(配合lumberjack库或go-file-rotatelogs库)实现定制化log日志归档](02_log/02_zap/04_customized_log/lumberjack.md)
 
 ## 第三章 消息队列
-- 1 [rabbitmq](03_amqp/01_rabbitmq/introduction.md)
+- [1 rabbitmq](03_amqp/01_rabbitmq/introduction.md)
   - 1.1 消费者：推拉模式
   - 1.1 生产者
 - 2 [kafka](03_amqp/02_kafka/kafka_intro.md)
@@ -44,6 +44,9 @@
 - 3 rocketmq
   - 3.1 消费者：简单消费,延迟消费
   - 3.2 生产者：简单消息，延迟消息，事务消息
+- [4 Asynq分布式延迟队列](03_amqp/04_asynq/asynq.md)
+  - [4.1 生产者](03_amqp/04_asynq/producer)
+  - [4.2 消费者](03_amqp/04_asynq/server)
 
 ## [第四章 服务注册及配置文件中心Nacos](04_nacos/nacos.md)
 - 1 [获取配置及监听文件变化](04_nacos/config_center/main.go)
