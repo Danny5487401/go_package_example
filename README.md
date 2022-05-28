@@ -127,7 +127,7 @@
   - [1.1 结合XORM](10_distributed_tracing/01_jaeger/01_jaeger_xorm/main_test.go)
   - [1.2 结合redis](10_distributed_tracing/01_jaeger/02_jaeger_redis/hook.go)
 - [2 OpenTelemetry](10_distributed_tracing/02_openTelemetry/openTelemetry.md)
-  - 跨服务组合tracer代码展示:需开启svc1和svc2两个http服务
+  - 跨服务组合tracer代码展示:需开启svc1和svc2两个http服务(url可以是zipkin或则jaeger)
 
 ## 第十一章 依赖注入
 - [1 dig依赖注入及http服务分层](11_dependency_injection/00_dig/dig.go)
