@@ -12,7 +12,7 @@ GitLab CI 是GitLab内置的进行持续集成的工具，只需要在仓库根�
 
 
 ### Gitlab Runner
-![](../36_buf/.gitlabCI_images/gitlab_runner.png)
+![](.gitlabCI_images/gitlab_runner.png)
 GitLab-Runner就是一个用来执行.gitlab-ci.yml 脚本的工具。可以理解成，Runner就像认真工作的工人，GitLab-CI就是管理工人的中心，所有工人都要在GitLab-CI里面注册，并且表明自己是为哪个项目服务。
 当相应的项目发生变化时，GitLab-CI就会通知相应的工人执行对应的脚本。
 
@@ -70,7 +70,7 @@ GitLab-Runner可以分类三种类型：Shared Runner（共享型）和Group run
 Job 的执行过程中往往会产生一些数据，默认情况下 GitLab Runner 会保存 Job 生成的这些数据，然后在下一个 Job 执行之前（甚至不局限于当次 CI/CD）将这些数据恢复。这样即便是不同的 Job 运行在不同的 Runner 上，它也能看到彼此生成的数据
 
 Job执行流程
-![](../36_buf/.gitlabCI_images/job_process.png)
+![](.gitlabCI_images/job_process.png)
 
 
 ### script语法
