@@ -101,6 +101,7 @@ GitLab CI的每个实例都有一个名为Lint的嵌入式调试工具，它可�
 ### 前置条件 
 1. gitlab 安装
 2. runner注册
+3. gitlabCI选择Tag
 
 
 
