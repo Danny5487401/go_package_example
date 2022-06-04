@@ -22,6 +22,53 @@ sentry支持自动收集和手动收集两种错误收集方法.
 
 ## 基本概念
 
+### hub 
+将 hub 视为我们的  SDK用于将 事件 路由到  Sentry的中心点。
+当您调用  init()时，会创建一个  hub，并在其上创建一个  client和一个空白  scope。
+然后该  hub与当前线程相关联，并将在内部保存 scope堆栈。
+```go
+type Hub struct {
+	mu          sync.RWMutex
+	stack       *stack
+	lastEventID EventID
+}
+```
+
+
+### scope 
+
+scope将保存应与事件一起发送的有用信息。例如 context(上下文) 或 breadcrumbs(面包屑) 存储在  scope内。
+当一个  scope被  push时，它从 父 scope 继承所有数据，当它  pop时，所有修改都被還原。
+
+
+默认的 SDK 集成将智能地  push和  pop scope。例如，Web 框架集成将围绕您的 路由 或 控制器 创建和销毁  scope。
+
+```go
+type Scope struct {
+	mu          sync.RWMutex
+	breadcrumbs []*Breadcrumb
+	user        User
+	tags        map[string]string
+	contexts    map[string]interface{}
+	extra       map[string]interface{}
+	fingerprint []string
+	level       Level
+	transaction string
+	request     *http.Request
+	// requestBody holds a reference to the original request.Body.
+	requestBody interface {
+		// Bytes returns bytes from the original body, lazily buffered as the
+		// original body is read.
+		Bytes() []byte
+		// Overflow returns true if the body is larger than the maximum buffer
+		// size.
+		Overflow() bool
+	}
+	eventProcessors []EventProcessor
+}
+```
+
+
 ### DSN
 DSN是连接客户端(项目)与sentry服务端,让两者能够通信的钥匙；
 每当我们在sentry服务端创建一个新的项目，都会得到一个独一无二的DSN，也就是密钥。在客户端初始化时会用到这个密钥，这样客户端报错，服务端就能抓到你对应项目的错误了

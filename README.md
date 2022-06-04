@@ -27,10 +27,11 @@
 ## 第二章 日志库
 - 1 [zerolog](02_log/01_zerolog/zerolog.md)
 - 2 [zap使用及源码分析](02_log/02_zap/zap.md)
-  - 2.1 控制台输出
-  - 2.2 文件输出
+  - [2.1 两种打印风格](02_log/02_zap/01_cosole/main.go)
+  - [2.2 定义多种输出位置: 控制台输出及文件输出](02_log/02_zap/02_file_stdout/main.go)
   - [2.3 并发安全logger](02_log/02_zap/03_concurrency_safe/main.go)
   - [2.4 zap(配合lumberjack库或go-file-rotatelogs库)实现定制化log日志归档](02_log/02_zap/04_customized_log/lumberjack.md)
+  - [2.5 简单的基于Entry实现的hook函数-->无法接收到Fields的相关参数](02_log/02_zap/05_hook/main.go)
 
 ## 第三章 消息队列
 - [1 rabbitmq](03_amqp/01_rabbitmq/introduction.md)
@@ -233,7 +234,8 @@
   - 2.2 V7版本
 
 ## [第二十五章 监控sentry](25_sentry/sentry.md)
-- [结合gin使用](25_sentry/gin/main.go)
+- [1 结合gin基本shiyong](25_sentry/gin/main.go)
+- [2 自定义zap core模块收集error级别日志上报sentry](25_sentry/zap_sentry/main.go)
 
 ## [第二十六章 图数据库Neo4j](26_neo4j/neo4j.md)
 - [cypher语句](26_neo4j/cypher.md)
