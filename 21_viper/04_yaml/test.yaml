@@ -1,0 +1,42 @@
+- name: wanger
+  age: 24
+  address: beijing
+  hobby:
+    - literature
+    - social
+- name: 冬哥
+  age: 30
+  address: chengdu
+  hobby:
+    - basketball
+    - guitar
+- name: 华子
+  age: 28
+  address: shenzhen
+  hobby:
+    - 王者荣耀
+- name: 乔克
+  age: 30
+  address: chongqing
+  hobby:
+    - 阅读
+    - 王者荣耀
+- name: 夏老师
+  age: 29
+  address: chengdu
+  hobby:
+    - 吃吃喝喝
+- name: 姜总
+  age: 25
+  address: shanghai
+  hobby:
+    - 钓鱼
+    - 音乐
+    - 美食
+    - 酒
+- name: 郑哥
+  age: 30
+  address: beijing
+  hobby:
+    - 阅读
+    - 复读机

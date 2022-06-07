@@ -100,6 +100,7 @@ require (
 	google.golang.org/grpc/examples v0.0.0-20220408224156-ebd098392a8b
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/ini.v1 v1.63.2
+	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 	xorm.io/builder v0.3.8
 	xorm.io/xorm v1.1.0
 )
