@@ -278,5 +278,7 @@
 
 ## [第三十六章 Proto管理工具Buf](36_buf/buf_intro.md)
 
+## [第三十六章 CI持续集成](37_CI/gitlabCI.md)
+
 
 
