@@ -51,7 +51,7 @@ require (
 	github.com/hashicorp/raft-boltdb v0.0.0-20211202195631-7d34b9fb3f42
 	github.com/hibiken/asynq v0.23.0
 	github.com/hpcloud/tail v1.0.0
-	github.com/jinzhu/copier v0.3.2
+	github.com/jinzhu/copier v0.3.5
 	github.com/jinzhu/gorm v1.9.16
 	github.com/jmoiron/sqlx v1.3.3
 	github.com/json-iterator/go v1.1.12
