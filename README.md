@@ -21,8 +21,9 @@
 ## [第一章 服务注册中心consul](01_consul/consul.md)
 - [consul架构](01_consul/consul.md)
 - [分布式锁-->consul实现)](01_consul/distributed_lock.md)
-  
-- [1 服务注册，过滤，获取](01_consul/main.go)
+
+- [1 http服务注册发现加健康检查](01_consul/01_http/test/consul_registry_test.go)
+- [1 grpc服务注册发现加健康检查](01_consul/01_http/test/consul_registry_test.go)
 
 ## 第二章 日志库
 - 1 [zerolog](02_log/01_zerolog/zerolog.md)
@@ -93,7 +94,7 @@
 - 4  protobuf的jsonpb包序列化和反序列化
 - [5  负载均衡](08_grpc/05_grpc_load_balance/load_balance.md)
   - [5.1 客户端负载均衡(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver_n_balancer.md)
-    - [第三方consul实现Resolver接口和Builder接口](08_grpc/05_grpc_load_balance/client/consul_client/main.go)
+    - [第三方consul实现Resolver接口和Builder接口](01_consul/02_grpc/consul_client/main.go)
     - [自定义实现Resolver接口和Builder接口](08_grpc/05_grpc_load_balance/client/customized_resolver_client/client.go)
     - [自定义实现nacos服务注册与发现](08_grpc/05_grpc_load_balance/client/nacos_client)
   - 5.2 服务端

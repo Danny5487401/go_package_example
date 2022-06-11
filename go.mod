@@ -11,7 +11,7 @@ require (
 	github.com/afex/hystrix-go v0.0.0-20180502004556-fa1af6a1f4f5
 	github.com/alibaba/sentinel-golang v1.0.2
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
-	github.com/armon/go-metrics v0.3.10 // indirect
+	github.com/armon/go-metrics v0.4.0 // indirect
 	github.com/aws/aws-sdk-go v1.38.17 // indirect
 	github.com/boltdb/bolt v1.3.1
 	github.com/bwmarrin/snowflake v0.3.0
@@ -42,13 +42,14 @@ require (
 	github.com/google/wire v0.5.0
 	github.com/grpc-ecosystem/go-grpc-middleware v1.1.0
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.10.0
-	github.com/hashicorp/consul/api v1.12.0
+	github.com/hashicorp/consul/api v1.13.0
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
-	github.com/hashicorp/go-hclog v1.0.0
+	github.com/hashicorp/go-hclog v1.2.1
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/raft v1.3.5
 	github.com/hashicorp/raft-boltdb v0.0.0-20211202195631-7d34b9fb3f42
+	github.com/hashicorp/serf v0.9.8 // indirect
 	github.com/hibiken/asynq v0.23.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/jinzhu/copier v0.3.5
@@ -59,9 +60,9 @@ require (
 	github.com/mailru/easyjson v0.7.7 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-sqlite3 v1.14.6
-	github.com/mbobakov/grpc-consul-resolver v1.4.0
+	github.com/mbobakov/grpc-consul-resolver v1.4.4
 	github.com/micro/go-micro v1.18.0
-	github.com/mitchellh/mapstructure v1.4.3
+	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nacos-group/nacos-sdk-go v1.0.7
 	github.com/nacos-group/nacos-sdk-go/v2 v2.0.1
 	github.com/natefinch/lumberjack v2.0.0+incompatible
@@ -79,7 +80,7 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.8.1
 	github.com/streadway/amqp v1.0.0
-	github.com/stretchr/testify v1.7.1
+	github.com/stretchr/testify v1.7.2
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/yoyofxteam/nacos-viper-remote v0.4.0
@@ -94,13 +95,14 @@ require (
 	go.uber.org/dig v1.11.0
 	go.uber.org/zap v1.17.0
 	golang.org/x/mod v0.5.0 // indirect
+	golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d // indirect
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	google.golang.org/genproto v0.0.0-20220317150908-0efb43f6373e
-	google.golang.org/grpc v1.45.0
+	google.golang.org/grpc v1.47.0
 	google.golang.org/grpc/examples v0.0.0-20220408224156-ebd098392a8b
 	google.golang.org/protobuf v1.28.0
 	gopkg.in/ini.v1 v1.63.2
-	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
+	gopkg.in/yaml.v3 v3.0.1
 	xorm.io/builder v0.3.8
 	xorm.io/xorm v1.1.0
 )

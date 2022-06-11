@@ -30,14 +30,14 @@ func main() {
 	//conn, err := grpc.Dial("127.0.0.1:9000", opts...)
 
 	// 1. 从证书相关文件中读取和解析信息，得到证书公钥、密钥对
-	cert, err := tls.LoadX509KeyPair("08_grpc/06_grpc_interceptor/client.pem", "08_grpc/06_grpc_interceptor/client.key")
+	cert, err := tls.LoadX509KeyPair("08_grpc/12_grpc_middleware/01_grpc_interceptor/client.pem", "08_grpc/12_grpc_middleware/01_grpc_interceptor/client.key")
 	if err != nil {
 		log.Fatalf("tls.LoadX509KeyPair err: %v", err)
 	}
 
 	// 2. 创建一个新的、空的 CertPool
 	certPool := x509.NewCertPool()
-	ca, err := ioutil.ReadFile("08_grpc/06_grpc_interceptor/ca.pem")
+	ca, err := ioutil.ReadFile("08_grpc/12_grpc_middleware/01_grpc_interceptor/ca.pem")
 	if err != nil {
 		log.Fatalf("ioutil.ReadFile err: %v", err)
 	}
