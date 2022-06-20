@@ -23,7 +23,7 @@
 - [分布式锁-->consul实现)](01_consul/distributed_lock.md)
 
 - [1 http服务注册发现加健康检查](01_consul/01_http/test/consul_registry_test.go)
-- [1 grpc服务注册发现加健康检查](01_consul/01_http/test/consul_registry_test.go)
+- [2 grpc服务注册发现加健康检查](01_consul/01_http/test/consul_registry_test.go)
 
 ## 第二章 日志库
 - 1 [zerolog](02_log/01_zerolog/zerolog.md)
