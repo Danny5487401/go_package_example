@@ -131,9 +131,9 @@
 - [2 OpenTelemetry](10_distributed_tracing/02_openTelemetry/openTelemetry.md)
   - 跨服务组合tracer代码展示:需开启svc1和svc2两个http服务(url可以是zipkin或则jaeger)
 
-## 第十一章 依赖注入
-- [1 dig依赖注入及http服务分层](11_dependency_injection/00_dig/dig.go)
-- 2 wire依赖注入
+## [第十一章 依赖注入容器(Dependency Injection Container)](11_dependency_injection/dependency_injection.md)
+- [1 dig依赖注入及http服务分层->不推荐](11_dependency_injection/00_dig/dig.go)
+- 2 wire依赖注入->推荐
   - [2.1 不使用wire现状](11_dependency_injection/01_wire/01_without_wire/main.go)
   - [使用wire优化](11_dependency_injection/01_wire/02_wire)
   - [wire使用-带err返回](11_dependency_injection/01_wire/03_wire_return_err/wire)
