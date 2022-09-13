@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	_ "go_grpc_example/08_grpc/15_customized_protobuf_plugin/helloworld_protobuf"
-	options "go_grpc_example/08_grpc/15_customized_protobuf_plugin/plugin_protobuf"
+	_ "go_package_example/08_grpc/15_customized_protobuf_plugin/helloworld_protobuf"
+	options "go_package_example/08_grpc/15_customized_protobuf_plugin/plugin_protobuf"
 
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/reflect/protoreflect"

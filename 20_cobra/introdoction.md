@@ -27,7 +27,7 @@ Cobra 是一个非常实用(流行)的golang包，很多优秀的开源应用都
 
 ### 1. 通过命令初始化项目
 ```shell script
-cobra init --pkg-name go_grpc_example/20_cobra
+cobra init --pkg-name go_package_example/20_cobra
 ```
 ### 2. 通过命令生成动作
 ```shell script
@@ -44,7 +44,7 @@ cobra的三个概念：
   eg:
 ```shell script
 cobra add show
-# 终端返回： show created at /Users/python/Desktop/go_grpc_example/20_cobra
+# 终端返回： show created at /Users/python/Desktop/go_package_example/20_cobra
 
 ```
   
@@ -64,7 +64,7 @@ Usage: ls [OPTION]... [FILE]...
 #### 4. 添加子命令
 ```shell script
 cobra add parse -p showCmd  
-# 终端返回： parse created at /Users/python/Desktop/go_grpc_example/20_cobra
+# 终端返回： parse created at /Users/python/Desktop/go_package_example/20_cobra
 ```
 解释： 给showCmd命令添加子命令parse
 

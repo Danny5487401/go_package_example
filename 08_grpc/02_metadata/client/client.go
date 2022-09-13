@@ -9,7 +9,7 @@ import (
 	"log"
 	"time"
 
-	pb "go_grpc_example/08_grpc/02_metadata/echo"
+	pb "go_package_example/08_grpc/02_metadata/echo"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 )

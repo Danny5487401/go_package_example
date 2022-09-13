@@ -19,4 +19,7 @@
 
 .DS_Store/
 
-.idea/
+.idea/*
+
+# sonar 扫描
+.scannerwork

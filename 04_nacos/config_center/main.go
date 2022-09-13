@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"go_grpc_example/04_nacos/config_center/config"
+	"go_package_example/04_nacos/config_center/config"
 
 	"github.com/nacos-group/nacos-sdk-go/clients"
 	"github.com/nacos-group/nacos-sdk-go/common/constant"

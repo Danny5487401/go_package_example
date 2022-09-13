@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"go_grpc_example/18_log_collect/logAgent/conf"
-	"go_grpc_example/18_log_collect/logAgent/etcd"
-	"go_grpc_example/18_log_collect/logAgent/kafka"
-	tailLog "go_grpc_example/18_log_collect/logAgent/tail_log"
-	"go_grpc_example/18_log_collect/logAgent/utils"
+	"go_package_example/18_log_collect/logAgent/conf"
+	"go_package_example/18_log_collect/logAgent/etcd"
+	"go_package_example/18_log_collect/logAgent/kafka"
+	tailLog "go_package_example/18_log_collect/logAgent/tail_log"
+	"go_package_example/18_log_collect/logAgent/utils"
 	"sync"
 	"time"
 
@@ -110,7 +110,7 @@ func main() {
 	wg.Wait()                                     // 一直监听着
 
 	// 2.打开日志文件准备收集日记
-	//fileName := "/Users/python/Desktop/go_grpc_example/log_collect/logAgent/log.txt"
+	//fileName := "/Users/python/Desktop/go_package_example/log_collect/logAgent/log.txt"
 	//if err := tailLog.Init(fileName);err!=nil{
 	//if err := tailLog.Init(appCfg.FilePath);err!=nil{
 	//	fmt.Printf("[Init tailLog failed]:%v",err)

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go_grpc_example/32_raft/cache"
+	"go_package_example/32_raft/cache"
 
 	"log"
 	"net"

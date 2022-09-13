@@ -1,0 +1,17 @@
+syntax = "proto3";                // proto 版本，建议使用 proto3
+option go_package = "11_protoc_gogofast/proto;search"; // 包名声明符
+
+message SearchRequestParam {      // message 类型
+  enum Type {                     // 枚举类型
+    PC = 0;
+    Mobile = 1;
+  }
+  string query_text = 1;          // 字符串类型 | 后面的「1」为数字标识符，在消息定义中需要唯一
+  int32 limit = 3;                // 整型
+  Type type = 4;                  // 枚举类型
+}
+
+message SearchResultPage {
+  repeated string result = 1;     // 「repeated」表示字段可以重复任意多次（包括0次）
+  int32 num_results = 2;
+}

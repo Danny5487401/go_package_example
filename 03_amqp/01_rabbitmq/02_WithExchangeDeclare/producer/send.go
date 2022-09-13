@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go_grpc_example/03_amqp/01_rabbitmq/02_WithExchangeDeclare/rmq"
+	"go_package_example/03_amqp/01_rabbitmq/02_WithExchangeDeclare/rmq"
 )
 
 func main() {

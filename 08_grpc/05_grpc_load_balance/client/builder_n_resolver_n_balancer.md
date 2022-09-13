@@ -14,12 +14,13 @@ type Builder interface {
 Resolver接口：监视指定目标的更新，包括地址更新和服务配置更新。
 ```go
 type Resolver interface {
-    ResolveNow(ResolveNowOption) // 被 gRPC 调用，以尝试再次解析目标名称。只用于提示，可忽略该方法。 需要并发安全的
-    Close()
+    ResolveNow(ResolveNowOption) // 立即resolve，重新查询服务信息
+    Close() ////关闭这个Resolver
 }
 ```
 
 ## 解析过程
+
 ![](.builder_n_resolver_images/builder_n_resolver.png)
 1. SchemeBuilder将自身实例注册到resolver包的map中； 
 2. grpc.Dial/DialContext时使用特定形式的target参数
@@ -29,6 +30,7 @@ type Resolver interface {
 6. 后续由SchemeResolver实例监视service instance变更状态并在有变更的时候更新ClientConnection
 7. 当address被作为target的实参传入grpc.DialContext后，它会被grpcutil.ParseTarget解析为一个resolver.Target结构体
 ```go
+// uri解析之后的对象, uri的格式详见RFC3986
 type Target struct {
 	Scheme    string
 	Authority string
@@ -90,8 +92,8 @@ func Get(scheme string) Builder {
 ```
 
 
-# 负载均衡
-![](.builder_n_resolver_n_balancer_images/balancer_process.png)
+## 负载均衡
+![](.builder_n_resolver_images/balancer_process.png)
 - 首先要注册一个名为"my_weighted_round_robin"的balancer Builder:wrrBuilder，该Builder由base包的NewBalancerBuilder构建；
 - base包的NewBalancerBuilder函数需要传入一个PickerBuilder实现，于是我们需要自定义一个返回Picker接口实现的PickerBuilder。
 - grpc.Dial调用时传入一个WithBalancerName("my_weighted_round_robin")，grpc通过balancer Name从已注册的balancer builder中选出我们实现的wrrBuilder，并调用wrrBuilder创建Picker：wrrPicker。

@@ -400,4 +400,19 @@ func (p *Producer) produce(msg *Message, msgFlags int, deliveryChan chan Event) 
 
 
 ## 消费者
+
+消息内容
+```go
+// Message represents a Kafka message
+type Message struct {
+	TopicPartition TopicPartition
+	Value          []byte
+	Key            []byte
+	Timestamp      time.Time
+	TimestampType  TimestampType
+	Opaque         interface{}
+	Headers        []Header
+}
+```
+
 同理

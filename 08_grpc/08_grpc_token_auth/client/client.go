@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
-	"go_grpc_example/08_grpc/06_grpc_interpretor/proto"
+	"go_package_example/08_grpc/08_grpc_token_auth/proto"
 
 	"google.golang.org/grpc"
 )
@@ -19,6 +19,7 @@ func (c CustomCredential) GetRequestMetadata(ctx context.Context, uri ...string)
 }
 
 func (c CustomCredential) RequireTransportSecurity() bool {
+	// 不需要基于 TLS 认证进行安全传输
 	return false
 }
 

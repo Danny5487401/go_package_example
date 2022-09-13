@@ -1,0 +1,31 @@
+# 待详细介绍补充
+
+
+run:
+  # The default concurrency value is the number of available CPU.
+  concurrency: 4
+  # Timeout for analysis, e.g. 30s, 5m.
+  # Default: 1m
+  timeout: 5m
+  # Exit code when at least one issue was found.
+  # Default: 1
+  issues-exit-code: 2
+  # Include test files or not.
+  # Default: true
+  tests: false
+  # List of build tags, all linters use it.
+  # Default: [].
+  build-tags:
+    - mytag
+  go: '1.16'
+
+
+linters-settings:
+  dupl:
+    # tokens count to trigger issue, 150 by default
+    threshold: 100
+
+linters:
+  enable:
+    - dupl
+    - golint

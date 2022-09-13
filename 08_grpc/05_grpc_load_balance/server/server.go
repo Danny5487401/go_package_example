@@ -11,7 +11,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "go_grpc_example/08_grpc/02_metadata/echo"
+	pb "go_package_example/08_grpc/02_metadata/echo"
 )
 
 var (

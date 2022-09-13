@@ -6,7 +6,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/hpcloud/tail"
-	"go_grpc_example/18_log_collect/logAgent/kafka"
+	"go_package_example/18_log_collect/logAgent/kafka"
 	"time"
 )
 

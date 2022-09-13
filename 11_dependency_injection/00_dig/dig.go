@@ -15,14 +15,14 @@ import (
 
 */
 
-//1。返回的Person
+// 1.返回的Person
 type Person struct {
 	Id   int    `json:"id"`
 	Name string `json:"name"`
 	Age  int    `json:"age"`
 }
 
-// 2。服务器配置
+// 2. 服务器配置
 //Enabled告诉我们我们的应用程序是否应该返回实际数 DatabasePath告诉我们数据库在哪里（我们正在使用sqlite）。Port告诉我们将运行我们的服务器的端口
 type Config struct {
 	Enabled      bool
@@ -38,12 +38,12 @@ func NewConfig() *Config {
 	}
 }
 
-// 3。打开数据库链接
+// 3. 打开数据库链接
 func ConnectDatabase(config *Config) (*sql.DB, error) {
 	return sql.Open("sqlite3", config.DatabasePath)
 }
 
-// 4。PersonRepository仓库：负责从我们的数据库中提取人员并将这些数据库结果反序列化为合适的Person结构
+// 4. PersonRepository仓库：负责从我们的数据库中提取人员并将这些数据库结果反序列化为合适的Person结构
 type PersonRepository struct {
 	database *sql.DB //管理数据库连接
 }
@@ -81,7 +81,7 @@ func NewPersonRepository(database *sql.DB) *PersonRepository {
 	return &PersonRepository{database: database}
 }
 
-// 5。为了在我们的HTTP服务器和PersonRepository我们之间提供一个图层，我们将创建一个PersonService
+// 5. 为了在我们的HTTP服务器和PersonRepository我们之间提供一个图层，我们将创建一个PersonService
 // 我们PersonService依赖于Config和PersonRepository。它公开了一个被称为“ FindAll有条件地调用PersonRepository应用程序是否被启用” 的函数
 type PersonService struct {
 	config     *Config
@@ -100,7 +100,7 @@ func NewPersonService(config *Config, repository *PersonRepository) *PersonServi
 	return &PersonService{config: config, repository: repository}
 }
 
-//6。这是负责运行一个HTTP服务器并委托给我们的合适的请求PersonService
+//6. 这是负责运行一个HTTP服务器并委托给我们的合适的请求PersonService
 type Server struct {
 	config        *Config
 	personService *PersonService
@@ -138,14 +138,6 @@ func NewServer(config *Config, service *PersonService) *Server {
 		personService: service,
 	}
 }
-
-/*
-DI框架通常提供两种功能：
-	一种“提供”新组件的机制。
-		这将告诉DI框架您需要构建自己的其他组件（您的依赖关系）以及在拥有这些组件后如何构建自己。
-	一种“检索”构建组件的机制。
-		DI框架通常基于您所讲述的“提供者”构建一个图并确定如何构建您的对象
-*/
 
 // 修改前：可怕的初始化
 //func main() {

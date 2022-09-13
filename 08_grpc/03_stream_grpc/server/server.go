@@ -9,7 +9,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"go_grpc_example/08_grpc/03_stream_grpc/proto"
+	"go_package_example/08_grpc/03_stream_grpc/proto"
 )
 
 const PORT = ":50051"

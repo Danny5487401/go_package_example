@@ -1,5 +1,5 @@
 # Consul
-![](consul_structure.png)
+![](.consul_images/consul_structure.png)
 
 ## 基本概念
 - Agent: 代理是 consul 集群中每个成员的基本单位，他们以守护进程的形式存在，代理有 客户端 以及 服务端 两种角色运行。
@@ -30,14 +30,23 @@ Consul支持多数据中心，上图中有两个 DataCenter，他们通过网络
 
 ## 端口说明：
 
-
 | 端口 | 作用 |
 | ------ | ------ |
-|8300       |RPC 调用       |     
-|8301       |数据中心内部 GOSSIP 协议使用       |     
-|8302       |跨数据中心 GOSSIP 协议使用       |
+|8300       |server rpc 端口，同一数据中心 consul server 之间通过该端口通信      |     
+|8301       |serf lan 端口，同一数据中心 consul client 通过该端口通信      |     
+|8302       |serf wan 端口，不同数据中心 consul server 通过该端口通信       |
 |8500       |HTTP API 和 Web 接口使用       |
-|8600       |用于 DNS 服务端       |
+|8600       |dns 端口，用于服务发现       |
+
+## docker简单安装
+```shell
+docker run --name consul1 -d -p 8500:8500 -p 8300:8300 -p 8301:8301 -p 8302:8302 -p 8600:8600 consul:latest agent -server -bootstrap-expect 1 -ui -bind=0.0.0.0 -client=0.0.0.0
+```
+- agent: 表示启动 Agent 进程。
+- client：表示启动 Consul Client 模式。
+- bind： 监听网口，0.0.0.0 表示所有网口，如果不指定默认未127.0.0.1，则无法和容器通信 
+- client 0.0.0.0 -ui 启动Web UI管理工具 
+- bootstrap-expect 1
 
 ## consul 为我们提供的四大组件
 Service Discovery: 当某个应用可用的时候，可以向 consul 客户端注册自己，或者让 consul 客户端通过配置发现自己，这样，如果有需要这个应用的其他应用就可以通过 consul 快速找到一个可用的应用了。
@@ -49,7 +58,28 @@ KV Store: 应用按需使用 consul 的 KV存储 ，可以用于动态配置、�
 Multi Datacenter: consul 提供开箱即用的多数据中心，这意味着用户不需要担心需要建立额外的抽象层让业务扩展到多个区域。
 
 
+## 注册中心
+![](.consul_images/register_center.png)
+![](.consul_images/register_center_info.png)
+
+所有的服务都启动后都通过注册中心来注册自己，同时把注册中心里面的服务信息拉回本地，后续调用，就直接检查本地的服务和节点信息来进行服务节点的调用
+
+每个服务节点都会来注册中心进行服务注册，那数据如何在服务端进行保存呢，其实就是注册表，其实等同于windows 里面的注册表，每个服务都来注册，
+把自己的信息上报上来，然后注册中心吧注册表，返回给client端，那服务之间就知道要调用服务的节点啦
+
+![](.consul_images/register_center_detail.png)
+微服务注册注册中心通常会大量的服务注册， 那不能每次客户端来请求的时候，服务端都返回全量的数据，在数据传输的设计中，通常会有一种增量同步，其实在注册中心中也类似
+注册中心通过将最近的服务变更事件保存在一个事件队列中，后续每次客户端拉取只返回增量数据，这样服务端的忘了压力就会小很多
+
+### 注册中心hashcode
+![](.consul_images/hashcode.png)
+增量数据有一个问题就是，如果客户端错过啦某些事件，比如事件队列满了，则客户端与注册中心的注册表就会不一致， 所以eureka里面引入了一个hashcode的概念，通过比对hashcode是否相同， 如果不同则客户端需要重新全量拉取
+
+
 ## 源码分析
+
+
+
 
 
 

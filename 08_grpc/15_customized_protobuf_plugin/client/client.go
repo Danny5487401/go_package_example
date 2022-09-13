@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	pb "go_grpc_example/08_grpc/15_customized_protobuf_plugin/helloworld_protobuf"
+	pb "go_package_example/08_grpc/15_customized_protobuf_plugin/helloworld_protobuf"
 	"google.golang.org/grpc"
 )
 

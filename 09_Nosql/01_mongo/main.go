@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"go_grpc_example/09_Nosql/01_mongo/model"
-	"go_grpc_example/09_Nosql/01_mongo/util"
+	"go_package_example/09_Nosql/01_mongo/model"
+	"go_package_example/09_Nosql/01_mongo/util"
 	"log"
 	"strconv"
 	"time"

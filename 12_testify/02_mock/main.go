@@ -7,15 +7,12 @@ import (
 	"net/http"
 )
 
-type User struct {
-	Name string
-	Age  int
-}
-
+// 爬虫接口
 type ICrawler interface {
 	GetUserList() ([]*User, error)
 }
 
+// 具体实现
 type MyCrawler struct {
 	url string
 }
@@ -50,5 +47,9 @@ func GetAndPrintUsers(crawler ICrawler) {
 	for _, u := range users {
 		fmt.Println(u)
 	}
-	fmt.Println("-----成功-----")
+}
+
+type User struct {
+	Name string
+	Age  int
 }
