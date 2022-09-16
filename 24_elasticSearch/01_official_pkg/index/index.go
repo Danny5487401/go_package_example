@@ -140,7 +140,7 @@ func main() {
 	}
 	res.Body.Close()
 
-	start := time.Now().UTC()
+	start := time.Now().Local()
 
 	// 循环收集
 	for _, a := range articles {

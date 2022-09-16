@@ -227,7 +227,7 @@
 
 ## [第二十四章 搜索引擎es](24_elasticSearch/es.md)
 - [es索引及索引生命周期管理](24_elasticSearch/es_index.md)
-- [1 官方包](24_elasticSearch/official_pkg/go_elasticseach.md)
+- [1 官方包](24_elasticSearch/01_official_pkg/go_elasticseach.md)
   - 1.1 批量写入Bulk
   - 1.2 es日志
   - 1.3 并发批量BulkIndexer
