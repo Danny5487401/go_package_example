@@ -1,5 +1,8 @@
 # Grpc
-参考使用连接：https://github.com/grpc/grpc-go/tree/master/examples/features
+
+![](.grpc_images/grpc_layer.png)
+
+最底层为TCP或Unix Socket协议，在此之上是HTTP/2协议的实现，然后在HTTP/2协议之上又构建了针对Go语言的gRPC核心库。应用程序通过gRPC插件生产的Stub代码和gRPC核心库通信，也可以直接和gRPC核心库通信。
 
 ## grpc分类
 ### 1. unary
@@ -36,3 +39,5 @@
 * PermitWithoutStream如果为true，当连接空闲时仍然发送PING帧监测，如果为false，则不发送忽略。我们设置为true
 
 
+## 参考链接
+1. [官方 example](https://github.com/grpc/grpc-go/tree/master/examples/features)
