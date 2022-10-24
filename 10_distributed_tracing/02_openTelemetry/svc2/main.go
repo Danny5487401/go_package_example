@@ -6,7 +6,7 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/baggage"
-	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/zipkin"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
@@ -36,7 +36,8 @@ func tracerProvider(url string) error {
 	// 可以直接连collector也可以连agent
 
 	//exp, err := jaeger.New(jaeger.WithAgentEndpoint(jaeger.WithAgentHost("127.0.0.1"), jaeger.WithAgentPort("6831")))
-	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+	//exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+	exp, err := zipkin.New("http://tencent.danny.games:9422/api/v2/spans") // 这样使用zipkin
 	if err != nil {
 		return err
 	}

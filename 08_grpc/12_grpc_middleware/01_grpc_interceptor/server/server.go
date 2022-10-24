@@ -2,14 +2,11 @@ package main
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
 	"fmt"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpctls "go_package_example/08_grpc/12_grpc_middleware/01_grpc_interceptor/tls"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
-	"io/ioutil"
 	"log"
 	"net"
 	"runtime/debug"
@@ -49,7 +46,7 @@ func main() {
 	//g := grpc.NewServer(opt)
 
 	// 2。定义多个拦截器
-	c := GetTLSCredentialsByCA()
+	c := grpctls.GetTLSCredentialsByCA()
 	opts := []grpc.ServerOption{
 		grpc.Creds(c),
 		grpc_middleware.WithUnaryServerChain(
@@ -67,34 +64,6 @@ func main() {
 		return
 	}
 	_ = server.Serve(lis)
-}
-
-func GetTLSCredentialsByCA() credentials.TransportCredentials {
-	cert, err := tls.LoadX509KeyPair("08_grpc/06_grpc_interceptor/server.pem", "08_grpc/06_grpc_interceptor/server.key")
-	if err != nil {
-		log.Fatalf("tls.LoadX509KeyPair err: %v", err)
-	}
-
-	// 创建一个新的、空的 CertPool
-	certPool := x509.NewCertPool()
-	ca, err := ioutil.ReadFile("08_grpc/06_grpc_interceptor/ca.pem")
-	if err != nil {
-		log.Fatalf("ioutil.ReadFile err: %v", err)
-	}
-
-	// 尝试解析所传入的 PEM 编码的证书
-	if ok := certPool.AppendCertsFromPEM(ca); !ok {
-		log.Fatalf("certPool.AppendCertsFromPEM err")
-	}
-
-	// 构建基于 TLS 的 TransportCredentials 选项
-	c := credentials.NewTLS(&tls.Config{
-		//tls.Config：Config 结构用于配置 TLS 客户端或服务器
-		Certificates: []tls.Certificate{cert}, //Certificates：设置证书链，允许包含一个或多个
-		ClientAuth:   tls.RequestClientCert,   //ClientAuth：要求必须校验客户端的证书。可以根据实际情况选用以下参数
-		ClientCAs:    certPool,                //设置根证书的集合，校验方式使用 ClientAuth 中设定的模式
-	})
-	return c
 }
 
 /*

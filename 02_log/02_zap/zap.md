@@ -6,10 +6,12 @@ zap 每打印1条日志，至少需要2次内存分配:
 1. 创建 field 时分配内存。
 2. 将组织好的日志格式化成目标 []byte 时分配内存
 
-   zap 通过 sync.Pool 提供的对象池，复用了大量可以复用的对象，避开了 gc 这个大麻烦
+zap 通过 sync.Pool 提供的对象池，复用了大量可以复用的对象，避开了 gc 这个大麻烦
+
 ## zap结构
 ![](.zap_images/zap_structure.png)
 ![](.zap_images/zap_structure2.png)
+
 通过 zap 打印一条结构化的日志大致包含5个过程：
 
 1. 分配日志 Entry: 创建整个结构体，此时虽然没有传参(fields)进来，但是 fields 参数其实创建了
@@ -60,7 +62,6 @@ zap为我们提供了New，Build两种方式来初始化Logger。除了core以�
 
 ### 1. 初始化    
 zap提供了两类构造Logger的方式，一类是使用了建造者模式的Build方法，一类是接收Option参数的New方法，这两类方法提供的能力完全相同，只是给用户提供了不同的选择
-
 
 
 ```go
@@ -131,6 +132,7 @@ type Config struct {
 	InitialFields map[string]interface{} `json:"initialFields" yaml:"initialFields"`
 }
 ```
+
 zapcore.EncoderConfig
 ```go
 type EncoderConfig struct {
@@ -161,7 +163,8 @@ type EncoderConfig struct {
     EncodeName NameEncoder `json:"nameEncoder" yaml:"nameEncoder"`
 }
 ```
-那开发环境进行讲解
+
+拿开发环境进行讲解
 ```go
 // 初始化
 func NewDevelopment(options ...Option) (*Logger, error) {
@@ -318,6 +321,7 @@ func AddStacktrace(lvl zapcore.LevelEnabler) Option {
     })
 }
 ```
+
 zap还为我们添加了hook，让我们在每次打印日志的时候，可以调用hook方法：比如可以统计打印日志的次数、统计打印字段等.
 ```go
 func Hooks(hooks ...func(zapcore.Entry) error) Option {
@@ -347,6 +351,7 @@ type Core interface {
     Sync() error
 }
 ```
+
 实现
 ![](.zap_images/zap_core_realized.png)
 

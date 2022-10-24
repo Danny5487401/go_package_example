@@ -21,19 +21,21 @@
 ## [第一章 服务注册中心consul](01_consul/consul.md)
 - [consul架构](01_consul/consul.md)
 - [分布式锁-->consul实现)](01_consul/distributed_lock.md)
-  
-- [1 服务注册，过滤，获取](01_consul/main.go)
+
+- [1 http服务注册发现加健康检查](01_consul/01_http/test/consul_registry_test.go)
+- [2 grpc服务注册发现加健康检查](01_consul/01_http/test/consul_registry_test.go)
 
 ## 第二章 日志库
 - 1 [zerolog](02_log/01_zerolog/zerolog.md)
 - 2 [zap使用及源码分析](02_log/02_zap/zap.md)
-  - 2.1 控制台输出
-  - 2.2 文件输出
+  - [2.1 两种打印风格](02_log/02_zap/01_cosole/main.go)
+  - [2.2 定义多种输出位置: 控制台输出及文件输出](02_log/02_zap/02_file_stdout/main.go)
   - [2.3 并发安全logger](02_log/02_zap/03_concurrency_safe/main.go)
   - [2.4 zap(配合lumberjack库或go-file-rotatelogs库)实现定制化log日志归档](02_log/02_zap/04_customized_log/lumberjack.md)
+  - [2.5 简单的基于Entry实现的hook函数-->无法接收到Fields的相关参数](02_log/02_zap/05_hook/main.go)
 
 ## 第三章 消息队列
-- 1 [rabbitmq](03_amqp/01_rabbitmq/introduction.md)
+- [1 rabbitmq](03_amqp/01_rabbitmq/introduction.md)
   - 1.1 消费者：推拉模式
   - 1.1 生产者
 - 2 [kafka](03_amqp/02_kafka/kafka_intro.md)
@@ -44,6 +46,9 @@
 - 3 rocketmq
   - 3.1 消费者：简单消费,延迟消费
   - 3.2 生产者：简单消息，延迟消息，事务消息
+- [4 Asynq分布式延迟队列](03_amqp/04_asynq/asynq.md)
+  - [4.1 生产者](03_amqp/04_asynq/producer)
+  - [4.2 消费者](03_amqp/04_asynq/server)
 
 ## [第四章 服务注册及配置文件中心Nacos](04_nacos/nacos.md)
 - 1 [获取配置及监听文件变化](04_nacos/config_center/main.go)
@@ -89,7 +94,7 @@
 - 4  protobuf的jsonpb包序列化和反序列化
 - [5  负载均衡](08_grpc/05_grpc_load_balance/load_balance.md)
   - [5.1 客户端负载均衡(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver_n_balancer.md)
-    - [第三方consul实现Resolver接口和Builder接口](08_grpc/05_grpc_load_balance/client/consul_client/main.go)
+    - [第三方consul实现Resolver接口和Builder接口](01_consul/02_grpc/consul_client/main.go)
     - [自定义实现Resolver接口和Builder接口](08_grpc/05_grpc_load_balance/client/customized_resolver_client/client.go)
     - [自定义实现nacos服务注册与发现](08_grpc/05_grpc_load_balance/client/nacos_client)
   - 5.2 服务端
@@ -124,11 +129,11 @@
   - [1.1 结合XORM](10_distributed_tracing/01_jaeger/01_jaeger_xorm/main_test.go)
   - [1.2 结合redis](10_distributed_tracing/01_jaeger/02_jaeger_redis/hook.go)
 - [2 OpenTelemetry](10_distributed_tracing/02_openTelemetry/openTelemetry.md)
-  - 跨服务组合tracer代码展示:需开启svc1和svc2两个http服务
+  - 跨服务组合tracer代码展示:需开启svc1和svc2两个http服务(url可以是zipkin或则jaeger)
 
-## 第十一章 依赖注入
-- [1 dig依赖注入及http服务分层](11_dependency_injection/00_dig/dig.go)
-- 2 wire依赖注入
+## [第十一章 依赖注入容器(Dependency Injection Container)](11_dependency_injection/dependency_injection.md)
+- [1 dig依赖注入及http服务分层->不推荐](11_dependency_injection/00_dig/dig.go)
+- 2 wire依赖注入->推荐
   - [2.1 不使用wire现状](11_dependency_injection/01_wire/01_without_wire/main.go)
   - [使用wire优化](11_dependency_injection/01_wire/02_wire)
   - [wire使用-带err返回](11_dependency_injection/01_wire/03_wire_return_err/wire)
@@ -202,10 +207,11 @@
 - 1 介绍及功能使用
 - 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
 
-## [第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify)](21_viper/viper.md)
+## [第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify,yaml)](21_viper/viper.md)
 - [1 viper获取本地文件内容](21_viper/01_read_n_watch_config/main.go)
 - [2 监听文件变化(fsnotify)原理分析](21_viper/02_fsnotify/fsnotify.md)
 - [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
+- [4 yaml.v3](21_viper/04_yaml/yaml.md)
 
 ## 第二十二章 ETCD
 - [服务端server--读和写流程分析](22_etcd/etcd_read_n_write.md)
@@ -230,7 +236,8 @@
   - 2.2 V7版本
 
 ## [第二十五章 监控sentry](25_sentry/sentry.md)
-- [结合gin使用](25_sentry/gin/main.go)
+- [1 结合gin基本shiyong](25_sentry/gin/main.go)
+- [2 自定义zap core模块收集error级别日志上报sentry](25_sentry/zap_sentry/main.go)
 
 ## [第二十六章 图数据库Neo4j](26_neo4j/neo4j.md)
 - [cypher语句](26_neo4j/cypher.md)
@@ -271,6 +278,9 @@
 ## [第三十五章 sonar静态代码质量分析-涉及与golangci-lint对比使用](35_sonar/sonar.md)
 
 ## [第三十六章 Proto管理工具Buf](36_buf/buf_intro.md)
+
+## [第三十七章 CI持续集成](37_CI/gitlabCI.md)
+- [1 runner 源码分析](37_CI/01_runner/runner.md)
 
 
 
