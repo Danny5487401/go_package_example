@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	pb "go_package_example/08_grpc/10_grpc_gateway/proto/helloworld"
+	pb "go_package_example/08_grpc/10_grpc_gateway/proto_without_buf/helloworld"
 	"google.golang.org/grpc"
 	"log"
 )

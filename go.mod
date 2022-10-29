@@ -22,6 +22,7 @@ require (
 	github.com/elastic/go-elasticsearch/v7 v7.16.0
 	github.com/elliotchance/phpserialize v1.3.1
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
+	github.com/felixge/httpsnoop v1.0.3
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/gin-gonic/gin v1.5.0

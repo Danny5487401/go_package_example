@@ -5,7 +5,8 @@ import (
 	"flag"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime" // 注意版本
-	pb "go_package_example/08_grpc/10_grpc_gateway/proto/helloworld"
+	pb "go_package_example/08_grpc/10_grpc_gateway/proto_without_buf/helloworld"
+	//pb "go_package_example/08_grpc/10_grpc_gateway/gen/go/helloworld"  // 使用Buf生成的也行
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -24,7 +25,7 @@ func (s *server) SayHello(ctx context.Context, in *pb.HelloRequest) (*pb.HelloRe
 }
 
 func main() {
-	// Create a gRPC server object
+	// 1. grpc服务
 	s := grpc.NewServer()
 	// Attach the Greeter service to the server
 	pb.RegisterGreeterServer(s, &server{})

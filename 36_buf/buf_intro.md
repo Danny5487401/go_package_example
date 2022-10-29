@@ -2,7 +2,7 @@
 buf目标就是从 api编程 转成 schema-driven paradigm ，更好管理 protobuf文件。
 
 ## 当前问题
-- 依赖管理：比如 google/api经常得拷贝到本地.使用Buf Schema Registry (BSR)可以解决问题，类似Go的module管理，javaScript的npm管理。
+- 依赖管理：比如 google/api经常得拷贝到本地.使用Buf Schema Registry (BSR)可以解决问题，类似Go的module管理，javaScript的npm管理,官方仓库地址：https://buf.build/。
 - stub生成过程很难：管理protoc对应插件很难
 
 ## buf cli工具
