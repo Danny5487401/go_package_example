@@ -208,11 +208,12 @@
   - [1.1 cobra 构建 time 展示及解析,flag 使用](20_cli_frame/01_cobra/main.go)
 - [2 Urfave Cli -->在 buildkit  中的应用](20_cli_frame/02_urfave_cli/urfave_cli.md)
 
-## [第二十一章 配置文件解析:viper(依赖mapstructure,fsnotify,yaml)](21_viper/viper.md)
+## [第二十一章 配置文件解析:viper(依赖mapstructure,fsnotify,yaml,toml)](21_viper/viper.md)
 - [1 viper获取本地文件内容](21_viper/01_read_n_watch_config/main.go)
 - [2 监听文件变化(fsnotify)原理分析](21_viper/02_fsnotify/fsnotify.md)
 - [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
-- [4 yaml.v3](21_viper/04_yaml/yaml.md)
+- [4 gopkg.in/yaml.v3 使用](21_viper/04_yaml/yaml.md)
+- [5 pelletier/go-toml 使用](21_viper/05_toml/toml.md)
 
 ## 第二十二章 ETCD
 - [服务端server--读和写流程分析](22_etcd/etcd_read_n_write.md)

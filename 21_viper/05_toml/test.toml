@@ -1,0 +1,13 @@
+os="darwin"
+version="10"
+
+# server表（也被称为哈希表或字典）是键值对的集合。
+[server]
+addr="192.168.1.1"
+port="80"
+http="https"
+route=["/test/1","/test/2"]
+desc = """
+玫瑰是红色的
+紫罗兰是蓝色的
+"""
