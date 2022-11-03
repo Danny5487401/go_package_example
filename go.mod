@@ -81,6 +81,7 @@ require (
 	github.com/stretchr/testify v1.7.2
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
+	github.com/urfave/cli/v2 v2.3.0
 	github.com/yoyofxteam/nacos-viper-remote v0.4.0
 	go.etcd.io/bbolt v1.3.3
 	go.etcd.io/etcd/client/v3 v3.5.2
