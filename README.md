@@ -288,5 +288,10 @@
 ## [第三十七章 CI持续集成](37_CI/gitlabCI.md)
 - [1 runner 源码分析](37_CI/01_runner/runner.md)
 
+## [第三十八章 Mergo实现 struct 与 map 之间转换-->k8s中应用](38_mergo/mergo.md)
+- [1 struct 与 map 之间转换](38_mergo/01_map_to_struct/main.go)
+- [2 override 覆盖选项](38_mergo/02_with_override/main.go)
+- [3 结构体中的切片使用](38_mergo/03_slice/main.go)
+- [4 类型检查](38_mergo/04_type_check/main.go)
 
 
