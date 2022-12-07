@@ -144,15 +144,19 @@
 - [2 mock测试替身](12_testify/02_mock/main_test.go)
 - [3 suite测试套件](12_testify/03_suite/suite_test.go)
 
-## [第十三章 序列化反序列化-包含标准库源码分析](13_serialize/serialize.md)
-- 1 Jsoniter(完全兼容标准库json，性能较好)
+## [第十三章 序列化反序列化-涉及多种协议](13_serialize/serialize.md)
+- [1 Jsoniter(完全兼容标准库json，性能较好)-涉及标准库 encoding/json 分析](13_serialize/01_jsoniter/jsoniter.md)
   - 1.1 序列化
-    - [结构体成员为基本类型,嵌套结构体，及tag标签使用](13_serialize/01_jsoniter/Marshal/Basic/main.go)
-    - [结构体成员为interface{}](13_serialize/01_jsoniter/Marshal/Interface/main.go)
+    - [结构体成员为基本类型, 嵌套指针结构体, 及tag标签使用](13_serialize/01_jsoniter/Marshal/01_pointer/main.go)
+    - [结构体成员为interface{}](13_serialize/01_jsoniter/Marshal/02_Interface/main.go)
+    - [临时添加额外的字段，临时忽略struct空字段](13_serialize/01_jsoniter/Marshal/03_add_tmp_value/main.go)
+    - [自定义MarshalJSON支持time.Time](13_serialize/01_jsoniter/Marshal/04_time/main.go)
+  - 统一更改字段的命名风格
   - 1.2 反序列化
-    - [基本使用](13_serialize/01_jsoniter/Unmarshal/json/main.go)
-    - [json字符串数组](13_serialize/01_jsoniter/Unmarshal/jsonArray/main.go)
-    - [json.RawMessage二次反序列化](13_serialize/01_jsoniter/Unmarshal/RawMessage/main.go)
+    - [解析匹配规则](13_serialize/01_jsoniter/Unmarshal/01_json_basic/main.go)
+    - [json字符串数组](13_serialize/01_jsoniter/Unmarshal/02_jsonArray/main.go)
+    - [json.RawMessage二次反序列化](13_serialize/01_jsoniter/Unmarshal/03_RawMessage/main.go)
+    - [解析私有的字段](13_serialize/01_jsoniter/Unmarshal/04_private_field/main.go)
 - 2 mapstructure使用（性能低但是方便）
   - [2.1 无tag标签](13_serialize/02_map2structure/01_without_tag/main.go)
   - [2.2 带tag标签mapstructure](13_serialize/02_map2structure/02_tag/main.go)
