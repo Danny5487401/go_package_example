@@ -1,6 +1,6 @@
 module go_package_example
 
-go 1.16
+go 1.18
 
 require (
 	bitbucket.org/bertimus9/systemstat v0.0.0-20180207000608-0eeff89b0690
@@ -69,7 +69,7 @@ require (
 	github.com/olivere/elastic/v7 v7.0.22
 	github.com/opentracing/opentracing-go v1.2.0
 	github.com/patrickmn/go-cache v2.1.0+incompatible
-	github.com/pelletier/go-toml v1.9.4 // indirect
+	github.com/pelletier/go-toml v1.9.4
 	github.com/rs/zerolog v1.26.1
 	github.com/samuel/go-zookeeper v0.0.0-20201211165307-7117e9ea2414
 	github.com/shirou/gopsutil v3.20.11+incompatible
