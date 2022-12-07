@@ -131,9 +131,9 @@
 - [2 OpenTelemetry](10_distributed_tracing/02_openTelemetry/openTelemetry.md)
   - 跨服务组合tracer代码展示:需开启svc1和svc2两个http服务(url可以是zipkin或则jaeger)
 
-## 第十一章 依赖注入
-- [1 dig依赖注入及http服务分层](11_dependency_injection/00_dig/dig.go)
-- 2 wire依赖注入
+## [第十一章 依赖注入容器(Dependency Injection Container)](11_dependency_injection/dependency_injection.md)
+- [1 dig依赖注入及http服务分层->不推荐](11_dependency_injection/00_dig/dig.go)
+- 2 wire依赖注入->推荐
   - [2.1 不使用wire现状](11_dependency_injection/01_wire/01_without_wire/main.go)
   - [使用wire优化](11_dependency_injection/01_wire/02_wire)
   - [wire使用-带err返回](11_dependency_injection/01_wire/03_wire_return_err/wire)
@@ -207,15 +207,17 @@
   - [2.1 客户端](19_fuse_currentLimiting_degradation/02_hystrix/client/client.go)
   - [2.2 服务端](19_fuse_currentLimiting_degradation/02_hystrix/server/server.go)
 
-## [第二十章 命令行框架Cobra](20_cobra/introdoction.md)
-- 1 介绍及功能使用
-- 2 [在k8s中的应用](20_cobra/cobra_in_k8s.md)
+## 第二十章 应用的命令行框架
+- [1 Cobra -->在 k8s 中的应用](20_cli_frame/01_cobra/introdoction.md)
+  - [1.1 cobra 构建 time 展示及解析,flag 使用](20_cli_frame/01_cobra/main.go)
+- [2 Urfave Cli -->在 buildkit  中的应用](20_cli_frame/02_urfave_cli/urfave_cli.md)
 
-## [第二十一章 配置文件获取工具viper(依赖mapstructure,fsnotify,yaml)](21_viper/viper.md)
+## [第二十一章 配置文件解析:viper(依赖mapstructure,fsnotify,yaml,toml)](21_viper/viper.md)
 - [1 viper获取本地文件内容](21_viper/01_read_n_watch_config/main.go)
 - [2 监听文件变化(fsnotify)原理分析](21_viper/02_fsnotify/fsnotify.md)
 - [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
-- [4 yaml.v3](21_viper/04_yaml/yaml.md)
+- [4 gopkg.in/yaml.v3 使用](21_viper/04_yaml/yaml.md)
+- [5 pelletier/go-toml 使用](21_viper/05_toml/toml.md)
 
 ## 第二十二章 ETCD
 - [服务端server--读和写流程分析](22_etcd/etcd_read_n_write.md)
@@ -283,7 +285,8 @@
 
 ## [第三十六章 Proto管理工具Buf](36_buf/buf_intro.md)
 
-## [第三十六章 CI持续集成](37_CI/gitlabCI.md)
+## [第三十七章 CI持续集成](37_CI/gitlabCI.md)
+- [1 runner 源码分析](37_CI/01_runner/runner.md)
 
 
 

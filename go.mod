@@ -22,7 +22,7 @@ require (
 	github.com/elastic/go-elasticsearch/v7 v7.16.0
 	github.com/elliotchance/phpserialize v1.3.1
 	github.com/envoyproxy/protoc-gen-validate v0.4.0
-	github.com/fatih/color v1.13.0 // indirect
+	github.com/felixge/httpsnoop v1.0.3
 	github.com/fsnotify/fsnotify v1.5.1
 	github.com/getsentry/sentry-go v0.11.0
 	github.com/gin-gonic/gin v1.5.0
@@ -46,7 +46,6 @@ require (
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-hclog v1.2.1
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
-	github.com/hashicorp/golang-lru v0.5.4 // indirect
 	github.com/hashicorp/raft v1.3.5
 	github.com/hashicorp/raft-boltdb v0.0.0-20211202195631-7d34b9fb3f42
 	github.com/hashicorp/serf v0.9.8 // indirect
@@ -58,7 +57,6 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
 	github.com/mailru/easyjson v0.7.7 // indirect
-	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/mbobakov/grpc-consul-resolver v1.4.4
 	github.com/micro/go-micro v1.18.0
@@ -83,6 +81,7 @@ require (
 	github.com/stretchr/testify v1.7.2
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
+	github.com/urfave/cli/v2 v2.3.0
 	github.com/yoyofxteam/nacos-viper-remote v0.4.0
 	go.etcd.io/bbolt v1.3.3
 	go.etcd.io/etcd/client/v3 v3.5.2

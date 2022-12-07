@@ -46,7 +46,7 @@ func main() {
 			appkey = val1[0]
 		}
 
-		if appid != "123456" || appkey != "i am a key" {
+		if appid != "name" || appkey != "danny" {
 			return resp, status.Errorf(codes.Unauthenticated, "认证信息错误")
 		}
 

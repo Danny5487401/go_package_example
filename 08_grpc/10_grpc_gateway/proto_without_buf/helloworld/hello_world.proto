@@ -1,0 +1,27 @@
+syntax = "proto3";
+option go_package="10_grpc_gateway/proto_without_buf/helloworld;helloworld";
+package helloworld;
+import "10_grpc_gateway/proto_without_buf/google/api/annotations.proto";
+
+// 引入annotations.proto文件，因为添加的注解依赖该文件。该文件需要手动从 grpc-gateway/third_party/googleapis 目录复制到自己的项目中。
+
+// The greeting service definition
+service Greeter {
+  // Sends a greeting
+  rpc SayHello (HelloRequest) returns (HelloReply) {
+    option (google.api.http) = {
+      post: "/v1/greeter/sayhello"
+      body: "*"
+    };
+  }
+}
+
+// The request message containing the user's name
+message HelloRequest {
+  string name = 1;
+}
+
+// The response message containing the greetings
+message HelloReply {
+  string message = 1;
+}

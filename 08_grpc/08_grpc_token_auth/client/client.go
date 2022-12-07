@@ -9,17 +9,17 @@ import (
 )
 
 type CustomCredential struct {
+	User     string
+	Password string
 }
 
 func (c CustomCredential) GetRequestMetadata(ctx context.Context, uri ...string) (map[string]string, error) {
-	return map[string]string{
-		"appid":  "123456",
-		"appkey": "i am a key",
-	}, nil
+	return map[string]string{"appid": c.User, "appkey": c.Password}, nil
 }
 
 func (c CustomCredential) RequireTransportSecurity() bool {
 	// 不需要基于 TLS 认证进行安全传输
+	// 在真实的环境中建议必须要求底层启用安全的链接，否则认证信息有泄露和被篡改的风险。
 	return false
 }
 
@@ -42,7 +42,10 @@ func main() {
 
 	var opts []grpc.DialOption
 	opts = append(opts, grpc.WithInsecure())
-	opts = append(opts, grpc.WithPerRPCCredentials(CustomCredential{}))
+	opts = append(opts, grpc.WithPerRPCCredentials(CustomCredential{
+		User:     "name",
+		Password: "danny",
+	}))
 
 	conn, err := grpc.Dial("127.0.0.1:9000", opts...)
 

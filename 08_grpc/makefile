@@ -17,8 +17,8 @@ gofast:
 
 .PHONY: grpcgateway
 grpcgateway:
-	protoc  --proto_path=. --go_out=. --go-grpc_out=.  ./10_grpc_gateway/proto/google/api/*.proto
-	protoc --proto_path=. --go_out=. --go-grpc_out=.  --grpc-gateway_out=.  ./10_grpc_gateway/proto/helloworld/*.proto
+	protoc  --proto_path=. --go_out=. --go-grpc_out=.  ./10_grpc_gateway/proto_without_buf/google/api/*.proto
+	protoc --proto_path=. --go_out=. --go-grpc_out=.  --grpc-gateway_out=.  ./10_grpc_gateway/proto_without_buf/helloworld/*.proto
 
 
 # 学习生成protobuf 使用：08_grpc/proto
