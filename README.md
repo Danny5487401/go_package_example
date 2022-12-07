@@ -144,8 +144,8 @@
 - [2 mock测试替身](12_testify/02_mock/main_test.go)
 - [3 suite测试套件](12_testify/03_suite/suite_test.go)
 
-## [第十三章 序列化反序列化-包含标准库源码分析](13_serialize/serialize.md)
-- 1 Jsoniter(完全兼容标准库json，性能较好)
+## [第十三章 序列化反序列化-涉及多种协议](13_serialize/serialize.md)
+- [1 Jsoniter(完全兼容标准库json，性能较好)-涉及标准库 encoding/json 分析](13_serialize/01_jsoniter/jsoniter.md)
   - 1.1 序列化
     - [结构体成员为基本类型, 嵌套指针结构体, 及tag标签使用](13_serialize/01_jsoniter/Marshal/01_pointer/main.go)
     - [结构体成员为interface{}](13_serialize/01_jsoniter/Marshal/02_Interface/main.go)
