@@ -4,6 +4,8 @@ MongoDB 是由C++语言编写的，是一个基于分布式文件存储的开源
 
 MongoDB 是一个介于关系数据库和非关系数据库之间的产品，是非关系数据库当中功能最丰富，最像关系数据库的。
 
+MongoDB stores BSON documents, i.e. data records, in collections; the collections in databases.
+
 
 ## 集群搭建的方式
 mongodb集群搭建有三种方式。
@@ -63,19 +65,24 @@ sharding通过将数据集分布于多个也称作分片(shard)的节点上来�
     2）MongoDB目前不支持join操作，需要复杂查询的应用也不建议使用MongoDB
 
 ## 概念
-### 1. 数据库
+### 1. 数据库 Databases
 
 一个mongodb中可以建立多个数据库。
 
 MongoDB的默认数据库为"db"，该数据库存储在data目录中。
 
 MongoDB的单个实例可以容纳多个独立的数据库，每一个都有自己的集合和权限，不同的数据库也放置在不同的文件中。
+```shell
+# 显示所有数据的列表
+show dbs
 
-"show dbs" 命令可以显示所有数据的列表。
+# 连接到一个指定的数据库，不存在会创建
+use myD
+```
 
-运行"use"命令，可以连接到一个指定的数据库。
 
-### 2. 文档
+
+### 2. 文档  document
 文档是一个键值(key-value)对(即BSON)。MongoDB 的文档不需要设置相同的字段，并且相同的字段不需要相同的数据类型，这与关系型数据库有很大的区别，也是 MongoDB 非常突出的特点。
 
 需要注意的是：
@@ -99,8 +106,8 @@ MongoDB使用了BSON这种结构来存储数据和网络数据交换。把这种
 只是这里的Document的变化更丰富一些，如Document可以嵌套
 
 
-### 3. 集合
-集合就是 MongoDB 文档组，类似于 RDBMS （关系数据库管理系统：Relational Database Management System)中的表格。
+### 3. 集合 collection
+集合就是 MongoDB 文档组，类似于 RDBMS （关系数据库管理系统：Relational Database Management System)中的表格 table。
 
 集合存在于数据库中，集合没有固定的结构，这意味着你在对集合可以插入不同格式和类型的数据，但通常情况下我们插入集合的数据都会有一定的关联性。
 
@@ -177,5 +184,8 @@ readPreference 主要控制客户端 Driver 从复制集的哪个节点读取数
 - secondary （只从）只从 scondary 节点读数据
 - secondaryPreferred （先从后主）优先从 secondary 读取，没有 secondary 成员时，从 primary 读取
 - nearest （就近）根据网络距离就近读取，根据客户端与服务端的PingTime实现
+
+## 参考资料
+1. [mongo 4.2 官方文档](https://www.mongodb.com/docs/v4.2/introduction/)
 
 

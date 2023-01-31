@@ -26,8 +26,8 @@
 - [2 grpc服务注册发现加健康检查](01_consul/01_http/test/consul_registry_test.go)
 
 ## 第二章 日志库
-- 1 [zerolog](02_log/01_zerolog/zerolog.md)
-- 2 [zap使用及源码分析](02_log/02_zap/zap.md)
+- [1 zerolog](02_log/01_zerolog/zerolog.md)
+- [2 zap使用及源码分析](02_log/02_zap/zap.md)
   - [2.1 两种打印风格](02_log/02_zap/01_cosole/main.go)
   - [2.2 定义多种输出位置: 控制台输出及文件输出](02_log/02_zap/02_file_stdout/main.go)
   - [2.3 并发安全logger](02_log/02_zap/03_concurrency_safe/main.go)

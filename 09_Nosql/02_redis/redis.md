@@ -1,6 +1,6 @@
 # Redis
 
-![](img/redis_info.png)
+![](.redis_images/redis_info.png)
 
 	Remote Dictionary Server, 翻译为远程字典服务. Redis是一个完全开源的基于Key-Value的NoSQL存储系统，他是一个使用ANSIC语言编写的，
 	遵守BSD协议，支持网络、可基于内存的可持久化的日志型、Key-Value数据库,并提供多种语言的API.
@@ -51,7 +51,7 @@ Redis6.0后引入多线程提速：
 	
 ## Redis五种数据类型应用场景
 ![](.redis_images/redis_db_structure.png)
-![](img/string.png)
+![](.redis_images/string.png)
 
 	1.String(sds,simple dynamic string简单动态字符串): 常规的set/get操作,因为string 类型是二进制安全的,可以用来存放图片，视频等内容.
 	    C 中字符串遇到 '\0' 会结束，那 '\0' 之后的数据就读取不上了。但在 SDS 中，是根据 len 长度来判断字符串结束的,这样二进制安全的问题就解决了.
@@ -59,7 +59,7 @@ Redis6.0后引入多线程提速：
         另外由于Redis的高性能读写功能，而string类型的value也可以是数字，一般做一些复杂的计数功能的缓存,还可以用作计数器（INCR,DECR），
 		比如分布式环境中统计系统的在线人数，秒杀等
 
-![](img/hash.png)
+![](.redis_images/hash.png)
 
 	2. hash(hash table): value 存放的是键值对结构化后的对象，将一些相关的数据存储在一起，比如用户的购物车。
 	    比较方便操作其中某个字段，比如可以做单点登录存放用户信息,以cookiele作为key，
@@ -67,17 +67,17 @@ Redis6.0后引入多线程提速：
 		
 		这里需要明确一点： Redis中只有一个K，一个V。其中 K 绝对是字符串对象，而 V 可以是String、List、Hash、Set、ZSet任意一种
 		
-![](img/list.png)
+![](.redis_images/list.png)
 
 	3. list(deque): 发布和订阅、慢查询、监视器等都用到了链表，Redis服务器本身还是用链表来保存多个客户端的状态信息，以及使用链表来构建客户端输出缓冲区。
     另外可以利用lrange命令，做基于redis的分页功能,性能极佳，用户体验好
 	
-![](img/set.png)
+![](.redis_images/set.png)
 
 	4. set(intset+dict):由于底层是字典实现的，查找元素特别快，另外set 数据类型不允许重复，利用这两个特性我们可以进行全局去重，
 		比如在用户注册模块，判断用户名是否注册；另外就是利用交集、并集、差集等操作，可以计算共同喜好，全部的喜好，自己独有的喜好等功能
 
-![](img/sort_set.png)		
+![](.redis_images/sort_set.png)		
 
 	5. Zset(skip list + hash table):有序的集合，可以做范围查找，排行榜应用，取 TOP N 操作等,还可以做延时任务
 	

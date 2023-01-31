@@ -1,6 +1,8 @@
 # ElasticSearch
 ## es架构
+
 ![](.img/distribution.png)
+
 ## es倒排索引原理
 ![](.img/inverted_index.png)
 默认情况下，Elasticsearch 在文档中的所有字段上构建一个反向索引，指向该字段所在的 Elasticsearch 文档。
@@ -9,8 +11,11 @@
 ## CRUD增删改查
 ![](.img/crud.png)
 
-## VS 关系型数据库
+
+## 基本概念
+### 对比关系型数据库
 ![](.img/es_n_mysql.png)
+
 ### Document 文档
 ![](.img/.es_images/document.png)
 Elasticsearch 是面向文档的，这意味着你索引或搜索的最小数据单元是文档.
@@ -48,10 +53,6 @@ Elasticsearch 具有 schema-less 的能力，这意味着无需显式指定如�
 Elasticsearch 起源于 Apache Lucene 。一个 Elasticsearch 的 index 分布于一个或多长 shard 之中，而每个 shard 相应于一个 Aache Lucene 的 index。
 每个 Index 一个或许多的 documents 组成，并且这些 document 可以分布于不同的 shard 之中。
 
-
-
-## 集群cluster
-![](.img/.es_images/cluster_es.png)
 ### Shards分片
 索引可以存储大量的数据，这些数据可能超过单个节点的硬件限制。例如，十亿个文件占用磁盘空间1TB的单指标可能不适合对单个节点的磁盘或可能太慢服务仅从单个节点的搜索请求。
 为了解决这个问题，Elasticsearch 提供了将索引划分成多份的能力，这些份就叫做分片（shard）.
@@ -65,7 +66,6 @@ Elasticsearch 起源于 Apache Lucene 。一个 Elasticsearch 的 index 分布�
 - Primary shard: 每个文档都存储在一个Primary shard。 索引文档时，它首先在 Primary shard上编制索引，然后在此分片的所有副本上（replica）编制索引。索引可以包含一个或多个主分片。 此数字确定索引相对于索引数据大小的可伸缩性。 创建索引后，无法更改索引中的主分片数。
 - Replica shard: 每个主分片可以具有零个或多个副本。 副本是主分片的副本，有两个目的：
   - 增加故障转移：如果主要故障，可以将副本分片提升为主分片。即使你失去了一个 node，那么副本分片还是拥有所有的数据
-
   - 提高性能：get 和 search 请求可以由主 shard 或副本 shard 处理。
 
 
@@ -101,17 +101,33 @@ shard 健康
 - 黄色：已分配所有主副本，但未分配至少一个副本
 - 绿色：分配所有分片
 
+
+## 集群cluster
+![](.img/.es_images/cluster_es.png)
+
+
+
 ### node
 ![](.img/.es_images/node_purpose.png)
 根据 node 的作用，可以分为如下的几种
-* master-eligible：可以作为主 node。一旦成为主 node，它可以管理整个 cluster 的设置及变化：创建，更新，删除 index；添加或删除 node；为 node 分配 shard
+* master-eligible：可以作为主 node。一旦成为主 node，它可以管理整个 cluster 的设置及变化：
+  * 创建，更新，删除 index；添加或删除 node；
+  * 为 node 分配 shard，应用的集群设置，其他与管理相关的人物等。
+  * master 节点角色通常不是非常占用资源，因此，一个主节点就足够整个集群，并且可以共同位于在较小集群中运行其他角色的节点上。如果这个主节点崩溃，集群将选择其他节点之一作为主节点，这样接力棒就会继续。 主节点不参与文档的 CRUD 操作，但主节点仍然知道文档的位置
 
-* data：数据 node
+* data：数据 node。数据节点是实际的索引、搜索、删除和其他与文档相关的操作发生的地方。 这些节点托管索引文档。 一旦收到索引请求，它们就会通过调用 Lucene 段上的编写器来将文档保存到其索引中。 可以想象，它们在 CRUD 操作期间经常与磁盘通信，因此它们是磁盘 I/O 和内存密集型操作。在最新的 Elastic Stack 发布版中 (7.9 之后），当我们部署多层（multi-tier）部署时，将使用数据节点角色的特定变体。 它们是 data_hot、data_cold、data_warm 和 data_frozen 角色
 
 * ingest: 数据接入（比如 pipepline)
 
+
+Elasticsearch 的主要目标是索引、搜索和分析，但通常需要在将文档存储到 Elasticsearch 之前对其进行修改或增强。以下是这种情况下最常见的情况：
+
 * machine learning (Gold/Platinum License)
+* coordinating node：严格来说，这个不是一个种类的节点。它甚至可以是上面的任何一种节点。顾名思义，协调节点负责端到端地处理客户端的请求。这种节点通常是接受客户端的 HTTP 请求的。当向 Elasticsearch 提出请求时，其中一个节点（协调节点）会接收该请求并戴上协调员的帽子。 在接受请求后，协调器请求集群中的其他节点处理请求。 它在收集和整理结果并将它们发送回客户端之前等待响应。
+
+
 ![](.img/.es_images/node_config.png)
+
 你也可以让一个 node 做专有的功能及角色。如果配置文件（Elasticsearch.yml）上面 node 配置参数没有任何配置，那么我们可以认为这个 node 是作为一个 coordination node。
 在这种情况下，它可以接受外部的请求，并转发到相应的节点来处理。针对 master node，有时我们需要设置 cluster.remote.connect: false。
 
@@ -162,3 +178,7 @@ Elasticsearch的数据扫描主要发生在query和fetch阶段。
 
 总的来说Elasticsearch的数据扫描和计算都没有向量化的能力，而且是以二级索引结果为基础，当二级索引返回的命中行数特别大时（涉及大量数据的分析查询），其搜索引擎就会暴露出数据处理能力不足的短板
 
+
+## 参考资料
+
+1. [es 官方中文目录](https://elasticstack.blog.csdn.net/article/details/102728604)

@@ -37,6 +37,7 @@
 
 ### http2.0
 ![](.grpc_images/http1.1VShttp2.0.png)
+
 ![](.grpc_images/definition.png)
 
 优点：
@@ -132,7 +133,6 @@ DATA 帧的主要作用是装填主体信息
 
     用于关闭连接，GOAWAY允许端点优雅地停止接受新流，同时仍然完成先前建立的流的处理。
     这个就厉害了，当服务端需要维护时，发送一个GOAWAY的Frame给客户端，那么发送之前的Stream都正常处理了，发送GOAWAY后，客户端会新启用一个链接，继续刚才未完成的Stream发送。
-
 
 ### http3.0
 ![](.grpc_images/http3.png)

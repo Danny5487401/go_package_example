@@ -4,6 +4,15 @@
 
 最底层为TCP或Unix Socket协议，在此之上是HTTP/2协议的实现，然后在HTTP/2协议之上又构建了针对Go语言的gRPC核心库。应用程序通过gRPC插件生产的Stub代码和gRPC核心库通信，也可以直接和gRPC核心库通信。
 
+## grpc 流程
+![](.grpc_images/simple_grpc_process.png)
+
+在 gRPC 中, 可以将 gRPC 的流程大致分为两个阶段, 分别是 RPC 连接阶段, 以及 RPC 交互阶段
+
+- 在 RPC 连接阶段, client 和 server 之间建立起来 TCP 连接, 并且由于 gRPC 底层依赖于 HTTP2, 因此 client 和 server 还需要协调 frame 的相关设置, 例如 frame 的大小, 滑动窗口的大小等等.
+- 在 RPC 交互阶段, client 将数据发送给 server, 并等待 server 执行指定 method 之后返回结果.
+。
+
 ## grpc分类
 ### 1. unary
 ![](.grpc_images/unary.png)
