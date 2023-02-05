@@ -1,7 +1,11 @@
-# Client源码分析
+# Client 源码分析
 因为gRPC没有提供服务注册，服务发现的功能，所以需要开发者自己编写服务发现的逻辑：也就是Resolver——解析器。
 
-在得到了解析的结果，也就是一连串的IP地址之后，需要对其中的IP进行选择，也就是Balancer
+在得到了解析的结果，也就是一连串的IP地址之后，需要对其中的IP进行选择，也就是Balancer。
+
+
+
+
 
 连接对象
 ```go
@@ -209,6 +213,7 @@ func NewGreeterClient(cc *grpc.ClientConn) GreeterClient {
 	return &greeterClient{cc}
 }
 ```
+
 ## 3. 调用
 
 底层http2连接对应的是一个grpc的stream，而stream的创建有两种方式
@@ -253,6 +258,7 @@ cs.SendMsg：发送 RPC 请求出去，但其并不承担等待响应的功能�
 cs.RecvMsg：阻塞等待接受到的 RPC 方法响应结果。
 */
 ```
+
 ## 4. 关闭链接
 ```go
 
