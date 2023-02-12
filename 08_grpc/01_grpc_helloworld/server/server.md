@@ -13,7 +13,11 @@ func (*UnimplementedGreeterServer) SayHello(context.Context, *HelloRequest) (*He
 
 但是，我们通常要强制server在编译期就必须实现对应的方法，所以生产中建议不嵌入。
 
-一. grpc.NewServer()分析
+
+
+
+
+## 一. grpc.NewServer()分析
 ```go
 func NewServer(opt ...ServerOption) *Server {
     opts := defaultServerOptions
@@ -42,7 +46,7 @@ func NewServer(opt ...ServerOption) *Server {
 4. 全局参数 EnableTraciing ，会调用golang.org/x/net/trace 这个包
 
 
-二. 注册
+## 二. 注册
 ```go
 func RegisterGreeterServer(s *grpc.Server, srv GreeterServer) {
     s.RegisterService(&_Greeter_serviceDesc, srv)
@@ -64,13 +68,85 @@ var _Greeter_serviceDesc = grpc.ServiceDesc{
     Metadata: "01_grpc_helloworld/proto/helloworld.proto",  //元数据，是一个描述数据属性的东西
 }
 ```
-三. s.Serve(lis)
+
+## 三. s.Serve(lis)
 
 1. listener 放到内部的map中
 2. for循环，进行tcp连接，这一部分和http源码中的ListenAndServe极其类似
+```go
+// /Users/python/go/pkg/mod/google.golang.org/grpc@v1.47.0/server.go
+func (s *Server) Serve(lis net.Listener) error {
+	......
+	s.serve = true
+	......
+	for {
+		rawConn, err := lis.Accept()
+		if err != nil {
+			......
+		}
+		......
+		s.serveWG.Add(1)
+		go func() {
+			s.handleRawConn(lis.Addr().String(), rawConn)
+			s.serveWG.Done()
+		}()
+
+}
+```
 3. 在协程中进行handleRawConn
+```go
+func (s *Server) handleRawConn(lisAddr string, rawConn net.Conn) {
+	// 如果 gRPC server 已经关闭, 那么同样关闭这个 TCP 连接
+	if s.quit.HasFired() {
+		rawConn.Close()
+		return
+	}
+	// 为这个 TCP 连接设置 deadline
+	rawConn.SetDeadline(time.Now().Add(s.opts.connectionTimeout))
+
+	// Finish handshaking (HTTP2)
+	// RPC 连接阶段, server 和 client 之间进行 HTTP2 的握手
+	st := s.newHTTP2Transport(rawConn)
+	rawConn.SetDeadline(time.Time{})
+	if st == nil {
+		return
+	}
+
+	if !s.addConn(lisAddr, st) {
+		return
+	}
+	// RPC 交互阶段, 在新的 goroutine 中处理来自 client 的数据
+	go func() {
+		s.serveStreams(st)
+		s.removeConn(lisAddr, st)
+	}()
+}
+```
 4. 将tcp连接封装对应的creds认证信息
+
 5. 新建newHTTP2Transport传输层连接
+```go
+func (s *Server) newHTTP2Transport(c net.Conn) transport.ServerTransport {
+	// 组装 ServerConfig
+	config := &transport.ServerConfig{
+		MaxStreams:            s.opts.maxConcurrentStreams,
+		ConnectionTimeout:     s.opts.connectionTimeout,
+		......
+	}
+	
+	// 根据 config 的配置信息, 和 client 进行 HTTP2 的握手
+	st, err := transport.NewServerTransport(c, config)
+	if err != nil {
+		......
+	}
+
+	return st
+}
+```
+transport.NewServerTransport 是一个很长的函数, 我们下面一点点来看.
+
+
+
 6. 在协程中进行serveStreams，而http1这里为阻塞的
 7. 函数HandleStreams中参数为2个函数，前者为处理请求，后者用于trace
 8. 进入handleStream，前半段被拆为service，后者为method，通过map查找

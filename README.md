@@ -78,17 +78,16 @@
 - [1 验证器校验错误英转中](07_gin_form_validator/err_en_to_ch_translate/main.go)
 - [2 前端数据校验](07_gin_form_validator/simpleForm/main.go)
 
-## [第八章 GRPC编程 ](08_grpc/grpc.md)
-- [MakeFile介绍](08_grpc/makefile.md)
-  - [makefile在protobuf中应用](08_grpc/makefile)
-- [grpc前置知识：http知识介绍](08_grpc/http.md)
+## [第八章 GRPC编程及调优](08_grpc/grpc.md)
+*前置知识*
+- [makefile在protobuf中应用](08_grpc/makefile)
 - [protobuf及工具介绍](08_grpc/16_import_proto/protobuf_n_tools.md)
   - 引入其他proto文件,支持编译多个proto文件
   - 编码原理
   - protoc,protoc-gen-go,protoc-gen-go-grpc,protoc-gen-gofast等工具
-- 1  HelloWorld入门
-  - [1.1 客户端Grpc源码](08_grpc/01_grpc_helloworld/client/client.md)
-  - [1.2 服务端Grpc源码](08_grpc/01_grpc_helloworld/server/server.md)
+- 1  HelloWorld入门使用及源码分析
+  - [1.1 客户端 Grpc 源码](08_grpc/01_grpc_helloworld/client/client.md)
+  - [1.2 服务端 Grpc 源码](08_grpc/01_grpc_helloworld/server/server.md)
 - 2  [context中的元数据metadata](08_grpc/02_metadata/grpc_context.md)
 - 3  流式GRPC
 - 4  protobuf的jsonpb包序列化和反序列化
@@ -107,7 +106,7 @@
 - [12 GRPC生态中间件(拦截器扩展)](08_grpc/12_grpc_middleware/01_grpc_interceptor/server/server.go)
   - 实现基于 CA 的 TLS 证书认证
   - go-grpc-middleware实现多个中间间：异常保护，日志
-- 13 channelz调试
+- [13 channelz 分析问题](08_grpc/13_channelz/channelz.md)
 - 14 multiplex多路复用
 - [15 自定义grpc插件](08_grpc/15_customized_protobuf_plugin/protobuf_extend.md)
 
@@ -125,10 +124,10 @@
     - [2.2.4 批处理pipeline分析](09_Nosql/02_redis/02_go-redis/go-redis_pipeline.md)
 
 ## [第十章 链路追踪(Distributed Tracing)](10_distributed_tracing/introduction.md)
-- [1 Jaeger](10_distributed_tracing/01_jaeger/jaeger.md)
+- [1 OpenTracing->Jaeger](10_distributed_tracing/01_jaeger/jaeger.md)
   - [1.1 结合XORM](10_distributed_tracing/01_jaeger/01_jaeger_xorm/main_test.go)
   - [1.2 结合redis](10_distributed_tracing/01_jaeger/02_jaeger_redis/hook.go)
-- [2 OpenTelemetry](10_distributed_tracing/02_openTelemetry/openTelemetry.md)
+- [2 OpenTelemetry 两大开源社区合并](10_distributed_tracing/02_openTelemetry/openTelemetry.md)
   - 跨服务组合tracer代码展示:需开启svc1和svc2两个http服务(url可以是zipkin或则jaeger)
 
 ## [第十一章 依赖注入容器(Dependency Injection Container)](11_dependency_injection/dependency_injection.md)

@@ -7,6 +7,8 @@ import (
 	"google.golang.org/grpc/channelz/service"
 	"log"
 	"net"
+	"os"
+	"os/signal"
 	"time"
 
 	"google.golang.org/grpc"
@@ -70,5 +72,8 @@ func main() {
 	/***** Wait for user exiting the program *****/
 	// Unless you exit the program (e.g. CTRL+C), channelz data will be available for querying.
 	// Users can take time to examine and learn about the info provided by channelz.
-	select {}
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, os.Interrupt)
+	// Block until a signal is received.
+	<-ch
 }

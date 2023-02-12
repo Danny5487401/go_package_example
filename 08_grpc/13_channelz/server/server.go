@@ -21,15 +21,15 @@ package main
 
 import (
 	"context"
-	"google.golang.org/grpc/channelz/service"
 	"log"
+	grpcrand "math/rand"
 	"net"
+	"os"
+	"os/signal"
 	"time"
 
 	"google.golang.org/grpc"
-
-	grpcrand "math/rand"
-
+	"google.golang.org/grpc/channelz/service"
 	pb "google.golang.org/grpc/examples/helloworld/helloworld"
 )
 
@@ -72,14 +72,16 @@ func main() {
 	defer s.Stop()
 
 	/***** Start three GreeterServers(with one of them to be the slowServer). *****/
+	var listeners []net.Listener
+	var svrs []*grpc.Server
 	for i := 0; i < 3; i++ {
 		lis, err := net.Listen("tcp", ports[i])
 		if err != nil {
 			log.Fatalf("failed to listen: %v", err)
 		}
-		defer lis.Close()
+		listeners = append(listeners, lis)
 		s := grpc.NewServer()
-		// Channelz通过gRPC服务提供gRPC内部联网机制统计信息。要启用channelz
+		svrs = append(svrs, s)
 		if i == 2 {
 			pb.RegisterGreeterServer(s, &slowServer{})
 		} else {
@@ -88,6 +90,13 @@ func main() {
 		go s.Serve(lis)
 	}
 
-	/***** Wait for user exiting the program *****/
-	select {}
+	/***** Wait for CTRL+C to exit *****/
+	ch := make(chan os.Signal, 1)
+	signal.Notify(ch, os.Interrupt)
+	// Block until a signal is received.
+	<-ch
+	for i := 0; i < 3; i++ {
+		svrs[i].Stop()
+		listeners[i].Close()
+	}
 }

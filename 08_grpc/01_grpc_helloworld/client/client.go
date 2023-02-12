@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"google.golang.org/grpc/credentials/insecure"
 	"log"
 	"time"
 
@@ -23,9 +24,11 @@ func main() {
 	flag.Parse()
 	// Set up a connection to the server.
 	opts := make([]grpc.DialOption, 0)
-	opts = append(opts, grpc.WithInsecure())                               // 不安全链接
-	opts = append(opts, grpc.WithBlock(), grpc.WithTimeout(time.Second*2)) // 保证连接上,连接不上会一直阻塞，加个时间限制
-	conn, err := grpc.DialContext(context.Background(), *addr, opts...)
+	opts = append(opts, grpc.WithTransportCredentials(insecure.NewCredentials())) // 不安全链接
+	opts = append(opts, grpc.WithBlock())                                         // 保证连接上,连接不上会一直阻塞
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
+	defer cancel()
+	conn, err := grpc.DialContext(ctx, *addr, opts...)
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
@@ -33,8 +36,6 @@ func main() {
 	c := pb.NewGreeterClient(conn)
 
 	// Contact the server and print out its response.
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
 	r, err := c.SayHello(ctx, &pb.HelloRequest{Name: *name})
 	if err != nil {
 		log.Fatalf("could not greet: %v", err)
