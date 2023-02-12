@@ -19,7 +19,7 @@ Proto：这个组件是语言无关的，主要是定义了 OpenTelemetry 的 OT
 
 Instrumentation Libraries：是根据 SDK 的开发规范开发的支持不同语言的 SDK，如 java，golang，c 等语言的 SDK。客户在构建观测性的时候，可以直接使用社区提供的已经开发好的 SDK 来构建观测能力。社区也在此基础上提供了一些工具，这些工具已经集成了常见软件的对接
 
-Collector：负责收集观测数据，处理观测数据，导出观测数据。
+Collector：负责收集观测数据，处理观测数据，导出观测数据。OpenTelemetry服务由两个主要的模型：Agent(一个本地代理)和Collector(一个独立运行的服务)。
 
 架构介绍：
 
@@ -61,7 +61,127 @@ Collector：负责收集观测数据，处理观测数据，导出观测数据�
 
 利用公共组件的设计模式，例如在 Golang 的 Gin 组件，实现了 Middleware 责任链设计模式。
 我们可以引用 github.com/gin-gonic/gin 库，创建一个 otelgin.Middleware，手动添加到 Middleware 链中，实现 Gin 的快速监测，
-    
+
+
+## 分布式跟踪(distributed trace) 基础概念
+
+一条分布式跟踪是一系列事件(Event)的顺序集合。这些事件分布在不同的应用程序中，可以 跨进程、网络和安全边界。例如，该链路可以从用户点击一个网页的按钮开始，在这种情况下，该跟踪会包含从点击按钮开始，所经过的所有下游服务， 最终串起来形成一条链路。
+
+
+### Trace(一种数据结构，代表了分布式跟踪链路)
+Traces 在OpenTelemetry中是通过Spans来进一步定义的. 我们可以把一个Trace想像成由 Spans组成的有向无环图（DAG）, 图的每条边代表了Spans之间的关系——父子关系。
+
+下图示例表示了一个由8个span组成的tracer:
+```css
+        [Span A]  ←←←(the root span)
+            |
+     +------+------+
+     |             |
+ [Span B]      [Span C] ←←←(Span C is a `ChildOf` Span A)
+     |             |
+ [Span D]      +---+-------+
+               |           |
+           [Span E]    [Span F] >>> [Span G] >>> [Span H]
+                                       ↑
+                                       ↑
+                                       ↑
+                         (Span G `FollowsFrom` Span F)
+```
+时间轴的展现方式
+```css
+––|–––––––|–––––––|–––––––|–––––––|–––––––|–––––––|–––––––|–> time
+ [Span A···················································]
+   [Span B··············································]
+      [Span D··········································]
+    [Span C········································]
+         [Span E·······]        [Span F··] [Span G··] [Span H··]
+```
+
+
+### Span(一种数据结构，代表了Trace中的某一个片段)
+Span是一条追踪链路中的基本组成要素，一个span表示一个独立的工作单元，比如可以表示一次函数调用，一次http请求等等。span会记录如下基本要素:
+- 服务名称（operation name）
+- 服务的开始时间和结束时间
+- Key:Value形式的属性集合，Key必须是字符串，Value可以是字符串、布尔或者数字类型
+- 0个或者多个事件(Event), 每个事件都是一个Key:Value Map和一个时间戳
+- 该Span的父Span ID
+- Links(链接)到0个或多个有因果关系的Spans (通过那些Spans的SpanContext).
+- 一个Span的SpanContext ID
+
+
+### SpanContext(Span上下文)
+包含所有能够识别Trace中某个Span的信息，而且该信息必须要跨越进程边界传播到子Span中。 一个SpanContext包含了将会由父Span传播到子Span的跟踪ID和一些设置选项
+
+- TraceId 是一条Trace的全局唯一ID，由16个随机生成的字节组成,TraceID用来把该次请求链路的所有Spans组合到一起
+  SpanId 是Span的全局唯一ID，由8个随机生成的字节组成，当一个SpanID被传播到子Span时，该ID就是子Span的父SpanID
+- TraceFlags 代表了一条Trace的设置标志，由一个字节组成(里面8个bit都是设置位)
+  例如采样Bit位 - 设置了该Trace是否要被采样（掩码0x1).
+- Tracestate 携带了具体的跟踪内容，表现为[{key:value}]的键指对形式,Tracestate 允许不同的APM提供商加入额外的自定义内容和对于旧ID的转换处理
+
+### Span之间的Links(链接)
+一个Span可以和多个其它Span产生具有因果关系的链接(通过SpanContext定义)。
+
+这些链接可以指向某一个Trace内部的SpanContexts，也可以指向其它的Traces。
+
+
+### Attributes
+Attributes以K/V键值对的形式保存用户自定义标签，主要用于链路追踪结果的查询过滤。例如： http.method="GET",http.status_code=200。
+其中key值必须为字符串，value必须是字符串，布尔型或者数值型。 span中的Attributes仅自己可见，不会随着 SpanContext传递给后续span。
+
+设置Attributes方式例如
+```go
+span.SetAttributes(
+    label.String("http.remote", conn.RemoteAddr().String()),
+    label.String("http.local", conn.LocalAddr().String()),
+)
+```
+
+### events
+
+Events与Attributes类似，也是K/V键值对形式。与Attributes不同的是，Events还会记录写入Events的时间，因此Events主要用于记录某些事件发生的时间。
+Events的key值同样必须为字符串，但对value类型则没有限制
+
+```go
+span.AddEvent("http.request", trace.WithAttributes(
+    label.Any("http.request.header", headers),
+    label.Any("http.request.baggage", gtrace.GetBaggageMap(ctx)),
+    label.String("http.request.body", bodyContent),
+))
+```
+
+### Annotation: 注解,用来记录请求特定事件相关信息(例如时间)
+通常包含四个注解信息：   
+(1) cs：Client Start,表示客户端发起请求
+
+(2) sr：Server Receive,表示服务端收到请求
+
+(3) ss：Server Send,表示服务端完成处理，并将结果发送给客户端
+
+(4) cr：Client Received,表示客户端获取到服务端返回信息
+
+### Propagator(传播者)
+
+Propagator传播器用于端对端的数据编码/解码，例如：Client到Server端的数据传输，TraceId、SpanId和Baggage也是需要通过传播器来管理数据传输。
+业务端开发者往往对Propagator无感知，只有中间件/拦截器的开发者需要知道它的作用。
+
+OpenTelemetry的标准协议实现库提供了常用的TextMapPropagator，用于常见的文本数据端到端传输。
+此外，为保证TextMapPropagator中的传输数据兼容性，不应当带有特殊字符
+
+
+### Baggage
+除了Trace传播之外，OpenTelemetry还提供了一个简单的机制来传播键值对，这一机制被称为Baggage。
+
+Baggage可以为一个服务查看可观测事件提供索引， 其属性则是由同一个事务的前一个服务提供。这有助于在各个事件之间建立因果关系
+
+OpenTelemetry Baggage 是一个简单但通用的键值系统。一旦数据被添加为 Baggage，它就可以被所有下游服务访问。
+这允许有用的信息，如账户和项目 ID，在事务的后期变得可用，而不需要从数据库中重新获取它们。
+
+例如，一个使用项目 ID 作为索引的前端服务可以将其作为 Baggage 添加，允许后端服务也通过项目 ID 对其跨度和指标进行索引。
+这信息添加到了http header中，进行上下文传递，因此每增加一个项目都必须被编码为一个头，每增加一个项目都会增加事务中每一个后续网络请求的大小，因此不建议在将大量的非重要的信息添加到Baggage中。
+
+### Resources
+Resource记录当前发生采集的实体的信息(虚拟机、容器等)，例如，Metrics如果是通过Kubernetes容器导出的，那么resource可以记录 Kubernetes集群、命名空间、Pod和容器名称等信息。
+
 
 ## 代码案例 :svc1和svc2整合
 ### 链路描述
@@ -73,4 +193,6 @@ Collector：负责收集观测数据，处理观测数据，导出观测数据�
 5. S’收到请求后执行Fc
 
 ## 参考文档
-1. [官方文档链接](https://opentelemetry.io/docs/concepts/what-is-opentelemetry/)
+1. [官网文档](https://opentelemetry.io/docs/concepts/what-is-opentelemetry/)
+1. [opentelemetry 官方 github 文档](https://opentelemetry.io/docs/concepts/what-is-opentelemetry/)
+1. [opentelemetry 官方 github 中文文档](https://github.com/open-telemetry/docs-cn/blob/main/specification/Readme.md)
