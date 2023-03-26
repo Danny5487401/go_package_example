@@ -1,6 +1,15 @@
-# gRPC-Gateway
+# gRPC 转码（RPC Transcoding）
 
-gRPC-Gateway 是Google protocol buffers compiler(protoc)的一个插件。读取 protobuf 定义然后生成反向代理服务器，将 RESTful HTTP API 转换为 gRPC。
+gRPC 转码（RPC Transcoding）是一种用于在 gRPC 方法和一个或多个 HTTP REST 端点之间进行映射的功能。 
+它允许开发人员构建一个同时支持 gRPC API 和 REST API 的 API 服务。
+许多系统，包括Google APIs，Cloud Endpoints，gRPC Gateway和Envoy 代理都支持此功能并将其用于大规模生产服务。
+
+HttpRule 定义了 gRPC/REST 映射的模式。 映射指定 gRPC 请求消息的不同部分如何映射到 URL 路径、URL 查询参数和 HTTP 请求正文。 它还控制 gRPC 响应消息如何映射到 HTTP 响应正文。 HttpRule 通常被指定为 gRPC 方法上的 google.api.http 注释
+
+## gRPC-Gateway
+
+gRPC-Gateway 是Google protocol buffers compiler(protoc)的一个插件。
+读取 protobuf 定义然后生成反向代理服务器，将 RESTful HTTP API 转换为 gRPC。
 
 换句话说就是将 gRPC 转为 RESTful HTTP API。
 
@@ -49,24 +58,28 @@ proto
     └── hello_world.proto
 ```
 2. 增加 http 相关注解
-```protobuf
- rpc SayHello (HelloRequest) returns (HelloReply) {
-    option (google.api.http) = {
-      get: "/v1/greeter/sayhello"
-      body: "*"
-    };
-  }
-```
-每个方法都必须添加 google.api.http 注解后 gRPC-Gateway 才能生成对应 http 方法。
 
-其中post为 HTTP Method，即 POST 方法，/v1/greeter/sayhello 则是请求路径。
+[proto 代码](./proto/helloworld/hello_world.proto)
 
 
-3. 编译 增加 --grpc-gateway_out
+
+
+
+3. 编译增加 --grpc-gateway_out
 
 - Go Plugins 用于生成 .pb.go 文件
 - gRPC Plugins 用于生成 _grpc.pb.go
 - gRPC-Gateway 则是 pb.gw.go
+
+
+## HTTP映射的规则
+
+1. 叶请求字段（请求消息中的递归扩展嵌套消息）分为三类
+- 由路径模板引用的字段。它们通过 URL 路径传递。
+- [HttpRule.body][google.api.HttpRule.body] 引用的字段。 它们通过 HTTP 请求正文传递。
+- 所有其他字段都是通过 URL 查询参数传递的，参数名称是请求消息中的字段路径。 一个重复的字段可以表示为同名的多个查询参数。
+2. 如果 [HttpRule.body][google.api.HttpRule.body] 为“*”，则没有 URL 查询参数，所有字段都通过 URL 路径和 HTTP 请求正文传递。
+3. 如果 [HttpRule.body][google.api.HttpRule.body] 省略，则没有 HTTP 请求正文，所有字段都通过 URL 路径和 URL 查询参数传递
 
 
 ## 源码分析

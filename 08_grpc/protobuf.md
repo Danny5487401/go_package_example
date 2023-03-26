@@ -6,7 +6,7 @@ Protocol buffers 是一种语言无关、平台无关的可扩展机制或者说
 ## v2 和 v3 主要区别
 * 删除原始值字段的字段存在逻辑
 * 删除 required 字段
-* 删除 optional 字段，默认就是
+* 删除 optional 字段([3.15 加回来了](https://github.com/protocolbuffers/protobuf/blob/v3.15.0/docs/field_presence.md))
 * 删除 default 字段
 * 删除扩展特性，新增 Any 类型来替代它
 * 删除 unknown 字段的支持

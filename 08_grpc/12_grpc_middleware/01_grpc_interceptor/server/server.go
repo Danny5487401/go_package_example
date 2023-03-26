@@ -30,7 +30,7 @@ func (s *Server) SayHello(ctx context.Context, request *proto.HelloRequest) (*pr
 }
 
 func main() {
-	// 1。定义单个拦截器
+	// 1. 定义单个拦截器
 	//ctx context.Context：请求上下文
 	//req interface{}：RPC 方法的请求参数
 	//info *UnaryServerInfo：RPC 方法的所有信息
@@ -45,7 +45,7 @@ func main() {
 	//opt := grpc.UnaryInterceptor(interceptor)
 	//g := grpc.NewServer(opt)
 
-	// 2。定义多个拦截器
+	// 2/ 定义多个拦截器
 	c := grpctls.GetTLSCredentialsByCA()
 	opts := []grpc.ServerOption{
 		grpc.Creds(c),
@@ -77,7 +77,7 @@ const (
 )
 */
 
-// 日志拦截器
+// LoggingInterceptor 日志拦截器
 func LoggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (interface{}, error) {
 	log.Printf("gRPC method: %s, %v", info.FullMethod, req)
 	resp, err := handler(ctx, req)
@@ -85,7 +85,7 @@ func LoggingInterceptor(ctx context.Context, req interface{}, info *grpc.UnarySe
 	return resp, err
 }
 
-// 异常保护
+// RecoveryInterceptor 异常保护
 func RecoveryInterceptor(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
 	defer func() {
 		if e := recover(); e != nil {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/felixge/httpsnoop"
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
-	gen "go_package_example/08_grpc/10_grpc_gateway/gen/go/helloworld"
+	gen "go_package_example/08_grpc/10_grpc_gateway/proto_without_buf/helloworld"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 	"log"

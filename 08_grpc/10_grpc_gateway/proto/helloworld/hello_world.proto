@@ -5,23 +5,76 @@ import "google/api/annotations.proto";
 
 // 引入annotations.proto文件，因为添加的注解依赖该文件。该文件需要手动从 grpc-gateway/third_party/googleapis 目录复制到自己的项目中。
 
-// The greeting service definition
-service Greeter {
-  // Sends a greeting
-  rpc SayHello (HelloRequest) returns (HelloReply) {
+service Messaging {
+  rpc GetMessage1(GetMessageRequest1) returns (Message) {
+    // GET /v1/messages/123456	GetMessage(name: "messages/123456")
     option (google.api.http) = {
-      post: "/v1/greeter/sayhello"
+      get: "/v1/{name=messages/*}"
+    };
+  }
+
+  rpc GetMessage2(GetMessageRequest2) returns (Message) {
+    // GET /v1/messages/123456?revision=2&sub.subfield=foo	GetMessage(message_id: "123456" revision: 2 sub: SubMessage(subfield:"foo"))
+    option (google.api.http) = {
+      get:"/v1/messages/{message_id}"
+    };
+  }
+
+
+  rpc UpdateMessage3(UpdateMessageRequest3) returns (Message) {
+    // PATCH /v1/messages/123456 { "text": "Hi!" }	UpdateMessage(message_id:"123456" message { text: "Hi!" })
+    option (google.api.http) = {
+      patch: "/v1/messages/{message_id}"
+      body: "message"
+    };
+  }
+
+  rpc UpdateMessage4(GetMessageRequest2) returns (Message) {
+    // PATCH /v1/messages/123456 { "text": "Hi!" }	UpdateMessage(message_id:"123456" text: "Hi!")
+    option (google.api.http) = {
+      patch: "/v1/messages/{message_id}"
       body: "*"
     };
   }
+
+
+  rpc GetMessage5(GetMessageRequest5) returns (Message) {
+    // GET /v1/messages/123456	GetMessage(message_id: "123456")
+    // GET /v1/users/me/messages/123456	GetMessage(user_id: "me" message_id:"123456")
+    option (google.api.http) = {
+      get: "/v1/messages/{message_id}"
+      additional_bindings {
+        get: "/v1/users/{user_id}/messages/{message_id}"
+      }
+    };
+  }
+
+}
+message GetMessageRequest1 {
+  string name = 1; // Mapped to URL path.
+}
+message Message {
+  string text = 1; // The resource content.
 }
 
-// The request message containing the user's name
-message HelloRequest {
-  string name = 1;
+message GetMessageRequest2 {
+  message SubMessage {
+    string subfield = 1;
+  }
+  string message_id = 1; // Mapped to URL path.
+  int64 revision = 2;    // Mapped to URL query parameter `revision`.
+  SubMessage sub = 3;    // Mapped to URL query parameter `sub.subfield`.
 }
 
-// The response message containing the greetings
-message HelloReply {
-  string message = 1;
+
+
+message UpdateMessageRequest3 {
+  string message_id = 1; // mapped to the URL
+  Message message = 2;   // mapped to the body
+}
+
+
+message GetMessageRequest5 {
+  string message_id = 1;
+  string user_id = 2;
 }

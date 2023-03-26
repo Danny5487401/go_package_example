@@ -58,7 +58,10 @@ dir_import_proto:
 
 
 
-
+# 17：08_grpc/17_fieldmask
+.PHONY: fieldmask
+fieldmask:
+	protoc --proto_path=. --go_out=. --go-grpc_out=. 17_fieldmask/proto/*.proto
 
 
 

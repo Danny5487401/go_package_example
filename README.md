@@ -81,7 +81,6 @@
 ## [第八章 GRPC编程及调优](08_grpc/grpc.md)
 *前置知识*
 - [makefile 在 protobuf 中应用,生成 Pb 文件](08_grpc/makefile)
-- [buf 在 protobuf 中应用,生成 Pb 文件-->推荐](08_grpc/10_grpc_gateway/buf.work.yaml)
 - [protobuf](08_grpc/protobuf.md)
   - 引入其他proto文件,支持编译多个proto文件
   - 编码原理
@@ -102,8 +101,10 @@
 - [6  retry机制](08_grpc/06_grpc_retry/retry.md)
 - [7  grpc错误抛出与捕获](08_grpc/07_grpc_error/error.md)
 - [8  auth自定义认证](08_grpc/08_grpc_token_auth/credentials.md)
-- [9  Grpc插件-proto字段验证器-->引入第三方proto](08_grpc/09_grpc_validate/proto/helloworld.proto)
-- [10 Grpc插件-grpc网关直接对外http服务-->etcd中应用](08_grpc/10_grpc_gateway/grpc_gateway.md)
+- [9  Grpc插件-引入第三方proto实现字段验证器-->](08_grpc/09_grpc_validate/proto/helloworld.proto)
+- [10 Grpc插件-使用 gRPC 转码（RPC Transcoding）实现暴露 http服务-->grpc网关在etcd中应用](08_grpc/10_grpc_gateway/grpc_gateway.md)
+  -[buf 在 protobuf 中应用,生成 Pb 文件-->推荐](08_grpc/10_grpc_gateway/buf.work.yaml)
+  -[原始不使用 buf 生成pb文件](08_grpc/10_grpc_gateway/proto_without_buf)
 - [11 Grpc插件-gogo/protobuf](08_grpc/11_protoc_gogofast/gogoprotobuf.md)
 - [12 GRPC生态中间件(拦截器扩展)](08_grpc/12_grpc_middleware/01_grpc_interceptor/server/server.go)
   - 实现基于 CA 的 TLS 证书认证
@@ -111,7 +112,8 @@
 - [13 channelz 分析问题](08_grpc/13_channelz/channelz.md)
 - 14 multiplex多路复用
 - [15 自定义 grpc 插件](08_grpc/15_customized_protobuf_plugin/protobuf_extend.md)
-- 同目录 proto 文件引入
+- [16 同目录 proto 文件引入](08_grpc/16_import_proto/proto)
+- [17 field masks](08_grpc/17_fieldmask/fieldmask.md)
 
 ## 第九章 Nosql 非关系型数据库
 - [1 MongoDB](09_Nosql/01_mongo/mongo.md)

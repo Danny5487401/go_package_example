@@ -41,5 +41,3 @@ func main() {
 		log.Fatalf("failed to serve: %v", err)
 	}
 }
-
-//注意：更改protobuf文件，先后上线server和client端没有影响

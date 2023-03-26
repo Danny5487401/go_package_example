@@ -42,6 +42,7 @@ require (
 	github.com/hashicorp/raft-boltdb v0.0.0-20211202195631-7d34b9fb3f42
 	github.com/hibiken/asynq v0.23.0
 	github.com/hpcloud/tail v1.0.0
+	github.com/iancoleman/strcase v0.0.0-20180726023541-3605ed457bf7
 	github.com/imdario/mergo v0.3.8
 	github.com/jinzhu/copier v0.3.5
 	github.com/jinzhu/gorm v1.9.16
@@ -50,6 +51,7 @@ require (
 	github.com/lestrrat/go-file-rotatelogs v0.0.0-20180223000712-d3151e2a480f
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/mbobakov/grpc-consul-resolver v1.4.4
+	github.com/mennanov/fieldmask-utils v1.0.0
 	github.com/micro/go-micro v1.18.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/nacos-group/nacos-sdk-go v1.0.7
@@ -69,7 +71,7 @@ require (
 	github.com/spf13/cobra v0.0.5
 	github.com/spf13/viper v1.8.1
 	github.com/streadway/amqp v1.0.0
-	github.com/stretchr/testify v1.7.2
+	github.com/stretchr/testify v1.8.0
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/yoyofxteam/nacos-viper-remote v0.4.0
@@ -84,7 +86,7 @@ require (
 	go.uber.org/dig v1.11.0
 	go.uber.org/zap v1.17.0
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
-	google.golang.org/genproto v0.0.0-20220317150908-0efb43f6373e
+	google.golang.org/genproto v0.0.0-20220531173845-685668d2de03
 	google.golang.org/grpc v1.47.0
 	google.golang.org/grpc/examples v0.0.0-20220408224156-ebd098392a8b
 	google.golang.org/protobuf v1.28.0
@@ -182,7 +184,7 @@ require (
 	github.com/spf13/afero v1.6.0 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/stretchr/objx v0.2.0 // indirect
+	github.com/stretchr/objx v0.4.0 // indirect
 	github.com/subosito/gotenv v1.2.0 // indirect
 	github.com/syndtr/goleveldb v1.0.0 // indirect
 	github.com/tidwall/gjson v1.2.1 // indirect
