@@ -121,7 +121,7 @@ type Status struct {
 }
 ```
 
-### Code:fRPC的错误码
+### Code: gRPC的错误码
 * OK 正常
 * Canceled 客户端取消
 * Unknown 未知

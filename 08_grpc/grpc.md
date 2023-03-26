@@ -7,7 +7,8 @@
 但是大多数情况下，讨论都是基于gRPC over HTTP2。
 ![](.grpc_images/grpc_layer.png)
 
-最底层为TCP或Unix Socket协议，在此之上是HTTP/2协议的实现，然后在HTTP/2协议之上又构建了针对Go语言的gRPC核心库。应用程序通过gRPC插件生产的Stub代码和gRPC核心库通信，也可以直接和gRPC核心库通信。
+最底层为TCP或Unix Socket协议，在此之上是HTTP/2协议的实现，然后在HTTP/2协议之上又构建了针对Go语言的gRPC核心库。
+应用程序通过gRPC插件生产的Stub代码和gRPC核心库通信，也可以直接和gRPC核心库通信。
 
 ## grpc 流程
 ![](.grpc_images/simple_grpc_process.png)
@@ -120,8 +121,7 @@ trace-proto-bin = jher831yy13JHy3hc
 ### 4. bidi streaming   
 ![](.grpc_images/bidi_streaming.png)
 
-## 拦截器
-![](.grpc_images/intercepter.png)
+
 
 
 ## grpc调优
@@ -156,6 +156,6 @@ const (
 
 ## 参考链接
 1. [官方 example 源码使用](https://github.com/grpc/grpc-go/tree/master/examples/features)
-2. [wireshark 抓取grpc ](https://www.imlc.me/how-to-inspect-grpc-with-wireshark/)
+2. [wireshark 抓取grpc](https://www.imlc.me/how-to-inspect-grpc-with-wireshark/)
 3. [官方 grpc 设计准则](https://grpc.io/blog/principles/)
 4. [官方 grpc 文档](https://github.com/grpc/grpc/tree/master/doc)

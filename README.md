@@ -80,17 +80,19 @@
 
 ## [第八章 GRPC编程及调优](08_grpc/grpc.md)
 *前置知识*
-- [makefile在protobuf中应用](08_grpc/makefile)
-- [protobuf及工具介绍](08_grpc/16_import_proto/protobuf_n_tools.md)
+- [makefile 在 protobuf 中应用,生成 Pb 文件](08_grpc/makefile)
+- [buf 在 protobuf 中应用,生成 Pb 文件-->推荐](08_grpc/10_grpc_gateway/buf.work.yaml)
+- [protobuf](08_grpc/protobuf.md)
   - 引入其他proto文件,支持编译多个proto文件
   - 编码原理
-  - protoc,protoc-gen-go,protoc-gen-go-grpc,protoc-gen-gofast等工具
-- 1  HelloWorld入门使用及源码分析
+- [protobuf 工具:protoc,protoc-gen-go,protoc-gen-go-grpc,protoc-gen-gofast 等](08_grpc/proto_tools.md)
+
+- 1  HelloWorld 入门使用及源码分析
   - [1.1 客户端 Grpc 源码](08_grpc/01_grpc_helloworld/client/client.md)
   - [1.2 服务端 Grpc 源码](08_grpc/01_grpc_helloworld/server/server.md)
-- 2  [context中的元数据metadata](08_grpc/02_metadata/grpc_context.md)
+- 2  [context 中的元数据 metadata](08_grpc/02_metadata/grpc_context.md)
 - 3  流式GRPC
-- 4  protobuf的jsonpb包序列化和反序列化
+- 4  protobuf的 jsonpb 包序列化和反序列化
 - [5  负载均衡](08_grpc/05_grpc_load_balance/load_balance.md)
   - [5.1 客户端负载均衡(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver_n_balancer.md)
     - [第三方consul实现Resolver接口和Builder接口](01_consul/02_grpc/consul_client/main.go)
@@ -100,17 +102,18 @@
 - [6  retry机制](08_grpc/06_grpc_retry/retry.md)
 - [7  grpc错误抛出与捕获](08_grpc/07_grpc_error/error.md)
 - [8  auth自定义认证](08_grpc/08_grpc_token_auth/credentials.md)
-- 9  Grpc插件-proto字段验证器
+- [9  Grpc插件-proto字段验证器-->引入第三方proto](08_grpc/09_grpc_validate/proto/helloworld.proto)
 - [10 Grpc插件-grpc网关直接对外http服务-->etcd中应用](08_grpc/10_grpc_gateway/grpc_gateway.md)
 - [11 Grpc插件-gogo/protobuf](08_grpc/11_protoc_gogofast/gogoprotobuf.md)
 - [12 GRPC生态中间件(拦截器扩展)](08_grpc/12_grpc_middleware/01_grpc_interceptor/server/server.go)
   - 实现基于 CA 的 TLS 证书认证
-  - go-grpc-middleware实现多个中间间：异常保护，日志
+  - go-grpc-middleware 实现多个中间件：异常保护，日志
 - [13 channelz 分析问题](08_grpc/13_channelz/channelz.md)
 - 14 multiplex多路复用
-- [15 自定义grpc插件](08_grpc/15_customized_protobuf_plugin/protobuf_extend.md)
+- [15 自定义 grpc 插件](08_grpc/15_customized_protobuf_plugin/protobuf_extend.md)
+- 同目录 proto 文件引入
 
-## 第九章 Nosql非关系型数据库
+## 第九章 Nosql 非关系型数据库
 - [1 MongoDB](09_Nosql/01_mongo/mongo.md)
   - [mongo和mysql对比：储存引擎及内存结构](09_Nosql/01_mongo/nosql_vs_rds.md)
   - 1.1 增删改查
