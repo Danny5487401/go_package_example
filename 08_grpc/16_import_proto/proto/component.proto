@@ -1,0 +1,12 @@
+syntax = "proto3";
+option go_package = "16_import_proto/proto"; // 必须要有 . 或则 /
+//package component;   // 表示当前 protobuf 文件属于 component包 ，这个package不是 Go 语言中的那个package
+
+message CPU {
+  string Name = 1;
+  int64 Frequency = 2;
+}
+message Memory {
+  string Name = 1;
+  int64 Cap = 2;
+}

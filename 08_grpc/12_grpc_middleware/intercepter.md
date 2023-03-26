@@ -1,4 +1,6 @@
 # 截取器
+![](../.grpc_images/intercepter.png)
+
 gRPC中的grpc.UnaryInterceptor和grpc.StreamInterceptor分别对普通方法和流方法提供了截取器的支持。我们这里简单介绍普通方法的截取器用法。
 
 ## 使用

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "/08_grpc/01_grpc_helloworld/proto;helloworld";
+option go_package = "01_grpc_helloworld/proto";
 
 
 

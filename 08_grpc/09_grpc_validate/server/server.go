@@ -11,7 +11,9 @@ import (
 	"go_package_example/08_grpc/09_grpc_validate/proto"
 )
 
-type Server struct{}
+type Server struct {
+	proto.UnimplementedGreeterServer
+}
 
 func (s *Server) SayHello(ctx context.Context, request *proto.Person) (*proto.Person,
 	error) {
@@ -33,7 +35,6 @@ func main() {
 	//}
 	var interceptor grpc.UnaryServerInterceptor
 	interceptor = func(ctx context.Context, req interface{}, info *grpc.UnaryServerInfo, handler grpc.UnaryHandler) (resp interface{}, err error) {
-		// 继续处理请求
 
 		// req.(proto.Person)可以满足person的验证，其他 接口也需要验证
 		// 通过转换成validator保证proto里面的都有validate方法
@@ -42,7 +43,8 @@ func main() {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
 		}
-
+		
+		// 继续处理请求
 		return handler(ctx, req)
 	}
 	var opts []grpc.ServerOption

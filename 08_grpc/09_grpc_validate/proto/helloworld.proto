@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-//使用envoyproxy/protoc-gen-validate验证器 1.6k star，在更新，但还是alpha阶段
-// 不推荐：mwitkow/go-proto-validators 0.8k star,停止更新
+// 使用 bufbuild/protoc-gen-validate,还是alpha阶段
+// 不推荐：mwitkow/go-proto-validators
 import "validate.proto";
-option go_package=".;proto";
+option go_package="09_grpc_validate/proto;proto";
 
 service Greeter {
   rpc SayHello (Person) returns (Person);
@@ -11,7 +11,6 @@ service Greeter {
 
 message Person {
   uint64 id    = 1 [(validate.rules).uint64.gt    = 999];
-
   string email = 2 [(validate.rules).string.email = true];
   string mobile  = 3 [(validate.rules).string = {
     pattern:   "^1[3456789]\\d{9}$"}];

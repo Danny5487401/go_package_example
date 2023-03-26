@@ -1,6 +1,6 @@
 syntax = "proto3";
 //声明 包名
-option go_package = "./;proto";
+option go_package = "04_jsonpb/proto;proto";
 
 service Member {
   rpc GetMember(MemberRequest)returns (MemberResponse);
