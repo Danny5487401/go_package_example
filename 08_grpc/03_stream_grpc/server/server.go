@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"google.golang.org/grpc/peer"
 	"log"
 	"net"
 	"sync"
@@ -15,9 +16,10 @@ import (
 const PORT = ":50051"
 
 type server struct {
+	proto.UnimplementedGreeterServer
 }
 
-//服务端 单向流
+// GetStream 服务端 推送流
 func (s *server) GetStream(req *proto.StreamReqData, res proto.Greeter_GetStreamServer) error {
 	i := 0
 	for {
@@ -31,9 +33,15 @@ func (s *server) GetStream(req *proto.StreamReqData, res proto.Greeter_GetStream
 	return nil
 }
 
-//客户端 单向流
+// PutStream 客户端 推送流
 func (s *server) PutStream(cliStr proto.Greeter_PutStreamServer) error {
 
+	ctx := cliStr.Context()
+	peerAddr := "0.0.0.0"
+	if peerInfo, ok := peer.FromContext(ctx); ok {
+		peerAddr = peerInfo.Addr.String()
+	}
+	fmt.Printf("客户端 推送流：获取客户端地址信息%v \n", peerAddr)
 	for {
 		if tem, err := cliStr.Recv(); err == nil {
 			log.Println(tem)
@@ -46,7 +54,7 @@ func (s *server) PutStream(cliStr proto.Greeter_PutStreamServer) error {
 	return nil
 }
 
-//客户端服务端 双向流
+// AllStream 客户端服务端 双向流
 func (s *server) AllStream(allStr proto.Greeter_AllStreamServer) error {
 
 	wg := sync.WaitGroup{}
@@ -58,7 +66,7 @@ func (s *server) AllStream(allStr proto.Greeter_AllStreamServer) error {
 				log.Println(err)
 				break
 			}
-			log.Println("服务端接收数据", data)
+			log.Println("服务端接收数据", data.GetData())
 
 		}
 		wg.Done()
@@ -66,7 +74,7 @@ func (s *server) AllStream(allStr proto.Greeter_AllStreamServer) error {
 
 	go func() {
 		for i := 0; i < 5; i++ {
-			allStr.Send(&proto.StreamResData{Data: "服务端发送连续数据ssss"})
+			allStr.Send(&proto.StreamResData{Data: fmt.Sprintf("服务端发送连续数据:%v", i)})
 			time.Sleep(time.Second)
 		}
 		wg.Done()
