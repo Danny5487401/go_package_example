@@ -1,3 +1,20 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [zap](#zap)
+  - [zap结构](#zap%E7%BB%93%E6%9E%84)
+  - [日志](#%E6%97%A5%E5%BF%97)
+  - [源码分析](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+    - [结构体logger](#%E7%BB%93%E6%9E%84%E4%BD%93logger)
+    - [1. 初始化](#1-%E5%88%9D%E5%A7%8B%E5%8C%96)
+      - [1. 第一种：建造者模式分析](#1-%E7%AC%AC%E4%B8%80%E7%A7%8D%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F%E5%88%86%E6%9E%90)
+      - [2. 第二种: 自定义的new方法](#2-%E7%AC%AC%E4%BA%8C%E7%A7%8D-%E8%87%AA%E5%AE%9A%E4%B9%89%E7%9A%84new%E6%96%B9%E6%B3%95)
+    - [zapcore](#zapcore)
+    - [打印案例](#%E6%89%93%E5%8D%B0%E6%A1%88%E4%BE%8B)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # zap
 Zap 跟 logrus 以及目前主流的 Go 语言 log 类似，提倡采用结构化的日志格式，而不是将所有消息放到消息体中，
 

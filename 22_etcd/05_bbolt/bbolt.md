@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [bbolt](#bbolt)
+  - [文件头格式](#%E6%96%87%E4%BB%B6%E5%A4%B4%E6%A0%BC%E5%BC%8F)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # bbolt
 CoreOS公司fork了BoltDB，继续维护这个项目。不过名字改成了bbolt.
 

@@ -1,3 +1,31 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [redis数据类型与11zh3ong编码方式](#redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B8%8E11zh3ong%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F)
+  - [1.redis核心对象结构](#1redis%E6%A0%B8%E5%BF%83%E5%AF%B9%E8%B1%A1%E7%BB%93%E6%9E%84)
+    - [Redis object对象的数据结构,具有五种属性](#redis-object%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%B7%E6%9C%89%E4%BA%94%E7%A7%8D%E5%B1%9E%E6%80%A7)
+      - [基本数据类型](#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B)
+      - [encoding编码方式](#encoding%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F)
+        - [1.  OBJ_ENCODING_RAW](#1--obj_encoding_raw)
+        - [2.OBJ_ENCODING_HT 哈希表](#2obj_encoding_ht-%E5%93%88%E5%B8%8C%E8%A1%A8)
+        - [5. OBJ_ENCODING_ZIPLIST 压缩列表](#5-obj_encoding_ziplist-%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8)
+        - [6.OBJ_ENCODING_INTSET整数集合](#6obj_encoding_intset%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88)
+        - [7.OBJ_ENCODING_SKIPLIST跳跃表](#7obj_encoding_skiplist%E8%B7%B3%E8%B7%83%E8%A1%A8)
+        - [8.  OBJ_ENCODING_EMBSTR(embedded string)](#8--obj_encoding_embstrembedded-string)
+        - [9.OBJ_ENCODING_QUICKLIST](#9obj_encoding_quicklist)
+    - [client、redisServer对象](#clientredisserver%E5%AF%B9%E8%B1%A1)
+  - [2.操作](#2%E6%93%8D%E4%BD%9C)
+    - [RedisDB内部结构](#redisdb%E5%86%85%E9%83%A8%E7%BB%93%E6%9E%84)
+    - [1.string](#1string)
+    - [2.hash(ziplist+dict)](#2hashziplistdict)
+    - [3.set(intset+dict)](#3setintsetdict)
+    - [4.list双端链表](#4list%E5%8F%8C%E7%AB%AF%E9%93%BE%E8%A1%A8)
+    - [5.Sort Set(dict+zskiplist)](#5sort-setdictzskiplist)
+    - [6.stream(radix-tree)](#6streamradix-tree)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # redis数据类型与11zh3ong编码方式
 
 ## 1.redis核心对象结构

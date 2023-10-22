@@ -1,3 +1,0 @@
-2021-12-13 20:56:23	INFO	04_customized_log/main.go:18	sugarLogger name:修华师1
-2021-12-13 20:56:23	INFO	04_customized_log/main.go:19	sugarLogger	{"name": "修华师2"}
-2021-12-13 20:56:23	INFO	04_customized_log/main.go:24	logger	{"name": "修华师6"}

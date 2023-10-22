@@ -1,3 +1,26 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [go-sql-driver/mysql源码分析](#go-sql-drivermysql%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [1. go-sql-driver/mysql@v1.5.0/buffer.go](#1-go-sql-drivermysqlv150buffergo)
+  - [2. Collations.go](#2-collationsgo)
+  - [3. Dsn.go   数据源名称 （Data Source Name）](#3-dsngo---%E6%95%B0%E6%8D%AE%E6%BA%90%E5%90%8D%E7%A7%B0-data-source-name)
+  - [4. Errors.go](#4-errorsgo)
+  - [5. Packets.go](#5-packetsgo)
+    - [mysql通信协议](#mysql%E9%80%9A%E4%BF%A1%E5%8D%8F%E8%AE%AE)
+      - [1. 基础数据类型](#1-%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B)
+      - [2. 报文协议](#2-%E6%8A%A5%E6%96%87%E5%8D%8F%E8%AE%AE)
+      - [3. 协议类型](#3-%E5%8D%8F%E8%AE%AE%E7%B1%BB%E5%9E%8B)
+  - [6. Driver.go](#6-drivergo)
+  - [7. connection.go](#7-connectiongo)
+  - [8. result.go](#8-resultgo)
+  - [9. row.go](#9-rowgo)
+  - [10. Statement.go](#10-statementgo)
+  - [11. Transaction.go](#11-transactiongo)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # go-sql-driver/mysql源码分析
 
 ## 1. go-sql-driver/mysql@v1.5.0/buffer.go

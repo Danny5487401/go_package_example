@@ -1,3 +1,29 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [OpenTelemetry](#opentelemetry)
+  - [OpenTelemetry 诞生](#opentelemetry-%E8%AF%9E%E7%94%9F)
+    - [openTelemetry架构](#opentelemetry%E6%9E%B6%E6%9E%84)
+    - [1. 收集、转换、转发遥测数据的工具 Collector](#1-%E6%94%B6%E9%9B%86%E8%BD%AC%E6%8D%A2%E8%BD%AC%E5%8F%91%E9%81%A5%E6%B5%8B%E6%95%B0%E6%8D%AE%E7%9A%84%E5%B7%A5%E5%85%B7-collector)
+    - [2. 自动监测客户端与第三方库 Instrumentation & Contrib](#2-%E8%87%AA%E5%8A%A8%E7%9B%91%E6%B5%8B%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%B8%8E%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%93-instrumentation--contrib)
+  - [分布式跟踪(distributed trace) 基础概念](#%E5%88%86%E5%B8%83%E5%BC%8F%E8%B7%9F%E8%B8%AAdistributed-trace-%E5%9F%BA%E7%A1%80%E6%A6%82%E5%BF%B5)
+    - [Trace(一种数据结构，代表了分布式跟踪链路)](#trace%E4%B8%80%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BB%A3%E8%A1%A8%E4%BA%86%E5%88%86%E5%B8%83%E5%BC%8F%E8%B7%9F%E8%B8%AA%E9%93%BE%E8%B7%AF)
+    - [Span(一种数据结构，代表了Trace中的某一个片段)](#span%E4%B8%80%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BB%A3%E8%A1%A8%E4%BA%86trace%E4%B8%AD%E7%9A%84%E6%9F%90%E4%B8%80%E4%B8%AA%E7%89%87%E6%AE%B5)
+    - [SpanContext(Span上下文)](#spancontextspan%E4%B8%8A%E4%B8%8B%E6%96%87)
+    - [Span之间的Links(链接)](#span%E4%B9%8B%E9%97%B4%E7%9A%84links%E9%93%BE%E6%8E%A5)
+    - [Attributes](#attributes)
+    - [events](#events)
+    - [Annotation: 注解,用来记录请求特定事件相关信息(例如时间)](#annotation-%E6%B3%A8%E8%A7%A3%E7%94%A8%E6%9D%A5%E8%AE%B0%E5%BD%95%E8%AF%B7%E6%B1%82%E7%89%B9%E5%AE%9A%E4%BA%8B%E4%BB%B6%E7%9B%B8%E5%85%B3%E4%BF%A1%E6%81%AF%E4%BE%8B%E5%A6%82%E6%97%B6%E9%97%B4)
+    - [Propagator(传播者)](#propagator%E4%BC%A0%E6%92%AD%E8%80%85)
+    - [Baggage](#baggage)
+    - [Resources](#resources)
+  - [代码案例 :svc1和svc2整合](#%E4%BB%A3%E7%A0%81%E6%A1%88%E4%BE%8B-svc1%E5%92%8Csvc2%E6%95%B4%E5%90%88)
+    - [链路描述](#%E9%93%BE%E8%B7%AF%E6%8F%8F%E8%BF%B0)
+  - [参考文档](#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # OpenTelemetry 
 
 ## OpenTelemetry 诞生

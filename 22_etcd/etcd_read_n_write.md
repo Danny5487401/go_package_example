@@ -1,3 +1,31 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Etcd的读写](#etcd%E7%9A%84%E8%AF%BB%E5%86%99)
+  - [分层模型](#%E5%88%86%E5%B1%82%E6%A8%A1%E5%9E%8B)
+  - [1. 读请求](#1-%E8%AF%BB%E8%AF%B7%E6%B1%82)
+    - [串行读与线性读](#%E4%B8%B2%E8%A1%8C%E8%AF%BB%E4%B8%8E%E7%BA%BF%E6%80%A7%E8%AF%BB)
+      - [线性读之ReadIndex](#%E7%BA%BF%E6%80%A7%E8%AF%BB%E4%B9%8Breadindex)
+    - [MVCC](#mvcc)
+      - [treeIndex](#treeindex)
+      - [buffer](#buffer)
+      - [boltdb](#boltdb)
+  - [2. 写请求](#2-%E5%86%99%E8%AF%B7%E6%B1%82)
+    - [Quota模块](#quota%E6%A8%A1%E5%9D%97)
+      - [解决方式](#%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F)
+    - [KVServer 模块](#kvserver-%E6%A8%A1%E5%9D%97)
+      - [Preflight Check](#preflight-check)
+      - [Propose](#propose)
+    - [WAL 模块](#wal-%E6%A8%A1%E5%9D%97)
+    - [APPLY模块](#apply%E6%A8%A1%E5%9D%97)
+    - [MVCC](#mvcc-1)
+      - [treeIndex索引模块](#treeindex%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%9D%97)
+      - [boltdb模块](#boltdb%E6%A8%A1%E5%9D%97)
+      - [事务提交的过程](#%E4%BA%8B%E5%8A%A1%E6%8F%90%E4%BA%A4%E7%9A%84%E8%BF%87%E7%A8%8B)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Etcd的读写
 ## 分层模型
 ![](.etcd_read_n_write_images/etcd_layer_model.png)

@@ -1,3 +1,29 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [CI持续集成（Continuous Integration）](#ci%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90continuous-integration)
+  - [gitlab CI](#gitlab-ci)
+    - [Gitlab Runner](#gitlab-runner)
+      - [GitLab Runner特点](#gitlab-runner%E7%89%B9%E7%82%B9)
+      - [执行器](#%E6%89%A7%E8%A1%8C%E5%99%A8)
+      - [执行器特性对比](#%E6%89%A7%E8%A1%8C%E5%99%A8%E7%89%B9%E6%80%A7%E5%AF%B9%E6%AF%94)
+      - [Runner类型](#runner%E7%B1%BB%E5%9E%8B)
+      - [runner注册](#runner%E6%B3%A8%E5%86%8C)
+    - [基本概念](#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5)
+      - [管道（pipeline）：](#%E7%AE%A1%E9%81%93pipeline)
+    - [阶段（Stage）](#%E9%98%B6%E6%AE%B5stage)
+    - [作业（Job）](#%E4%BD%9C%E4%B8%9Ajob)
+    - [script语法](#script%E8%AF%AD%E6%B3%95)
+    - [常用配置介绍](#%E5%B8%B8%E7%94%A8%E9%85%8D%E7%BD%AE%E4%BB%8B%E7%BB%8D)
+      - [预设变量](#%E9%A2%84%E8%AE%BE%E5%8F%98%E9%87%8F)
+    - [验证.gitlab-ci.yml](#%E9%AA%8C%E8%AF%81gitlab-ciyml)
+  - [操作流程](#%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B)
+    - [前置条件](#%E5%89%8D%E7%BD%AE%E6%9D%A1%E4%BB%B6)
+  - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # CI持续集成（Continuous Integration）
 
 持续集成（Continuous Integration）是一种软件开发实践，即团队开发成员经常集成它们的工作，通过每个成员每天至少集成一次，也就意味着每天可能会发生多次集成。

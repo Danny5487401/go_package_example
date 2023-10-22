@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Channelz](#channelz)
+  - [proto定义](#proto%E5%AE%9A%E4%B9%89)
+  - [案例分析](#%E6%A1%88%E4%BE%8B%E5%88%86%E6%9E%90)
+    - [分析](#%E5%88%86%E6%9E%90)
+  - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Channelz
 
 Channelz是一个工具，可提供有关gRPC中不同级别的连接的全面运行时信息。它旨在帮助调试可能受到网络，性能，配置问题等困扰的实时程序.

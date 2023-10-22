@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [etcd鉴权](#etcd%E9%89%B4%E6%9D%83)
+  - [控制面](#%E6%8E%A7%E5%88%B6%E9%9D%A2)
+  - [数据面](#%E6%95%B0%E6%8D%AE%E9%9D%A2)
+  - [认证](#%E8%AE%A4%E8%AF%81)
+    - [密码认证](#%E5%AF%86%E7%A0%81%E8%AE%A4%E8%AF%81)
+    - [证书认证](#%E8%AF%81%E4%B9%A6%E8%AE%A4%E8%AF%81)
+  - [授权](#%E6%8E%88%E6%9D%83)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # etcd鉴权
 
 etcd 鉴权体系架构由控制面和数据面组成.

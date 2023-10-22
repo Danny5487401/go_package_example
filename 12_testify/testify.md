@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [testify](#testify)
+  - [第三方使用](#%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BD%BF%E7%94%A8)
+  - [1. assert](#1-assert)
+    - [Assertions 对象](#assertions-%E5%AF%B9%E8%B1%A1)
+  - [2. mock](#2-mock)
+  - [3. suite](#3-suite)
+  - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # testify
 三大套件：assert断言，mock测试替身，suite测试套件
 

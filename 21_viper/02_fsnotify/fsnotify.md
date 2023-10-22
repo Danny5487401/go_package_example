@@ -1,3 +1,20 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [fsnotify](#fsnotify)
+  - [需求](#%E9%9C%80%E6%B1%82)
+  - [做法](#%E5%81%9A%E6%B3%95)
+  - [inotify机制](#inotify%E6%9C%BA%E5%88%B6)
+    - [inotify 的三个接口](#inotify-%E7%9A%84%E4%B8%89%E4%B8%AA%E6%8E%A5%E5%8F%A3)
+    - [inotify 怎么实现监控的？](#inotify-%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%E7%9B%91%E6%8E%A7%E7%9A%84)
+  - [watcher结构体](#watcher%E7%BB%93%E6%9E%84%E4%BD%93)
+  - [初始化](#%E5%88%9D%E5%A7%8B%E5%8C%96)
+  - [事件](#%E4%BA%8B%E4%BB%B6)
+  - [添加文件或则目录监听](#%E6%B7%BB%E5%8A%A0%E6%96%87%E4%BB%B6%E6%88%96%E5%88%99%E7%9B%AE%E5%BD%95%E7%9B%91%E5%90%AC)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # fsnotify
 
 fsnotify ，就是封装了系统调用，用来监控文件事件的。当指定目录或者文件，发生了创建，删除，修改，重命名的事件，里面就能得到通知。

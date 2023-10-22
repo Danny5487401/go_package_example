@@ -1,3 +1,21 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Consul](#consul)
+  - [基本概念](#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5)
+  - [节点分类:](#%E8%8A%82%E7%82%B9%E5%88%86%E7%B1%BB)
+  - [数据中心内部通信:](#%E6%95%B0%E6%8D%AE%E4%B8%AD%E5%BF%83%E5%86%85%E9%83%A8%E9%80%9A%E4%BF%A1)
+  - [跨数据中心通信:](#%E8%B7%A8%E6%95%B0%E6%8D%AE%E4%B8%AD%E5%BF%83%E9%80%9A%E4%BF%A1)
+  - [端口说明：](#%E7%AB%AF%E5%8F%A3%E8%AF%B4%E6%98%8E)
+  - [docker简单安装](#docker%E7%AE%80%E5%8D%95%E5%AE%89%E8%A3%85)
+  - [consul 为我们提供的四大组件](#consul-%E4%B8%BA%E6%88%91%E4%BB%AC%E6%8F%90%E4%BE%9B%E7%9A%84%E5%9B%9B%E5%A4%A7%E7%BB%84%E4%BB%B6)
+  - [注册中心](#%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83)
+    - [注册中心hashcode](#%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83hashcode)
+  - [源码分析](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Consul
 ![](.consul_images/consul_structure.png)
 

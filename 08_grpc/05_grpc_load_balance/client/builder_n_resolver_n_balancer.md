@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Builder接口和Resolver接口](#builder%E6%8E%A5%E5%8F%A3%E5%92%8Cresolver%E6%8E%A5%E5%8F%A3)
+  - [解析过程](#%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B)
+  - [负载均衡](#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Builder接口和Resolver接口
 
 gRPC已提供了简单的负载均衡策略（如：Round Robin），我们只需实现它提供的Builder和Resolver接口，就能完成gRPC客户端负载均衡。

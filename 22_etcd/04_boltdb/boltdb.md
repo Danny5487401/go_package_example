@@ -1,3 +1,29 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [boltdb](#boltdb)
+  - [特点](#%E7%89%B9%E7%82%B9)
+  - [缺点](#%E7%BC%BA%E7%82%B9)
+  - [db 文件磁盘布局](#db-%E6%96%87%E4%BB%B6%E7%A3%81%E7%9B%98%E5%B8%83%E5%B1%80)
+  - [磁盘数据分析](#%E7%A3%81%E7%9B%98%E6%95%B0%E6%8D%AE%E5%88%86%E6%9E%90)
+  - [page 磁盘页结构](#page-%E7%A3%81%E7%9B%98%E9%A1%B5%E7%BB%93%E6%9E%84)
+    - [从物理层面来说](#%E4%BB%8E%E7%89%A9%E7%90%86%E5%B1%82%E9%9D%A2%E6%9D%A5%E8%AF%B4)
+    - [从逻辑层面来说](#%E4%BB%8E%E9%80%BB%E8%BE%91%E5%B1%82%E9%9D%A2%E6%9D%A5%E8%AF%B4)
+    - [1. meta page 数据结构](#1-meta-page-%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84)
+      - [为什么会有两个 meta 页？](#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E6%9C%89%E4%B8%A4%E4%B8%AA-meta-%E9%A1%B5)
+    - [branch page](#branch-page)
+    - [leaf page](#leaf-page)
+    - [freelist](#freelist)
+  - [boltdb 的B+ 树](#boltdb-%E7%9A%84b-%E6%A0%91)
+    - [node](#node)
+  - [添加数据](#%E6%B7%BB%E5%8A%A0%E6%95%B0%E6%8D%AE)
+  - [事务提交](#%E4%BA%8B%E5%8A%A1%E6%8F%90%E4%BA%A4)
+  - [Open函数](#open%E5%87%BD%E6%95%B0)
+  - [参考链接](#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # boltdb
 
 ## 特点

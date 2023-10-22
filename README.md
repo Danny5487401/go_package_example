@@ -31,7 +31,7 @@
   - [第二十五章 监控sentry](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%BA%94%E7%AB%A0-%E7%9B%91%E6%8E%A7sentry)
   - [第二十六章 图数据库Neo4j](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E7%AB%A0-%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93neo4j)
   - [第二十七章 Mysql的binlog](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B8%83%E7%AB%A0-mysql%E7%9A%84binlog)
-  - [第二十八章 OLAP(Online Analytical Processing联机分析处理)](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AB%E7%AB%A0-olaponline-analytical-processing%E8%81%94%E6%9C%BA%E5%88%86%E6%9E%90%E5%A4%84%E7%90%86)
+  - [第二十八章 OLAP(Online Analytical Processing 联机分析处理)](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AB%E7%AB%A0-olaponline-analytical-processing-%E8%81%94%E6%9C%BA%E5%88%86%E6%9E%90%E5%A4%84%E7%90%86)
   - [第二十九章 分布式锁及源码分析](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B9%9D%E7%AB%A0-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
   - [第三十章 Zookeeper](#%E7%AC%AC%E4%B8%89%E5%8D%81%E7%AB%A0-zookeeper)
   - [第三十一章 分布式Id](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%80%E7%AB%A0-%E5%88%86%E5%B8%83%E5%BC%8Fid)
@@ -42,6 +42,8 @@
   - [第三十六章 Proto管理工具Buf](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%85%AD%E7%AB%A0-proto%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7buf)
   - [第三十七章 CI持续集成](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%83%E7%AB%A0-ci%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90)
   - [第三十八章 Mergo实现 struct 与 map 之间转换-->k8s中应用](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%85%AB%E7%AB%A0-mergo%E5%AE%9E%E7%8E%B0-struct-%E4%B8%8E-map-%E4%B9%8B%E9%97%B4%E8%BD%AC%E6%8D%A2--k8s%E4%B8%AD%E5%BA%94%E7%94%A8)
+  - [第三十九章 权限管理 casbin](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B9%9D%E7%AB%A0-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86-casbin)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -301,7 +303,7 @@
 - [binlog,gtid介绍](27_mysql_binlog/binlog.md)
 - [canal使用及源码分析](27_mysql_binlog/canal/canal.md)
 
-## 第二十八章 OLAP(Online Analytical Processing联机分析处理)
+## 第二十八章 OLAP(Online Analytical Processing 联机分析处理)
 - [1 列数据库ClickHouse](28_OLAP/01_clickHouse/clickHouse.md)
   - [1.1 标准库sql操作clickHouse](28_OLAP/01_clickHouse/01_database_sql/main.go)
   - [1.2 扩展包sqlx操作clickHouse](28_OLAP/01_clickHouse/02_sqlx/main.go)
@@ -342,4 +344,13 @@
 - [3 结构体中的切片使用](38_mergo/03_slice/main.go)
 - [4 类型检查](38_mergo/04_type_check/main.go)
 
+## [第三十九章 权限管理 casbin](39_casbin/casbin.md)
+- [1 ACL（access-control-list，访问控制列表)](39_casbin/01_acl/main.go)
+- [2 RBAC (role-based-access-control 基于角色的权限访问控制)](39_casbin/02_rbac/rbac.md)
+- [3 基于domain或tenant租户实现RBAC](39_casbin/03_domain_rbac/main.go)
+- [4 ABAC(Attribute-based access control 基于属性的权限验证)](39_casbin/04_abac/main.go)
 
+
+## 参考 
+
+- [awesome-go](https://github.com/avelino/awesome-go)

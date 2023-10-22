@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [protobuf 工具](#protobuf-%E5%B7%A5%E5%85%B7)
+  - [1 protoc (protocol buffer compiler)](#1-protoc-protocol-buffer-compiler)
+  - [2 protoc-gen-go](#2-protoc-gen-go)
+  - [3 protoc-gen-go-grpc](#3-protoc-gen-go-grpc)
+  - [4 protoc-gen-go的替代版本:gogoprotobuf,2022开始 depreciated ](#4-protoc-gen-go%E7%9A%84%E6%9B%BF%E4%BB%A3%E7%89%88%E6%9C%ACgogoprotobuf2022%E5%BC%80%E5%A7%8B-depreciated)
+- [使用](#%E4%BD%BF%E7%94%A8)
+- [生成的protobuf.pb.go源码分析](#%E7%94%9F%E6%88%90%E7%9A%84protobufpbgo%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+- [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 ## protobuf 工具
 

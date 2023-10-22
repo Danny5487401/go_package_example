@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [关系型数据库和非关系型数据库的应用场景对比](#%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93%E5%92%8C%E9%9D%9E%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF%E5%AF%B9%E6%AF%94)
+  - [Mysql和MongoDB内存结构](#mysql%E5%92%8Cmongodb%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84)
+    - [1、InnoDb内存使用机制](#1innodb%E5%86%85%E5%AD%98%E4%BD%BF%E7%94%A8%E6%9C%BA%E5%88%B6)
+    - [2、MongoDB的存储结构及数据模型](#2mongodb%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84%E5%8F%8A%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B)
+      - [1）MongoDB使用的储存引擎是WiredTiger，WiredTiger的结构如图所示](#1mongodb%E4%BD%BF%E7%94%A8%E7%9A%84%E5%82%A8%E5%AD%98%E5%BC%95%E6%93%8E%E6%98%AFwiredtigerwiredtiger%E7%9A%84%E7%BB%93%E6%9E%84%E5%A6%82%E5%9B%BE%E6%89%80%E7%A4%BA)
+      - [2）数据模型](#2%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B)
+        - [内嵌](#%E5%86%85%E5%B5%8C)
+        - [引用模型又称规格化模型（Normalized data models)](#%E5%BC%95%E7%94%A8%E6%A8%A1%E5%9E%8B%E5%8F%88%E7%A7%B0%E8%A7%84%E6%A0%BC%E5%8C%96%E6%A8%A1%E5%9E%8Bnormalized-data-models)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 关系型数据库和非关系型数据库的应用场景对比
 
 关系型数据库适合存储结构化数据，如用户的帐号、地址：

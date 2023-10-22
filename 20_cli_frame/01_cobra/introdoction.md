@@ -1,3 +1,20 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Cobra](#cobra)
+  - [主要功能](#%E4%B8%BB%E8%A6%81%E5%8A%9F%E8%83%BD)
+  - [基本操作](#%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C)
+    - [1. 通过命令初始化项目](#1-%E9%80%9A%E8%BF%87%E5%91%BD%E4%BB%A4%E5%88%9D%E5%A7%8B%E5%8C%96%E9%A1%B9%E7%9B%AE)
+    - [2. 通过命令生成动作](#2-%E9%80%9A%E8%BF%87%E5%91%BD%E4%BB%A4%E7%94%9F%E6%88%90%E5%8A%A8%E4%BD%9C)
+    - [3. 为 Command 添加选项(flags)](#3-%E4%B8%BA-command-%E6%B7%BB%E5%8A%A0%E9%80%89%E9%A1%B9flags)
+      - [4. 添加子命令](#4-%E6%B7%BB%E5%8A%A0%E5%AD%90%E5%91%BD%E4%BB%A4)
+      - [5. 编译](#5-%E7%BC%96%E8%AF%91)
+  - [执行流程](#%E6%89%A7%E8%A1%8C%E6%B5%81%E7%A8%8B)
+  - [应用](#%E5%BA%94%E7%94%A8)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Cobra
 Cobra 是一个非常实用(流行)的golang包，很多优秀的开源应用都在使用它，包括 Docker 和 Kubernetes 等，
 它提供了简单的接口来创建命令行程序。同时，Cobra 也是一个应用程序，用来生成应用框架，从而开发以 Cobra 为基础的应用。

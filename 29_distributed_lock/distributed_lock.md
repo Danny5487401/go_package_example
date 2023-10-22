@@ -1,3 +1,27 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [分布式锁](#%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
+  - [应用场景](#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF)
+  - [实现分布式锁方案](#%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E6%96%B9%E6%A1%88)
+  - [1. redis实现](#1-redis%E5%AE%9E%E7%8E%B0)
+    - [主备版的 Redis 服务，至少具备一个 Slave 节点--采用了主备异步复制协议](#%E4%B8%BB%E5%A4%87%E7%89%88%E7%9A%84-redis-%E6%9C%8D%E5%8A%A1%E8%87%B3%E5%B0%91%E5%85%B7%E5%A4%87%E4%B8%80%E4%B8%AA-slave-%E8%8A%82%E7%82%B9--%E9%87%87%E7%94%A8%E4%BA%86%E4%B8%BB%E5%A4%87%E5%BC%82%E6%AD%A5%E5%A4%8D%E5%88%B6%E5%8D%8F%E8%AE%AE)
+      - [加锁](#%E5%8A%A0%E9%94%81)
+      - [解锁](#%E8%A7%A3%E9%94%81)
+    - [RedLock 算法-->Redis 作者为了解决 SET key value [EX] 10 [NX]命令实现分布式锁不安全的问题](#redlock-%E7%AE%97%E6%B3%95--redis-%E4%BD%9C%E8%80%85%E4%B8%BA%E4%BA%86%E8%A7%A3%E5%86%B3-set-key-value-ex-10-nx%E5%91%BD%E4%BB%A4%E5%AE%9E%E7%8E%B0%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E4%B8%8D%E5%AE%89%E5%85%A8%E7%9A%84%E9%97%AE%E9%A2%98)
+    - [redsync(redis官方推荐的go版本分布式锁实现) 源码分析](#redsyncredis%E5%AE%98%E6%96%B9%E6%8E%A8%E8%8D%90%E7%9A%84go%E7%89%88%E6%9C%AC%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%AE%9E%E7%8E%B0-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+      - [与redis通信](#%E4%B8%8Eredis%E9%80%9A%E4%BF%A1)
+      - [获取锁](#%E8%8E%B7%E5%8F%96%E9%94%81)
+      - [释放锁](#%E9%87%8A%E6%94%BE%E9%94%81)
+      - [multierror库](#multierror%E5%BA%93)
+  - [2. ZooKeeper 分布式锁](#2-zookeeper-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
+    - [3. ectd分布式锁](#3-ectd%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
+      - [etcd 自带的 concurrency 包](#etcd-%E8%87%AA%E5%B8%A6%E7%9A%84-concurrency-%E5%8C%85)
+      - [源码](#%E6%BA%90%E7%A0%81)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 分布式锁
 
 ## 应用场景

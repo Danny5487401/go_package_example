@@ -1,3 +1,21 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Gopstuil](#gopstuil)
+  - [模块](#%E6%A8%A1%E5%9D%97)
+  - [容器环境下获取进程指标](#%E5%AE%B9%E5%99%A8%E7%8E%AF%E5%A2%83%E4%B8%8B%E8%8E%B7%E5%8F%96%E8%BF%9B%E7%A8%8B%E6%8C%87%E6%A0%87)
+  - [使用](#%E4%BD%BF%E7%94%A8)
+    - [CPU](#cpu)
+    - [磁盘](#%E7%A3%81%E7%9B%98)
+      - [1. IO](#1-io)
+      - [2. 分区](#2-%E5%88%86%E5%8C%BA)
+      - [3. 使用率](#3-%E4%BD%BF%E7%94%A8%E7%8E%87)
+    - [主机](#%E4%B8%BB%E6%9C%BA)
+    - [内存](#%E5%86%85%E5%AD%98)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Gopstuil
 gopsutil是 Python 工具库psutil 的 Golang 移植版，可以帮助我们方便地获取各种系统和硬件信息。gopsutil为我们屏蔽了各个系统之间的差异，具有非常强悍的可移植性。
 有了gopsutil，我们不再需要针对不同的系统使用syscall调用对应的系统方法。更棒的是gopsutil的实现中没有任何cgo的代码，使得交叉编译成为可能。

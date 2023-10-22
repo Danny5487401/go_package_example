@@ -1,3 +1,36 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [graph database图数据库-neo4j](#graph-database%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93-neo4j)
+  - [市场上的图数据](#%E5%B8%82%E5%9C%BA%E4%B8%8A%E7%9A%84%E5%9B%BE%E6%95%B0%E6%8D%AE)
+  - [Neo4j的特点](#neo4j%E7%9A%84%E7%89%B9%E7%82%B9)
+  - [集群模式](#%E9%9B%86%E7%BE%A4%E6%A8%A1%E5%BC%8F)
+    - [因果集群](#%E5%9B%A0%E6%9E%9C%E9%9B%86%E7%BE%A4)
+    - [角色](#%E8%A7%92%E8%89%B2)
+      - [Core Servers](#core-servers)
+      - [Read Replicas](#read-replicas)
+  - [测试:简单docker安装](#%E6%B5%8B%E8%AF%95%E7%AE%80%E5%8D%95docker%E5%AE%89%E8%A3%85)
+    - [因果一致性](#%E5%9B%A0%E6%9E%9C%E4%B8%80%E8%87%B4%E6%80%A7)
+    - [高可用集群](#%E9%AB%98%E5%8F%AF%E7%94%A8%E9%9B%86%E7%BE%A4)
+      - [仲裁者实例](#%E4%BB%B2%E8%A3%81%E8%80%85%E5%AE%9E%E4%BE%8B)
+      - [事务传播](#%E4%BA%8B%E5%8A%A1%E4%BC%A0%E6%92%AD)
+      - [故障转移](#%E6%95%85%E9%9A%9C%E8%BD%AC%E7%A7%BB)
+      - [法定人数](#%E6%B3%95%E5%AE%9A%E4%BA%BA%E6%95%B0)
+      - [选举规则](#%E9%80%89%E4%B8%BE%E8%A7%84%E5%88%99)
+      - [数据分支](#%E6%95%B0%E6%8D%AE%E5%88%86%E6%94%AF)
+    - [索引配置](#%E7%B4%A2%E5%BC%95%E9%85%8D%E7%BD%AE)
+      - [字段索引](#%E5%AD%97%E6%AE%B5%E7%B4%A2%E5%BC%95)
+    - [Bolt连接池管理](#bolt%E8%BF%9E%E6%8E%A5%E6%B1%A0%E7%AE%A1%E7%90%86)
+      - [线程池的工作机制](#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%9A%84%E5%B7%A5%E4%BD%9C%E6%9C%BA%E5%88%B6)
+      - [配置选项](#%E9%85%8D%E7%BD%AE%E9%80%89%E9%A1%B9)
+    - [性能](#%E6%80%A7%E8%83%BD)
+      - [测试环境](#%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83)
+      - [写入测试结果](#%E5%86%99%E5%85%A5%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C)
+      - [读取测试结果](#%E8%AF%BB%E5%8F%96%E6%B5%8B%E8%AF%95%E7%BB%93%E6%9E%9C)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # graph database图数据库-neo4j
 ## 市场上的图数据
 图数据库常规的有：neo4j（支持超多语言）、JanusGraph/Titan（分布式）、Orientdb，google也开源了图数据库Cayley（Go语言构成）、PostgreSQL存储RDF格式数据。

@@ -1,3 +1,22 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Neo4j之Cypher语句](#neo4j%E4%B9%8Bcypher%E8%AF%AD%E5%8F%A5)
+    - [CREATE 语句：](#create-%E8%AF%AD%E5%8F%A5)
+    - [MATCH语句](#match%E8%AF%AD%E5%8F%A5)
+    - [RETURN 语句：](#return-%E8%AF%AD%E5%8F%A5)
+    - [关系创建](#%E5%85%B3%E7%B3%BB%E5%88%9B%E5%BB%BA)
+      - [1. 在两个现有的节点之间创建无属性的关系](#1-%E5%9C%A8%E4%B8%A4%E4%B8%AA%E7%8E%B0%E6%9C%89%E7%9A%84%E8%8A%82%E7%82%B9%E4%B9%8B%E9%97%B4%E5%88%9B%E5%BB%BA%E6%97%A0%E5%B1%9E%E6%80%A7%E7%9A%84%E5%85%B3%E7%B3%BB)
+      - [2. 在两个现有的节点之间创建有属性的关系](#2-%E5%9C%A8%E4%B8%A4%E4%B8%AA%E7%8E%B0%E6%9C%89%E7%9A%84%E8%8A%82%E7%82%B9%E4%B9%8B%E9%97%B4%E5%88%9B%E5%BB%BA%E6%9C%89%E5%B1%9E%E6%80%A7%E7%9A%84%E5%85%B3%E7%B3%BB)
+      - [3. 在两个新节点之间创建无属性的关系](#3-%E5%9C%A8%E4%B8%A4%E4%B8%AA%E6%96%B0%E8%8A%82%E7%82%B9%E4%B9%8B%E9%97%B4%E5%88%9B%E5%BB%BA%E6%97%A0%E5%B1%9E%E6%80%A7%E7%9A%84%E5%85%B3%E7%B3%BB)
+      - [4. 在两个新节点之间创建有属性的关系](#4-%E5%9C%A8%E4%B8%A4%E4%B8%AA%E6%96%B0%E8%8A%82%E7%82%B9%E4%B9%8B%E9%97%B4%E5%88%9B%E5%BB%BA%E6%9C%89%E5%B1%9E%E6%80%A7%E7%9A%84%E5%85%B3%E7%B3%BB)
+    - [WHERE 子句](#where-%E5%AD%90%E5%8F%A5)
+    - [REMOVE 子句](#remove-%E5%AD%90%E5%8F%A5)
+    - [SET 子句](#set-%E5%AD%90%E5%8F%A5)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Neo4j之Cypher语句
 ### CREATE 语句：
 - 创建没有属性的节点

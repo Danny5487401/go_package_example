@@ -1,3 +1,21 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [两阶段提交(2PC)/XA](#%E4%B8%A4%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A42pcxa)
+  - [应用](#%E5%BA%94%E7%94%A8)
+  - [X/Open Distributed Transaction Processing (DTP标准分布式事务) Model (X/Open XA)](#xopen-distributed-transaction-processing-dtp%E6%A0%87%E5%87%86%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1-model-xopen-xa)
+    - [了解规范](#%E4%BA%86%E8%A7%A3%E8%A7%84%E8%8C%83)
+  - [1、第一阶段：投票阶段](#1%E7%AC%AC%E4%B8%80%E9%98%B6%E6%AE%B5%E6%8A%95%E7%A5%A8%E9%98%B6%E6%AE%B5)
+  - [2.第二阶段：提交/执行阶段](#2%E7%AC%AC%E4%BA%8C%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4%E6%89%A7%E8%A1%8C%E9%98%B6%E6%AE%B5)
+    - [成功流程](#%E6%88%90%E5%8A%9F%E6%B5%81%E7%A8%8B)
+    - [失败流程](#%E5%A4%B1%E8%B4%A5%E6%B5%81%E7%A8%8B)
+  - [2PC缺点](#2pc%E7%BC%BA%E7%82%B9)
+  - [2pc代码参考案例](#2pc%E4%BB%A3%E7%A0%81%E5%8F%82%E8%80%83%E6%A1%88%E4%BE%8B)
+- [三阶段提交](#%E4%B8%89%E9%98%B6%E6%AE%B5%E6%8F%90%E4%BA%A4)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 两阶段提交(2PC)/XA    
 2PC是一个非常经典的强一致、中心化的原子提交协议。
 中心化是指协议中有两类节点：一个是中心化协调者节点（coordinator）和N个参与者节点（partcipant）

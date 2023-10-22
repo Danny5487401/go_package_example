@@ -1,3 +1,21 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [copier源码分析](#copier%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [静态参数](#%E9%9D%99%E6%80%81%E5%8F%82%E6%95%B0)
+  - [整体设计思路](#%E6%95%B4%E4%BD%93%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF)
+  - [辅助方法说明](#%E8%BE%85%E5%8A%A9%E6%96%B9%E6%B3%95%E8%AF%B4%E6%98%8E)
+    - [1.获取实际的Type和Value](#1%E8%8E%B7%E5%8F%96%E5%AE%9E%E9%99%85%E7%9A%84type%E5%92%8Cvalue)
+    - [2.Tag处理](#2tag%E5%A4%84%E7%90%86)
+  - [copy主方法copier(toValue, fromValue, opt)说明](#copy%E4%B8%BB%E6%96%B9%E6%B3%95copiertovalue-fromvalue-opt%E8%AF%B4%E6%98%8E)
+    - [参数说明](#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E)
+    - [两个类型都是map的处理](#%E4%B8%A4%E4%B8%AA%E7%B1%BB%E5%9E%8B%E9%83%BD%E6%98%AFmap%E7%9A%84%E5%A4%84%E7%90%86)
+    - [只有一个类型是结构体的处理](#%E5%8F%AA%E6%9C%89%E4%B8%80%E4%B8%AA%E7%B1%BB%E5%9E%8B%E6%98%AF%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E5%A4%84%E7%90%86)
+    - [判断数组设置标识](#%E5%88%A4%E6%96%AD%E6%95%B0%E7%BB%84%E8%AE%BE%E7%BD%AE%E6%A0%87%E8%AF%86)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # copier源码分析
 
 ## 静态参数

@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [gogo/protobuf](#gogoprotobuf)
+  - [使用](#%E4%BD%BF%E7%94%A8)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # gogo/protobuf
 生成 Golang 代码的插件 protoc-gen-go，这个插件其实是 golang 官方提供的 一个 Protobuf api 实现。
 

@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [protobuf插件](#protobuf%E6%8F%92%E4%BB%B6)
+  - [自定义选项](#%E8%87%AA%E5%AE%9A%E4%B9%89%E9%80%89%E9%A1%B9)
+  - [场景描述](#%E5%9C%BA%E6%99%AF%E6%8F%8F%E8%BF%B0)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # protobuf插件
 
 ## 自定义选项

@@ -1,3 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [confluent-kafka源码分析](#confluent-kafka%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [C库参考链接](#c%E5%BA%93%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5)
+  - [生产者](#%E7%94%9F%E4%BA%A7%E8%80%85)
+  - [消费者](#%E6%B6%88%E8%B4%B9%E8%80%85)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # confluent-kafka源码分析
 底层使用c库
 

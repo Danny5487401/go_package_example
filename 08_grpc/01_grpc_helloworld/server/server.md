@@ -1,3 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [grpc源码分析](#grpc%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [一. grpc.NewServer()分析](#%E4%B8%80-grpcnewserver%E5%88%86%E6%9E%90)
+  - [二. 注册](#%E4%BA%8C-%E6%B3%A8%E5%86%8C)
+  - [三. s.Serve(lis)](#%E4%B8%89-sservelis)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # grpc源码分析
 ```go
 // UnimplementedGreeterServer can be embedded to have forward compatible implementations.

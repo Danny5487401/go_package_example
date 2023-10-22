@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [lumberjack](#lumberjack)
+  - [logger对象](#logger%E5%AF%B9%E8%B1%A1)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # lumberjack
 
 zap的重点在于对日志内容的组装和控制，没有实现对于日志文件的管理。而lumberjack就是一个用来管理日志文件的利器，经常与各种日志组件配合起来使用，实现日志的老化压缩，文件分割等等功能

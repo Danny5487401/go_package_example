@@ -1,3 +1,32 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Kafka](#kafka)
+  - [一. 基本概念](#%E4%B8%80-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5)
+    - [AR,ISR，OSR](#arisrosr)
+    - [HW高水位High Watermark](#hw%E9%AB%98%E6%B0%B4%E4%BD%8Dhigh-watermark)
+    - [LEO(Log End Offset)](#leolog-end-offset)
+    - [ISR集合，以及HW和LEO之间的关系](#isr%E9%9B%86%E5%90%88%E4%BB%A5%E5%8F%8Ahw%E5%92%8Cleo%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB)
+  - [二. producer发布消息](#%E4%BA%8C-producer%E5%8F%91%E5%B8%83%E6%B6%88%E6%81%AF)
+  - [三. broker保存消息](#%E4%B8%89-broker%E4%BF%9D%E5%AD%98%E6%B6%88%E6%81%AF)
+  - [四. 消费者](#%E5%9B%9B-%E6%B6%88%E8%B4%B9%E8%80%85)
+  - [五. kafka高可用HA](#%E4%BA%94-kafka%E9%AB%98%E5%8F%AF%E7%94%A8ha)
+    - [kafka 多副本](#kafka-%E5%A4%9A%E5%89%AF%E6%9C%AC)
+    - [宕机的场景](#%E5%AE%95%E6%9C%BA%E7%9A%84%E5%9C%BA%E6%99%AF)
+  - [六. 开发注意事项](#%E5%85%AD-%E5%BC%80%E5%8F%91%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
+  - [七. 位移主题](#%E4%B8%83-%E4%BD%8D%E7%A7%BB%E4%B8%BB%E9%A2%98)
+  - [八. 安全认证](#%E5%85%AB-%E5%AE%89%E5%85%A8%E8%AE%A4%E8%AF%81)
+  - [九. 消息重复和消费幂等](#%E4%B9%9D-%E6%B6%88%E6%81%AF%E9%87%8D%E5%A4%8D%E5%92%8C%E6%B6%88%E8%B4%B9%E5%B9%82%E7%AD%89)
+    - [消费阻塞以及堆积](#%E6%B6%88%E8%B4%B9%E9%98%BB%E5%A1%9E%E4%BB%A5%E5%8F%8A%E5%A0%86%E7%A7%AF)
+    - [分区个数](#%E5%88%86%E5%8C%BA%E4%B8%AA%E6%95%B0)
+  - [十. 面试问题](#%E5%8D%81-%E9%9D%A2%E8%AF%95%E9%97%AE%E9%A2%98)
+    - [为什么Kafka不支持读写分离？](#%E4%B8%BA%E4%BB%80%E4%B9%88kafka%E4%B8%8D%E6%94%AF%E6%8C%81%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB)
+    - [Kafka的那些设计让它有如此高的性能](#kafka%E7%9A%84%E9%82%A3%E4%BA%9B%E8%AE%BE%E8%AE%A1%E8%AE%A9%E5%AE%83%E6%9C%89%E5%A6%82%E6%AD%A4%E9%AB%98%E7%9A%84%E6%80%A7%E8%83%BD)
+    - [kafka中的事务](#kafka%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Kafka
 建议参考阿里文档：https://help.aliyun.com/document_detail/68166.html?spm=a2c4g.11186623.6.760.4d62203aT0ks10#title-k03-if4-cs8
 

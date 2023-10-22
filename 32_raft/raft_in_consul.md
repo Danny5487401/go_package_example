@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [raft协议在consul中应用](#raft%E5%8D%8F%E8%AE%AE%E5%9C%A8consul%E4%B8%AD%E5%BA%94%E7%94%A8)
+  - [源码分析(v1.9.11)](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90v1911)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # raft协议在consul中应用
 hashicorp/raft是raft协议的一种golang实现，由hashicorp公司实现并开源，已经在consul等软件中使用。
 它封装了raft协议的leader选举、log同步等底层实现，基于它能够相对比较容易的构建强一致性的分布式系统.

@@ -1,3 +1,24 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [mysql的binlog二进制日志((归档日志)](#mysql%E7%9A%84binlog%E4%BA%8C%E8%BF%9B%E5%88%B6%E6%97%A5%E5%BF%97%E5%BD%92%E6%A1%A3%E6%97%A5%E5%BF%97)
+  - [MySQL的主从复制](#mysql%E7%9A%84%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6)
+  - [常用的Binlog操作命令](#%E5%B8%B8%E7%94%A8%E7%9A%84binlog%E6%93%8D%E4%BD%9C%E5%91%BD%E4%BB%A4)
+  - [Binlog 文件以及扩展](#binlog-%E6%96%87%E4%BB%B6%E4%BB%A5%E5%8F%8A%E6%89%A9%E5%B1%95)
+- [GTID](#gtid)
+  - [GTID在binlog中的结构](#gtid%E5%9C%A8binlog%E4%B8%AD%E7%9A%84%E7%BB%93%E6%9E%84)
+    - [GTID相关参数](#gtid%E7%9B%B8%E5%85%B3%E5%8F%82%E6%95%B0)
+    - [GTID的工作原理](#gtid%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86)
+    - [GTID优缺点](#gtid%E4%BC%98%E7%BC%BA%E7%82%B9)
+  - [binlog dump](#binlog-dump)
+  - [Binlog 的日志格式](#binlog-%E7%9A%84%E6%97%A5%E5%BF%97%E6%A0%BC%E5%BC%8F)
+    - [1. statement](#1-statement)
+    - [2. row](#2-row)
+    - [3. mixed](#3-mixed)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # mysql的binlog二进制日志((归档日志)
 当前测试版本：5.7
 ![](.binlog_images/mysql_version.png)

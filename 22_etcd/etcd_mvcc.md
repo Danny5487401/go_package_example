@@ -1,3 +1,21 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [etcd的MVCC(Multiversion concurrency control）机制](#etcd%E7%9A%84mvccmultiversion-concurrency-control%E6%9C%BA%E5%88%B6)
+  - [背景](#%E8%83%8C%E6%99%AF)
+  - [使用](#%E4%BD%BF%E7%94%A8)
+  - [整体架构](#%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84)
+  - [treeIndex](#treeindex)
+    - [背景](#%E8%83%8C%E6%99%AF-1)
+    - [MVCC 更新 key 原理](#mvcc-%E6%9B%B4%E6%96%B0-key-%E5%8E%9F%E7%90%86)
+    - [MVCC 查询 key 原理](#mvcc-%E6%9F%A5%E8%AF%A2-key-%E5%8E%9F%E7%90%86)
+      - [那指定版本号读取历史记录又是怎么实现的呢？](#%E9%82%A3%E6%8C%87%E5%AE%9A%E7%89%88%E6%9C%AC%E5%8F%B7%E8%AF%BB%E5%8F%96%E5%8E%86%E5%8F%B2%E8%AE%B0%E5%BD%95%E5%8F%88%E6%98%AF%E6%80%8E%E4%B9%88%E5%AE%9E%E7%8E%B0%E7%9A%84%E5%91%A2)
+    - [MVCC 删除 key 原理](#mvcc-%E5%88%A0%E9%99%A4-key-%E5%8E%9F%E7%90%86)
+      - [什么时候会真正删除它呢？](#%E4%BB%80%E4%B9%88%E6%97%B6%E5%80%99%E4%BC%9A%E7%9C%9F%E6%AD%A3%E5%88%A0%E9%99%A4%E5%AE%83%E5%91%A2)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # etcd的MVCC(Multiversion concurrency control）机制
 
 MVCC 机制的核心思想是保存一个 key-value 数据的多个历史版本，etcd 基于它不仅实现了可靠的 Watch 机制，

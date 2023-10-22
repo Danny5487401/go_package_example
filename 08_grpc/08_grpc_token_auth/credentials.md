@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [RPC 方法做自定义认证](#rpc-%E6%96%B9%E6%B3%95%E5%81%9A%E8%87%AA%E5%AE%9A%E4%B9%89%E8%AE%A4%E8%AF%81)
+  - [gRPC 中默认定义 PerRPCCredential](#grpc-%E4%B8%AD%E9%BB%98%E8%AE%A4%E5%AE%9A%E4%B9%89-perrpccredential)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 #  RPC 方法做自定义认证
 
 ##  gRPC 中默认定义 PerRPCCredential

@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [lease租约](#lease%E7%A7%9F%E7%BA%A6)
+  - [lease启动过程](#lease%E5%90%AF%E5%8A%A8%E8%BF%87%E7%A8%8B)
+  - [操作](#%E6%93%8D%E4%BD%9C)
+  - [如何优化 Lease 续期性能](#%E5%A6%82%E4%BD%95%E4%BC%98%E5%8C%96-lease-%E7%BB%AD%E6%9C%9F%E6%80%A7%E8%83%BD)
+  - [如何高效淘汰过期 Lease](#%E5%A6%82%E4%BD%95%E9%AB%98%E6%95%88%E6%B7%98%E6%B1%B0%E8%BF%87%E6%9C%9F-lease)
+    - [获取到待过期的 LeaseID 后，Leader 是如何通知其他 Follower 节点淘汰它们呢？](#%E8%8E%B7%E5%8F%96%E5%88%B0%E5%BE%85%E8%BF%87%E6%9C%9F%E7%9A%84-leaseid-%E5%90%8Eleader-%E6%98%AF%E5%A6%82%E4%BD%95%E9%80%9A%E7%9F%A5%E5%85%B6%E4%BB%96-follower-%E8%8A%82%E7%82%B9%E6%B7%98%E6%B1%B0%E5%AE%83%E4%BB%AC%E5%91%A2)
+  - [checkpoint 机制](#checkpoint-%E6%9C%BA%E5%88%B6)
+    - [为什么需要 checkpoint 机制](#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81-checkpoint-%E6%9C%BA%E5%88%B6)
+    - [做法](#%E5%81%9A%E6%B3%95)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # lease租约
 
 在实际业务场景中，我们常常会遇到类似 Kubernetes 的调度器、控制器组件同一时刻只能存在一个副本对外提供服务的情况。然而单副本部署的组件，是无法保证其高可用性的。

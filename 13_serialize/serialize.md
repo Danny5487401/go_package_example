@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [序列化Marshal和反序列化UnMarshal](#%E5%BA%8F%E5%88%97%E5%8C%96marshal%E5%92%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96unmarshal)
+  - [常见序列化协议](#%E5%B8%B8%E8%A7%81%E5%BA%8F%E5%88%97%E5%8C%96%E5%8D%8F%E8%AE%AE)
+    - [xml（Extensible Markup Language）](#xmlextensible-markup-language)
+    - [JSON(JavaScript Object Notation, JS 对象标记)](#jsonjavascript-object-notation-js-%E5%AF%B9%E8%B1%A1%E6%A0%87%E8%AE%B0)
+    - [Thrift](#thrift)
+    - [Avro](#avro)
+  - [Protobuf](#protobuf)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 序列化Marshal和反序列化UnMarshal
 
 - 序列化（编码）是将对象序列化为二进制形式（字节数组），主要用于网络传输、数据持久化等；

@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [load balance负载均衡](#load-balance%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1)
+  - [负载均衡策略](#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%AD%96%E7%95%A5)
+    - [1. 集中式load balance](#1-%E9%9B%86%E4%B8%AD%E5%BC%8Fload-balance)
+    - [2. 进程内load balance](#2-%E8%BF%9B%E7%A8%8B%E5%86%85load-balance)
+    - [3. 独立进程load balance](#3-%E7%8B%AC%E7%AB%8B%E8%BF%9B%E7%A8%8Bload-balance)
+  - [负载均衡算法](#%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E7%AE%97%E6%B3%95)
+  - [参考文档](#%E5%8F%82%E8%80%83%E6%96%87%E6%A1%A3)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # load balance负载均衡
 
 当server端是集群部署时，client调用server就需要用到服务发现与负载均衡。通常有两种方式：

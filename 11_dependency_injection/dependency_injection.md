@@ -1,3 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [DI 依赖注入容器（Dependency Injection Container）](#di-%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E5%AE%B9%E5%99%A8dependency-injection-container)
+  - [工厂模式和DI容器的区别](#%E5%B7%A5%E5%8E%82%E6%A8%A1%E5%BC%8F%E5%92%8Cdi%E5%AE%B9%E5%99%A8%E7%9A%84%E5%8C%BA%E5%88%AB)
+  - [DI容器的核心功能](#di%E5%AE%B9%E5%99%A8%E7%9A%84%E6%A0%B8%E5%BF%83%E5%8A%9F%E8%83%BD)
+  - [dig 和 wire 对比](#dig-%E5%92%8C-wire-%E5%AF%B9%E6%AF%94)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # DI 依赖注入容器（Dependency Injection Container）
 
 

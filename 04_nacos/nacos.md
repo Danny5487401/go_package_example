@@ -1,3 +1,28 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Nacos](#nacos)
+  - [nacos版本](#nacos%E7%89%88%E6%9C%AC)
+  - [关键特性](#%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7)
+  - [Nacos概念](#nacos%E6%A6%82%E5%BF%B5)
+    - [命名空间](#%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4)
+    - [1. 配置管理](#1-%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86)
+      - [配置集 ID](#%E9%85%8D%E7%BD%AE%E9%9B%86-id)
+    - [2. 服务管理](#2-%E6%9C%8D%E5%8A%A1%E7%AE%A1%E7%90%86)
+      - [元信息](#%E5%85%83%E4%BF%A1%E6%81%AF)
+      - [服务分组](#%E6%9C%8D%E5%8A%A1%E5%88%86%E7%BB%84)
+      - [实例](#%E5%AE%9E%E4%BE%8B)
+      - [权重](#%E6%9D%83%E9%87%8D)
+      - [健康保护阈值](#%E5%81%A5%E5%BA%B7%E4%BF%9D%E6%8A%A4%E9%98%88%E5%80%BC)
+  - [领域模型](#%E9%A2%86%E5%9F%9F%E6%A8%A1%E5%9E%8B)
+    - [数据模型](#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B)
+    - [服务领域模型](#%E6%9C%8D%E5%8A%A1%E9%A2%86%E5%9F%9F%E6%A8%A1%E5%9E%8B)
+    - [配置领域模型](#%E9%85%8D%E7%BD%AE%E9%A2%86%E5%9F%9F%E6%A8%A1%E5%9E%8B)
+  - [go-nacos源码分析](#go-nacos%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Nacos
 官方参考文档： https://nacos.io/zh-cn/docs/2.0.0-compatibility.html
 ![](.nacos_images/nacos_structure.png)

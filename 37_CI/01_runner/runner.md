@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [gitlab-runner 源码分析(版本 v15.1.0-46)](#gitlab-runner-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90%E7%89%88%E6%9C%AC-v1510-46)
+  - [接口](#%E6%8E%A5%E5%8F%A3)
+  - [注册 runner](#%E6%B3%A8%E5%86%8C-runner)
+  - [作业请求和处理循环](#%E4%BD%9C%E4%B8%9A%E8%AF%B7%E6%B1%82%E5%92%8C%E5%A4%84%E7%90%86%E5%BE%AA%E7%8E%AF)
+    - [请求获取job 信息](#%E8%AF%B7%E6%B1%82%E8%8E%B7%E5%8F%96job-%E4%BF%A1%E6%81%AF)
+    - [找 executor 执行](#%E6%89%BE-executor-%E6%89%A7%E8%A1%8C)
+  - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # gitlab-runner 源码分析(版本 v15.1.0-46)
 
 ![](.runner_images/runner_process.png)

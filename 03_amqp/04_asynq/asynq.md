@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [源码分析](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [设计思路](#%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF)
+  - [lua前置知识](#lua%E5%89%8D%E7%BD%AE%E7%9F%A5%E8%AF%86)
+  - [ui界面](#ui%E7%95%8C%E9%9D%A2)
+  - [客户端-->生产者](#%E5%AE%A2%E6%88%B7%E7%AB%AF--%E7%94%9F%E4%BA%A7%E8%80%85)
+  - [server -->消费者](#server---%E6%B6%88%E8%B4%B9%E8%80%85)
+    - [状态转移](#%E7%8A%B6%E6%80%81%E8%BD%AC%E7%A7%BB)
+    - [处理](#%E5%A4%84%E7%90%86)
+      - [ProcessTask处理函数查找：type与方法的匹配-->参考go官方的http server的路由匹配](#processtask%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0%E6%9F%A5%E6%89%BEtype%E4%B8%8E%E6%96%B9%E6%B3%95%E7%9A%84%E5%8C%B9%E9%85%8D--%E5%8F%82%E8%80%83go%E5%AE%98%E6%96%B9%E7%9A%84http-server%E7%9A%84%E8%B7%AF%E7%94%B1%E5%8C%B9%E9%85%8D)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 源码分析
 
 ## 设计思路

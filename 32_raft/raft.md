@@ -1,3 +1,25 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [共识算法](#%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95)
+  - [背景：如何避免单点故障](#%E8%83%8C%E6%99%AF%E5%A6%82%E4%BD%95%E9%81%BF%E5%85%8D%E5%8D%95%E7%82%B9%E6%95%85%E9%9A%9C)
+  - [多副本常用的技术方案](#%E5%A4%9A%E5%89%AF%E6%9C%AC%E5%B8%B8%E7%94%A8%E7%9A%84%E6%8A%80%E6%9C%AF%E6%96%B9%E6%A1%88)
+    - [主从复制，又分为全同步复制、异步复制、半同步复制，比如 MySQL/Redis 单机主备版就基于主从复制实现的。](#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%8F%88%E5%88%86%E4%B8%BA%E5%85%A8%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6%E5%BC%82%E6%AD%A5%E5%A4%8D%E5%88%B6%E5%8D%8A%E5%90%8C%E6%AD%A5%E5%A4%8D%E5%88%B6%E6%AF%94%E5%A6%82-mysqlredis-%E5%8D%95%E6%9C%BA%E4%B8%BB%E5%A4%87%E7%89%88%E5%B0%B1%E5%9F%BA%E4%BA%8E%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%AE%9E%E7%8E%B0%E7%9A%84)
+    - [中心化复制](#%E4%B8%AD%E5%BF%83%E5%8C%96%E5%A4%8D%E5%88%B6)
+  - [Raft 算法](#raft-%E7%AE%97%E6%B3%95)
+    - [RPC种类](#rpc%E7%A7%8D%E7%B1%BB)
+    - [压缩](#%E5%8E%8B%E7%BC%A9)
+    - [快照实现以及何时做快照](#%E5%BF%AB%E7%85%A7%E5%AE%9E%E7%8E%B0%E4%BB%A5%E5%8F%8A%E4%BD%95%E6%97%B6%E5%81%9A%E5%BF%AB%E7%85%A7)
+    - [1. leader选举](#1-leader%E9%80%89%E4%B8%BE)
+    - [2. 日志复制](#2-%E6%97%A5%E5%BF%97%E5%A4%8D%E5%88%B6)
+      - [1. 日志复制的两条保证](#1-%E6%97%A5%E5%BF%97%E5%A4%8D%E5%88%B6%E7%9A%84%E4%B8%A4%E6%9D%A1%E4%BF%9D%E8%AF%81)
+      - [2. 日志的不正常情况](#2-%E6%97%A5%E5%BF%97%E7%9A%84%E4%B8%8D%E6%AD%A3%E5%B8%B8%E6%83%85%E5%86%B5)
+      - [3. 如何保证日志的正常复制](#3-%E5%A6%82%E4%BD%95%E4%BF%9D%E8%AF%81%E6%97%A5%E5%BF%97%E7%9A%84%E6%AD%A3%E5%B8%B8%E5%A4%8D%E5%88%B6)
+    - [3. 安全性](#3-%E5%AE%89%E5%85%A8%E6%80%A7)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 共识算法
 共识算法推荐资料：Leslie Lamport和Diego Ongaro的数篇论文、Ongaro在youtube上发的三个视频讲解，以及何登成的ppt。
 

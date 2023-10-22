@@ -1,3 +1,12 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [yaml](#yaml)
+  - [golang yaml v2和v3具体区别表现在v3拥有了许多新功能](#golang-yaml-v2%E5%92%8Cv3%E5%85%B7%E4%BD%93%E5%8C%BA%E5%88%AB%E8%A1%A8%E7%8E%B0%E5%9C%A8v3%E6%8B%A5%E6%9C%89%E4%BA%86%E8%AE%B8%E5%A4%9A%E6%96%B0%E5%8A%9F%E8%83%BD)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # yaml 
 
 ## golang yaml v2和v3具体区别表现在v3拥有了许多新功能

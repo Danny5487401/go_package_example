@@ -1,3 +1,27 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [etcd的watch机制](#etcd%E7%9A%84watch%E6%9C%BA%E5%88%B6)
+  - [基本使用](#%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
+  - [源码proto](#%E6%BA%90%E7%A0%81proto)
+  - [四大核心问题](#%E5%9B%9B%E5%A4%A7%E6%A0%B8%E5%BF%83%E9%97%AE%E9%A2%98)
+  - [问题一回答：分析获取事件的机制 (轮询 vs 流式推送)](#%E9%97%AE%E9%A2%98%E4%B8%80%E5%9B%9E%E7%AD%94%E5%88%86%E6%9E%90%E8%8E%B7%E5%8F%96%E4%BA%8B%E4%BB%B6%E7%9A%84%E6%9C%BA%E5%88%B6-%E8%BD%AE%E8%AF%A2-vs-%E6%B5%81%E5%BC%8F%E6%8E%A8%E9%80%81)
+  - [问题二回答：滑动窗口 vs MVCC](#%E9%97%AE%E9%A2%98%E4%BA%8C%E5%9B%9E%E7%AD%94%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3-vs-mvcc)
+  - [问题三回答：可靠事件推送机制](#%E9%97%AE%E9%A2%98%E4%B8%89%E5%9B%9E%E7%AD%94%E5%8F%AF%E9%9D%A0%E4%BA%8B%E4%BB%B6%E6%8E%A8%E9%80%81%E6%9C%BA%E5%88%B6)
+    - [服务端监听流程](#%E6%9C%8D%E5%8A%A1%E7%AB%AF%E7%9B%91%E5%90%AC%E6%B5%81%E7%A8%8B)
+    - [监听的相关概念](#%E7%9B%91%E5%90%AC%E7%9A%84%E7%9B%B8%E5%85%B3%E6%A6%82%E5%BF%B5)
+    - [1. 最新事件推送机制](#1-%E6%9C%80%E6%96%B0%E4%BA%8B%E4%BB%B6%E6%8E%A8%E9%80%81%E6%9C%BA%E5%88%B6)
+    - [2. 异常场景重试机制](#2-%E5%BC%82%E5%B8%B8%E5%9C%BA%E6%99%AF%E9%87%8D%E8%AF%95%E6%9C%BA%E5%88%B6)
+    - [3. 历史事件推送机制](#3-%E5%8E%86%E5%8F%B2%E4%BA%8B%E4%BB%B6%E6%8E%A8%E9%80%81%E6%9C%BA%E5%88%B6)
+      - [在历史事件推送机制中，如果你监听老的版本号已经被 etcd 压缩了，client 该如何处理？](#%E5%9C%A8%E5%8E%86%E5%8F%B2%E4%BA%8B%E4%BB%B6%E6%8E%A8%E9%80%81%E6%9C%BA%E5%88%B6%E4%B8%AD%E5%A6%82%E6%9E%9C%E4%BD%A0%E7%9B%91%E5%90%AC%E8%80%81%E7%9A%84%E7%89%88%E6%9C%AC%E5%8F%B7%E5%B7%B2%E7%BB%8F%E8%A2%AB-etcd-%E5%8E%8B%E7%BC%A9%E4%BA%86client-%E8%AF%A5%E5%A6%82%E4%BD%95%E5%A4%84%E7%90%86)
+    - [问题四回答：高效的事件匹配](#%E9%97%AE%E9%A2%98%E5%9B%9B%E5%9B%9E%E7%AD%94%E9%AB%98%E6%95%88%E7%9A%84%E4%BA%8B%E4%BB%B6%E5%8C%B9%E9%85%8D)
+  - [watch的proto文件](#watch%E7%9A%84proto%E6%96%87%E4%BB%B6)
+  - [client的watch流程源码](#client%E7%9A%84watch%E6%B5%81%E7%A8%8B%E6%BA%90%E7%A0%81)
+    - [当wgs == nil创建watchGrpcStream](#%E5%BD%93wgs--nil%E5%88%9B%E5%BB%BAwatchgrpcstream)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # etcd的watch机制
 
 在 Kubernetes 中，各种各样的控制器实现了 Deployment、StatefulSet、Job 等功能强大的 Workload。控制器的核心思想是监听、比较资源实际状态与期望状态是否一致，若不一致则进行协调工作，使其最终一致。

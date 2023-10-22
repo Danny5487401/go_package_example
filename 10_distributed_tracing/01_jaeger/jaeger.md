@@ -1,3 +1,22 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [jaeger](#jaeger)
+  - [架构](#%E6%9E%B6%E6%9E%84)
+  - [Jaeger端口统计](#jaeger%E7%AB%AF%E5%8F%A3%E7%BB%9F%E8%AE%A1)
+    - [Agent](#agent)
+    - [Collector](#collector)
+    - [Query](#query)
+  - [Jaeger解决的问题](#jaeger%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98)
+  - [安装方式](#%E5%AE%89%E8%A3%85%E6%96%B9%E5%BC%8F)
+    - [1. docker-compose安装](#1-docker-compose%E5%AE%89%E8%A3%85)
+      - [安装结果](#%E5%AE%89%E8%A3%85%E7%BB%93%E6%9E%9C)
+    - [2. Jaeger-Operator](#2-jaeger-operator)
+  - [参考链接](#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # jaeger
 
 ## 架构

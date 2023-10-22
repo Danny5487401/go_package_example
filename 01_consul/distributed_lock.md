@@ -1,3 +1,20 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [分布式锁](#%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
+  - [难点](#%E9%9A%BE%E7%82%B9)
+    - [死锁](#%E6%AD%BB%E9%94%81)
+      - [四大必要 条件分别为：](#%E5%9B%9B%E5%A4%A7%E5%BF%85%E8%A6%81-%E6%9D%A1%E4%BB%B6%E5%88%86%E5%88%AB%E4%B8%BA)
+    - [惊群效应](#%E6%83%8A%E7%BE%A4%E6%95%88%E5%BA%94)
+    - [脑裂](#%E8%84%91%E8%A3%82)
+  - [Consul分布式锁源码分析](#consul%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+    - [锁结构体](#%E9%94%81%E7%BB%93%E6%9E%84%E4%BD%93)
+    - [锁选项](#%E9%94%81%E9%80%89%E9%A1%B9)
+    - [lock,unlock](#lockunlock)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 分布式锁
 
 ## 难点

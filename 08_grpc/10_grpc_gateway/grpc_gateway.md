@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [gRPC 转码（RPC Transcoding）](#grpc-%E8%BD%AC%E7%A0%81rpc-transcoding)
+  - [gRPC-Gateway](#grpc-gateway)
+  - [应用](#%E5%BA%94%E7%94%A8)
+  - [流程](#%E6%B5%81%E7%A8%8B)
+  - [环境准备](#%E7%8E%AF%E5%A2%83%E5%87%86%E5%A4%87)
+  - [使用](#%E4%BD%BF%E7%94%A8)
+  - [HTTP映射的规则](#http%E6%98%A0%E5%B0%84%E7%9A%84%E8%A7%84%E5%88%99)
+  - [源码分析](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # gRPC 转码（RPC Transcoding）
 
 gRPC 转码（RPC Transcoding）是一种用于在 gRPC 方法和一个或多个 HTTP REST 端点之间进行映射的功能。 

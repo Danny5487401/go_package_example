@@ -1,3 +1,24 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Grpc](#grpc)
+  - [grpc 流程](#grpc-%E6%B5%81%E7%A8%8B)
+    - [Server 流程](#server-%E6%B5%81%E7%A8%8B)
+    - [client 大概流程](#client-%E5%A4%A7%E6%A6%82%E6%B5%81%E7%A8%8B)
+    - [wireshark 抓包结果](#wireshark-%E6%8A%93%E5%8C%85%E7%BB%93%E6%9E%9C)
+      - [1. 客户端请求](#1-%E5%AE%A2%E6%88%B7%E7%AB%AF%E8%AF%B7%E6%B1%82)
+      - [2. 服务端返回](#2-%E6%9C%8D%E5%8A%A1%E7%AB%AF%E8%BF%94%E5%9B%9E)
+  - [grpc分类](#grpc%E5%88%86%E7%B1%BB)
+    - [1. unary](#1-unary)
+    - [2. client streaming](#2-client-streaming)
+    - [3. server streaming](#3-server-streaming)
+    - [4. bidi streaming](#4-bidi-streaming)
+  - [grpc调优](#grpc%E8%B0%83%E4%BC%98)
+  - [参考链接](#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Grpc
 准确来说gRPC设计上是分层的，底层支持不同的协议，目前gRPC支持：
 

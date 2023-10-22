@@ -1,3 +1,29 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [RabbitMq 简介](#rabbitmq-%E7%AE%80%E4%BB%8B)
+  - [docker安装](#docker%E5%AE%89%E8%A3%85)
+  - [工作流程](#%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B)
+  - [交换机](#%E4%BA%A4%E6%8D%A2%E6%9C%BA)
+    - [1. 直连型交换机（ Direct Exchange）](#1-%E7%9B%B4%E8%BF%9E%E5%9E%8B%E4%BA%A4%E6%8D%A2%E6%9C%BA-direct-exchange)
+    - [2. 扇型交换机 （ Fanout Exchange）](#2-%E6%89%87%E5%9E%8B%E4%BA%A4%E6%8D%A2%E6%9C%BA--fanout-exchange)
+    - [3. 主题交换机（ Topic Exchanges）](#3-%E4%B8%BB%E9%A2%98%E4%BA%A4%E6%8D%A2%E6%9C%BA-topic-exchanges)
+    - [4. 头交换机 (Headers exchange)](#4-%E5%A4%B4%E4%BA%A4%E6%8D%A2%E6%9C%BA-headers-exchange)
+  - [队列（ Queue)](#%E9%98%9F%E5%88%97-queue)
+  - [消息确认 (acknowledgement)](#%E6%B6%88%E6%81%AF%E7%A1%AE%E8%AE%A4-acknowledgement)
+  - [消息](#%E6%B6%88%E6%81%AF)
+  - [连接 (Connection)](#%E8%BF%9E%E6%8E%A5-connection)
+  - [通道 （channels）](#%E9%80%9A%E9%81%93-channels)
+  - [虚拟主机 (vhost)](#%E8%99%9A%E6%8B%9F%E4%B8%BB%E6%9C%BA-vhost)
+  - [消息的顺序性](#%E6%B6%88%E6%81%AF%E7%9A%84%E9%A1%BA%E5%BA%8F%E6%80%A7)
+    - [出现消费顺序错乱的情况](#%E5%87%BA%E7%8E%B0%E6%B6%88%E8%B4%B9%E9%A1%BA%E5%BA%8F%E9%94%99%E4%B9%B1%E7%9A%84%E6%83%85%E5%86%B5)
+  - [消息的可靠性](#%E6%B6%88%E6%81%AF%E7%9A%84%E5%8F%AF%E9%9D%A0%E6%80%A7)
+    - [丢失的场景](#%E4%B8%A2%E5%A4%B1%E7%9A%84%E5%9C%BA%E6%99%AF)
+    - [保证消息可靠性的方法](#%E4%BF%9D%E8%AF%81%E6%B6%88%E6%81%AF%E5%8F%AF%E9%9D%A0%E6%80%A7%E7%9A%84%E6%96%B9%E6%B3%95)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # RabbitMq 简介
 
 ## docker安装

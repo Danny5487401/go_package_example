@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [TCC事务模式](#tcc%E4%BA%8B%E5%8A%A1%E6%A8%A1%E5%BC%8F)
+  - [构成](#%E6%9E%84%E6%88%90)
+  - [TCC 设计原则](#tcc-%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # TCC事务模式
 TCC是Try、Confirm、Cancel三个词语的缩写，最早是由 Pat Helland 于 2007 年发表的一篇名为《Life beyond Distributed Transactions:an Apostate’s Opinion》的论文提出。
 

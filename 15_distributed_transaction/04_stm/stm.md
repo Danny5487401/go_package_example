@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [分布式事务stm（Software Transactional Memory，软件事务内存）](#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1stmsoftware-transactional-memory%E8%BD%AF%E4%BB%B6%E4%BA%8B%E5%8A%A1%E5%86%85%E5%AD%98)
+  - [etcd 事务的使用示例](#etcd-%E4%BA%8B%E5%8A%A1%E7%9A%84%E4%BD%BF%E7%94%A8%E7%A4%BA%E4%BE%8B)
+  - [源码](#%E6%BA%90%E7%A0%81)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 分布式事务stm（Software Transactional Memory，软件事务内存）
 etcd 实现了在一个事务中，原子地执行冲突检查、更新多个 keys 的值。除此之外，etcd 将底层 MVCC 机制的版本信息暴露出来，根据版本信息封装出了一套基于乐观锁的事务框架 STM，并实现了不同的隔离级别。
 

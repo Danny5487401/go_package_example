@@ -1,3 +1,27 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [使用Hystrix解决同步等待的雪崩问题](#%E4%BD%BF%E7%94%A8hystrix%E8%A7%A3%E5%86%B3%E5%90%8C%E6%AD%A5%E7%AD%89%E5%BE%85%E7%9A%84%E9%9B%AA%E5%B4%A9%E9%97%AE%E9%A2%98)
+  - [Hystrix设计目标：](#hystrix%E8%AE%BE%E8%AE%A1%E7%9B%AE%E6%A0%87)
+  - [Hystrix遵循的设计原则：](#hystrix%E9%81%B5%E5%BE%AA%E7%9A%84%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99)
+  - [Hystrix如何实现这些设计目标](#hystrix%E5%A6%82%E4%BD%95%E5%AE%9E%E7%8E%B0%E8%BF%99%E4%BA%9B%E8%AE%BE%E8%AE%A1%E7%9B%AE%E6%A0%87)
+  - [Hystrix容错](#hystrix%E5%AE%B9%E9%94%99)
+    - [1. 资源隔离](#1-%E8%B5%84%E6%BA%90%E9%9A%94%E7%A6%BB)
+      - [线程隔离-线程池](#%E7%BA%BF%E7%A8%8B%E9%9A%94%E7%A6%BB-%E7%BA%BF%E7%A8%8B%E6%B1%A0)
+        - [线程池隔离优缺点](#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E9%9A%94%E7%A6%BB%E4%BC%98%E7%BC%BA%E7%82%B9)
+      - [线程隔离-信号量](#%E7%BA%BF%E7%A8%8B%E9%9A%94%E7%A6%BB-%E4%BF%A1%E5%8F%B7%E9%87%8F)
+      - [总结](#%E6%80%BB%E7%BB%93)
+    - [2.熔断](#2%E7%86%94%E6%96%AD)
+      - [熔断器配置](#%E7%86%94%E6%96%AD%E5%99%A8%E9%85%8D%E7%BD%AE)
+      - [工作原理](#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86)
+    - [3. 回退降级](#3-%E5%9B%9E%E9%80%80%E9%99%8D%E7%BA%A7)
+  - [Go-hystrix源码](#go-hystrix%E6%BA%90%E7%A0%81)
+    - [流量控制](#%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6)
+    - [流量控制上报状态](#%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6%E4%B8%8A%E6%8A%A5%E7%8A%B6%E6%80%81)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 使用Hystrix解决同步等待的雪崩问题
 
 Hystrix [hɪst'rɪks]，中文含义是豪猪，因其背上长满棘刺，从而拥有了自我保护的能力。

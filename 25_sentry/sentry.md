@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Sentry](#sentry)
+  - [为什么用Sentry](#%E4%B8%BA%E4%BB%80%E4%B9%88%E7%94%A8sentry)
+  - [基本概念](#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5)
+    - [hub](#hub)
+    - [scope](#scope)
+    - [DSN](#dsn)
+    - [event](#event)
+    - [issue](#issue)
+  - [sentry-Go 初始化客户端配置](#sentry-go-%E5%88%9D%E5%A7%8B%E5%8C%96%E5%AE%A2%E6%88%B7%E7%AB%AF%E9%85%8D%E7%BD%AE)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Sentry
 Sentry 是一个开源的实时错误追踪系统，可以帮助开发者实时监控并修复异常问题。它主要专注于持续集成、提高效率并且提升用户体验。
 

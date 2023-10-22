@@ -1,3 +1,21 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [freecache源码分析](#freecache%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [特点](#%E7%89%B9%E7%82%B9)
+  - [初始化](#%E5%88%9D%E5%A7%8B%E5%8C%96)
+  - [核心存储结构](#%E6%A0%B8%E5%BF%83%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
+  - [流程](#%E6%B5%81%E7%A8%8B)
+    - [set](#set)
+      - [set操作为什么高效](#set%E6%93%8D%E4%BD%9C%E4%B8%BA%E4%BB%80%E4%B9%88%E9%AB%98%E6%95%88)
+    - [get](#get)
+  - [淘汰算法](#%E6%B7%98%E6%B1%B0%E7%AE%97%E6%B3%95)
+    - [freecache为什么不完全实现LRU置换算法呢？](#freecache%E4%B8%BA%E4%BB%80%E4%B9%88%E4%B8%8D%E5%AE%8C%E5%85%A8%E5%AE%9E%E7%8E%B0lru%E7%BD%AE%E6%8D%A2%E7%AE%97%E6%B3%95%E5%91%A2)
+  - [freecache的不足](#freecache%E7%9A%84%E4%B8%8D%E8%B6%B3)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # freecache源码分析
 ![](.free_cache_images/freecache_structure.png)
 

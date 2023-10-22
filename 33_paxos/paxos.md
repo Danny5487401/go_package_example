@@ -1,3 +1,19 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [paxos](#paxos)
+  - [Proposal Numbers](#proposal-numbers)
+  - [basic paxos](#basic-paxos)
+    - [prepare阶段](#prepare%E9%98%B6%E6%AE%B5)
+    - [accept阶段](#accept%E9%98%B6%E6%AE%B5)
+    - [paxos算法的关键特性](#paxos%E7%AE%97%E6%B3%95%E7%9A%84%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7)
+      - [safety](#safety)
+      - [liveness](#liveness)
+  - [Multi-Paxos](#multi-paxos)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # paxos
 
 ## Proposal Numbers

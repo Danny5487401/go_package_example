@@ -1,3 +1,23 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [事务](#%E4%BA%8B%E5%8A%A1)
+  - [分布式事务](#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1)
+    - [强一致性、弱一致性、最终一致性](#%E5%BC%BA%E4%B8%80%E8%87%B4%E6%80%A7%E5%BC%B1%E4%B8%80%E8%87%B4%E6%80%A7%E6%9C%80%E7%BB%88%E4%B8%80%E8%87%B4%E6%80%A7)
+      - [强一致性](#%E5%BC%BA%E4%B8%80%E8%87%B4%E6%80%A7)
+      - [弱一致性](#%E5%BC%B1%E4%B8%80%E8%87%B4%E6%80%A7)
+  - [CAP 原则](#cap-%E5%8E%9F%E5%88%99)
+    - [一致性（C）：](#%E4%B8%80%E8%87%B4%E6%80%A7c)
+    - [可用性（A）：](#%E5%8F%AF%E7%94%A8%E6%80%A7a)
+    - [分区容错性（P）：](#%E5%88%86%E5%8C%BA%E5%AE%B9%E9%94%99%E6%80%A7p)
+  - [BASE 理论](#base-%E7%90%86%E8%AE%BA)
+  - [幂等操作](#%E5%B9%82%E7%AD%89%E6%93%8D%E4%BD%9C)
+  - [分布式事物常见解决方案:](#%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E7%89%A9%E5%B8%B8%E8%A7%81%E8%A7%A3%E5%86%B3%E6%96%B9%E6%A1%88)
+  - [一致性分类](#%E4%B8%80%E8%87%B4%E6%80%A7%E5%88%86%E7%B1%BB)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 事务
 学习事务参考dtm链接：https://dtm.pub/practice/saga.html
 

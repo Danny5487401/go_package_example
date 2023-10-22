@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Config包](#config%E5%8C%85)
+  - [Config 特征](#config-%E7%89%B9%E5%BE%81)
+  - [Source 是资源加载来源](#source-%E6%98%AF%E8%B5%84%E6%BA%90%E5%8A%A0%E8%BD%BD%E6%9D%A5%E6%BA%90)
+  - [ChangeSet](#changeset)
+  - [Encoder 处理配置文件的编码与解码，支持](#encoder-%E5%A4%84%E7%90%86%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E7%BC%96%E7%A0%81%E4%B8%8E%E8%A7%A3%E7%A0%81%E6%94%AF%E6%8C%81)
+  - [Config动态配置接口抽象](#config%E5%8A%A8%E6%80%81%E9%85%8D%E7%BD%AE%E6%8E%A5%E5%8F%A3%E6%8A%BD%E8%B1%A1)
+  - [Reader](#reader)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Config包
 
 ## Config 特征

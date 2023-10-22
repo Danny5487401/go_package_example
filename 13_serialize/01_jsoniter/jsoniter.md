@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Go 原生 encoding/json](#go-%E5%8E%9F%E7%94%9F-encodingjson)
+  - [序列化](#%E5%BA%8F%E5%88%97%E5%8C%96)
+  - [反序列化](#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96)
+- [第三方包 jsoniter](#%E7%AC%AC%E4%B8%89%E6%96%B9%E5%8C%85-jsoniter)
+- [反序列化](#%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-1)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 ## Go 原生 encoding/json
 使用 json.Unmarshal 和 json.Marshal 函数，可以轻松将 JSON 格式的二进制数据反序列化到指定的 Go 结构体中，以及将 Go 结构体序列化为二进制流。
 而对于未知结构或不确定结构的数据，则支持将二进制反序列化到 map[string]interface{} 类型中，使用 KV 的模式进行数据的存取

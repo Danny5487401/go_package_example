@@ -1,3 +1,31 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [sonar](#sonar)
+  - [sonarQube能带来什么？](#sonarqube%E8%83%BD%E5%B8%A6%E6%9D%A5%E4%BB%80%E4%B9%88)
+  - [Sonar的客户端共有四种](#sonar%E7%9A%84%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%85%B1%E6%9C%89%E5%9B%9B%E7%A7%8D)
+  - [sonar的组成](#sonar%E7%9A%84%E7%BB%84%E6%88%90)
+  - [平台要求](#%E5%B9%B3%E5%8F%B0%E8%A6%81%E6%B1%82)
+  - [搭建服务端](#%E6%90%AD%E5%BB%BA%E6%9C%8D%E5%8A%A1%E7%AB%AF)
+    - [配置项目](#%E9%85%8D%E7%BD%AE%E9%A1%B9%E7%9B%AE)
+  - [搭建客户端](#%E6%90%AD%E5%BB%BA%E5%AE%A2%E6%88%B7%E7%AB%AF)
+  - [与Go工具对比](#%E4%B8%8Ego%E5%B7%A5%E5%85%B7%E5%AF%B9%E6%AF%94)
+    - [1. 单元测试](#1-%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95)
+    - [2. 覆盖率](#2-%E8%A6%86%E7%9B%96%E7%8E%87)
+    - [3. 静态扫描](#3-%E9%9D%99%E6%80%81%E6%89%AB%E6%8F%8F)
+    - [4. 外部规则](#4-%E5%A4%96%E9%83%A8%E8%A7%84%E5%88%99)
+      - [常用的Linter介绍](#%E5%B8%B8%E7%94%A8%E7%9A%84linter%E4%BB%8B%E7%BB%8D)
+      - [golint ：官方，deprecated](#golint-%E5%AE%98%E6%96%B9deprecated)
+      - [gometalinter:不维护了](#gometalinter%E4%B8%8D%E7%BB%B4%E6%8A%A4%E4%BA%86)
+      - [golangci-lint](#golangci-lint)
+      - [特点](#%E7%89%B9%E7%82%B9)
+      - [golangci-lint使用](#golangci-lint%E4%BD%BF%E7%94%A8)
+  - [工作流转](#%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%BD%AC)
+  - [参考连接](#%E5%8F%82%E8%80%83%E8%BF%9E%E6%8E%A5)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # sonar
 
 sonar是一款静态代码质量分析工具，支持Java、Python、PHP、JavaScript、CSS等25种以上的语言，而且能够集成在IDE、Jenkins、Git等服务中，方便随时查看代码质量分析报告；

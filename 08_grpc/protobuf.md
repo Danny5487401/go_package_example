@@ -1,3 +1,31 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Protobuf](#protobuf)
+  - [v2 和 v3 主要区别](#v2-%E5%92%8C-v3-%E4%B8%BB%E8%A6%81%E5%8C%BA%E5%88%AB)
+  - [核心编码原理(包括 Varint 编码、ZigZag编码及 protobuf 特有的 Message Structure 编码结构等)](#%E6%A0%B8%E5%BF%83%E7%BC%96%E7%A0%81%E5%8E%9F%E7%90%86%E5%8C%85%E6%8B%AC-varint-%E7%BC%96%E7%A0%81zigzag%E7%BC%96%E7%A0%81%E5%8F%8A-protobuf-%E7%89%B9%E6%9C%89%E7%9A%84-message-structure-%E7%BC%96%E7%A0%81%E7%BB%93%E6%9E%84%E7%AD%89)
+    - [1. Varint编码:protobuf 编码主要依赖于 Varint 编码](#1-varint%E7%BC%96%E7%A0%81protobuf-%E7%BC%96%E7%A0%81%E4%B8%BB%E8%A6%81%E4%BE%9D%E8%B5%96%E4%BA%8E-varint-%E7%BC%96%E7%A0%81)
+      - [原理](#%E5%8E%9F%E7%90%86)
+      - [编码方式](#%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F)
+      - [缺点](#%E7%BC%BA%E7%82%B9)
+      - [github.com/golang/protobuf/proto源码](#githubcomgolangprotobufproto%E6%BA%90%E7%A0%81)
+    - [2. ZigZag编码](#2-zigzag%E7%BC%96%E7%A0%81)
+    - [3.  Message Structure 编码](#3--message-structure-%E7%BC%96%E7%A0%81)
+    - [4. Signed Integers 编码](#4-signed-integers-%E7%BC%96%E7%A0%81)
+    - [5. Non-varint Numbers](#5-non-varint-numbers)
+    - [6.  字符串](#6--%E5%AD%97%E7%AC%A6%E4%B8%B2)
+    - [7. 嵌入式 message](#7-%E5%B5%8C%E5%85%A5%E5%BC%8F-message)
+    - [8. Packed Repeated Fields](#8-packed-repeated-fields)
+  - [使用](#%E4%BD%BF%E7%94%A8)
+    - [基本定义](#%E5%9F%BA%E6%9C%AC%E5%AE%9A%E4%B9%89)
+    - [1. 引入其他proto文件](#1-%E5%BC%95%E5%85%A5%E5%85%B6%E4%BB%96proto%E6%96%87%E4%BB%B6)
+    - [生成protobuf](#%E7%94%9F%E6%88%90protobuf)
+      - [插件解析](#%E6%8F%92%E4%BB%B6%E8%A7%A3%E6%9E%90)
+    - [wiretype](#wiretype)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Protobuf
 ![](16_import_proto/.proto_images/proto_optimize.png)    
 Protocol buffers 是一种语言无关、平台无关的可扩展机制或者说是数据交换格式，用于序列化结构化数据。

@@ -1,3 +1,20 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [raft应用-->etcd](#raft%E5%BA%94%E7%94%A8--etcd)
+  - [1. etcd Leader 选举原理](#1-etcd-leader-%E9%80%89%E4%B8%BE%E5%8E%9F%E7%90%86)
+    - [特殊情况](#%E7%89%B9%E6%AE%8A%E6%83%85%E5%86%B5)
+  - [2. 日志复制](#2-%E6%97%A5%E5%BF%97%E5%A4%8D%E5%88%B6)
+    - [两个疑问](#%E4%B8%A4%E4%B8%AA%E7%96%91%E9%97%AE)
+  - [3. 安全性](#3-%E5%AE%89%E5%85%A8%E6%80%A7)
+    - [选举规则](#%E9%80%89%E4%B8%BE%E8%A7%84%E5%88%99)
+    - [日志复制规则](#%E6%97%A5%E5%BF%97%E5%A4%8D%E5%88%B6%E8%A7%84%E5%88%99)
+      - [问题](#%E9%97%AE%E9%A2%98)
+      - [解决方式](#%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # raft应用-->etcd
 
 ## 1. etcd Leader 选举原理

@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	InitLog("02_zap/04_customized_log/log/info.log", "02_zap/04_customized_log/log/error.log", zap.InfoLevel)
+	InitLog("02_log/02_zap/04_customized_log/log/info.log", "02_log/02_zap/04_customized_log/log/error.log", zap.InfoLevel)
 	defer logger.Sync()
 
 	sugarLogger.Infof("sugarLogger name:%s", "修华师1")

@@ -1,3 +1,26 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [mongo](#mongo)
+  - [集群搭建的方式](#%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA%E7%9A%84%E6%96%B9%E5%BC%8F)
+    - [Replica-Set方式](#replica-set%E6%96%B9%E5%BC%8F)
+    - [Sharding方式](#sharding%E6%96%B9%E5%BC%8F)
+  - [MongoDB的应用场景](#mongodb%E7%9A%84%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF)
+  - [不适用的场景](#%E4%B8%8D%E9%80%82%E7%94%A8%E7%9A%84%E5%9C%BA%E6%99%AF)
+  - [概念](#%E6%A6%82%E5%BF%B5)
+    - [1. 数据库 Databases](#1-%E6%95%B0%E6%8D%AE%E5%BA%93-databases)
+    - [2. 文档  document](#2-%E6%96%87%E6%A1%A3--document)
+      - [bson简介](#bson%E7%AE%80%E4%BB%8B)
+    - [3. 集合 collection](#3-%E9%9B%86%E5%90%88-collection)
+    - [4. 索引](#4-%E7%B4%A2%E5%BC%95)
+  - [CRUD](#crud)
+    - [1. 聚合通道](#1-%E8%81%9A%E5%90%88%E9%80%9A%E9%81%93)
+  - [readPreference读策略](#readpreference%E8%AF%BB%E7%AD%96%E7%95%A5)
+  - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # mongo
 
 MongoDB 是由C++语言编写的，是一个基于分布式文件存储的开源数据库系统.

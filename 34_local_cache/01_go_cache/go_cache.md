@@ -1,3 +1,24 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [go-cache](#go-cache)
+  - [为什么选择go-cache？](#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%80%89%E6%8B%A9go-cache)
+  - [源码分析](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+    - [核心的存储结构](#%E6%A0%B8%E5%BF%83%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
+    - [Set](#set)
+    - [get](#get)
+    - [Delete](#delete)
+    - [定时清理逻辑](#%E5%AE%9A%E6%97%B6%E6%B8%85%E7%90%86%E9%80%BB%E8%BE%91)
+  - [性能分析](#%E6%80%A7%E8%83%BD%E5%88%86%E6%9E%90)
+    - [Lock 的使用](#lock-%E7%9A%84%E4%BD%BF%E7%94%A8)
+    - [使用读写锁？](#%E4%BD%BF%E7%94%A8%E8%AF%BB%E5%86%99%E9%94%81)
+    - [锁的粒度是否可以变更小？](#%E9%94%81%E7%9A%84%E7%B2%92%E5%BA%A6%E6%98%AF%E5%90%A6%E5%8F%AF%E4%BB%A5%E5%8F%98%E6%9B%B4%E5%B0%8F)
+    - [使用sync.map?](#%E4%BD%BF%E7%94%A8syncmap)
+    - [runtime.SetFinalizer](#runtimesetfinalizer)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # go-cache
 基于内存的 K/V 存储/缓存 : (类似于Memcached)，适用于单机应用程序 ，支持删除，过期，默认Cache共享锁，
 

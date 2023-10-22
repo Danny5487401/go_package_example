@@ -1,3 +1,24 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [背景](#%E8%83%8C%E6%99%AF)
+  - [雪崩效应常见场景](#%E9%9B%AA%E5%B4%A9%E6%95%88%E5%BA%94%E5%B8%B8%E8%A7%81%E5%9C%BA%E6%99%AF)
+    - [雪崩效应应对策略](#%E9%9B%AA%E5%B4%A9%E6%95%88%E5%BA%94%E5%BA%94%E5%AF%B9%E7%AD%96%E7%95%A5)
+  - [sentinel vs hystrix](#sentinel-vs-hystrix)
+  - [解决方式](#%E8%A7%A3%E5%86%B3%E6%96%B9%E5%BC%8F)
+  - [2. 滑动窗口](#2-%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3)
+    - [滑动时间窗口有两个很重要设置：](#%E6%BB%91%E5%8A%A8%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E6%9C%89%E4%B8%A4%E4%B8%AA%E5%BE%88%E9%87%8D%E8%A6%81%E8%AE%BE%E7%BD%AE)
+    - [举例](#%E4%B8%BE%E4%BE%8B)
+    - [滑动窗口的周期和格子长度怎么设置？](#%E6%BB%91%E5%8A%A8%E7%AA%97%E5%8F%A3%E7%9A%84%E5%91%A8%E6%9C%9F%E5%92%8C%E6%A0%BC%E5%AD%90%E9%95%BF%E5%BA%A6%E6%80%8E%E4%B9%88%E8%AE%BE%E7%BD%AE)
+    - [固定时间窗口限流](#%E5%9B%BA%E5%AE%9A%E6%97%B6%E9%97%B4%E7%AA%97%E5%8F%A3%E9%99%90%E6%B5%81)
+      - [工作原理](#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86)
+      - [代码实现](#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0)
+  - [4. 令牌桶介绍](#4-%E4%BB%A4%E7%89%8C%E6%A1%B6%E4%BB%8B%E7%BB%8D)
+      - [特点](#%E7%89%B9%E7%82%B9)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 背景
 分布式系统环境下，服务间类似依赖非常常见，一个业务调用通常依赖多个基础服务。
 对于同步调用，当库存服务不可用时，商品服务请求线程被阻塞，当有大批量请求调用库存服务时，最终可能导致整个商品服务资源耗尽，无法继续对外提供服务。并且这种不可用可能沿请求调用链向上传递，这种现象被称为雪崩效应。

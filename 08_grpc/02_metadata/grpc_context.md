@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [grpc context](#grpc-context)
+  - [源码分析](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+    - [流程](#%E6%B5%81%E7%A8%8B)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # grpc context
 gRPC 是基于 HTTP/2 协议的。进程间传输定义了一个 metadata 对象，该对象放在 Request-Headers 内，所以通过 metadata 我们可以将上一个进程中的全局对象透传到下一个被调用的进程.
 

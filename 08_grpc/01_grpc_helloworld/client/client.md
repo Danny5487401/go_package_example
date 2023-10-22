@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Client 源码分析](#client-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [1.  grpc.Dial 方法实际上是对于 grpc.DialContext 的封装，区别在于 ctx 是直接传入 context.Background。](#1--grpcdial-%E6%96%B9%E6%B3%95%E5%AE%9E%E9%99%85%E4%B8%8A%E6%98%AF%E5%AF%B9%E4%BA%8E-grpcdialcontext-%E7%9A%84%E5%B0%81%E8%A3%85%E5%8C%BA%E5%88%AB%E5%9C%A8%E4%BA%8E-ctx-%E6%98%AF%E7%9B%B4%E6%8E%A5%E4%BC%A0%E5%85%A5-contextbackground)
+  - [2. 实例化](#2-%E5%AE%9E%E4%BE%8B%E5%8C%96)
+  - [3. 调用](#3-%E8%B0%83%E7%94%A8)
+  - [4. 关闭链接](#4-%E5%85%B3%E9%97%AD%E9%93%BE%E6%8E%A5)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Client 源码分析
 因为gRPC没有提供服务注册，服务发现的功能，所以需要开发者自己编写服务发现的逻辑：也就是Resolver——解析器。
 

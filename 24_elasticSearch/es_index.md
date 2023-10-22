@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Es索引简介](#es%E7%B4%A2%E5%BC%95%E7%AE%80%E4%BB%8B)
+  - [ES从6.7版本推出了索引生命周期管理（Index Lifecycle Management ，简称ILM)机制，能帮我们自动管理一个索引策略（Policy）下索引集群的生命周期。](#es%E4%BB%8E67%E7%89%88%E6%9C%AC%E6%8E%A8%E5%87%BA%E4%BA%86%E7%B4%A2%E5%BC%95%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86index-lifecycle-management-%E7%AE%80%E7%A7%B0ilm%E6%9C%BA%E5%88%B6%E8%83%BD%E5%B8%AE%E6%88%91%E4%BB%AC%E8%87%AA%E5%8A%A8%E7%AE%A1%E7%90%86%E4%B8%80%E4%B8%AA%E7%B4%A2%E5%BC%95%E7%AD%96%E7%95%A5policy%E4%B8%8B%E7%B4%A2%E5%BC%95%E9%9B%86%E7%BE%A4%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
+    - [操作](#%E6%93%8D%E4%BD%9C)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Es索引简介
 对于日志或指标（metric）类时序性强的ES索引，因为数据量大，并且写入和查询大多都是近期时间内的数据。
 

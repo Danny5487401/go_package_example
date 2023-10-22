@@ -1,4 +1,15 @@
-# OLAP
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [数据仓库OLAP（Online Analytical Processing）](#%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93olaponline-analytical-processing)
+  - [多维度分析案例](#%E5%A4%9A%E7%BB%B4%E5%BA%A6%E5%88%86%E6%9E%90%E6%A1%88%E4%BE%8B)
+    - [销售明细表](#%E9%94%80%E5%94%AE%E6%98%8E%E7%BB%86%E8%A1%A8)
+  - [OLAP分类](#olap%E5%88%86%E7%B1%BB)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# 数据仓库OLAP（Online Analytical Processing）
 OLAP 名为联机分析处理，又可以称之为多维分析处理，指的是通过多种不同的维度审视数据，进行深层次分析
 
 ## 多维度分析案例
@@ -22,5 +33,9 @@ OLAP 名为联机分析处理，又可以称之为多维分析处理，指的是
 ## OLAP分类
 1. 第一类架构称为 ROLAP（Relational OLAP，关系型 OLAP），顾名思义，它直接使用关系模型构建，数据模型常使用星型模型或者雪花模型，这是最先能够想到、也是最为直接的实现方法
 2. 第二类架构称为 MOLAP（Multidimensional OLAP，多维型 OLAP），它的出现就是为了缓解 ROLAP 性能问题。
-   1. MOLAP 使用多维数组的形式存数据，其核心思想是借助预先聚合结果（说白了就是提前先算好，然后将结果保存起来），使用空间换取时间的形式从而提升查询性能。也就是说，用更多的存储空间换得查询时间的减少，其具体的实现方式是依托立方体模型的概念。首先，对需要分析的数据进行建模，框定需要分析的维度字段；然后，通过预处理的形式，对各种维度进行组合并事先聚合；最后，将聚合结果以某种索引或者缓存的形式保存起来（通常只保留聚合后的结果，不存储明细数据），这样一来，在随后的查询过程中，可以直接利用结果返回数据。
+   - MOLAP 使用多维数组的形式存数据，其核心思想是借助预先聚合结果（说白了就是提前先算好，然后将结果保存起来），使用空间换取时间的形式从而提升查询性能。 
+   也就是说，用更多的存储空间换得查询时间的减少，其具体的实现方式是依托立方体模型的概念。
+   首先，对需要分析的数据进行建模，框定需要分析的维度字段；
+   然后，通过预处理的形式，对各种维度进行组合并事先聚合；
+   最后，将聚合结果以某种索引或者缓存的形式保存起来（通常只保留聚合后的结果，不存储明细数据），这样一来，在随后的查询过程中，可以直接利用结果返回数据。
 3. 第三类架构称为 HOLAP（Hybrid OLAP，混合架构的OLAP），这种思路可以理解成 ROLAP 和 MOLAP 两者的组合

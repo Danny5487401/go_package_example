@@ -1,3 +1,17 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [cobra在k8s中的应用](#cobra%E5%9C%A8k8s%E4%B8%AD%E7%9A%84%E5%BA%94%E7%94%A8)
+  - [kubectl 的启动工程](#kubectl-%E7%9A%84%E5%90%AF%E5%8A%A8%E5%B7%A5%E7%A8%8B)
+    - [1. 主函数路径： cmd/kubectl/kubectl.go](#1-%E4%B8%BB%E5%87%BD%E6%95%B0%E8%B7%AF%E5%BE%84-cmdkubectlkubectlgo)
+    - [2. 包具体实现： pkg/kubectl/cmd/cmd.go](#2-%E5%8C%85%E5%85%B7%E4%BD%93%E5%AE%9E%E7%8E%B0-pkgkubectlcmdcmdgo)
+    - [3. cobra具体定义](#3-cobra%E5%85%B7%E4%BD%93%E5%AE%9A%E4%B9%89)
+    - [4.开始添加子命令](#4%E5%BC%80%E5%A7%8B%E6%B7%BB%E5%8A%A0%E5%AD%90%E5%91%BD%E4%BB%A4)
+      - [5.拿kubectl apply命令讲解](#5%E6%8B%BFkubectl-apply%E5%91%BD%E4%BB%A4%E8%AE%B2%E8%A7%A3)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # cobra在k8s中的应用
 
 ## kubectl 的启动工程

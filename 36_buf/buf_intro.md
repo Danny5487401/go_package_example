@@ -1,3 +1,41 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [buf](#buf)
+  - [当前问题](#%E5%BD%93%E5%89%8D%E9%97%AE%E9%A2%98)
+  - [buf cli工具](#buf-cli%E5%B7%A5%E5%85%B7)
+  - [安装](#%E5%AE%89%E8%A3%85)
+  - [1. 配置编译](#1-%E9%85%8D%E7%BD%AE%E7%BC%96%E8%AF%91)
+    - [配置buf.yaml](#%E9%85%8D%E7%BD%AEbufyaml)
+  - [2. lint protobuf文件](#2-lint-protobuf%E6%96%87%E4%BB%B6)
+    - [lint修改](#lint%E4%BF%AE%E6%94%B9)
+  - [3. 上传登陆bsr仓库](#3-%E4%B8%8A%E4%BC%A0%E7%99%BB%E9%99%86bsr%E4%BB%93%E5%BA%93)
+    - [概念](#%E6%A6%82%E5%BF%B5)
+    - [1. 登陆](#1-%E7%99%BB%E9%99%86)
+    - [2. 创建仓库](#2-%E5%88%9B%E5%BB%BA%E4%BB%93%E5%BA%93)
+    - [3. 在buf.yaml中添加名字](#3-%E5%9C%A8bufyaml%E4%B8%AD%E6%B7%BB%E5%8A%A0%E5%90%8D%E5%AD%97)
+    - [4. bud.md](#4-budmd)
+    - [5. 推送文件](#5-%E6%8E%A8%E9%80%81%E6%96%87%E4%BB%B6)
+  - [4. 添加依赖](#4-%E6%B7%BB%E5%8A%A0%E4%BE%9D%E8%B5%96)
+    - [1. 去除 datetime.proto](#1-%E5%8E%BB%E9%99%A4-datetimeproto)
+    - [2. buf.yaml添加依赖dependency](#2-bufyaml%E6%B7%BB%E5%8A%A0%E4%BE%9D%E8%B5%96dependency)
+  - [5. 生成Go代码](#5-%E7%94%9F%E6%88%90go%E4%BB%A3%E7%A0%81)
+    - [1. 编辑buf.gen.yaml：使用protoc插件生成工具](#1-%E7%BC%96%E8%BE%91bufgenyaml%E4%BD%BF%E7%94%A8protoc%E6%8F%92%E4%BB%B6%E7%94%9F%E6%88%90%E5%B7%A5%E5%85%B7)
+    - [2. 根据buf.yaml上面的name生成go文件](#2-%E6%A0%B9%E6%8D%AEbufyaml%E4%B8%8A%E9%9D%A2%E7%9A%84name%E7%94%9F%E6%88%90go%E6%96%87%E4%BB%B6)
+  - [6. 实现服务端和客户端](#6-%E5%AE%9E%E7%8E%B0%E6%9C%8D%E5%8A%A1%E7%AB%AF%E5%92%8C%E5%AE%A2%E6%88%B7%E7%AB%AF)
+  - [7. workspace本地调试多个项目](#7-workspace%E6%9C%AC%E5%9C%B0%E8%B0%83%E8%AF%95%E5%A4%9A%E4%B8%AA%E9%A1%B9%E7%9B%AE)
+    - [1. 多个项目paymentapis](#1-%E5%A4%9A%E4%B8%AA%E9%A1%B9%E7%9B%AEpaymentapis)
+    - [2. 指定多个路径](#2-%E6%8C%87%E5%AE%9A%E5%A4%9A%E4%B8%AA%E8%B7%AF%E5%BE%84)
+  - [8. 管理package名字](#8-%E7%AE%A1%E7%90%86package%E5%90%8D%E5%AD%97)
+    - [1. 去除proto中go_package](#1-%E5%8E%BB%E9%99%A4proto%E4%B8%ADgo_package)
+    - [2. 增加managed管理](#2-%E5%A2%9E%E5%8A%A0managed%E7%AE%A1%E7%90%86)
+    - [3. 移除不需要管理底层包](#3-%E7%A7%BB%E9%99%A4%E4%B8%8D%E9%9C%80%E8%A6%81%E7%AE%A1%E7%90%86%E5%BA%95%E5%B1%82%E5%8C%85)
+  - [8. 推送多个项目workspace代码的注意](#8-%E6%8E%A8%E9%80%81%E5%A4%9A%E4%B8%AA%E9%A1%B9%E7%9B%AEworkspace%E4%BB%A3%E7%A0%81%E7%9A%84%E6%B3%A8%E6%84%8F)
+  - [参考链接](#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # buf 
 buf目标就是从 api编程 转成 schema-driven paradigm ，更好管理 protobuf文件。
 

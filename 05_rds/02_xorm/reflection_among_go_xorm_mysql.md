@@ -1,3 +1,13 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [映射关系](#%E6%98%A0%E5%B0%84%E5%85%B3%E7%B3%BB)
+  - [Go与字段类型对应表](#go%E4%B8%8E%E5%AD%97%E6%AE%B5%E7%B1%BB%E5%9E%8B%E5%AF%B9%E5%BA%94%E8%A1%A8)
+  - [xorm与数据库类型对照](#xorm%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%BA%93%E7%B1%BB%E5%9E%8B%E5%AF%B9%E7%85%A7)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 映射关系  
 
 ## Go与字段类型对应表  

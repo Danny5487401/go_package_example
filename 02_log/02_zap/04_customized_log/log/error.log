@@ -1,3 +1,0 @@
-2021-12-13 20:56:23	ERROR	04_customized_log/main.go:20	sugarLogger name:修华师3
-2021-12-13 20:56:23	WARN	04_customized_log/main.go:22	sugarLogger name:修华师5
-2021-12-13 20:56:23	ERROR	04_customized_log/main.go:25	logger	{"name": "修华师7"}

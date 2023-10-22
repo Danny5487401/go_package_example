@@ -1,3 +1,14 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [本地缓存](#%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98)
+  - [需求](#%E9%9C%80%E6%B1%82)
+  - [Go本身实现背景](#go%E6%9C%AC%E8%BA%AB%E5%AE%9E%E7%8E%B0%E8%83%8C%E6%99%AF)
+  - [本地缓存组件优化方式](#%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98%E7%BB%84%E4%BB%B6%E4%BC%98%E5%8C%96%E6%96%B9%E5%BC%8F)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # 本地缓存
 参考链接：https://mp.weixin.qq.com/s/UuqkO9UUXjNWNGyI2sjG4Q
 

@@ -1,3 +1,26 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Canal](#canal)
+  - [能力](#%E8%83%BD%E5%8A%9B)
+  - [原理](#%E5%8E%9F%E7%90%86)
+  - [Canal架构](#canal%E6%9E%B6%E6%9E%84)
+    - [admin版本整体架构](#admin%E7%89%88%E6%9C%AC%E6%95%B4%E4%BD%93%E6%9E%B6%E6%9E%84)
+    - [canal-server架构](#canal-server%E6%9E%B6%E6%9E%84)
+      - [1. EventParser子模块](#1-eventparser%E5%AD%90%E6%A8%A1%E5%9D%97)
+      - [2. EventSink子模块](#2-eventsink%E5%AD%90%E6%A8%A1%E5%9D%97)
+      - [3. EventStore子模块](#3-eventstore%E5%AD%90%E6%A8%A1%E5%9D%97)
+  - [Canal 启动流程](#canal-%E5%90%AF%E5%8A%A8%E6%B5%81%E7%A8%8B)
+  - [Canal 数据流向](#canal-%E6%95%B0%E6%8D%AE%E6%B5%81%E5%90%91)
+  - [客户端使用](#%E5%AE%A2%E6%88%B7%E7%AB%AF%E4%BD%BF%E7%94%A8)
+  - [优点](#%E4%BC%98%E7%82%B9)
+  - [缺点](#%E7%BC%BA%E7%82%B9)
+  - [go-mysql@v1.3.0/canal源码分析](#go-mysqlv130canal%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+    - [流程分析](#%E6%B5%81%E7%A8%8B%E5%88%86%E6%9E%90)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Canal
 canal [kə'næl]，译意为水道/管道/沟渠，主要用途是基于 MySQL 数据库增量日志解析，提供增量数据 订阅 和 消费。
 应该是阿里云DTS（Data Transfer Service）的开源版本。

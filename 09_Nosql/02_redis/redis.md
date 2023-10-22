@@ -1,3 +1,22 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Redis](#redis)
+  - [为什么需要Redis?](#%E4%B8%BA%E4%BB%80%E4%B9%88%E9%9C%80%E8%A6%81redis)
+  - [Reactor 单线程的Redis为什么这么快?](#reactor-%E5%8D%95%E7%BA%BF%E7%A8%8B%E7%9A%84redis%E4%B8%BA%E4%BB%80%E4%B9%88%E8%BF%99%E4%B9%88%E5%BF%AB)
+  - [Redis五种数据类型应用场景](#redis%E4%BA%94%E7%A7%8D%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF)
+    - [扩展：](#%E6%89%A9%E5%B1%95)
+  - [持久化方式](#%E6%8C%81%E4%B9%85%E5%8C%96%E6%96%B9%E5%BC%8F)
+    - [1. RDB(redis database)：](#1-rdbredis-database)
+    - [2. AOF(append only file)](#2-aofappend-only-file)
+  - [Redis集群特点](#redis%E9%9B%86%E7%BE%A4%E7%89%B9%E7%82%B9)
+  - [集群方案](#%E9%9B%86%E7%BE%A4%E6%96%B9%E6%A1%88)
+    - [redis cluster 的哈希槽为啥16384个](#redis-cluster-%E7%9A%84%E5%93%88%E5%B8%8C%E6%A7%BD%E4%B8%BA%E5%95%A516384%E4%B8%AA)
+  - [高并发缓存](#%E9%AB%98%E5%B9%B6%E5%8F%91%E7%BC%93%E5%AD%98)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Redis
 
 ![](.redis_images/redis_info.png)

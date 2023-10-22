@@ -1,3 +1,11 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [zerolog](#zerolog)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # zerolog
 
 zerolog 包提供了一个专门用于 JSON 输出的简单快速的 Logger。
