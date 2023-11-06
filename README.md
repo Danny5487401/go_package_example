@@ -271,6 +271,7 @@
 - [3 远程读取nacos配置(源码分析)](21_viper/03_remote_config/remote_viper_config.md)
 - [4 gopkg.in/yaml.v3 使用](21_viper/04_yaml/yaml.md)
 - [5 pelletier/go-toml 使用](21_viper/05_toml/toml.md)
+- [6 gopkg.in/ini.v1 使用](21_viper/06_ini/ini.md)
 
 ## 第二十二章 ETCD
 - [服务端server--读和写流程分析](22_etcd/etcd_read_n_write.md)
