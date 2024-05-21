@@ -26,10 +26,10 @@ func main() {
 	logger.Debug("logger", zap.String("name", "修华师8"))
 }
 
-//只能输出结构化日志，但是性能要高于 SugaredLogger
+// 只能输出结构化日志，但是性能要高于 SugaredLogger
 var logger *zap.Logger
 
-//可以输出 结构化日志、非结构化日志。性能差于 zap.Logger，
+// 可以输出 结构化日志、非结构化日志。性能差于 zap.Logger，
 var sugarLogger *zap.SugaredLogger
 
 // 初始化日志 logger
@@ -40,7 +40,7 @@ func InitLog(logPath, errPath string, logLevel zapcore.Level) {
 		TimeKey:      "ts",                        //结构化（json）输出：时间的key（INFO，WARN，ERROR等）
 		CallerKey:    "file",                      //结构化（json）输出：打印日志的文件对应的Key
 		EncodeLevel:  zapcore.CapitalLevelEncoder, //将日志级别转换成大写（INFO，WARN，ERROR等）
-		EncodeCaller: zapcore.ShortCallerEncoder,  //采用短文件路径编码输出（test/main.go:14 ）
+		EncodeCaller: zapcore.ShortCallerEncoder,  //采用短文件路径编码输出（test/sql_squirrel_test.go:14 ）
 		EncodeTime: func(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
 			enc.AppendString(t.Format("2006-01-02 15:04:05"))
 		}, //输出的时间格式

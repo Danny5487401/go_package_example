@@ -23,3 +23,5 @@ vendor/
 
 # sonar 扫描
 .scannerwork
+
+node_modules

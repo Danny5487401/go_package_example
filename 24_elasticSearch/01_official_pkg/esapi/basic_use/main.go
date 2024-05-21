@@ -1,4 +1,4 @@
-// $ go run _examples/main.go
+// $ go run _examples/sql_squirrel_test.go
 
 package main
 

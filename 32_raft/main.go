@@ -65,7 +65,7 @@ func main() {
 }
 
 // 运行 cd 32_raft
-// go build -o main main.go
+// go build -o main sql_squirrel_test.go
 // ./main -bootstrap true -node node1
 // 测试数据
 // 写： curl "http://127.0.0.1:6000/set?key=name&value=danny"

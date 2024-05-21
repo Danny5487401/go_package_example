@@ -18,7 +18,15 @@
 
 权限实际上就是控制谁能对什么资源进行什么操作。
 casbin将访问控制模型抽象到一个基于 PERM（Policy，Effect，Request，Matchers） 元模型的配置文件（模型文件）中。因此切换或更新授权机制只需要简单地修改配置文件。
-
+```go
+var sectionNameMap = map[string]string{
+	"r": "request_definition",
+	"p": "policy_definition",
+	"g": "role_definition",
+	"e": "policy_effect",
+	"m": "matchers",
+}
+```
 
 - policy是策略或者说是规则的定义。它定义了具体的规则。
 
@@ -28,9 +36,20 @@ casbin将访问控制模型抽象到一个基于 PERM（Policy，Effect，Reques
 
 - effect根据对请求运用匹配器得出的所有结果进行汇总，来决定该请求是允许还是拒绝。
 
+Model CONF 文件可以包含注释。注释以 # 开头， # 会注释该行剩余部分。
+
+
+
 ## 背景
 权限管理在几乎每个系统中都是必备的模块。如果项目开发每次都要实现一次权限管理，无疑会浪费开发时间，增加开发成本。
 
+我们理想中的情况就是：可以在中间件中，统一对用户进行鉴权，如果没有权限，中止继续访问，返回 HTTP status code 403，而如果有权限，则放行。
+
+那么，再具体细化，就是这个权限引擎应该给我们提供至少以下几个接口：
+
+- 判断某个用户 ID 是否具有权限;
+- 管理用户角色，甚至角色组;
+- 管理角色的权限，即可以对那些资源进行什么样的操作;
 
 
 ## 前置知识:访问控制模型
@@ -40,7 +59,7 @@ casbin将访问控制模型抽象到一个基于 PERM（Policy，Effect，Reques
 这个是Linux中对于资源进行权限管理的访问模型。Linux中一切资源都是文件，UGO把操作当前文件的进程分为3种类型：
 
 - User用户。文件的属主，即主体进程的euid等于客体文件的uid。
-- Group同组用户。即主体进程的egid等于客体文件的gid。
+- Group同组用户。即主体进程的 egid 等于客体文件的gid。
 - Other用户。不满足上述两种条件的其他用户
 这种访问模型的缺点很明显，只能为一类用户设置权限，如果这类用户中有特殊的人，那么它无能为力了
 
@@ -49,7 +68,8 @@ DAC思想：进程与其执行用户，拥有相同的权限。
 例如：进程A，以root用户执行，进程A就拥有了root用户的权限。
 
 DAC访问控制的实现：ACL(访问控制列表 Access Control List)  
-原理是，每个资源都配置有一个列表，这个列表记录哪些用户可以对这项资源进行CRUD操作。当系统试图访问这项资源的时候，会首先检查这个列表中是否有关于当前用户的访问权限，从而确定这个用户是否有权限访问当前资源.linux在UGO之外，也增加了这个功能。
+原理是，每个资源都配置有一个列表，这个列表记录哪些用户可以对这项资源进行CRUD操作。
+当系统试图访问这项资源的时候，会首先检查这个列表中是否有关于当前用户的访问权限，从而确定这个用户是否有权限访问当前资源.linux在UGO之外，也增加了这个功能。
 
 ```shell
 $ sudo apt install acl
@@ -75,19 +95,58 @@ RBAC模型通过引入角色（role）这个中间层来解决这个问题。
 - 操作属性（如读取)
 - 对象属性（如一篇文章，又称资源属性）
 
-我们在不同的时间段对数据data实现不同的权限控制。正常工作时间9:00-18:00所有人都可以读写data，其他时间只有数据所有者能读写。这种需求我们可以很方便地使用ABAC（attribute base access list）模型完成.
+我们在不同的时间段对数据data实现不同的权限控制。正常工作时间9:00-18:00所有人都可以读写data，其他时间只有数据所有者能读写。
+这种需求我们可以很方便地使用ABAC（attribute base access list）模型完成.
 
 
 ## 使用
 casbin的使用非常精炼。基本上就生成一个结构，Enforcer，构造这个结构的时候加载 model.conf 和 policy.csv。
 其中 model.conf 存储的是我们的访问控制模型，policy.csv 存储的是我们具体的用户权限配置。
 
-[ model 语法](https://casbin.org/docs/syntax-for-models)
+[model 语法](https://casbin.org/docs/syntax-for-models)
 
 
 ## 案例
 
+### argocd(rbac 模型)
 [argocd Authentication and Authorization](https://argo-cd.readthedocs.io/en/stable/developer-guide/architecture/authz-authn/)
 ![](.casbin_images/9fdd0cb7.png)
+
+
+
+## 源码分析
+
+加载模型文件: 从文件中
+```go
+// NewModelFromFile creates a model from a .CONF file.
+func NewModelFromFile(path string) (Model, error) {
+	m := NewModel()
+
+	err := m.LoadModel(path)
+	if err != nil {
+		return nil, err
+	}
+
+	return m, nil
+}
+
+```
+
+模型结构体
+```go
+// Model represents the whole access control model.
+type Model map[string]AssertionMap
+
+// AssertionMap is the collection of assertions, can be "r", "p", "g", "e", "m".
+type AssertionMap map[string]*Assertion
+```
+
+
+
+## 参考
+
+- [casbin 支持的模型](https://casbin.org/zh/docs/supported-models)
+
+
 
 

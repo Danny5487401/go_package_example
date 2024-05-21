@@ -21,9 +21,24 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# go-sql-driver/mysql源码分析
+# github.com/go-sql-driver/mysql  源码分析
+
+Go中支持MySQL的驱动目前比较多，有如下几种
+
+- https://github.com/go-sql-driver/mysql 支持database/sql，全部采用go写。
+- https://github.com/ziutek/mymysql 支持database/sql，也支持自定义的接口，全部采用go写。
+- https://github.com/Philio/GoMySQL 不支持database/sql，自定义接口，全部采用go写。
+
+
+我主要以第一个驱动为例(我目前项目中也是采用它来驱动)，也推荐大家采用它，主要理由：
+
+- 这个驱动比较新，维护的比较好
+- 完全支持database/sql接口
+- 支持keepalive，保持长连接,
+
 
 ## 1. go-sql-driver/mysql@v1.5.0/buffer.go
+
 buffer 数是据库连接 (net.Conn) 进行缓冲的一个数据结构
 ```go
 type buffer struct {
