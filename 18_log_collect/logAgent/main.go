@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"go_package_example/18_log_collect/logAgent/conf"
-	"go_package_example/18_log_collect/logAgent/etcd"
-	"go_package_example/18_log_collect/logAgent/kafka"
-	tailLog "go_package_example/18_log_collect/logAgent/tail_log"
-	"go_package_example/18_log_collect/logAgent/utils"
+	"github.com/Danny5487401/go_package_example/18_log_collect/logAgent/conf"
+	"github.com/Danny5487401/go_package_example/18_log_collect/logAgent/etcd"
+	"github.com/Danny5487401/go_package_example/18_log_collect/logAgent/kafka"
+	tailLog "github.com/Danny5487401/go_package_example/18_log_collect/logAgent/tail_log"
+	"github.com/Danny5487401/go_package_example/18_log_collect/logAgent/utils"
 	"sync"
 	"time"
 

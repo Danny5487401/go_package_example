@@ -2,7 +2,7 @@ package conn
 
 import (
 	"fmt"
-	"go_package_example/09_Nosql/02_redis/02_go-redis/hooks"
+	"github.com/Danny5487401/go_package_example/09_Nosql/02_redis/02_go-redis/hooks"
 	"os"
 	"sync"
 	"time"

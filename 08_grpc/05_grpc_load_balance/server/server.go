@@ -1,4 +1,4 @@
-//负载均衡
+// 负载均衡
 // Binary server is an example server.
 package main
 
@@ -11,7 +11,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	pb "go_package_example/08_grpc/02_metadata/echo"
+	pb "github.com/Danny5487401/go_package_example/08_grpc/02_metadata/echo"
 )
 
 var (

@@ -2,7 +2,7 @@ package models
 
 import (
 	"fmt"
-	"go_package_example/26_neo4j/database"
+	"github.com/Danny5487401/go_package_example/26_neo4j/database"
 	"log"
 	"strconv"
 )

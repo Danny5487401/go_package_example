@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
-	"go_package_example/01_consul/02_grpc/api"
-	pb "go_package_example/08_grpc/01_grpc_helloworld/proto"
-	grpctls "go_package_example/08_grpc/12_grpc_middleware/01_grpc_interceptor/tls"
+	"github.com/Danny5487401/go_package_example/01_consul/02_grpc/api"
+	pb "github.com/Danny5487401/go_package_example/08_grpc/01_grpc_helloworld/proto"
+	grpctls "github.com/Danny5487401/go_package_example/08_grpc/12_grpc_middleware/01_grpc_interceptor/tls"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/health/grpc_health_v1"
 	"log"
@@ -39,7 +39,7 @@ func RegisterToConsul() {
 	})
 }
 
-//health
+// health
 type HealthImpl struct{}
 
 // Check 实现健康检查接口，这里直接返回健康状态，这里也可以有更复杂的健康检查策略，比如根据服务器负载来返回

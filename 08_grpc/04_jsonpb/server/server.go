@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go_package_example/08_grpc/04_jsonpb/proto"
+	"github.com/Danny5487401/go_package_example/08_grpc/04_jsonpb/proto"
 	"google.golang.org/grpc"
 
 	"context"
@@ -11,7 +11,7 @@ import (
 type Member struct {
 }
 
-//获取用户信息的接口
+// 获取用户信息的接口
 func (m *Member) GetMember(context.Context, *proto.MemberRequest) (resp *proto.MemberResponse, err error) {
 	resp = &proto.MemberResponse{}
 	resp.Phone = "15112810201"

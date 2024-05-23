@@ -3,14 +3,18 @@
 规则引擎由是一种嵌入在应用程序中的组件，实现了将业务决策从应用程序代码中分离出来，并使用预定义的语义模块编写业务决策。
 
 
-## 当前开源
 
+## 背景 
+
+
+
+## 当前开源
 
 - https://github.com/Knetic/govaluate
 - https://github.com/rencalo770/gengine: 应用于B站风控系统、流量投放系统、AB测试、推荐平台系统等多个业务场景
 - https://github.com/apache/incubator-kie-drools: java 实现
-- gorule
-
+- https://github.com/SpikeWong/gorule
+- https://github.com/PaesslerAG/gval
 
 
 ## 规则的执行模式

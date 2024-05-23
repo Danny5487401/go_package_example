@@ -8,9 +8,9 @@ import (
 )
 
 func check(e *casbin.Enforcer, sub, obj, act string) {
-	ok, _ := e.Enforce(sub, obj, act)
+	ok, reason, _ := e.EnforceEx(sub, obj, act)
 	if ok {
-		fmt.Printf("%s CAN %s %s\n", sub, act, obj)
+		fmt.Printf("%s CAN %s %s ,reason:%s \n", sub, act, obj, reason)
 	} else {
 		fmt.Printf("%s CANNOT %s %s\n", sub, act, obj)
 	}

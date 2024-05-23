@@ -6,7 +6,7 @@ import (
 	_ "google.golang.org/grpc/balancer/grpclb"
 	"sync"
 
-	"go_package_example/08_grpc/03_stream_grpc/proto"
+	"github.com/Danny5487401/go_package_example/08_grpc/03_stream_grpc/proto"
 
 	"context"
 	"log"

@@ -5,8 +5,8 @@ package tailLog
 import (
 	"context"
 	"fmt"
+	"github.com/Danny5487401/go_package_example/18_log_collect/logAgent/kafka"
 	"github.com/hpcloud/tail"
-	"go_package_example/18_log_collect/logAgent/kafka"
 	"time"
 )
 

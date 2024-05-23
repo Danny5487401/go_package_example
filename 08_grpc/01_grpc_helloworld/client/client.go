@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	pb "go_package_example/08_grpc/01_grpc_helloworld/proto"
+	pb "github.com/Danny5487401/go_package_example/08_grpc/01_grpc_helloworld/proto"
 	"google.golang.org/grpc"
 )
 

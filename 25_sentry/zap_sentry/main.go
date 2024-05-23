@@ -5,7 +5,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"go_package_example/25_sentry/zap_sentry/sentryzapcore"
+	"github.com/Danny5487401/go_package_example/25_sentry/zap_sentry/sentryzapcore"
 	"time"
 
 	"github.com/getsentry/sentry-go"
@@ -13,7 +13,7 @@ import (
 	"go.uber.org/zap/zapcore"
 )
 
-//  生成SentryCore对象并添加到Logger中
+// 生成SentryCore对象并添加到Logger中
 func main() {
 	dsn := "http://437e75d208004309b74cac7dad719c3f@tencent.danny.games:9000/2"
 	// 默认使用IoCore

@@ -1,8 +1,8 @@
 package apis
 
 import (
+	"github.com/Danny5487401/go_package_example/26_neo4j/models"
 	"github.com/gin-gonic/gin"
-	"go_package_example/26_neo4j/models"
 	"log"
 	"net/http"
 )

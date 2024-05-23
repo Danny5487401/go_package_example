@@ -8,7 +8,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"go_package_example/08_grpc/09_grpc_validate/proto"
+	"github.com/Danny5487401/go_package_example/08_grpc/09_grpc_validate/proto"
 )
 
 type Server struct {
@@ -43,7 +43,7 @@ func main() {
 				return nil, status.Error(codes.InvalidArgument, err.Error())
 			}
 		}
-		
+
 		// 继续处理请求
 		return handler(ctx, req)
 	}

@@ -5,14 +5,14 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	grpcErrProtobuf "go_package_example/08_grpc/07_grpc_error/proto"
+	grpcErrProtobuf "github.com/Danny5487401/go_package_example/08_grpc/07_grpc_error/proto"
 	epb "google.golang.org/genproto/googleapis/rpc/errdetails"
 	"google.golang.org/grpc/status"
 	"log"
 	"os"
 	"time"
 
-	pb "go_package_example/08_grpc/01_grpc_helloworld/proto"
+	pb "github.com/Danny5487401/go_package_example/08_grpc/01_grpc_helloworld/proto"
 	"google.golang.org/grpc"
 )
 

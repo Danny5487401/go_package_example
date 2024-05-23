@@ -1,4 +1,4 @@
-module go_package_example
+module github.com/Danny5487401/go_package_example
 
 go 1.18
 

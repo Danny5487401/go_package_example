@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/Danny5487401/go_package_example/22_etcd/conn"
 	"go.etcd.io/etcd/client/v3"
-	"go_package_example/22_etcd/conn"
 	"time"
 )
 

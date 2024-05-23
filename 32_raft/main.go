@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go_package_example/32_raft/cache"
+	"github.com/Danny5487401/go_package_example/32_raft/cache"
 
 	"log"
 	"net"

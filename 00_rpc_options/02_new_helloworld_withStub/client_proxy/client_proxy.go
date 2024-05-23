@@ -1,7 +1,7 @@
 package client_proxy
 
 import (
-	"go_package_example/00_rpc_options/02_new_helloworld_withStub/handler"
+	"github.com/Danny5487401/go_package_example/00_rpc_options/02_new_helloworld_withStub/handler"
 	"net/rpc"
 )
 

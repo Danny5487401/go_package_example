@@ -120,8 +120,8 @@
     - 获取retrieve
     - 更新update
 - 3 database/sql 源码分析
-  - 3.1 [converter把普通的值转化成driver.Value的接口](05_rds/03_database_sql/01_converter/converter.md)
-- 4 SQL生成库 Squirrel
+  - [3.1 converter把普通的值转化成driver.Value的接口](05_rds/03_database_sql/01_converter/converter.md)
+- [4 SQL生成库 Squirrel](05_rds/04_squirrel/quirrel.md)
 
 ## 第六章 获取对外可用IP和端口
 - [通过google, 国内移动、电信和联通通用的DNS获取对外Ip和端口](06_get_available_ip_port/get_ip/main.go)
@@ -352,7 +352,7 @@
 - [1 ACL（access-control-list，访问控制列表)](39_casbin/01_acl/main.go)
 - [2 RBAC (role-based-access-control 基于角色的权限访问控制)](39_casbin/02_rbac/rbac.md)
 - [3 基于domain或tenant租户实现RBAC](39_casbin/03_domain_rbac/main.go)
-- [4 ABAC(Attribute-based access control 基于属性的权限验证)](39_casbin/04_abac/main.go)
+- [4 ABAC(Attribute-based access control 基于属性的权限验证)使用 eval()功能构造来实现基于自定义规则](39_casbin/04_abac/main.go)
 
 
 ## [第四十章 规则引擎 rule engine](40_rules_engine/rule_engine.md)

@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"flag"
-	"go_package_example/08_grpc/17_fieldmask/proto"
+	"github.com/Danny5487401/go_package_example/08_grpc/17_fieldmask/proto"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/fieldmaskpb"
 	"log"

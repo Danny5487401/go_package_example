@@ -7,7 +7,7 @@ import (
 	"log"
 	"time"
 
-	ecpb "go_package_example/08_grpc/02_metadata/echo"
+	ecpb "github.com/Danny5487401/go_package_example/08_grpc/02_metadata/echo"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/resolver"
 )

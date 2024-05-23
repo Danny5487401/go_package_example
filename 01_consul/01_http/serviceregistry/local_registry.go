@@ -2,7 +2,7 @@ package serviceregistry
 
 import (
 	"errors"
-	"go_package_example/01_consul/01_http/instance"
+	"github.com/Danny5487401/go_package_example/01_consul/01_http/instance"
 )
 
 type localServiceRegistry struct {

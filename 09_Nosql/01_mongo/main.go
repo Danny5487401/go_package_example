@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 	"fmt"
-	"go_package_example/09_Nosql/01_mongo/model"
-	"go_package_example/09_Nosql/01_mongo/util"
+	"github.com/Danny5487401/go_package_example/09_Nosql/01_mongo/model"
+	"github.com/Danny5487401/go_package_example/09_Nosql/01_mongo/util"
 	"log"
 	"strconv"
 	"time"
@@ -176,7 +176,7 @@ func SearchData(collection *mongo.Collection) {
 	}
 }
 
-//更新数据
+// 更新数据
 func UpdateData(collection *mongo.Collection) {
 
 	var uResult *mongo.UpdateResult

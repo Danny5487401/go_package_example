@@ -29,7 +29,7 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/util"
 	"github.com/nacos-group/nacos-sdk-go/vo"
 
-	"go_package_example/04_nacos/service_center/v1/server"
+	"github.com/Danny5487401/go_package_example/04_nacos/service_center/v1/server"
 )
 
 func main() {

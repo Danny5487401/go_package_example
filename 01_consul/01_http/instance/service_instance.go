@@ -1,7 +1,7 @@
 package instance
 
 import (
-	"go_package_example/01_consul/01_http/util"
+	"github.com/Danny5487401/go_package_example/01_consul/01_http/util"
 	"math/rand"
 	"strconv"
 	"time"

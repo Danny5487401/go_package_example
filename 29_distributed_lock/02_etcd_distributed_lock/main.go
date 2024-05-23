@@ -2,7 +2,7 @@ package main
 
 import (
 	"context"
-	"go_package_example/22_etcd/conn"
+	"github.com/Danny5487401/go_package_example/22_etcd/conn"
 	"log"
 
 	// 注意是这，不是github.com/coreos/etcd v3.3.17+incompatible

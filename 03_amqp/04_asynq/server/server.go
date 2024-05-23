@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go_package_example/03_amqp/04_asynq/tasks"
+	"github.com/Danny5487401/go_package_example/03_amqp/04_asynq/tasks"
 	"log"
 
 	"github.com/hibiken/asynq"

@@ -3,8 +3,8 @@ package serviceregistry
 import (
 	"errors"
 	"fmt"
+	"github.com/Danny5487401/go_package_example/01_consul/01_http/instance"
 	"github.com/hashicorp/consul/api"
-	"go_package_example/01_consul/01_http/instance"
 
 	"strconv"
 	"unsafe"

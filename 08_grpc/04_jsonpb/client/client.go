@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"os"
 
-	"go_package_example/08_grpc/04_jsonpb/proto"
+	"github.com/Danny5487401/go_package_example/08_grpc/04_jsonpb/proto"
 )
 
 /*

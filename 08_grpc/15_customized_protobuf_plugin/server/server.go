@@ -7,7 +7,7 @@ import (
 	"log"
 	"net"
 
-	pb "go_package_example/08_grpc/15_customized_protobuf_plugin/helloworld_protobuf"
+	pb "github.com/Danny5487401/go_package_example/08_grpc/15_customized_protobuf_plugin/helloworld_protobuf"
 	"google.golang.org/grpc"
 )
 

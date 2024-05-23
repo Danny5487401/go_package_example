@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	searchproto "github.com/Danny5487401/go_package_example/08_grpc/11_protoc_gogofast/proto"
 	"github.com/gogo/protobuf/proto"
-	searchproto "go_package_example/08_grpc/11_protoc_gogofast/proto"
 	"log"
 )
 

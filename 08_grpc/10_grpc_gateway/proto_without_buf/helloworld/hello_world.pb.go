@@ -7,7 +7,7 @@
 package helloworld
 
 import (
-	_ "go_package_example/08_grpc/10_grpc_gateway/proto_without_buf/google/api"
+	_ "github.com/Danny5487401/go_package_example/08_grpc/10_grpc_gateway/proto_without_buf/google/api"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"

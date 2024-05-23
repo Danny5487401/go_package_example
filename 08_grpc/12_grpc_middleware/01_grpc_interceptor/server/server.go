@@ -3,15 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
+	grpctls "github.com/Danny5487401/go_package_example/08_grpc/12_grpc_middleware/01_grpc_interceptor/tls"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpctls "go_package_example/08_grpc/12_grpc_middleware/01_grpc_interceptor/tls"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"log"
 	"net"
 	"runtime/debug"
 
-	"go_package_example/08_grpc/12_grpc_middleware/01_grpc_interceptor/proto"
+	"github.com/Danny5487401/go_package_example/08_grpc/12_grpc_middleware/01_grpc_interceptor/proto"
 	"google.golang.org/grpc"
 )
 

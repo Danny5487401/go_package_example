@@ -12,7 +12,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "go_package_example/08_grpc/06_grpc_retry/echo"
+	pb "github.com/Danny5487401/go_package_example/08_grpc/06_grpc_retry/echo"
 )
 
 var port = flag.Int("port", 50052, "port number")

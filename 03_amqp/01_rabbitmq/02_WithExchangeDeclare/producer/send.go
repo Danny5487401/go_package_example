@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go_package_example/03_amqp/01_rabbitmq/02_WithExchangeDeclare/rmq"
+	"github.com/Danny5487401/go_package_example/03_amqp/01_rabbitmq/02_WithExchangeDeclare/rmq"
 )
 
 func main() {

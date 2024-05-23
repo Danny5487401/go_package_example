@@ -1,8 +1,8 @@
 package main
 
 import (
+	"github.com/Danny5487401/go_package_example/26_neo4j/apis"
 	"github.com/gin-gonic/gin"
-	"go_package_example/26_neo4j/apis"
 )
 
 func main() {

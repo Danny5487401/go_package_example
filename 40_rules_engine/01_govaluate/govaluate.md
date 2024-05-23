@@ -41,16 +41,21 @@ func NewEvaluableExpressionWithFunctions(expression string, functions map[string
 	ret.QueryDateFormat = isoDateFormat
 	ret.inputExpression = expression
 
+	// 解析 token 
 	ret.tokens, err = parseTokens(expression, functions)
 	if err != nil {
 		return nil, err
 	}
 
+	
+	// 语法分析
+	// 检查括号
 	err = checkBalance(ret.tokens)
 	if err != nil {
 		return nil, err
 	}
 
+	// check当前的token是否是上一个token的合法值，合法值是预设的
 	err = checkExpressionSyntax(ret.tokens)
 	if err != nil {
 		return nil, err
@@ -61,6 +66,7 @@ func NewEvaluableExpressionWithFunctions(expression string, functions map[string
 		return nil, err
 	}
 
+	// 执行计划解析
 	ret.evaluationStages, err = planStages(ret.tokens)
 	if err != nil {
 		return nil, err
@@ -69,10 +75,101 @@ func NewEvaluableExpressionWithFunctions(expression string, functions map[string
 	ret.ChecksTypes = true
 	return ret, nil
 }
-
 ```
 
-## 参考 
 
+解析成 token 
+```go
+type ExpressionToken struct {
+	Kind  TokenKind
+	Value interface{}
+}
+
+
+type TokenKind int
+
+const (
+	UNKNOWN TokenKind = iota
+
+	PREFIX
+	NUMERIC
+	BOOLEAN
+	STRING
+	PATTERN
+	TIME
+	VARIABLE
+	FUNCTION
+	SEPARATOR
+	ACCESSOR
+
+	COMPARATOR
+	LOGICALOP
+	MODIFIER
+
+	CLAUSE
+	CLAUSE_CLOSE
+
+	TERNARY
+)
+
+
+// 对应的类型 前缀
+var prefixSymbols = map[string]OperatorSymbol{
+	"-": NEGATE,
+	"!": INVERT,
+	"~": BITWISE_NOT,
+}
+```
+
+"(mem_used / total_mem) * 100" parseToken 后的一堆token:
+![](.govaluate_images/parseToken1.png)
+
+```go
+func checkExpressionSyntax(tokens []ExpressionToken) error {
+
+	var state lexerState
+	var lastToken ExpressionToken
+	var err error
+
+	state = validLexerStates[0]
+
+	for _, token := range tokens {
+
+		if !state.canTransitionTo(token.Kind) {
+			// 判断合法性
+		}
+
+
+		lastToken = token
+	}
+
+	if !state.isEOF {
+		return errors.New("Unexpected end of expression")
+	}
+	return nil
+}
+```
+
+比如  lexerState NUMERIC 类型
+```go
+lexerState{
+
+		kind:       NUMERIC,
+		isEOF:      true,
+		isNullable: false,
+		validNextKinds: []TokenKind{
+
+			MODIFIER,
+			COMPARATOR,
+			LOGICALOP,
+			CLAUSE_CLOSE,
+			TERNARY,
+			SEPARATOR,
+		},
+	},
+```
+
+## 参考
 
 - https://github.com/jianfengye/inside-go/tree/master/govaluate-3.0.0
+- [用规则引擎让你一天上线十个需求](https://zhuanlan.zhihu.com/p/456838412)

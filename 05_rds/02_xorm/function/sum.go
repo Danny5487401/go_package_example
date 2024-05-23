@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go_package_example/05_rds/02_xorm/models"
-	"go_package_example/05_rds/02_xorm/util"
+	"github.com/Danny5487401/go_package_example/05_rds/02_xorm/models"
+	"github.com/Danny5487401/go_package_example/05_rds/02_xorm/util"
 
 	"fmt"
 )

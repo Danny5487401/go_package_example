@@ -2,11 +2,11 @@ package main
 
 import (
 	"fmt"
-	"go_package_example/05_rds/02_xorm/models"
+	"github.com/Danny5487401/go_package_example/05_rds/02_xorm/models"
 
 	_ "github.com/go-sql-driver/mysql"
 
-	"go_package_example/05_rds/02_xorm/util"
+	"github.com/Danny5487401/go_package_example/05_rds/02_xorm/util"
 )
 
 func main() {

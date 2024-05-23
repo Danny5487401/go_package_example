@@ -3,7 +3,7 @@ package main
 import (
 	"errors"
 	"fmt"
-	"go_package_example/09_Nosql/02_redis/02_go-redis/conn"
+	"github.com/Danny5487401/go_package_example/09_Nosql/02_redis/02_go-redis/conn"
 	"log"
 	"math/rand"
 	"time"
@@ -316,8 +316,8 @@ func ExampleClient_SortSet() {
 	log.Println("ZRangeByScore结果:", rets)
 }
 
-//用来做基数统计的算法，HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定 的、并且是很小的。
-//每个 HyperLogLog 键只需要花费 12 KB 内存，就可以计算接近 2^64 个不同元素的基 数
+// 用来做基数统计的算法，HyperLogLog 的优点是，在输入元素的数量或者体积非常非常大时，计算基数所需的空间总是固定 的、并且是很小的。
+// 每个 HyperLogLog 键只需要花费 12 KB 内存，就可以计算接近 2^64 个不同元素的基 数
 func ExampleClient_HyperLogLog() {
 	log.Println("ExampleClient_HyperLogLog")
 	defer log.Println("ExampleClient_HyperLogLog")

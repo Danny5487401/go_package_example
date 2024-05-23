@@ -7,6 +7,16 @@ import (
 )
 
 func main() {
+
+	// 参数解析
+	parameters := make(map[string]interface{})
+	expr, _ := govaluate.NewEvaluableExpression("(mem_used / total_mem) * 100")
+	parameters = make(map[string]interface{})
+	parameters["total_mem"] = 1024
+	parameters["mem_used"] = 512
+	result, _ := expr.Evaluate(parameters)
+	fmt.Println(result)
+
 	// 自定义函数
 	functions := map[string]govaluate.ExpressionFunction{
 		"strlen": func(args ...interface{}) (interface{}, error) {
@@ -17,18 +27,10 @@ func main() {
 
 	exprString := "strlen('teststring')"
 	exprFunc, _ := govaluate.NewEvaluableExpressionWithFunctions(exprString, functions)
-	result, _ := exprFunc.Evaluate(nil)
+	result, _ = exprFunc.Evaluate(nil)
 	fmt.Println(result)
 
-	// 参数解析
-	parameters := make(map[string]interface{})
-	expr, _ := govaluate.NewEvaluableExpression("(mem_used / total_mem) * 100")
-	parameters = make(map[string]interface{})
-	parameters["total_mem"] = 1024
-	parameters["mem_used"] = 512
-	result, _ = expr.Evaluate(parameters)
-	fmt.Println(result)
-
+	// 访问器（Accessors）就是通过.操作访问结构中的字段
 	// 结构体方法访问
 	u := User{FirstName: "Xia", LastName: "Danny", Age: 18}
 	parameters = make(map[string]interface{})

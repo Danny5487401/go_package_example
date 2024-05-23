@@ -2,10 +2,10 @@ package test
 
 import (
 	"fmt"
+	"github.com/Danny5487401/go_package_example/01_consul/01_http/instance"
+	"github.com/Danny5487401/go_package_example/01_consul/01_http/serviceregistry"
+	"github.com/Danny5487401/go_package_example/01_consul/01_http/util"
 	"github.com/gin-gonic/gin"
-	"go_package_example/01_consul/01_http/instance"
-	"go_package_example/01_consul/01_http/serviceregistry"
-	"go_package_example/01_consul/01_http/util"
 	"math/rand"
 	"testing"
 	"time"

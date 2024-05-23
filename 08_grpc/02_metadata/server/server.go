@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
 
-	pb "go_package_example/08_grpc/02_metadata/echo"
+	pb "github.com/Danny5487401/go_package_example/08_grpc/02_metadata/echo"
 )
 
 var port = flag.Int("port", 50051, "the port to serve on")

@@ -115,6 +115,24 @@ casbin的使用非常精炼。基本上就生成一个结构，Enforcer，构造
 
 
 ## 源码分析
+初始化
+```go
+func (e *Enforcer) InitWithAdapter(modelPath string, adapter persist.Adapter) error {
+	m, err := model.NewModelFromFile(modelPath)
+	if err != nil {
+		return err
+	}
+
+	err = e.InitWithModelAndAdapter(m, adapter)
+	if err != nil {
+		return err
+	}
+
+	e.modelPath = modelPath
+	return nil
+}
+```
+
 
 加载模型文件: 从文件中
 ```go
@@ -141,6 +159,35 @@ type Model map[string]AssertionMap
 type AssertionMap map[string]*Assertion
 ```
 
+
+
+```go
+// 根据 model 和 数据库adapter 来初始化
+func (e *Enforcer) InitWithModelAndAdapter(m model.Model, adapter persist.Adapter) error {
+	e.adapter = adapter
+
+	e.model = m
+	m.SetLogger(e.logger)
+	e.model.PrintModel()
+	e.fm = model.LoadFunctionMap()
+
+	e.initialize()
+
+	// Do not initialize the full policy when using a filtered adapter
+	fa, ok := e.adapter.(persist.FilteredAdapter)
+	if e.adapter != nil && (!ok || ok && !fa.IsFiltered()) {
+		err := e.LoadPolicy()
+		if err != nil {
+			return err
+		}
+	}
+    return nil
+}
+```
+
+
+
+判断当前请求是否有权限
 
 
 ## 参考

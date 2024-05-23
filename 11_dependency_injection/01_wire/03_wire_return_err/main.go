@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"go_package_example/11_dependency_injection/01_wire/03_wire_return_err/wire"
+	"github.com/Danny5487401/go_package_example/11_dependency_injection/01_wire/03_wire_return_err/wire"
 	"os"
 )
 

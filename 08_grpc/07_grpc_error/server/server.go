@@ -15,9 +15,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	pb "go_package_example/08_grpc/01_grpc_helloworld/proto"
-	"go_package_example/08_grpc/07_grpc_error/customize_error_pkg"
-	grpcErrProtobuf "go_package_example/08_grpc/07_grpc_error/proto"
+	pb "github.com/Danny5487401/go_package_example/08_grpc/01_grpc_helloworld/proto"
+	"github.com/Danny5487401/go_package_example/08_grpc/07_grpc_error/customize_error_pkg"
+	grpcErrProtobuf "github.com/Danny5487401/go_package_example/08_grpc/07_grpc_error/proto"
 )
 
 var port = flag.Int("port", 50052, "port number")
