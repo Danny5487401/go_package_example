@@ -24,7 +24,14 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# boltdb
+# github.com/etcd-io/bbolt
+
+github.com/boltdb/bolt 已归档, etcd 维护的版本 github.com/etcd-io/bbolt
+
+
+BoltDB 主要设计思想源于 LMDB（Lightning Memory-Mapped Database），支持 ACID 事务、无锁并发事务 MVCC，提供 B+Tree 索引。
+BoltDB 采用一个单独的文件作为持久化存储，利用mmap将文件映射到内存中，并将文件划分为大小相同的 Page 存储数据，使用写时复制技术将脏页写入文件。
+
 
 ## 特点
 
@@ -39,6 +46,7 @@
 
 ## db 文件磁盘布局
 ![](.boltdb_images/boltdb_structure.png)
+![](.boltdb_images/boldtdb_data_in_disk.png)
 
 图中的左边部分你可以看到，文件的内容由若干个 page 组成，一般情况下 page size 为 4KB。
 
@@ -97,6 +105,7 @@ Overflow: 0
 
 ## page 磁盘页结构
 ![](.boltdb_images/page_structure.png)
+
 ![](.boltdb_images/page_structure1.png)
 page 磁盘页结构由页 ID(id)、页类型 (flags)、数量 (count)、溢出页数量 (overflow)、页面数据起始位置 (ptr) 字段组成
 ```go
@@ -128,12 +137,12 @@ boltdb 把这一个个 page 组成了一个树形结构，它们之间通过 pag
 const (
 	branchPageFlag   = 0x01 // 分支节点
 	leafPageFlag     = 0x02 // 叶子节点
-	metaPageFlag     = 0x04
-	freelistPageFlag = 0x10
+	metaPageFlag     = 0x04 // 元数据
+	freelistPageFlag = 0x10 // 空闲数据
 )
 ```
 
-### 1. meta page 数据结构
+### 1 meta page 数据结构
 元数据的 page ，这可太重要了。对于 boltdb 来说，meta 的 page 位置是固定的，就在 page 0，page 1 这两个位置（ 也就是前两个 4k 页 ）的位置。
 
 ```go
@@ -191,8 +200,7 @@ p.id = pgid(m.txid % 2)
 - 事务 2 写 page 0 ；
 - 事务 3 写 page 1 ；
 
-
-### branch page
+### 2 branch page
 ![](.boltdb_images/branch_page_structure.png)
 ![](.boltdb_images/branche_structure1.png)
 
@@ -211,7 +219,7 @@ type branchPageElement struct {
 根据偏移量和 key 大小，我们就可以方便地从 branch page 中解析出所有 key，然后二分搜索匹配 key，
 获取其子节点 page id，递归搜索，直至从 bucketLeafFlag 类型的 leaf page 中找到目的 bucket name。
 
-### leaf page
+### 3 leaf page
 ![](.boltdb_images/left_element.png)
 ```go
 const (
@@ -242,9 +250,7 @@ bbolt为每一个key-value对分配一个leafPageElement结构体，会保存在
 
 Note: 一个节点内的所有key-value数据是按key升序排列的。因为对于bbolt来说，所有的key、value都是[]byte，所以是用bytes.Compare来比较key的大小。
 
-
-
-### freelist
+### 4 freelist
 ![](.boltdb_images/freelist_structure.png)
 
 freelist page 中记录了哪些页是空闲的。当你在 boltdb 中删除大量数据的时候，其对应的 page 就会被释放，页 ID 存储到 freelist 所指向的空闲页中。
@@ -263,12 +269,12 @@ type freelist struct {
 
 假设总共需要3个连续的页面的空间来保存所有的空闲页面ID，那么pgid就是第一个页面的ID，overflow的值就是2；例如pgid的值是6，那么就是编号为6、7、8的这三个页面。
 
-## boltdb 的B+ 树
+## boltdb 的 B+ 树
 
 都说 boltdb 用的是 B+ 树的形式，说的也是对的，但是 boltdb 的 B+ 树有些变异，几点差异如下：
 
-- 节点的分支个数不是固定值；
-- 叶子节点不相互感知，它们之间不存在相互的指向引用；
+- 节点的分支个数不是一个固定范围，而是依据其所存元素大小之和来限制的，这个上限即为页大小。
+- 所有叶子节点并没有通过链表首尾相接起来。
 - 并不保证所有的叶子节点在同一层；
 
 划重点：boltdb 它用的是一个不一样的 B+ 树。 除了上面的，索引查找和数据组织形式都是 B+ 树的样子。
@@ -278,7 +284,14 @@ type freelist struct {
 - Bucket ：这是一个 boltdb 封装的一个抽象概念，但本质上呢它就是个命名空间，就是一些 key/value 的集合，不同的 Bucket 可以有同名的 key/value ；
 - node ：B+ 树节点的抽象封装，可以说 page 是磁盘物理的概念，node 则是逻辑上的抽象了；
 
-### node
+
+代码组织上，boltdb 索引相关的源文件如下：
+
+- bucket.go：对 bucket 操作的高层封装。包括kv 的增删改查、子bucket 的增删改查以及 B+ 树拆分和合并。
+- node.go：对 node 所存元素和 node 间关系的相关操作。节点内所存元素的增删、加载和落盘，访问孩子兄弟元素、拆分与合并的详细逻辑。
+- cursor.go：实现了类似迭代器的功能，可以在 B+ 树上的叶子节点上进行随意游走
+
+### 基本单元——节点（Node）
 ![](.boltdb_images/node_vs_page.png)
 对应关系如下，node为内存中数据的存储模式，page是磁盘中存储格式。
 
@@ -356,7 +369,6 @@ func (n *node) read(p *page) {
         n.key = nil
     }
 ```
-
 
 ## 添加数据
 所有的数据新增都发生在叶子节点，如果新增数据后 B+ 树不平衡，之后会通过 node.spill 来进行拆分调整
@@ -670,5 +682,4 @@ func Open(path string, mode os.FileMode, options *Options) (*DB, error) {
 
 
 ## 参考链接
-1. https://www.modb.pro/db/159598
-2. https://www.qtmuniao.com/2020/12/14/bolt-index-design/
+- [Boltdb 源码导读（二）：Boltdb 索引设计](https://www.qtmuniao.com/2020/12/14/bolt-index-design/) 

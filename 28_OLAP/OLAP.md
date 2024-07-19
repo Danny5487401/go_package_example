@@ -10,7 +10,8 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # 数据仓库OLAP（Online Analytical Processing）
-OLAP 名为联机分析处理，又可以称之为多维分析处理，指的是通过多种不同的维度审视数据，进行深层次分析
+OLAP 名为联机分析处理，又可以称之为多维分析处理，指的是通过多种不同的维度审视数据，进行深层次分析.
+例如clickhouse，greenplum，Doris。
 
 ## 多维度分析案例
 

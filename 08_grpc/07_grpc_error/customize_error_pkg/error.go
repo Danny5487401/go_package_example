@@ -11,7 +11,6 @@ var (
 var _ ErrorNo = (*err)(nil)
 
 type ErrorNo interface {
-	i()
 	WithTitle(title string) ErrorNo
 	GetTitle() string
 	GetCode() int
@@ -21,7 +20,7 @@ type err struct {
 	Errors errors `json:"errors"`
 }
 
-//title,details 两个字段的内容一样，现在的客户端正常只用其中一个，为了兼容老版本客户端，此处继续维护
+// title,details 两个字段的内容一样，现在的客户端正常只用其中一个，为了兼容老版本客户端，此处继续维护
 type errors struct {
 	Id         int    `json:"id,string"`     // id
 	Code       int    `json:"code,string"`   // 业务编码
@@ -32,7 +31,7 @@ type errors struct {
 	Details    string `json:"details"`       // level=2 弹框内容
 }
 
-//level=1  toast提示
+// level=1  toast提示
 func NewError(code int, title string, opts ...Option) ErrorNo {
 	if len(title) == 0 {
 		title = "网络异常"
@@ -51,7 +50,7 @@ func NewError(code int, title string, opts ...Option) ErrorNo {
 	return e
 }
 
-//level=2  弹框提示
+// level=2  弹框提示
 func NewPopupError(code int, title string, detail string, opts ...Option) ErrorNo {
 	if len(title) == 0 {
 		title = "网络异常"
@@ -70,8 +69,6 @@ func NewPopupError(code int, title string, detail string, opts ...Option) ErrorN
 	}
 	return e
 }
-
-func (e *err) i() {}
 
 func (e *err) WithTitle(msg string) ErrorNo {
 	eCopy := &err{Errors: errors{
@@ -93,7 +90,7 @@ func (e *err) GetCode() int {
 	return e.Errors.Code
 }
 
-//仅兼容官方包error签名
+// 仅兼容官方包error签名
 func (e *err) Error() string {
 	return ""
 }
@@ -114,7 +111,7 @@ func WithDetail(detail string) Option {
 
 type Level int
 
-//优先推荐使用level 1-仅toast提示
+// 优先推荐使用level 1-仅toast提示
 const (
 	LevelToast Level = 1 //toast提示
 	LevelPopup Level = 2 //弹窗提示

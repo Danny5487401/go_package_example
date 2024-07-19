@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/boltdb/bolt"
+	"github.com/etcd-io/bbolt"
 	"log"
 )
 
@@ -10,7 +10,7 @@ var world = []byte("greeting")
 
 func main() {
 	// 1. 连接数据库，打开boltdb文件，获取db对象
-	db, err := bolt.Open("22_etcd/04_boltdb/bolt.db", 0644, nil)
+	db, err := bbolt.Open("22_etcd/04_boltdb/bolt.db", 0644, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -20,7 +20,7 @@ func main() {
 	value := []byte("Hello World!")
 
 	// 2. store some data
-	err = db.Update(func(tx *bolt.Tx) error {
+	err = db.Update(func(tx *bbolt.Tx) error {
 		bucket, err := tx.CreateBucketIfNotExists(world)
 		if err != nil {
 			return err
@@ -38,7 +38,7 @@ func main() {
 	}
 
 	// 3. retrieve the data,内部封装事务
-	err = db.View(func(tx *bolt.Tx) error {
+	err = db.View(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(world)
 		if bucket == nil {
 			return fmt.Errorf("bucket %s not found", world)

@@ -113,9 +113,10 @@ func New(c codes.Code, msg string) *Status {
 	return &Status{s: &spb.Status{Code: int32(c), Message: msg}}
 }
 ```
-内部定义的pb包:status结构体
+
 ```go
-// /Users/xiaxin/go/pkg/mod/google.golang.org/genproto@v0.0.0-20210729151513-df9385d47c1b/googleapis/rpc/status/status.pb.go
+// You can find out more about this error model and how to work with it in the
+// [API Design Guide](https://cloud.google.com/apis/design/errors).
 type Status struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -133,7 +134,8 @@ type Status struct {
 }
 ```
 
-### Code: gRPC的错误码
+
+Code: gRPC的错误码
 * OK 正常
 * Canceled 客户端取消
 * Unknown 未知
@@ -151,3 +153,25 @@ type Status struct {
 * Unavailable 不可用状态
 * DataLoss 数据丢失
 * Unauthenticated 未认证
+
+
+类似于HTTP 状态码code的个数也是有限的。有个很大的问题就是 表达能力非常有限
+
+所以我们需要一个能够额外传递业务错误信息字段的功能
+
+
+Google 基于自身业务, 有了一套错误扩展 https://cloud.google.com/apis/design/errors#error_model. 
+
+可以看到比标准错误多了一个 details 数组字段, 而且这个字段是 Any 类型, 支持我们自行扩展
+
+
+下面是一些示例 error_details 载荷：
+
+- ErrorInfo 提供既稳定又可扩展的结构化错误信息。
+- RetryInfo：描述客户端何时可以重试失败的请求，这些内容可能在以下方法中返回：Code.UNAVAILABLE 或 Code.ABORTED
+- QuotaFailure：描述配额检查失败的方式，这些内容可能在以下方法中返回：Code.RESOURCE_EXHAUSTED
+- BadRequest：描述客户端请求中的违规行为，这些内容可能在以下方法中返回：Code.INVALID_ARGUMENT
+
+## 参考
+
+- [写给go开发者的gRPC教程-错误处理](https://mp.weixin.qq.com/s?__biz=MzAxMTA4Njc0OQ==&mid=2651454448&idx=1&sn=77daf4371a7cf92a222da9b7a9d13ac8&chksm=80bb2502b7ccac143a98167d952935c1c421aaf058f697872d2c87fb4bc89c96f5a8cd1043a0&scene=21#wechat_redirect)

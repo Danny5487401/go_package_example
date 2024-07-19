@@ -141,9 +141,9 @@
 - 1  HelloWorld 入门使用及源码分析
   - [1.1 客户端 Grpc 源码](08_grpc/01_grpc_helloworld/client/client.md)
   - [1.2 服务端 Grpc 源码](08_grpc/01_grpc_helloworld/server/server.md)
-- 2  [context 中的元数据 metadata](08_grpc/02_metadata/grpc_context.md)
+- [2  context 中的元数据 metadata](08_grpc/02_metadata/grpc_context.md)
 - 3  流式GRPC
-- 4  protobuf的 jsonpb 包序列化和反序列化
+- [4  jsonpb 包序列化和反序列化: protobuf 转 json](08_grpc/04_jsonpb/jsonpb.md)
 - [5  负载均衡](08_grpc/05_grpc_load_balance/load_balance.md)
   - [5.1 客户端负载均衡(Resolver接口和Builder接口)](08_grpc/05_grpc_load_balance/client/builder_n_resolver_n_balancer.md)
     - [第三方consul实现Resolver接口和Builder接口](01_consul/02_grpc/consul_client/main.go)

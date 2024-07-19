@@ -9,6 +9,7 @@ import (
 )
 
 type Member struct {
+	proto.UnimplementedMemberServer
 }
 
 // 获取用户信息的接口
