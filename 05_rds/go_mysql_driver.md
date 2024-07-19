@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [go-sql-driver/mysql源码分析](#go-sql-drivermysql%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+- [github.com/go-sql-driver/mysql  源码分析](#githubcomgo-sql-drivermysql--%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
   - [1. go-sql-driver/mysql@v1.5.0/buffer.go](#1-go-sql-drivermysqlv150buffergo)
   - [2. Collations.go](#2-collationsgo)
   - [3. Dsn.go   数据源名称 （Data Source Name）](#3-dsngo---%E6%95%B0%E6%8D%AE%E6%BA%90%E5%90%8D%E7%A7%B0-data-source-name)

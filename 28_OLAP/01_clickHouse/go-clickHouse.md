@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [go-clickHouse源码分析](#go-clickhouse%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+- [go-clickHouse 源码分析](#go-clickhouse-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
   - [初始化](#%E5%88%9D%E5%A7%8B%E5%8C%96)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
