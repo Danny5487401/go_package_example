@@ -11,6 +11,9 @@
     - [4 ABAC(Attribute-based access control 基于属性的权限验证)](#4-abacattribute-based-access-control-%E5%9F%BA%E4%BA%8E%E5%B1%9E%E6%80%A7%E7%9A%84%E6%9D%83%E9%99%90%E9%AA%8C%E8%AF%81)
   - [使用](#%E4%BD%BF%E7%94%A8)
   - [案例](#%E6%A1%88%E4%BE%8B)
+    - [argocd(rbac 模型)](#argocdrbac-%E6%A8%A1%E5%9E%8B)
+  - [源码分析](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

@@ -43,6 +43,8 @@
   - [第三十七章 CI持续集成](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%83%E7%AB%A0-ci%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90)
   - [第三十八章 Mergo实现 struct 与 map 之间转换-->k8s中应用](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%85%AB%E7%AB%A0-mergo%E5%AE%9E%E7%8E%B0-struct-%E4%B8%8E-map-%E4%B9%8B%E9%97%B4%E8%BD%AC%E6%8D%A2--k8s%E4%B8%AD%E5%BA%94%E7%94%A8)
   - [第三十九章 权限管理 casbin](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B9%9D%E7%AB%A0-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86-casbin)
+  - [第四十章 规则引擎 rule engine](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E7%AB%A0-%E8%A7%84%E5%88%99%E5%BC%95%E6%93%8E-rule-engine)
+  - [第四十章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E7%AB%A0-hashicorpgo-plugin-%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8--httprunner-40-%E4%BD%BF%E7%94%A8)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -358,6 +360,9 @@
 ## [第四十章 规则引擎 rule engine](40_rules_engine/rule_engine.md)
 - [1 govaluate-->casbin 使用](40_rules_engine/01_govaluate/govaluate.md)
 - [2 gengine](40_rules_engine/02_gengine/gengine.md)
+
+## [第四十章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](41_go_plugin/go-plugin.md)
+
 
 ## 参考 
 
