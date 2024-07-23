@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [官方扩展库限流算法golang.org/x/time/rate](#%E5%AE%98%E6%96%B9%E6%89%A9%E5%B1%95%E5%BA%93%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95golangorgxtimerate)
+- [官方扩展库 Token Bucket(令牌桶)限流算法 golang.org/x/time/rate](#%E5%AE%98%E6%96%B9%E6%89%A9%E5%B1%95%E5%BA%93-token-bucket%E4%BB%A4%E7%89%8C%E6%A1%B6%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95-golangorgxtimerate)
   - [适用场景](#%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF)
   - [golang.org/x/time/rate源码分析](#golangorgxtimerate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
     - [常量结构](#%E5%B8%B8%E9%87%8F%E7%BB%93%E6%9E%84)
@@ -14,7 +14,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# 官方扩展库限流算法golang.org/x/time/rate
+# 官方扩展库 Token Bucket(令牌桶)限流算法 golang.org/x/time/rate
 该限流器也是基于 Token Bucket(令牌桶) 实现的
 
 ## 适用场景

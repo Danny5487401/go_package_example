@@ -252,8 +252,8 @@
 - 2 文件内容读取发送
 
 ## [第十九章 熔断,限流及降级](19_fuse_currentLimiting_degradation/rate_limit.md)
-- [0 熔断，降级，限流(官方包x/time/rate)](19_fuse_currentLimiting_degradation/00_tokenBucket/time_rate.md)
-- 1 Sentinel
+- [0 令牌桶官方包 x/time/rate](19_fuse_currentLimiting_degradation/00_tokenBucket/time_rate.md)
+- 1 Sentinel-->滑动窗口
   - 1.1 基于流量QPS控制
     - [流量控制器的Token计算策略:direct](19_fuse_currentLimiting_degradation/01_sentinel/01_flow/direct/main.go)
     - [流量控制器的Token计算策略:warmUp](19_fuse_currentLimiting_degradation/01_sentinel/01_flow/warm_up/main.go)
@@ -261,9 +261,11 @@
     - [ErrorCount](19_fuse_currentLimiting_degradation/01_sentinel/02_circuit_breaker/error_count/main.go)
     - [ErrorRatio](19_fuse_currentLimiting_degradation/01_sentinel/02_circuit_breaker/error_ratio/main.go)
     - [SlowRequestRatio](19_fuse_currentLimiting_degradation/01_sentinel/02_circuit_breaker/slow_request_ratio/main.go)
-- [2 Hystrix](19_fuse_currentLimiting_degradation/02_hystrix/hystrix.md)
+- [2 Hystrix-->滑动窗口](19_fuse_currentLimiting_degradation/02_hystrix/hystrix.md)
   - [2.1 客户端](19_fuse_currentLimiting_degradation/02_hystrix/client/client.go)
   - [2.2 服务端](19_fuse_currentLimiting_degradation/02_hystrix/server/server.go)
+- 3 uber-go/ratelimit-->漏桶
+- 4 envoyproxy/ratelimit-->计数器
 
 ## 第二十章 应用的命令行框架
 - [1 Cobra -->在 k8s 中的应用](20_cli_frame/01_cobra/introdoction.md)
