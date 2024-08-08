@@ -2,8 +2,9 @@ package main
 
 import (
 	"fmt"
-	jsoniter "github.com/json-iterator/go"
 	"reflect"
+
+	jsoniter "github.com/json-iterator/go"
 )
 
 type Class struct {
@@ -16,11 +17,11 @@ type StuRead struct {
 	HIgh interface{}
 	sex  interface{} //小写
 	//普通struct类型
-	Class Class `json:"class"`
+	//Class Class `json:"class"`
 	//指针类型
-	//Class *Class `json:"class"`
+	Class *Class `json:"class"`
 
-	Test interface{}
+	Null interface{} // 数据无
 }
 
 func main() {
@@ -34,28 +35,30 @@ func main() {
 	// Unmarshal的第一个参数是json字符串，第二个参数是接受json解析的数据结构。
 	// 第二个参数必须是指针，否则无法接收解析的数据，如stu仍为空对象StuRead{}
 	stu := StuRead{}
-	printType(&stu)
+
 	err := json.Unmarshal([]byte(data), &stu)
 	if err != nil {
 		fmt.Println("解析失败会报错，如json字符串格式不对，缺\"号，缺}等。", err)
 		return
 	}
-	fmt.Println("--json 解析后数据-----:", &stu)
+	fmt.Println("--json 解析后数据-----")
+	printType(&stu)
+
 }
 
-//利用反射，打印变量类型
+// 利用反射，打印变量类型
 func printType(stu *StuRead) {
 	nameType := reflect.TypeOf(stu.Name)
 	ageType := reflect.TypeOf(stu.Age)
 	highType := reflect.TypeOf(stu.HIgh)
 	sexType := reflect.TypeOf(stu.sex)
 	classType := reflect.TypeOf(stu.Class)
-	testType := reflect.TypeOf(stu.Test)
+	nullType := reflect.TypeOf(stu.Null)
 
-	fmt.Println("nameType:", nameType)
-	fmt.Println("ageType:", ageType)
-	fmt.Println("highType:", highType)
-	fmt.Println("sexType:", sexType)
-	fmt.Println("classType:", classType)
-	fmt.Println("testType:", testType)
+	fmt.Printf("nameType: %v,value: %v \n", nameType, stu.Name)
+	fmt.Printf("ageType:: %v,value: %v \n", ageType, stu.Age)
+	fmt.Printf("highType: %v,value: %v \n", highType, stu.HIgh)
+	fmt.Printf("sexType: %v,value: %v \n", sexType, stu.sex)
+	fmt.Printf("classType: %v,value: %v \n", classType, stu.Class)
+	fmt.Printf("nullType:: %v,value: %v \n", nullType, stu.Null)
 }

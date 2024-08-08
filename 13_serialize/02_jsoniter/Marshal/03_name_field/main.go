@@ -12,18 +12,18 @@ func main() {
 		UserName      string `json:"user_name"`
 		FirstLanguage string `json:"first_language"`
 	}{
-		UserName:      "taowen",
+		UserName:      "Danny",
 		FirstLanguage: "Chinese",
 	})
 	fmt.Println("原生方式", string(output1), err)
 
-	// 优化方式
+	// 优化方式 统一更改字段的命名风格
 	extra.SetNamingStrategy(extra.LowerCaseWithUnderscores)
 	output2, err := jsoniter.Marshal(struct {
 		UserName      string
 		FirstLanguage string
 	}{
-		UserName:      "taowen",
+		UserName:      "Danny",
 		FirstLanguage: "Chinese",
 	})
 	fmt.Println("优化方式", string(output2), err)

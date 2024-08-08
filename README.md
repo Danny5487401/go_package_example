@@ -203,28 +203,33 @@
 - [3 suite测试套件](12_testify/03_suite/suite_test.go)
 
 ## [第十三章 序列化反序列化-涉及多种协议](13_serialize/serialize.md)
-- [1 Jsoniter(完全兼容标准库json，性能较好)-涉及标准库 encoding/json 分析](13_serialize/01_jsoniter/jsoniter.md)
-  - 1.1 序列化
-    - [结构体成员为基本类型, 嵌套指针结构体, 及tag标签使用](13_serialize/01_jsoniter/Marshal/01_pointer/main.go)
-    - [结构体成员为interface{}](13_serialize/01_jsoniter/Marshal/02_Interface/main.go)
-    - [临时添加额外的字段，临时忽略struct空字段](13_serialize/01_jsoniter/Marshal/03_add_tmp_value/main.go)
-    - [自定义MarshalJSON支持time.Time](13_serialize/01_jsoniter/Marshal/04_time/main.go)
-  - 统一更改字段的命名风格
-  - 1.2 反序列化
-    - [解析匹配规则](13_serialize/01_jsoniter/Unmarshal/01_json_basic/main.go)
-    - [json字符串数组](13_serialize/01_jsoniter/Unmarshal/02_jsonArray/main.go)
-    - [json.RawMessage二次反序列化](13_serialize/01_jsoniter/Unmarshal/03_RawMessage/main.go)
-    - [解析私有的字段](13_serialize/01_jsoniter/Unmarshal/04_private_field/main.go)
-- 2 mapstructure使用（性能低但是方便）
-  - [2.1 无tag标签](13_serialize/02_map2structure/01_without_tag/main.go)
-  - [2.2 带tag标签mapstructure](13_serialize/02_map2structure/02_tag/main.go)
-  - [2.3 embeded内嵌标签squash](13_serialize/02_map2structure/03_embeded/main.go)
-  - [2.4 未映射字段保留标签remain](13_serialize/02_map2structure/04_remain/main.go)
-  - [2.5 省略字段标签omitempty](13_serialize/02_map2structure/05_omitempty/main.go)
-  - [2.6 元数据展示源数据未映射字段](13_serialize/02_map2structure/06_metadata/main.go)
-  - [2.7 错误](13_serialize/02_map2structure/07_error/main.go)
-  - [2.8 弱解析](13_serialize/02_map2structure/08_weekDecode/main.go)
-  - [2.9 自定义解析器](13_serialize/02_map2structure/09_decoder/main.go)
+- [1 标准库 json](13_serialize/01_std_json/json.md)
+  - [1.1 omitempty 标签: 忽略空值字段,忽略嵌套结构体空值字段,不修改原结构体忽略空值字段](13_serialize/01_std_json/01_omitempty/main.go)
+  - [1.2 string 标签: 处理字符串格式的数字,json.Number 处理json字符串中的数字](13_serialize/01_std_json/02_number/main.go)
+  - [1.3 自定义的时间格式解析](13_serialize/01_std_json/03_time/main.go)
+  - [1.4 自定义的MarshalJSON方法 和 UnmarshalJSON](13_serialize/01_std_json/04_custom_marshal_unmarshal/main.go)
+  - [1.5 使用匿名结构体添加字段, 使用匿名结构体组合多个结构体](13_serialize/01_std_json/05_anonymous_struct/main.go)
+  - [1.6 inline 标签: 将嵌套结构体字段展开到父结构体中](13_serialize/01_std_json/06_inline/main.go)
+- [2 Jsoniter(完全兼容标准库json，性能较好)-涉及标准库 encoding/json 分析](13_serialize/02_jsoniter/jsoniter.md)
+  - 2.1 序列化
+    - [2.1.1 指针变量，序列化时自动转换为它所指向的值](13_serialize/02_jsoniter/Marshal/01_pointer/main.go)
+    - [2.1.2 结构体成员为interface{}](13_serialize/02_jsoniter/Marshal/02_Interface/main.go)
+    - [2.1.3 extra.SetNamingStrategy 统一更改字段的命名风格](13_serialize/02_jsoniter/Marshal/03_name_field/main.go)
+  - 2.2 反序列化
+    - [2.2.1 反序列化匹配规则](13_serialize/02_jsoniter/Unmarshal/01_json_basic/main.go)
+    - [2.2.2 json 字符串数组](13_serialize/02_jsoniter/Unmarshal/02_jsonArray/main.go)
+    - [2.2.3 json.RawMessage 二次反序列化](13_serialize/02_jsoniter/Unmarshal/03_RawMessage/main.go)
+    - [2.2.4 extra.SupportPrivateFields() 解析私有的字段](13_serialize/02_jsoniter/Unmarshal/04_private_field/main.go)
+- 3 mapstructure 将通用的map值解码为结构体
+  - [3.1 无tag标签](13_serialize/03_mapstructure/01_without_tag/main.go)
+  - [3.2 带tag标签mapstructure](13_serialize/03_mapstructure/02_tag/main.go)
+  - [3.3 embeded内嵌标签squash](13_serialize/03_mapstructure/03_embeded/main.go)
+  - [3.4 未映射字段保留标签remain](13_serialize/03_mapstructure/04_remain/main.go)
+  - [3.5 省略字段标签omitempty](13_serialize/03_mapstructure/05_omitempty/main.go)
+  - [3.6 元数据展示源数据未映射字段](13_serialize/03_mapstructure/06_metadata/main.go)
+  - [3.7 错误](13_serialize/03_mapstructure/07_error/main.go)
+  - [3.8 弱解析](13_serialize/03_mapstructure/08_weekDecode/main.go)
+  - [3.9 自定义解析器](13_serialize/03_mapstructure/09_decoder/main.go)
 
 ## 第十四章 系统监控
 - [1 systemstat包(适合linux系统，已断更)](14_system_monitor/01_systemstat/main.go)

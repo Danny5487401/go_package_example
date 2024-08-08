@@ -8,7 +8,9 @@
     - [JSON(JavaScript Object Notation, JS 对象标记)](#jsonjavascript-object-notation-js-%E5%AF%B9%E8%B1%A1%E6%A0%87%E8%AE%B0)
     - [Thrift](#thrift)
     - [Avro](#avro)
-  - [Protobuf](#protobuf)
+    - [Protobuf](#protobuf)
+  - [json 协议](#json-%E5%8D%8F%E8%AE%AE)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -49,7 +51,7 @@ Hadoop的一个子项目，解决了JSON的冗长和没有IDL的问题。
 
 适用场景：在Hadoop中做Hive、Pig和MapReduce的持久化数据格式。
 
-## Protobuf
+### Protobuf
 将数据结构以.proto文件进行描述，通过代码生成工具可以生成对应数据结构的POJO对象和Protobuf相关的方法和属性
 - 优点：序列化后码流小，性能高、结构化数据存储格式（XML JSON等）、通过标识字段的顺序，可以实现协议的前向兼容、结构化的文档更容易管理和维护。
 - 缺点：需要依赖于工具生成代码、支持的语言相对较少，官方只支持Java 、C++ 、python,但是可以扩展。
@@ -58,5 +60,49 @@ Hadoop的一个子项目，解决了JSON的冗长和没有IDL的问题。
 
 
 
+
+
+
+## json 协议
+
+
+协议结构包括要素
+- 对象（Object）：由一对大括号{}包围，内部是零个或多个键值对，每个键值对由冒号:分隔，键（key）是一个字符串，值（value）可以是字符串、数字、布尔值、对象、数组或null。
+- 数组（Array）：由一对方括号[]包围，内部是零个或多个值，值可以是字符串、数字、布尔值、对象、数组或null，多个值之间用逗号,分隔。
+- 字符串（String）：由双引号""包围的Unicode字符序列，可以包含任意字符，使用转义字符\来表示特殊字符。
+- 数字（Number）：整数或浮点数。
+- 布尔值（Boolean）：true或false。
+- null：表示空值。
+
+
+
+JSON语法规则
+- 数据由键值对组成，键和值之间使用冒号（:）分隔。
+- 键必须是字符串，使用双引号（"）括起来。
+- 值可以是字符串、数字、布尔值、数组、对象或null。
+- 多个键值对之间使用逗号（,）分隔。
+- 对象使用花括号（{}）表示，键值对之间没有顺序。
+- 数组使用方括号（[]）表示，值之间使用逗号分隔。
+
+```json
+
+{
+  "name": "John",
+  "age": 30,
+  "isStudent": true,
+  "address": {
+    "street": "123 Main St",
+    "city": "New York"
+  },
+  "hobbies": ["reading", "music", "sports"],
+  "scores": [98, 85, 92, 76],
+  "isMarried": null
+}
+
+```
+
+
+
+## 参考
 
 

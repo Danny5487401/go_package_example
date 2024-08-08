@@ -24,12 +24,12 @@ func main() {
 	// 初始化，完全兼容encoding/json
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
 
-	data := "{\"name\":\"张三\",\"Age\":18,\"high\":true,\"sex\":\"男\",\"CLASS\":{\"naME\":\"1班\",\"GradE\":3}}"
+	data := `{"name":"张三","Age":18,"high":true,"sex":"男","CLASS":{"naME":"1班","GradE":3}}"`
 	str := []byte(data)
 	stu := StuRead{}
 	_ = json.Unmarshal(str, &stu)
 
-	//注意这里：二次解析！
+	// 注意这里：二次解析！
 	cla := new(Class)
 	json.Unmarshal(stu.Class, cla)
 
@@ -40,7 +40,7 @@ func main() {
 
 }
 
-//利用反射，打印变量类型
+// 利用反射，打印变量类型
 func printType(stu *StuRead) {
 	nameType := reflect.TypeOf(stu.Name)
 	ageType := reflect.TypeOf(stu.Age)

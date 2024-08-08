@@ -10,7 +10,7 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 func main() {
 
-	//实例化一个数据结构，用于生成json字符串
+	// 实例化一个数据结构，用于生成json字符串
 	stu := Stu{
 		Name: "张三",
 		Age:  18,
@@ -25,7 +25,7 @@ func main() {
 		fmt.Println("生成json字符串错误")
 		return
 	}
-	fmt.Println(string(jsonStu1))
+	fmt.Printf("%s\n", jsonStu1) // {"name":"张三","Age":18,"HIgh":true,"class":null}
 
 	// 指针变量初始化
 	cla := new(Class)

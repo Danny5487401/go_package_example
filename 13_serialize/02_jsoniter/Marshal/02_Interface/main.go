@@ -5,8 +5,6 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
-// Json Marshal：将数据编码成json字符串
-
 func main() {
 	// 初始化，完全兼容encoding/json
 	json := jsoniter.ConfigCompatibleWithStandardLibrary
@@ -23,6 +21,7 @@ func main() {
 	cla := new(Class)
 	cla.Name = "1班"
 	cla.Grade = 3
+
 	stu.Class = cla
 	jsonStu, err := json.Marshal(stu)
 	if err != nil {
