@@ -366,7 +366,8 @@
 
 ## [第四十章 规则引擎 rule engine](40_rules_engine/rule_engine.md)
 - [1 govaluate-->casbin 使用](40_rules_engine/01_govaluate/govaluate.md)
-- [2 gengine](40_rules_engine/02_gengine/gengine.md)
+- [2 bilibili/gengine](40_rules_engine/02_gengine/gengine.md)
+- [3 expr-lang/expr-->argo-rollouts 使用](40_rules_engine/03_expr/expr.md)
 
 ## [第四十章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](41_go_plugin/go-plugin.md)
 

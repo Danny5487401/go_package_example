@@ -31,6 +31,7 @@
 - https://github.com/apache/incubator-kie-drools: java 实现
 - https://github.com/SpikeWong/gorule
 - https://github.com/PaesslerAG/gval
+- https://github.com/expr-lang/expr Argo integrates Expr into Argo Rollouts and Argo Workflows for Kubernetes.
 
 
 ## 规则的执行模式
