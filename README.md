@@ -275,7 +275,8 @@
 ## 第二十章 应用的命令行框架
 - [1 Cobra -->在 k8s 中的应用](20_cli_frame/01_cobra/introdoction.md)
   - [1.1 cobra 构建 time 展示及解析,flag 使用](20_cli_frame/01_cobra/main.go)
-- [2 Urfave Cli -->在 buildkit  中的应用](20_cli_frame/02_urfave_cli/urfave_cli.md)
+- [2 Urfave Cli -->在 buildkit 中的应用](20_cli_frame/02_urfave_cli/urfave_cli.md)
+- [3 alecthomas/kingpin -->在 node_exporter 使用](20_cli_frame/03_kingpin/kingpin.md)
 
 ## [第二十一章 配置文件解析:viper(依赖mapstructure,fsnotify,yaml,toml)](21_viper/viper.md)
 - [1 viper获取本地文件内容](21_viper/01_read_n_watch_config/main.go)
