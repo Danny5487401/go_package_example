@@ -77,14 +77,19 @@
 - [2 grpc服务注册发现加健康检查](01_consul/01_http/test/consul_registry_test.go)
 
 ## 第二章 日志库
-- [1 zerolog](02_log/01_zerolog/zerolog.md)
-- [2 zap使用及源码分析](02_log/02_zap/zap.md)
-  - [2.1 两种打印风格](02_log/02_zap/01_cosole/main.go)
-  - [2.2 定义多种输出位置: 控制台输出及文件输出](02_log/02_zap/02_file_stdout/main.go)
-  - [2.3 并发安全logger](02_log/02_zap/03_concurrency_safe/main.go)
-  - [2.4 zap(配合lumberjack库或go-file-rotatelogs库)实现定制化log日志归档](02_log/02_zap/04_customized_log/lumberjack.md)
-  - [2.5 简单的基于Entry实现的hook函数-->无法接收到Fields的相关参数](02_log/02_zap/05_hook/main.go)
-
+- [1 标准库 log](02_log/01_log/log.md) 
+- [2 slog-->go 1.21 引入](02_log/02_slog/slog.md)
+  - [2.1 自定义 level](02_log/02_slog/01_level/main.go)
+  - [2.2 使用 handler](02_log/02_slog/02_handler/main.go)
+  - [2.3 使用 group 汇总多个属性](02_log/02_slog/03_group/main.go)
+- [3 zap使用及源码分析](02_log/03_zap/zap.md)
+  - [3.1 两种打印风格](02_log/03_zap/01_cosole/main.go)
+  - [3.2 定义多种输出位置: 控制台输出及文件输出](02_log/03_zap/02_file_stdout/main.go)
+  - [3.3 并发安全logger](02_log/03_zap/03_concurrency_safe/main.go)
+  - [3.4 zap(配合lumberjack库或go-file-rotatelogs库)实现定制化log日志归档](02_log/03_zap/04_customized_log/lumberjack.md)
+  - [3.5 简单的基于Entry实现的hook函数-->无法接收到Fields的相关参数](02_log/03_zap/05_hook/main.go)
+- [4 logrus-->兼容 log 库](02_log/04_logrus/logrus.md)
+- [5 zerolog](02_log/05_zerolog/zerolog.md)
 ## 第三章 消息队列
 - [1 rabbitmq](03_amqp/01_rabbitmq/introduction.md)
   - 1.1 消费者：推拉模式

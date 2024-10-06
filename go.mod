@@ -1,6 +1,6 @@
 module github.com/Danny5487401/go_package_example
 
-go 1.18
+go 1.21
 
 require (
 	bitbucket.org/bertimus9/systemstat v0.0.0-20180207000608-0eeff89b0690
