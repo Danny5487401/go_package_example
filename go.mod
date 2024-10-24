@@ -45,6 +45,7 @@ require (
 	github.com/hashicorp/consul/api v1.13.0
 	github.com/hashicorp/go-hclog v1.2.1
 	github.com/hashicorp/go-plugin v1.6.1
+	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/hashicorp/raft v1.3.5
 	github.com/hashicorp/raft-boltdb v0.0.0-20211202195631-7d34b9fb3f42
 	github.com/hibiken/asynq v0.23.0
@@ -90,6 +91,7 @@ require (
 	go.opentelemetry.io/otel/sdk v1.7.0
 	go.opentelemetry.io/otel/trace v1.7.0
 	go.uber.org/dig v1.11.0
+	go.uber.org/ratelimit v0.0.0-20180316092928-c15da0234277
 	go.uber.org/zap v1.17.0
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230711160842-782d3b101e98

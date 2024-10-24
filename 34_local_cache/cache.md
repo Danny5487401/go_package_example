@@ -3,14 +3,36 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [本地缓存](#%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98)
+  - [缓存淘汰算法](#%E7%BC%93%E5%AD%98%E6%B7%98%E6%B1%B0%E7%AE%97%E6%B3%95)
   - [需求](#%E9%9C%80%E6%B1%82)
   - [Go本身实现背景](#go%E6%9C%AC%E8%BA%AB%E5%AE%9E%E7%8E%B0%E8%83%8C%E6%99%AF)
   - [本地缓存组件优化方式](#%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98%E7%BB%84%E4%BB%B6%E4%BC%98%E5%8C%96%E6%96%B9%E5%BC%8F)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # 本地缓存
-参考链接：https://mp.weixin.qq.com/s/UuqkO9UUXjNWNGyI2sjG4Q
+
+
+
+## 缓存淘汰算法
+
+
+LRU（Least Recently Used）：最近最少使用算法。从时间角度对缓存条目进行淘汰，即最长时间没有被使用的缓存条目会被淘汰。
+该算法有一个问题：如果某些历史数据突然被大量访问，但仅仅访问一次，就可能会把那些需要频繁访问的缓存条目给淘汰掉，造成之后大量频繁访问的缓存条目出现 cache-miss。
+
+
+LFU（Least Frequently Used）：最不常用算法。从访问频率角度对缓存条目进行淘汰，即访问频率最少的缓存条目会被淘汰。
+该算法也存在问题：如果之前频繁访问过一些缓存条目，但是现在并不会访问这些条目，这些条目也会一直占据缓冲区，很难被淘汰。
+
+
+LRU-K :相比于 LRU， LRU-K 算法多维护一个队列，用来记录所有缓存数据被访问的历史，只有当数据访问的次数达到 K 时，才将数据放入真正的缓存队列.LRU-K 一定程度上解决了 LRU 的缺点。实际应用中，通常采用 LRU-2。
+
+2Q 即 two-queues 算法，类似于 LRU-2，也是使用两个缓存队列，只不过一个是 FIFO 队列，一个是 LRU 队列
+
+ARC（Adaptive Replacement Cache）：自适应缓存替换算法。它同时结合了 LRU 和 LFU，当访问的数据趋向于最近访问的条目时，会更多地命中 LRU cache；当访问的数据趋向于最频繁的条目时，会更多地命中 LFU cache。ARC 会动态调整 LRU 和 LFU 的比例，从而提高缓存命中率
+
+
 
 ## 需求
 ![](.cache_images/cache_need.png)
@@ -37,3 +59,7 @@ Go 中内置的可以直接用来做本地缓存的无非就是 map 和 sync.Map
 
 2. 实现高性能的关键在于：
    a. 数据分片（降低锁的粒度)
+
+
+## 参考
+- [Go 本地缓存（bigcache/freecache/fastcache等）选型对比及原理总结](https://mp.weixin.qq.com/s/UuqkO9UUXjNWNGyI2sjG4Q)

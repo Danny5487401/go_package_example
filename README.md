@@ -274,7 +274,7 @@
 - [2 Hystrix-->滑动窗口](19_fuse_currentLimiting_degradation/02_hystrix/hystrix.md)
   - [2.1 客户端](19_fuse_currentLimiting_degradation/02_hystrix/client/client.go)
   - [2.2 服务端](19_fuse_currentLimiting_degradation/02_hystrix/server/server.go)
-- 3 uber-go/ratelimit-->漏桶
+- 3 uber-go/ratelimit-->Leaky Bucket(漏桶)
 - 4 envoyproxy/ratelimit-->计数器
 
 ## 第二十章 应用的命令行框架
@@ -349,6 +349,7 @@
 ## [第三十四章 本地缓存](34_local_cache/cache.md)
 - [1 go-cache源码分析及性能分析](34_local_cache/01_go_cache/go_cache.md)
 - [2 free-cache源码分析及性能分析](34_local_cache/02_free_cache/free_cache.md)
+- [3 hashicorp/golang-lru实现及变体](34_local_cache/03_lru/lru.md)
 
 ## [第三十五章 sonar静态代码质量分析-涉及与golangci-lint对比使用](35_sonar/sonar.md)
 
