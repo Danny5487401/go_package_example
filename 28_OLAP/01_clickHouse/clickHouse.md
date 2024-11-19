@@ -106,6 +106,15 @@ ClickHouse并不像其他分布式系统那样，拥有高度自动化的分片�
 
 ## 架构设计
 ### 1. 单机结构
+```shell
+$ mkdir ch_data ch_logs
+$ docker run -d \
+    -v $(realpath ./ch_data):/var/lib/clickhouse/ \
+    -v $(realpath ./ch_logs):/var/log/clickhouse-server/ -p 18123:8123 -p19000:9000 \
+    --name some-clickhouse-server  --ulimit nofile=262144:262144 clickhouse/clickhouse-server:22.2.3.5
+```
+
+$ docker exec -it some-clickhouse-server clickhouse-client
 ![](.clickHouse_images/single_machine_structure.png)
 1）Parser与Interpreter
 
@@ -181,7 +190,7 @@ Column提供了数据的读取能力，而DataType知道如何正反序列化，
 比如上述配置中，我们首先可以在cluster1中的每个节点上创建ReplicatedMergeTree表，通过配置文件，可以看到Clickhouse-node1和Clickhouse-node2是在同一个shard里的，
 每个shard标签里的replica就代表复制节点。这时我们创建表时将两个副本指定在同一个zookeeper目录下，那么写入到node1的数据会复制到node2，写入node2的数据会同步到node1，达到预计的复制效果。
 
-#### Distributed引擎
+#### Distributed 引擎
 ![](.clickHouse_images/local_table_n_remote_table.png)
 使用Distributed引擎的表本身不存储任何数据，但允许在多个服务器上进行分布式查询处理，读取是自动并行的。
 在读取期间，会使用远程服务器上的表索引（也就是我们上述使用的Replicated*MergeTree引擎）
@@ -202,7 +211,17 @@ Column提供了数据的读取能力，而DataType知道如何正反序列化，
 3）其他：并发，官网默认配置为100。由于是大数据分析数据库主要适用于olap场景，对并发支持略差多个大数据查询可能会直接将cpu等资源占满，故并发实际达不到100
 
 
-## MergeTree引擎
+## 表引擎
+
+表引擎（即表的类型）决定了：
+
+- 数据的存储方式和位置，写到哪里以及从哪里读取数据
+- 支持哪些查询以及如何支持。
+- 并发数据访问。
+- 索引的使用（如果存在）。
+- 是否可以执行多线程请求。
+- 数据复制参数。
+### MergeTree引擎
 MergeTree这个名词是在我们耳熟能详的LSM Tree之上做减法而来——去掉了MemTable和Log。也就是说，向MergeTree引擎族的表插入数据时，数据会不经过缓冲而直接写到磁盘。
 
 > MergeTree is not an LSM tree because it doesn’t contain "memtable" and "log": inserted data is written directly to the filesystem. 
@@ -214,3 +233,7 @@ MergeTree这个名词是在我们耳熟能详的LSM Tree之上做减法而来—
 
 
 ## 参考
+
+- [docker 安装 clickhouse](https://hub.docker.com/_/clickhouse)
+- [透过ClickHouse学习列式存储数据库](https://www.luozhiyun.com/archives/837)
+- [官方文档:表引擎](https://clickhouse.com/docs/zh/engines/table-engines)

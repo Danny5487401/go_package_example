@@ -9,9 +9,26 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# 数据仓库OLAP（Online Analytical Processing）
+# 数据仓库 OLAP（Online Analytical Processing）
 OLAP 名为联机分析处理，又可以称之为多维分析处理，指的是通过多种不同的维度审视数据，进行深层次分析.
 例如clickhouse，greenplum，Doris。
+
+- Greenplum是基于数据库分布式架构的开源大数据平台，采用无共享(no sharing)的MPP架构，具有良好的线性扩展能力，具有高效的并行运算、并行存储等特性。拥有独特的高效的ORCA优化器。兼容SQL语法。适合用于高效PB数据量级的存储、处理和实时分析能力。由于内核是基于PostgreSQL数据库，也支持涵盖OLTP型业务混合负载。同时数据节点和主节点都有自己备份节点。提供数据库的高可用性
+
+
+|   比较内容   | OLTP（on-line transaction processing）联机事务处理 | OLAP（On-Line Analytical Processing）联机分析处理 |
+|:--------:|:------------------------------------------:|:-----------------------------------------:|
+|   操作特点   |             日常业务操作，尤其是包含大量前台操作             |            后台操作，例如统计报表，大批量数据加载            |
+|   响应速度   |              优先级最高，要求相应速度非常高               |                要求速度高，吞吐量大                 |
+|   吞吐量    |                     小                      |                     大                     |
+|  并发访问量   |                    非常高                     |                    不高                     |
+| 单笔事务消耗资源 |                     小                      |                     大                     |
+| SQL 语句类型 |               插入和修改操作为主，DML                |              大量查询操作或批量DML操作               |
+|     索引类型     |                    B*索引                    |           Bitmap、Bitmap Join 索引           |
+|     索引量     |                     适量                     |                     多                     |
+|     访问方式     |                    按索引访问                   |                   全表扫描                    |
+|     连接方式     |                    Nested_loop                   |                   Hash Join                   |
+|     BIND 变量     |                    	使用或强制使用	                 |                   不使用                    |
 
 ## 多维度分析案例
 

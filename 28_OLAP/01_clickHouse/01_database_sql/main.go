@@ -12,10 +12,10 @@ import (
 func main() {
 	var (
 		// 多个主机，使用逗号分割
-		host1    = "tencent.danny.games:9000"
+		host1    = "127.0.0.1:19000"
 		host2    = "" // 可以写多个
-		username = "root"
-		password = "chuanzhi"
+		username = "default"
+		password = ""
 		database = "default"
 		tcpInfo  = "tcp://%s?username=%s&password=%s&database=%s&read_timeout=5&write_timeout=5&debug=true&compress=true&alt_hosts=%s"
 	)
@@ -25,7 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	if err := connect.Ping(); err != nil {
+	if err = connect.Ping(); err != nil {
 		if exception, ok := err.(*clickhouse.Exception); ok {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
@@ -34,7 +34,7 @@ func main() {
 		return
 	}
 
-	// 创建表
+	// 创建表: Memory 引擎以未压缩的形式将数据存储在 RAM 中
 	_, err = connect.Exec(`
 		CREATE TABLE IF NOT EXISTS example (
 			country_code FixedString(2),
@@ -70,7 +70,7 @@ func main() {
 		}
 	}
 
-	if err := tx.Commit(); err != nil {
+	if err = tx.Commit(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -94,7 +94,7 @@ func main() {
 		log.Printf("country: %s, os: %d, browser: %d, categories: %v, action_day: %s, action_time: %s", country, os, browser, categories, actionDay, actionTime)
 	}
 
-	if err := rows.Err(); err != nil {
+	if err = rows.Err(); err != nil {
 		log.Fatal(err)
 	}
 

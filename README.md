@@ -272,7 +272,7 @@
 - [2 Hystrix-->滑动窗口](19_fuse_currentLimiting_degradation/02_hystrix/hystrix.md)
   - [2.1 客户端](19_fuse_currentLimiting_degradation/02_hystrix/client/client.go)
   - [2.2 服务端](19_fuse_currentLimiting_degradation/02_hystrix/server/server.go)
-- 3 uber-go/ratelimit-->Leaky Bucket(漏桶)
+- [3 uber-go/ratelimit-->Leaky Bucket(漏桶)](19_fuse_currentLimiting_degradation/03_ubergo_ratelimit/uber-ratelimit.md)
 - 4 envoyproxy/ratelimit-->计数器
 
 ## 第二十章 应用的命令行框架
@@ -374,7 +374,7 @@
 - [2 bilibili/gengine](40_rules_engine/02_gengine/gengine.md)
 - [3 expr-lang/expr-->argo-rollouts 使用](40_rules_engine/03_expr/expr.md)
 
-## [第四十章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](41_go_plugin/go-plugin.md)
+## [第四十一章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](41_go_plugin/go-plugin.md)
 
 
 ## 参考 
