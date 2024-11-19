@@ -4,7 +4,7 @@
 
 - [ElasticSearch](#elasticsearch)
   - [es架构](#es%E6%9E%B6%E6%9E%84)
-  - [es倒排索引原理](#es%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86)
+  - [es 倒排索引原理](#es-%E5%80%92%E6%8E%92%E7%B4%A2%E5%BC%95%E5%8E%9F%E7%90%86)
   - [CRUD增删改查](#crud%E5%A2%9E%E5%88%A0%E6%94%B9%E6%9F%A5)
   - [基本概念](#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5)
     - [对比关系型数据库](#%E5%AF%B9%E6%AF%94%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93)
@@ -20,6 +20,7 @@
   - [查询架构](#%E6%9F%A5%E8%AF%A2%E6%9E%B6%E6%9E%84)
     - [计算引擎](#%E8%AE%A1%E7%AE%97%E5%BC%95%E6%93%8E)
     - [数据扫描](#%E6%95%B0%E6%8D%AE%E6%89%AB%E6%8F%8F)
+  - [lucene](#lucene)
   - [参考资料](#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -29,7 +30,7 @@
 
 ![](.img/distribution.png)
 
-## es倒排索引原理
+## es 倒排索引原理
 ![](.img/inverted_index.png)
 默认情况下，Elasticsearch 在文档中的所有字段上构建一个反向索引，指向该字段所在的 Elasticsearch 文档。
 也就是说在每个 Elasticsearch 的 Lucene里，有一个位置存放这个 inverted index。如果你的索引包含包含五个全文字段的文档，你将有五个反向索引。
@@ -203,6 +204,10 @@ Elasticsearch的数据扫描主要发生在query和fetch阶段。
 而fetch阶段主要是点查Lucene索引中的行存文件读取明细结果。表达式计算和聚合计算在两个阶段都有可能发生，其计算逻辑都是以行为单位进行运算。
 
 总的来说Elasticsearch的数据扫描和计算都没有向量化的能力，而且是以二级索引结果为基础，当二级索引返回的命中行数特别大时（涉及大量数据的分析查询），其搜索引擎就会暴露出数据处理能力不足的短板
+
+
+## lucene
+![](.es_images/lucene.png)
 
 
 ## 参考资料

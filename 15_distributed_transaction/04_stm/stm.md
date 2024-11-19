@@ -74,6 +74,27 @@ etcd 事务的实现基于乐观锁，涉及两次事务操作，第一次事务
 ## 源码
 
 STM 是软件事务存储的接口。其中定义了 Get、Put、Rev、Del、commit、reset 等接口方法。
+```go
+// go.etcd.io/etcd/client/v3@v3.5.2/concurrency/stm.go
+
+type STM interface {
+	// Get returns the value for a key and inserts the key in the txn's read set.
+	// If Get fails, it aborts the transaction with an error, never returning.
+	Get(key ...string) string
+	// Put adds a value for a key to the write set.
+	Put(key, val string, opts ...v3.OpOption)
+	// Rev returns the revision of a key in the read set.
+	Rev(key string) int64
+	// Del deletes a key.
+	Del(key string)
+
+	// commit attempts to apply the txn's changes to the server.
+	commit() *v3.TxnResponse
+	reset()
+}
+```
+
+
 STM 的接口有两个实现类：stm 和 stmSerializable。具体选择哪一个，由我们指定的隔离级别决定。
 
 

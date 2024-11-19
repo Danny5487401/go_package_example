@@ -16,7 +16,7 @@
       - [释放锁](#%E9%87%8A%E6%94%BE%E9%94%81)
       - [multierror库](#multierror%E5%BA%93)
   - [2. ZooKeeper 分布式锁](#2-zookeeper-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
-    - [3. ectd分布式锁](#3-ectd%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
+  - [3. ectd分布式锁](#3-ectd%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
       - [etcd 自带的 concurrency 包](#etcd-%E8%87%AA%E5%B8%A6%E7%9A%84-concurrency-%E5%8C%85)
       - [源码](#%E6%BA%90%E7%A0%81)
 
@@ -229,7 +229,7 @@ Unlock
 1 delete(n)
 ```
 
-### 3. ectd分布式锁
+## 3. ectd分布式锁
 相比 Redis 基于主备异步复制导致锁的安全性问题，etcd 是基于 Raft 共识算法实现的，一个写请求需要经过集群多数节点确认。
 因此一旦分布式锁申请返回给 client 成功后，它一定是持久化到了集群多数节点上，不会出现 Redis 主备异步复制可能导致丢数据的问题，具备更高的安全性。
 

@@ -18,6 +18,7 @@
       - [Distributed引擎](#distributed%E5%BC%95%E6%93%8E)
   - [性能](#%E6%80%A7%E8%83%BD)
   - [MergeTree引擎](#mergetree%E5%BC%95%E6%93%8E)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -210,3 +211,6 @@ MergeTree这个名词是在我们耳熟能详的LSM Tree之上做减法而来—
 
 
 社区通过 https://github.com/ClickHouse/ClickHouse/pull/8290  和 https://github.com/ClickHouse/ClickHouse/pull/10697 两个PR实现了名为Polymorphic Parts的特性，使得MergeTree引擎能够更好地处理频繁的小批量写入，但同时也标志着MergeTree的内核开始向真正的LSM Tree靠拢。
+
+
+## 参考

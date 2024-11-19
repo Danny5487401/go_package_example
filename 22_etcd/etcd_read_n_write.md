@@ -168,6 +168,14 @@ etcdserver 从 Raft 模块获取到以上消息和日志条目后，作为 Leade
 同时需要把集群 Leader 任期号、投票信息、已提交索引、提案内容持久化到一个 WAL（Write Ahead Log）日志文件中，用于保证集群的一致性、可恢复性，也就是我们图中的流程五模块
 
 ![WAL 日志结构](.etcd_read_n_write_images/wal_log_structure.png)   
+```protobuf
+// https://github.com/etcd-io/etcd/blob/45390b9fb8b05dfae14bc9b0bd2b5ff7d39143f3/wal/walpb/record.proto
+message Record {
+	optional int64 type  = 1 [(gogoproto.nullable) = false];
+	optional uint32 crc  = 2 [(gogoproto.nullable) = false];
+	optional bytes data  = 3;
+}
+```
 上图是 WAL 结构，它由多种类型的 WAL 记录顺序追加写入组成，每个记录由类型、数据、循环冗余校验码组成。不同类型的记录通过 Type 字段区分，Data 为对应记录内容，CRC 为循环校验码信息
 
 WAL 记录类型目前支持 5 种，分别是文件元数据记录、日志条目记录、状态信息记录、CRC 记录、快照记录：

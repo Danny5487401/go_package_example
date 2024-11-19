@@ -3,8 +3,9 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Es索引简介](#es%E7%B4%A2%E5%BC%95%E7%AE%80%E4%BB%8B)
-  - [ES从6.7版本推出了索引生命周期管理（Index Lifecycle Management ，简称ILM)机制，能帮我们自动管理一个索引策略（Policy）下索引集群的生命周期。](#es%E4%BB%8E67%E7%89%88%E6%9C%AC%E6%8E%A8%E5%87%BA%E4%BA%86%E7%B4%A2%E5%BC%95%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86index-lifecycle-management-%E7%AE%80%E7%A7%B0ilm%E6%9C%BA%E5%88%B6%E8%83%BD%E5%B8%AE%E6%88%91%E4%BB%AC%E8%87%AA%E5%8A%A8%E7%AE%A1%E7%90%86%E4%B8%80%E4%B8%AA%E7%B4%A2%E5%BC%95%E7%AD%96%E7%95%A5policy%E4%B8%8B%E7%B4%A2%E5%BC%95%E9%9B%86%E7%BE%A4%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F)
-    - [操作](#%E6%93%8D%E4%BD%9C)
+  - [索引生命周期管理](#%E7%B4%A2%E5%BC%95%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86)
+    - [建立 ILM policy](#%E5%BB%BA%E7%AB%8B-ilm-policy)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -14,7 +15,8 @@
     我们可以采用hot-warm-cold架构将索引数据切分成hot/warm/cold的索引。hot索引负责最新数据的读写，可使用内存存储；
     warm索引负责较旧数据的读取，可使用内存或SSD存储；cold索引很少被读取，可使用大容量磁盘存储
 
-## ES从6.7版本推出了索引生命周期管理（Index Lifecycle Management ，简称ILM)机制，能帮我们自动管理一个索引策略（Policy）下索引集群的生命周期。
+## 索引生命周期管理
+ES从6.7版本推出了索引生命周期管理（Index Lifecycle Management ，简称ILM)机制，能帮我们自动管理一个索引策略（Policy）下索引集群的生命周期。
 ![Log 文档在 Elasticsearch 中生命周期](.img/.es_images/logs_lifecycle.png)
 索引生命周期由五个阶段（phases）组成：hot，warm，cold，frozen 及 delete。
 
@@ -34,8 +36,7 @@ ILM 由一些策略（policies）组成，而这些策略可以触发一些 acti
 |delete       |永久地删除一个索引      | 
 
 
-### 操作
-建立 ILM policy
+### 建立 ILM policy
 ```json
 // PUT _ilm/policy/logs_policy
 {
@@ -106,3 +107,6 @@ ILM 由一些策略（policies）组成，而这些策略可以触发一些 acti
 在这里定义了一个叫做 logs 的 alias，它指向 logs-00001 索引。注意这里的 is_write_index 为 true。如果有 rollover 发生时，这个alias会自动指向最新 rollover 的 index。
 
 
+
+## 参考
+- [Index 生命周期管理入门](https://blog.csdn.net/UbuntuTouch/article/details/102728987)

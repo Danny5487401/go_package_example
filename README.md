@@ -15,7 +15,7 @@
   - [第九章 Nosql 非关系型数据库](#%E7%AC%AC%E4%B9%9D%E7%AB%A0-nosql-%E9%9D%9E%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93)
   - [第十章 链路追踪(Distributed Tracing)](#%E7%AC%AC%E5%8D%81%E7%AB%A0-%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AAdistributed-tracing)
   - [第十一章 依赖注入容器(Dependency Injection Container)](#%E7%AC%AC%E5%8D%81%E4%B8%80%E7%AB%A0-%E4%BE%9D%E8%B5%96%E6%B3%A8%E5%85%A5%E5%AE%B9%E5%99%A8dependency-injection-container)
-  - [第十二章 测试框架testify(gin使用)](#%E7%AC%AC%E5%8D%81%E4%BA%8C%E7%AB%A0-%E6%B5%8B%E8%AF%95%E6%A1%86%E6%9E%B6testifygin%E4%BD%BF%E7%94%A8)
+  - [第十二章 clockwork 虚拟时钟库-->etcd使用](#%E7%AC%AC%E5%8D%81%E4%BA%8C%E7%AB%A0-clockwork-%E8%99%9A%E6%8B%9F%E6%97%B6%E9%92%9F%E5%BA%93--etcd%E4%BD%BF%E7%94%A8)
   - [第十三章 序列化反序列化-涉及多种协议](#%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%BA%8F%E5%88%97%E5%8C%96%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-%E6%B6%89%E5%8F%8A%E5%A4%9A%E7%A7%8D%E5%8D%8F%E8%AE%AE)
   - [第十四章 系统监控](#%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E7%B3%BB%E7%BB%9F%E7%9B%91%E6%8E%A7)
   - [第十五章 分布式事务](#%E7%AC%AC%E5%8D%81%E4%BA%94%E7%AB%A0-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1)
@@ -202,10 +202,8 @@
   - [wire使用-带err返回](11_dependency_injection/01_wire/03_wire_return_err/wire)
   - [wire使用-带参数初始化](11_dependency_injection/01_wire/04_wire_pass_params/wire)
 
-## [第十二章 测试框架testify(gin使用)](12_testify/testify.md)
-- [1 assert断言](12_testify/01_assert/calculate_test.go)
-- [2 mock测试替身](12_testify/02_mock/main_test.go)
-- [3 suite测试套件](12_testify/03_suite/suite_test.go)
+
+## [第十二章 clockwork 虚拟时钟库-->etcd使用](12_clockwork/clockwork.md)
 
 ## [第十三章 序列化反序列化-涉及多种协议](13_serialize/serialize.md)
 - [1 标准库 json](13_serialize/01_std_json/json.md)
@@ -340,9 +338,9 @@
   - [SonyFlake(解决时间回拨问题)](31_distributed_Id/sony_snowflake/main.go)
 
 ## [第三十二章 多副本常用的技术方案及Raft协议](32_raft/raft.md)
-  - [raft在consul实现](32_raft/raft_in_consul.md)
-  - [raft在etcd实现原理分析](32_raft/raft_in_etcd.md)
-  - [1 使用hashicorp/raft调试应用](32_raft/main.go)
+  - [hashicorp/raft 在consul实现](32_raft/raft_in_consul.md)
+  - [raft 在etcd实现原理分析](32_raft/raft_in_etcd.md)
+  - [1 使用 hashicorp/raft 调试应用](32_raft/main.go)
 
 ## [第三十三章 多副本常用的技术方案及Paxos协议](33_paxos/paxos.md)
 
