@@ -4,6 +4,7 @@
 
 - [lumberjack](#lumberjack)
   - [logger对象](#logger%E5%AF%B9%E8%B1%A1)
+  - [第三方应用-->k8s](#%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%94%E7%94%A8--k8s)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -14,7 +15,7 @@ zap的重点在于对日志内容的组装和控制，没有实现对于日志�
 ## logger对象
 
 ```go
-// /Users/xiaxin/go/pkg/mod/github.com/natefinch/lumberjack@v2.0.0+incompatible/lumberjack.go
+// lumberjack@v2.0.0+incompatible/lumberjack.go
 
 // If MaxBackups and MaxAge are both 0, no old log files will be deleted.
 type Logger struct {
@@ -311,5 +312,35 @@ func (l *Logger) millRunOnce() error {
 	}
 
 	return err
+}
+```
+
+
+## 第三方应用-->k8s
+
+审计日志 log 后端
+```go
+// https://github.com/kubernetes/kubernetes/blob/a380ef5c416194826b70ae75dc4e86776e1a3afe/staging/src/k8s.io/apiserver/pkg/server/options/audit.go
+
+func (o *AuditLogOptions) getWriter() (io.Writer, error) {
+	if !o.enabled() {
+		return nil, nil
+	}
+
+	if o.Path == "-" {
+		return os.Stdout, nil
+	}
+
+	if err := o.ensureLogFile(); err != nil {
+		return nil, fmt.Errorf("ensureLogFile: %w", err)
+	}
+
+	return &lumberjack.Logger{
+		Filename:   o.Path,
+		MaxAge:     o.MaxAge,
+		MaxBackups: o.MaxBackups,
+		MaxSize:    o.MaxSize,
+		Compress:   o.Compress,
+	}, nil
 }
 ```

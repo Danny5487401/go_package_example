@@ -204,7 +204,7 @@ readPreference 主要控制客户端 Driver 从复制集的哪个节点读取数
     
 - primary （只主）只从 primary 节点读数据，这个是默认设置
 - primaryPreferred （先主后从）优先从 primary 读取，primary 不可服务，从 secondary 读
-- secondary （只从）只从 scondary 节点读数据
+- secondary （只从）只从 secondary 节点读数据
 - secondaryPreferred （先从后主）优先从 secondary 读取，没有 secondary 成员时，从 primary 读取
 - nearest （就近）根据网络距离就近读取，根据客户端与服务端的PingTime实现
 

@@ -2,17 +2,17 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [redis数据类型与11zh3ong编码方式](#redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B8%8E11zh3ong%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F)
+- [redis数据类型与 11种编码方式](#redis%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B%E4%B8%8E-11%E7%A7%8D%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F)
   - [1.redis核心对象结构](#1redis%E6%A0%B8%E5%BF%83%E5%AF%B9%E8%B1%A1%E7%BB%93%E6%9E%84)
     - [Redis object对象的数据结构,具有五种属性](#redis-object%E5%AF%B9%E8%B1%A1%E7%9A%84%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E5%85%B7%E6%9C%89%E4%BA%94%E7%A7%8D%E5%B1%9E%E6%80%A7)
       - [基本数据类型](#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B)
       - [encoding编码方式](#encoding%E7%BC%96%E7%A0%81%E6%96%B9%E5%BC%8F)
-        - [1.  OBJ_ENCODING_RAW](#1--obj_encoding_raw)
+        - [1. OBJ_ENCODING_RAW](#1-obj_encoding_raw)
         - [2.OBJ_ENCODING_HT 哈希表](#2obj_encoding_ht-%E5%93%88%E5%B8%8C%E8%A1%A8)
         - [5. OBJ_ENCODING_ZIPLIST 压缩列表](#5-obj_encoding_ziplist-%E5%8E%8B%E7%BC%A9%E5%88%97%E8%A1%A8)
         - [6.OBJ_ENCODING_INTSET整数集合](#6obj_encoding_intset%E6%95%B4%E6%95%B0%E9%9B%86%E5%90%88)
-        - [7.OBJ_ENCODING_SKIPLIST跳跃表](#7obj_encoding_skiplist%E8%B7%B3%E8%B7%83%E8%A1%A8)
-        - [8.  OBJ_ENCODING_EMBSTR(embedded string)](#8--obj_encoding_embstrembedded-string)
+        - [7. OBJ_ENCODING_SKIPLIST 跳跃表](#7-obj_encoding_skiplist-%E8%B7%B3%E8%B7%83%E8%A1%A8)
+        - [8. OBJ_ENCODING_EMBSTR(embedded string)](#8-obj_encoding_embstrembedded-string)
         - [9.OBJ_ENCODING_QUICKLIST](#9obj_encoding_quicklist)
     - [client、redisServer对象](#clientredisserver%E5%AF%B9%E8%B1%A1)
   - [2.操作](#2%E6%93%8D%E4%BD%9C)
@@ -23,10 +23,11 @@
     - [4.list双端链表](#4list%E5%8F%8C%E7%AB%AF%E9%93%BE%E8%A1%A8)
     - [5.Sort Set(dict+zskiplist)](#5sort-setdictzskiplist)
     - [6.stream(radix-tree)](#6streamradix-tree)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# redis数据类型与11zh3ong编码方式
+# redis数据类型与 11种编码方式
 
 ## 1.redis核心对象结构
 ### Redis object对象的数据结构,具有五种属性
@@ -75,7 +76,7 @@ typedef struct redisObject {
 #define OBJ_ENCODING_QUICKLIST 9 /* Encoded as linked list of ziplists */
 #define OBJ_ENCODING_STREAM 10 /* Encoded as a radix tree of listpacks */
 ```
-##### 1.  OBJ_ENCODING_RAW
+##### 1. OBJ_ENCODING_RAW
 RAW编码方式使用简单动态字符串来保存字符串对象
 ![](.redis_images/sdshdr.png)
 
@@ -223,7 +224,7 @@ contents数组是整数集合的底层实现：整数集合的每个元素都是
 length属性记录了整数集合包含得元素数量，也即是contents数组得长度。
 
 
-##### 7.OBJ_ENCODING_SKIPLIST跳跃表
+##### 7. OBJ_ENCODING_SKIPLIST 跳跃表
 为有序集合对象专用，有序集合对象采用了字典+跳跃表的方式实现
 ```cgo
 typedef struct zset {
@@ -270,7 +271,7 @@ typedef struct zskiplist {
     * 进行对比操作时，不仅要检查 score 值，还要检查 member：当 score 值可以重复时，单靠 score 值无法判断一个元素的身份，所以需要连 member 域都一并检查才行。
     * 每个节点都带有一个高度为1层的后退指针，用于从表尾方向向表头方向迭代：当执行 ZREVRANGE 或ZREVRANGEBYSCORE这类以逆序处理有序集的命令时，就会用到这个属性
 
-##### 8.  OBJ_ENCODING_EMBSTR(embedded string)
+##### 8. OBJ_ENCODING_EMBSTR(embedded string)
 从Redis 3.0版本开始字符串引入了EMBSTR编码方式，长度小于OBJ_ENCODING_EMBSTR_SIZE_LIMIT的字符串将以EMBSTR方式存储
 ```cgo
 robj *createStringObject(const char *ptr, size_t len) {
@@ -416,3 +417,6 @@ PipeLine:
 	我们知道 redis cluster 默认分配了 16384 个slot，当我们set一个key 时，会用CRC16算法来取模得到所属的slot，
 	然后将这个key 分到哈希槽区间的节点上，具体算法就是：CRC16(key) % 16384。如果我们使用pipeline功能，
 	一个批次中包含的多条命令，每条命令涉及的key可能属于不同的slot
+
+
+## 参考

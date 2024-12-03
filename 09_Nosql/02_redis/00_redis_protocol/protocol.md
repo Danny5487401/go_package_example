@@ -1,4 +1,13 @@
-#Redis协议
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Redis 协议](#redis-%E5%8D%8F%E8%AE%AE)
+  - [参考](#%E5%8F%82%E8%80%83)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
+# Redis 协议
 
 ![](../.redis_images/redis_scheme.png)
 
@@ -33,3 +42,5 @@ RESP实际上是一个支持以下数据类型的序列化协议：简单字符�
     
     5、对于数组，回复的第一个字节是“*”
 
+## 参考
+- https://redis.io/docs/latest/develop/reference/protocol-spec/

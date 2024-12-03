@@ -7,7 +7,7 @@
   - [第一章 服务注册中心consul](#%E7%AC%AC%E4%B8%80%E7%AB%A0-%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%AD%E5%BF%83consul)
   - [第二章 日志库](#%E7%AC%AC%E4%BA%8C%E7%AB%A0-%E6%97%A5%E5%BF%97%E5%BA%93)
   - [第三章 消息队列](#%E7%AC%AC%E4%B8%89%E7%AB%A0-%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97)
-  - [第四章 服务注册及配置文件中心Nacos](#%E7%AC%AC%E5%9B%9B%E7%AB%A0-%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E5%8F%8A%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E4%B8%AD%E5%BF%83nacos)
+  - [第四章 服务注册及配置文件中心 Nacos](#%E7%AC%AC%E5%9B%9B%E7%AB%A0-%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E5%8F%8A%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E4%B8%AD%E5%BF%83-nacos)
   - [第五章 关系型数据库](#%E7%AC%AC%E4%BA%94%E7%AB%A0-%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93)
   - [第六章 获取对外可用IP和端口](#%E7%AC%AC%E5%85%AD%E7%AB%A0-%E8%8E%B7%E5%8F%96%E5%AF%B9%E5%A4%96%E5%8F%AF%E7%94%A8ip%E5%92%8C%E7%AB%AF%E5%8F%A3)
   - [第七章 Gin前端form验证器](#%E7%AC%AC%E4%B8%83%E7%AB%A0-gin%E5%89%8D%E7%AB%AFform%E9%AA%8C%E8%AF%81%E5%99%A8)
@@ -44,7 +44,7 @@
   - [第三十八章 Mergo实现 struct 与 map 之间转换-->k8s中应用](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%85%AB%E7%AB%A0-mergo%E5%AE%9E%E7%8E%B0-struct-%E4%B8%8E-map-%E4%B9%8B%E9%97%B4%E8%BD%AC%E6%8D%A2--k8s%E4%B8%AD%E5%BA%94%E7%94%A8)
   - [第三十九章 权限管理 casbin](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B9%9D%E7%AB%A0-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86-casbin)
   - [第四十章 规则引擎 rule engine](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E7%AB%A0-%E8%A7%84%E5%88%99%E5%BC%95%E6%93%8E-rule-engine)
-  - [第四十章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E7%AB%A0-hashicorpgo-plugin-%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8--httprunner-40-%E4%BD%BF%E7%94%A8)
+  - [第四十一章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%B8%80%E7%AB%A0-hashicorpgo-plugin-%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8--httprunner-40-%E4%BD%BF%E7%94%A8)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -102,11 +102,11 @@
 - 3 rocketmq
   - 3.1 消费者：简单消费,延迟消费
   - 3.2 生产者：简单消息，延迟消息，事务消息
-- [4 Asynq分布式延迟队列](03_amqp/04_asynq/asynq.md)
+- [4 Asynq 分布式延迟队列](03_amqp/04_asynq/asynq.md)
   - [4.1 生产者](03_amqp/04_asynq/producer)
   - [4.2 消费者](03_amqp/04_asynq/server)
 
-## [第四章 服务注册及配置文件中心Nacos](04_nacos/nacos.md)
+## [第四章 服务注册及配置文件中心 Nacos](04_nacos/nacos.md)
 - 1 [获取配置及监听文件变化](04_nacos/config_center/main.go)
 - 2 服务注册，监听，获取
   - [V1版本](04_nacos/service_center/v1/main.go)
@@ -198,9 +198,9 @@
 - [1 dig依赖注入及http服务分层->不推荐](11_dependency_injection/00_dig/dig.go)
 - 2 wire依赖注入->推荐
   - [2.1 不使用wire现状](11_dependency_injection/01_wire/01_without_wire/main.go)
-  - [使用wire优化](11_dependency_injection/01_wire/02_wire)
-  - [wire使用-带err返回](11_dependency_injection/01_wire/03_wire_return_err/wire)
-  - [wire使用-带参数初始化](11_dependency_injection/01_wire/04_wire_pass_params/wire)
+  - [2.2 使用wire优化](11_dependency_injection/01_wire/02_wire)
+  - [2.3 wire使用-带err返回](11_dependency_injection/01_wire/03_wire_return_err/wire)
+  - [2.4 wire使用-带参数初始化](11_dependency_injection/01_wire/04_wire_pass_params/wire)
 
 
 ## [第十二章 clockwork 虚拟时钟库-->etcd使用](12_clockwork/clockwork.md)
@@ -253,7 +253,7 @@
 - [1 copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
 
 ## 第十七章 数据加解密
-- 1 phpserialize
+- 1 phpserialize(不推荐)
 
 ## [第十八章 日志收集项目 log_collect](18_log_collect/log_collect.md)
 - 1 动态选择文件

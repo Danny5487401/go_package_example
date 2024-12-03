@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [数据仓库OLAP（Online Analytical Processing）](#%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93olaponline-analytical-processing)
+- [数据仓库 OLAP（Online Analytical Processing）](#%E6%95%B0%E6%8D%AE%E4%BB%93%E5%BA%93-olaponline-analytical-processing)
   - [多维度分析案例](#%E5%A4%9A%E7%BB%B4%E5%BA%A6%E5%88%86%E6%9E%90%E6%A1%88%E4%BE%8B)
     - [销售明细表](#%E9%94%80%E5%94%AE%E6%98%8E%E7%BB%86%E8%A1%A8)
   - [OLAP分类](#olap%E5%88%86%E7%B1%BB)

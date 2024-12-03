@@ -15,9 +15,10 @@
     - [1. 单机结构](#1-%E5%8D%95%E6%9C%BA%E7%BB%93%E6%9E%84)
     - [2. Clickhouse集群架构设计](#2-clickhouse%E9%9B%86%E7%BE%A4%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1)
       - [Replicated MergeTree引擎](#replicated-mergetree%E5%BC%95%E6%93%8E)
-      - [Distributed引擎](#distributed%E5%BC%95%E6%93%8E)
+      - [Distributed 引擎](#distributed-%E5%BC%95%E6%93%8E)
   - [性能](#%E6%80%A7%E8%83%BD)
-  - [MergeTree引擎](#mergetree%E5%BC%95%E6%93%8E)
+  - [表引擎](#%E8%A1%A8%E5%BC%95%E6%93%8E)
+    - [MergeTree引擎](#mergetree%E5%BC%95%E6%93%8E)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->

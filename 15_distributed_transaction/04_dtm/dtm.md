@@ -8,6 +8,7 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # DTM
+DTM是一款开源的分布式事务管理器，解决跨数据库、跨服务、跨语言栈更新数据的一致性问题
 
 ## 协议分类
 dtm支持http协议和gRPC协议
