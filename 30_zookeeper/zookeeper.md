@@ -3,14 +3,42 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Zookeeper](#zookeeper)
+  - [Zab协议(Zookeeper Atomic Broadcast)](#zab%E5%8D%8F%E8%AE%AEzookeeper-atomic-broadcast)
+  - [Zookeeper角色：](#zookeeper%E8%A7%92%E8%89%B2)
   - [node节点](#node%E8%8A%82%E7%82%B9)
     - [节点类型](#%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8B)
       - [1. PERSISTENT（持久节点)](#1-persistent%E6%8C%81%E4%B9%85%E8%8A%82%E7%82%B9)
+      - [2 EPHEMERAL](#2-ephemeral)
+      - [3 PERSISTENT_SEQUENTIAL](#3-persistent_sequential)
+      - [4 EPHEMERAL_SEQUENTIAL](#4-ephemeral_sequential)
+  - [Zookeeper的数据模型](#zookeeper%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Zookeeper
-ZooKeeper是用于分布式应用程序的协调服务。它公开了一组简单的API，分布式应用程序可以基于这些API用于同步，节点状态、配置等信息、服务注册等信息.
+ZooKeeper 是一个分布式的，开放源码的分布式应用程序协调服务，是 Google 的 Chubby 一个开源的实现，是 Hadoop 和 Hbase 的重要组件。它是一个为分布式应用提供一致性服务的软件，提供的功能包括：配置维护、域名服务、分布式同步、组服务等.
+
+- 配置中心:发布者将数据发布到ZK节点上，供订阅者动态获取数据，实现配置信息的集中式管理和动态更新。例如全局的配置信息、服务式服务框架的服务地址列表等就非常适合使用
+- 负载均衡: 消息中间件中发布者和订阅者的负载均衡linkedin开源的Kafka和阿里开源的metaq（RocketMQ的前身）都是通过zookeeper来做到生产者、消费者的负载均衡。
+- 分布式通知/协调
+
+
+## Zab协议(Zookeeper Atomic Broadcast)
+
+Zab协议是为分布式协调服务Zookeeper专门设计的一种 支持崩溃恢复 的 原子广播协议 ，是Zookeeper保证数据一致性的核心算法。Zab借鉴了Paxos算法，但又不像Paxos那样，是一种通用的分布式一致性算法。
+
+
+## Zookeeper角色：
+leader领导者、follower跟随者、observer观察者、client客户端
+
+（1）leader：负责投票的发起和决议，更新系统状态，处理事务请求。
+
+（2）follower跟随者：参与投票，接收客户端请求，处理非事务请求并返回结果，转发事务请求给leader。
+
+（3）observer观察者：不参与投票过程，只同步leader状态，为了扩展系统，提高读写速度。也接收客户端请求，处理非事务请求并返回结果，转发事务请求给leader。
+
+（4）client客户端：请求发起方。
 
 
 ## node节点
@@ -25,12 +53,37 @@ zookeeper 中节点叫znode存储结构上跟文件系统类似，以树级结�
 - type:节点类型
 
 ### 节点类型
-![](.zookeeper_images/node_cate.png)
+临时节点（ephemeral）、持久节点（persistent）、顺序节点（sequence）。节点类型在创建时确定，之后不可修改。
 
 #### 1. PERSISTENT（持久节点)
 
-持久化保存的节点，也是默认创建的.
+持久节点除非手动删除，否则节点一直存在于 Zookeeper 上
 ```shell
-#默认创建的就是持久节点
+# create [-s] [-e] path data   
+# 其中 -s 为有序节点， -e 临时节点
+
+# 下面创建的就是持久节点
 create /test
 ```
+
+
+#### 2 EPHEMERAL
+临时节点临时节点的生命周期与客户端会话绑定，一旦客户端会话失效（客户端与zookeeper 连接断开不一定会话失效），那么这个客户端创建的所有临时节点都会被移除
+
+
+
+#### 3 PERSISTENT_SEQUENTIAL
+持久顺序节点基本特性同持久节点，只是增加了顺序属性，节点名后边会追加一个由父节点维护的自增整型数字。
+
+#### 4 EPHEMERAL_SEQUENTIAL
+临时顺序节点基本特性同临时节点，增加了顺序属性，节点名后边会追加一个由父节点维护的自增整型数字。
+
+## Zookeeper的数据模型
+![](.zookeeper_images/zookeeper_data_structure.png)
+Zookeeper数据模型的结构与Unix文件系统很类似，整体上可以看作是一颗树，每一个节点称做一个ZNode。
+每一个Znode默认能够存储1MB的数据，每个ZNode都可以通过其路径唯一标识。
+
+## 参考
+
+- [ZAB协议概述与选主流程详解](https://github.com/h2pl/JavaTutorial/blob/master/docs/distributed/practice/%E6%90%9E%E6%87%82%E5%88%86%E5%B8%83%E5%BC%8F%E6%8A%80%E6%9C%AF%EF%BC%9AZAB%E5%8D%8F%E8%AE%AE%E6%A6%82%E8%BF%B0%E4%B8%8E%E9%80%89%E4%B8%BB%E6%B5%81%E7%A8%8B%E8%AF%A6%E8%A7%A3.md)
+- [zookeeper 全解](https://blog.csdn.net/General_zy/article/details/129233373)
