@@ -3,19 +3,20 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [分布式Id](#%E5%88%86%E5%B8%83%E5%BC%8Fid)
-  - [一般分布式 ID 的特点：](#%E4%B8%80%E8%88%AC%E5%88%86%E5%B8%83%E5%BC%8F-id-%E7%9A%84%E7%89%B9%E7%82%B9)
+  - [一般分布式 ID 的特点](#%E4%B8%80%E8%88%AC%E5%88%86%E5%B8%83%E5%BC%8F-id-%E7%9A%84%E7%89%B9%E7%82%B9)
   - [twitter的snowflake算法](#twitter%E7%9A%84snowflake%E7%AE%97%E6%B3%95)
-    - [源码github.com/bwmarrin/snowflake](#%E6%BA%90%E7%A0%81githubcombwmarrinsnowflake)
+    - [源码 github.com/bwmarrin/snowflake](#%E6%BA%90%E7%A0%81-githubcombwmarrinsnowflake)
   - [优缺点](#%E4%BC%98%E7%BC%BA%E7%82%B9)
   - [sonyFlake](#sonyflake)
     - [源码](#%E6%BA%90%E7%A0%81)
-    - [Sony 关于时间回拨问题：](#sony-%E5%85%B3%E4%BA%8E%E6%97%B6%E9%97%B4%E5%9B%9E%E6%8B%A8%E9%97%AE%E9%A2%98)
+    - [Sony 关于时间回拨问题](#sony-%E5%85%B3%E4%BA%8E%E6%97%B6%E9%97%B4%E5%9B%9E%E6%8B%A8%E9%97%AE%E9%A2%98)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # 分布式Id
 雪花算法一般用在分布式 ID，但是单机也可以使用，早使用可方便拓展业务
-## 一般分布式 ID 的特点：
+## 一般分布式 ID 的特点
 
 1. 全局唯一性
 不能出现有重复的ID标识，这是基本要求。
@@ -51,7 +52,7 @@ timestamp，datacenter_id，worker_id和sequence_id这四个字段中，timestam
 但datacenter_id和worker_id需要我们在部署阶段就能够获取得到，并且一旦程序启动之后，就是不可更改的了
 
 
-### 源码github.com/bwmarrin/snowflake
+### 源码 github.com/bwmarrin/snowflake
 ![](.distribued_id_images/go_snowflake.png)
 ```go
 var(
@@ -195,7 +196,7 @@ func lower16BitPrivateIP() (uint16, error) {
 ```
 
 ### 源码
-启动阶段的配置参数：
+启动阶段的配置参数
 ```go
 func NewSonyflake(st Settings) *Sonyflake
 ```
@@ -219,7 +220,7 @@ redis 127.0.0.1:6379> SADD base64_encoding_of_last16bits MzI0Mgo=
 redis 127.0.0.1:6379> SADD base64_encoding_of_last16bits MzI0Mgo=
 (integer) 0
 ```
-### Sony 关于时间回拨问题：
+### Sony 关于时间回拨问题
 
 - 只有当current大于elapsedTime，才会将current赋值给elapsedTime，也就是说elapsedTime是一直增大的，即使时钟回拨，也不会改变elapsedTime。
 - 如果没有发生时间回拨，就是sf.elapsedTime = current，自增id满了以后，这个单位时间内不能再生成id了，就需要睡眠一下，等到下一个时间单位。
@@ -247,3 +248,5 @@ func (sf *Sonyflake) NextID() (uint64, error) {
 }
 
 ```
+
+## 参考

@@ -35,8 +35,8 @@
   - [第二十九章 分布式锁及源码分析](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B9%9D%E7%AB%A0-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
   - [第三十章 Zookeeper](#%E7%AC%AC%E4%B8%89%E5%8D%81%E7%AB%A0-zookeeper)
   - [第三十一章 分布式Id](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%80%E7%AB%A0-%E5%88%86%E5%B8%83%E5%BC%8Fid)
-  - [第三十二章 多副本常用的技术方案及Raft协议](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%BA%8C%E7%AB%A0-%E5%A4%9A%E5%89%AF%E6%9C%AC%E5%B8%B8%E7%94%A8%E7%9A%84%E6%8A%80%E6%9C%AF%E6%96%B9%E6%A1%88%E5%8F%8Araft%E5%8D%8F%E8%AE%AE)
-  - [第三十三章 多副本常用的技术方案及Paxos协议](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%A4%9A%E5%89%AF%E6%9C%AC%E5%B8%B8%E7%94%A8%E7%9A%84%E6%8A%80%E6%9C%AF%E6%96%B9%E6%A1%88%E5%8F%8Apaxos%E5%8D%8F%E8%AE%AE)
+  - [第三十二章 Consensus algorithm 共识算法](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%BA%8C%E7%AB%A0-consensus-algorithm-%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95)
+  - [第三十三章 压缩](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%8E%8B%E7%BC%A9)
   - [第三十四章 本地缓存](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%9B%9B%E7%AB%A0-%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98)
   - [第三十五章 sonar静态代码质量分析-涉及与golangci-lint对比使用](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%BA%94%E7%AB%A0-sonar%E9%9D%99%E6%80%81%E4%BB%A3%E7%A0%81%E8%B4%A8%E9%87%8F%E5%88%86%E6%9E%90-%E6%B6%89%E5%8F%8A%E4%B8%8Egolangci-lint%E5%AF%B9%E6%AF%94%E4%BD%BF%E7%94%A8)
   - [第三十六章 Proto管理工具Buf](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%85%AD%E7%AB%A0-proto%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7buf)
@@ -337,12 +337,16 @@
   - [bwmarrin/snowflake库](31_distributed_Id/snowflake/main.go)
   - [SonyFlake(解决时间回拨问题)](31_distributed_Id/sony_snowflake/main.go)
 
-## [第三十二章 多副本常用的技术方案及Raft协议](32_raft/raft.md)
-  - [hashicorp/raft 在consul实现](32_raft/raft_in_consul.md)
-  - [raft 在etcd实现原理分析](32_raft/raft_in_etcd.md)
-  - [1 使用 hashicorp/raft 调试应用](32_raft/main.go)
+## [第三十二章 Consensus algorithm 共识算法](32_consensus_algorithm/consensusAlgorithm.md)
+- [1 Paxos协议](32_consensus_algorithm/01_paxos/paxos.md)
+- [2 raft协议](32_consensus_algorithm/02_raft/raft.md)
+  - [hashicorp/raft 在consul实现](32_consensus_algorithm/02_raft/raft_in_consul.md)
+  - [raft 在etcd实现原理分析](32_consensus_algorithm/02_raft/raft_in_etcd.md)
+  - [2.1 使用 hashicorp/raft 调试应用](32_consensus_algorithm/02_raft/main.go)
 
-## [第三十三章 多副本常用的技术方案及Paxos协议](33_paxos/paxos.md)
+## [第三十三章 压缩](33_compress/compress.md)
+- [1 snappy 压缩库-->prometheus 使用](33_compress/01_snappy/snappy.md)
+
 
 ## [第三十四章 本地缓存](34_local_cache/cache.md)
 - [1 go-cache源码分析及性能分析](34_local_cache/01_go_cache/go_cache.md)
