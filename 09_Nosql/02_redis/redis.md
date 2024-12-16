@@ -11,8 +11,6 @@
     - [1. RDB(redis database)：](#1-rdbredis-database)
     - [2. AOF(append only file)](#2-aofappend-only-file)
   - [Redis集群特点](#redis%E9%9B%86%E7%BE%A4%E7%89%B9%E7%82%B9)
-  - [集群方案](#%E9%9B%86%E7%BE%A4%E6%96%B9%E6%A1%88)
-    - [redis cluster 的哈希槽为啥16384个](#redis-cluster-%E7%9A%84%E5%93%88%E5%B8%8C%E6%A7%BD%E4%B8%BA%E5%95%A516384%E4%B8%AA)
   - [高并发缓存](#%E9%AB%98%E5%B9%B6%E5%8F%91%E7%BC%93%E5%AD%98)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -170,20 +168,6 @@ auto-aof-rewrite-percentage 80
 4. 支持在线增加、删除节点  
 5. 客户端可以连任何一个主节点进行读写
 
-## 集群方案
-
-![](.redis_images/codis_vs_cluster.png)
-
-1. vip多线程版本 twemproxy(Twitter开源)
-2. codis   
-![](.redis_images/codis.png)
-
-3. redis cluster    
-![](.redis_images/redis_cluster.png)
-
-
-###  redis cluster 的哈希槽为啥16384个
-![](.redis_images/redis_cluster_slot_with_author_answers.png)
 
 
 ## 高并发缓存

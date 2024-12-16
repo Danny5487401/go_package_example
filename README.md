@@ -45,6 +45,7 @@
   - [第三十九章 权限管理 casbin](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B9%9D%E7%AB%A0-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86-casbin)
   - [第四十章 规则引擎 rule engine](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E7%AB%A0-%E8%A7%84%E5%88%99%E5%BC%95%E6%93%8E-rule-engine)
   - [第四十一章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%B8%80%E7%AB%A0-hashicorpgo-plugin-%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8--httprunner-40-%E4%BD%BF%E7%94%A8)
+  - [第四十二章 prometheus](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%BA%8C%E7%AB%A0-prometheus)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -178,10 +179,11 @@
 - [1 MongoDB](09_Nosql/01_mongo/mongo.md)
   - [mongo和mysql对比：储存引擎及内存结构](09_Nosql/01_mongo/nosql_vs_rds.md)
   - 1.1 增删改查
-- 2 [Redis(协议，原理，数据结构分析)](09_Nosql/02_redis/redis.md)
+- [2 Redis(协议，原理，持久化方式)](09_Nosql/02_redis/redis.md)
   - [redis底层数据结构对象源码分析](09_Nosql/02_redis/redis_obj.md)
+  - [redis 集群](09_Nosql/02_redis/redis_cluster.md)
   - 2.1 redigo使用
-  - 2.2 go-redis使用
+  - 2.2 go-redis使用(官方)
     - [2.2.1 连接池分析](09_Nosql/02_redis/02_go-redis/go-redis_pool.md)
     - [2.2.2 连接初始化及命令执行流程](09_Nosql/02_redis/02_go-redis/go-redis_init_n_excute.md)
     - [2.2.3 protocol协议封装](09_Nosql/02_redis/02_go-redis/go-redis_protocol.md)
@@ -298,12 +300,12 @@
 - [2 boltdb基本操作及在etcd中的源码分析](22_etcd/04_boltdb/boltdb.md)
 - [3 bbolt改善boldb](22_etcd/05_bbolt/bbolt.md)
 
-## 第二十三章 Go-Micro框架 (不推荐使用)
+## 第二十三章 Go-Micro框架(不推荐)
 - [1 Config配置加载包](23_micro/01_Config/config.md)
 
 ## [第二十四章 搜索引擎es](24_elasticSearch/es.md)
 - [es索引及索引生命周期管理](24_elasticSearch/es_index.md)
-- [1 官方包](24_elasticSearch/01_official_pkg/go_elasticseach.md)
+- [1 go-elasticsearch 官方包](24_elasticSearch/01_official_pkg/go_elasticseach.md)
   - 1.1 批量写入Bulk
   - 1.2 es日志
   - 1.3 并发批量BulkIndexer
@@ -380,6 +382,16 @@
 
 ## [第四十一章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](41_go_plugin/go-plugin.md)
 
+## [第四十二章 prometheus](42_prometheus/prometheus.md) 
+- 部署方式
+  - [手工部署](42_prometheus/k8s_deploy/manual)
+  - [operator 部署](42_prometheus/k8s_deploy/opeartor)
+- [1 exporter](42_prometheus/01_exporter/exporter.md)
+  - [1.1 内置collector](42_prometheus/01_exporter/01_embeded_collector/main.go)
+  - [1.2 使用自定义collector](42_prometheus/01_exporter/02_customized_collector/main.go)
+- [2 Prometheus Operator](42_prometheus/k8s_deploy/opeartor/operator.md)
+- [3 AlertManager](42_prometheus/alert_manager.md)
+- [4 PromQL](42_prometheus/alert_manager.md)
 
 ## 参考 
 
