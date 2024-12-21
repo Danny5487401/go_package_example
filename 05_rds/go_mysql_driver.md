@@ -8,7 +8,7 @@
   - [3. Dsn.go   数据源名称 （Data Source Name）](#3-dsngo---%E6%95%B0%E6%8D%AE%E6%BA%90%E5%90%8D%E7%A7%B0-data-source-name)
   - [4. Errors.go](#4-errorsgo)
   - [5. Packets.go](#5-packetsgo)
-    - [mysql通信协议](#mysql%E9%80%9A%E4%BF%A1%E5%8D%8F%E8%AE%AE)
+    - [mysql 通信协议](#mysql-%E9%80%9A%E4%BF%A1%E5%8D%8F%E8%AE%AE)
       - [1. 基础数据类型](#1-%E5%9F%BA%E7%A1%80%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B)
       - [2. 报文协议](#2-%E6%8A%A5%E6%96%87%E5%8D%8F%E8%AE%AE)
       - [3. 协议类型](#3-%E5%8D%8F%E8%AE%AE%E7%B1%BB%E5%9E%8B)
@@ -169,9 +169,10 @@ const (
 )
 ```
 
-### mysql通信协议
+### mysql 通信协议
 ![](.go_mysql_driver_images/mysql_mysqld_communication.png)
-官方mysql服务端和客户端协议参考: https://dev.mysql.com/doc/internals/en/client-server-protocol.html
+  
+[官方mysql服务端和客户端协议参考](https://dev.mysql.com/doc/dev/mysql-server/8.4.3/PAGE_PROTOCOL.html)
 
 #### 1. 基础数据类型
 MySQL 通信的基本数据类型有两种， Integer 、 String

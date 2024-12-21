@@ -4,18 +4,23 @@
 
 - [分布式Id](#%E5%88%86%E5%B8%83%E5%BC%8Fid)
   - [一般分布式 ID 的特点](#%E4%B8%80%E8%88%AC%E5%88%86%E5%B8%83%E5%BC%8F-id-%E7%9A%84%E7%89%B9%E7%82%B9)
-  - [twitter的snowflake算法](#twitter%E7%9A%84snowflake%E7%AE%97%E6%B3%95)
+  - [生成方式](#%E7%94%9F%E6%88%90%E6%96%B9%E5%BC%8F)
+  - [UUID(Universally Unique Identifier)](#uuiduniversally-unique-identifier)
+    - [uuid 选择](#uuid-%E9%80%89%E6%8B%A9)
+    - [github.com/google/uuid](#githubcomgoogleuuid)
+  - [雪花算法](#%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95)
+    - [原生雪花算法优缺点](#%E5%8E%9F%E7%94%9F%E9%9B%AA%E8%8A%B1%E7%AE%97%E6%B3%95%E4%BC%98%E7%BC%BA%E7%82%B9)
+    - [twitter的snowflake 算法](#twitter%E7%9A%84snowflake-%E7%AE%97%E6%B3%95)
     - [源码 github.com/bwmarrin/snowflake](#%E6%BA%90%E7%A0%81-githubcombwmarrinsnowflake)
-  - [优缺点](#%E4%BC%98%E7%BC%BA%E7%82%B9)
-  - [sonyFlake](#sonyflake)
-    - [源码](#%E6%BA%90%E7%A0%81)
+    - [sony/sonyflake](#sonysonyflake)
     - [Sony 关于时间回拨问题](#sony-%E5%85%B3%E4%BA%8E%E6%97%B6%E9%97%B4%E5%9B%9E%E6%8B%A8%E9%97%AE%E9%A2%98)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # 分布式Id
-雪花算法一般用在分布式 ID，但是单机也可以使用，早使用可方便拓展业务
+
+
 ## 一般分布式 ID 的特点
 
 1. 全局唯一性
@@ -33,7 +38,135 @@
 
 在高并发的环境下依然表现良好。
 
-## twitter的snowflake算法
+
+## 生成方式
+9种，分布式ID生成器方式以及优缺点：
+
+- UUID
+- 数据库自增ID:基于数据库的auto_increment自增ID
+- 数据库多主模式:设置起始值和自增步长
+- 号段模式:从数据库批量的获取自增ID，每次从数据库取出一个号段范围
+- Redis:利用redis的 incr命令实现ID的原子性自增
+- 雪花算法（SnowFlake）
+- 滴滴出品（github.com/didi/tinyid):基于号段模式
+- 百度(github.com/baidu/uid-generator）:uid-generator是基于Snowflake算法实现
+- 美团(github.com/Meituan-Dianping/Leaf):同时支持号段模式和snowflake算法模式
+
+
+## UUID(Universally Unique Identifier)
+UUID 是一串全球唯一的(16进制)数字串.UUID有16进制的32个数字组成，故理论上总量为16^32,即使每纳秒生成一万亿个，也好耗尽壹佰亿年才能强所有UUID用完
+
+UUID 的标准格式为“xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxx”，五个部分分别为8个字符、4个字符、4个字符、4个字符、12个字符，中间用“-”号间隔
+
+有 8 个 UUID 版本（v1 到 v8）
+
+- UUID 版本 1 (v1)由时间戳、单调计数器和 MAC 地址生成。
+- UUID 版本 2 (v2)保留用于没有已知详细信息的安全 ID。
+- UUID 版本 3 (v3)是根据您提供的某些数据的 MD5 哈希值生成的。 RFC 在候选数据中建议了 DNS 和 URL。
+- UUID 版本 4 (v4)是根据完全随机的数据生成的。这可能是大多数人对 UUID 的想法和遇到的情况。
+- UUID 版本 5 (v5)是根据您提供的一些数据的 SHA1 哈希值生成的。与 v3 一样，RFC 建议使用 DNS 或 URL 作为候选。
+- UUID 版本 6 (v6)由时间戳、单调计数器和 MAC 地址生成。这些数据与版本 1 相同，但更改了顺序，以便对它们进行排序时将按创建时间排序。
+- UUID 版本 7 (v7)由时间戳和随机数据生成。
+- UUID 版本 8 (v8)完全是自定义的（除了所有版本都包含的必需版本/变体字段）。
+
+### uuid 选择
+
+v4 或 v7。也有一些场合选择v5或v8。
+
+- 当您只想要一个随机 ID 时，请使用 v4。这是一个很好的默认选择。
+- 如果您要在希望能够排序的上下文中使用 ID，请使用 v7。例如，如果您使用 UUID 作为数据库键，请考虑使用 v7。
+- 如果您在 UUID 中有自己想要的数据，则使用 v5 或 v8，但一般来说，您会知道是否需要它。
+
+
+### github.com/google/uuid
+```go
+// github.com/google/uuid@v1.6.0/uuid.go
+
+// A UUID is a 128 bit (16 byte) Universal Unique IDentifier as defined in RFC
+// 4122.
+type UUID [16]byte
+```
+
+v4 版本
+```go
+func NewRandom() (UUID, error) {
+	if !poolEnabled {
+		return NewRandomFromReader(rander)
+	}
+	return newRandomFromPool()
+}
+
+```
+
+```go
+func NewRandomFromReader(r io.Reader) (UUID, error) {
+	var uuid UUID
+	_, err := io.ReadFull(r, uuid[:])
+	if err != nil {
+		return Nil, err
+	}
+	uuid[6] = (uuid[6] & 0x0f) | 0x40 // Version 4
+	uuid[8] = (uuid[8] & 0x3f) | 0x80 // Variant is 10
+	return uuid, nil
+}
+```
+
+
+v7 版本
+```go
+func NewV7() (UUID, error) {
+	uuid, err := NewRandom()
+	if err != nil {
+		return uuid, err
+	}
+	makeV7(uuid[:])
+	return uuid, nil
+}
+
+
+func makeV7(uuid []byte) {
+	/*
+		 0                   1                   2                   3
+		 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+		+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		|                           unix_ts_ms                          |
+		+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		|          unix_ts_ms           |  ver  |  rand_a (12 bit seq)  |
+		+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		|var|                        rand_b                             |
+		+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+		|                            rand_b                             |
+		+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	*/
+	_ = uuid[15] // bounds check
+
+	t, s := getV7Time()
+
+	uuid[0] = byte(t >> 40)
+	uuid[1] = byte(t >> 32)
+	uuid[2] = byte(t >> 24)
+	uuid[3] = byte(t >> 16)
+	uuid[4] = byte(t >> 8)
+	uuid[5] = byte(t)
+
+	uuid[6] = 0x70 | (0x0F & byte(s>>8))
+	uuid[7] = byte(s)
+}
+```
+
+## 雪花算法
+
+SnowFlake 算法，是 Twitter 开源的分布式 id 生成算法。其核心思想就是：使用一个 64 bit的 long 型的数字作为全局唯一 id。在分布式系统中的应用十分广泛，且ID 引入了时间戳，基本上是保持自增的
+
+### 原生雪花算法优缺点
+原生的Snowflake算法是完全依赖于时间的，如果有时钟回拨的情况发生，会生成重复的ID，市场上的解决方案也是非常多的：
+
+- 最简单的方案，就是关闭生成唯一ID机器的时间同步。
+- 使用阿里云的的时间服务器进行同步，2017年1月1日的闰秒调整，阿里云服务器NTP系统24小时“消化”闰秒，完美解决了问题。
+- 如果发现有时钟回拨，时间很短比如5毫秒,就等待，然后再生成。或者就直接报错，交给业务层去处理。
+- 可以找2bit位作为时钟回拨位，发现有时钟回拨就将回拨位加1，达到最大位后再从0开始进行循环。
+
+### twitter的snowflake 算法
 ![](.distribued_id_images/twitter_id.png)
 首先确定我们的数值是64位，int64类型，被划分为四部分，不含开头的第一个bit，因为这个bit是符号位。
 
@@ -154,15 +287,8 @@ func (n *Node) Generate() ID {
 
 ```
 
-## 优缺点
-原生的Snowflake算法是完全依赖于时间的，如果有时钟回拨的情况发生，会生成重复的ID，市场上的解决方案也是非常多的：
 
-- 最简单的方案，就是关闭生成唯一ID机器的时间同步。
-- 使用阿里云的的时间服务器进行同步，2017年1月1日的闰秒调整，阿里云服务器NTP系统24小时“消化”闰秒，完美解决了问题。
-- 如果发现有时钟回拨，时间很短比如5毫秒,就等待，然后再生成。或者就直接报错，交给业务层去处理。
-- 可以找2bit位作为时钟回拨位，发现有时钟回拨就将回拨位加1，达到最大位后再从0开始进行循环。
-
-## sonyFlake
+### sony/sonyflake
 ![](.distribued_id_images/sony_snowflake.png)
 索尼公司的Sonyflake对原生的Snowflake进行改进，重新分配了各部分的bit位。
 
@@ -195,7 +321,7 @@ func lower16BitPrivateIP() (uint16, error) {
 
 ```
 
-### 源码
+
 启动阶段的配置参数
 ```go
 func NewSonyflake(st Settings) *Sonyflake
@@ -220,6 +346,7 @@ redis 127.0.0.1:6379> SADD base64_encoding_of_last16bits MzI0Mgo=
 redis 127.0.0.1:6379> SADD base64_encoding_of_last16bits MzI0Mgo=
 (integer) 0
 ```
+
 ### Sony 关于时间回拨问题
 
 - 只有当current大于elapsedTime，才会将current赋值给elapsedTime，也就是说elapsedTime是一直增大的，即使时钟回拨，也不会改变elapsedTime。
@@ -250,3 +377,6 @@ func (sf *Sonyflake) NextID() (uint64, error) {
 ```
 
 ## 参考
+
+- https://www.rfc-editor.org/rfc/rfc9562.html#name-introduction
+- [9种 分布式ID生成方式](https://mp.weixin.qq.com/s?__biz=MzAxNTM4NzAyNg==&mid=2247483785&idx=1&sn=8b828a8ae1701b810fe3969be536cb14&chksm=9b859174acf21862f0b95e0502a1a441c496a5488f5466b2e147d7bb9de072bde37c4db25d7a&token=745402269&lang=zh_CN#rd)

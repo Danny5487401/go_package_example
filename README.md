@@ -26,7 +26,7 @@
   - [第二十章 应用的命令行框架](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E7%AB%A0-%E5%BA%94%E7%94%A8%E7%9A%84%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%A1%86%E6%9E%B6)
   - [第二十一章 配置文件解析:viper(依赖mapstructure,fsnotify,yaml,toml)](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B8%80%E7%AB%A0-%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E8%A7%A3%E6%9E%90viper%E4%BE%9D%E8%B5%96mapstructurefsnotifyyamltoml)
   - [第二十二章 ETCD](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%BA%8C%E7%AB%A0-etcd)
-  - [第二十三章 Go-Micro框架 (不推荐使用)](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B8%89%E7%AB%A0-go-micro%E6%A1%86%E6%9E%B6-%E4%B8%8D%E6%8E%A8%E8%8D%90%E4%BD%BF%E7%94%A8)
+  - [第二十三章 Go-Micro框架(不推荐)](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B8%89%E7%AB%A0-go-micro%E6%A1%86%E6%9E%B6%E4%B8%8D%E6%8E%A8%E8%8D%90)
   - [第二十四章 搜索引擎es](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%9B%9B%E7%AB%A0-%E6%90%9C%E7%B4%A2%E5%BC%95%E6%93%8Ees)
   - [第二十五章 监控sentry](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%BA%94%E7%AB%A0-%E7%9B%91%E6%8E%A7sentry)
   - [第二十六章 图数据库Neo4j](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AD%E7%AB%A0-%E5%9B%BE%E6%95%B0%E6%8D%AE%E5%BA%93neo4j)
@@ -34,7 +34,7 @@
   - [第二十八章 OLAP(Online Analytical Processing 联机分析处理)](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E5%85%AB%E7%AB%A0-olaponline-analytical-processing-%E8%81%94%E6%9C%BA%E5%88%86%E6%9E%90%E5%A4%84%E7%90%86)
   - [第二十九章 分布式锁及源码分析](#%E7%AC%AC%E4%BA%8C%E5%8D%81%E4%B9%9D%E7%AB%A0-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81%E5%8F%8A%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
   - [第三十章 Zookeeper](#%E7%AC%AC%E4%B8%89%E5%8D%81%E7%AB%A0-zookeeper)
-  - [第三十一章 分布式Id](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%80%E7%AB%A0-%E5%88%86%E5%B8%83%E5%BC%8Fid)
+  - [第三十一章 分布式 Id](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%80%E7%AB%A0-%E5%88%86%E5%B8%83%E5%BC%8F-id)
   - [第三十二章 Consensus algorithm 共识算法](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%BA%8C%E7%AB%A0-consensus-algorithm-%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95)
   - [第三十三章 压缩](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%8E%8B%E7%BC%A9)
   - [第三十四章 本地缓存](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%9B%9B%E7%AB%A0-%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98)
@@ -334,10 +334,12 @@
 
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
 
-## [第三十一章 分布式Id](31_distributed_Id/distribued_id.md)
-- 雪花算法
-  - [bwmarrin/snowflake库](31_distributed_Id/snowflake/main.go)
-  - [SonyFlake(解决时间回拨问题)](31_distributed_Id/sony_snowflake/main.go)
+## [第三十一章 分布式 Id](31_distributed_Id/distribued_id.md)
+- 1 通用唯一标识码UUID（Universally Unique Identifier）
+  - 1.1 github.com/google/uuid 8个版本使用
+- 2 雪花算法
+  - [2.1 bwmarrin/snowflake-->原生 twitter实现](31_distributed_Id/02_snowflake/01_bwmarrin_snowflake/main.gos)
+  - [2.2 SonyFlake-->解决原生算法时间回拨问题](31_distributed_Id/02_snowflake/02_sony_snowflake/main.go)
 
 ## [第三十二章 Consensus algorithm 共识算法](32_consensus_algorithm/consensusAlgorithm.md)
 - [1 Paxos协议](32_consensus_algorithm/01_paxos/paxos.md)
