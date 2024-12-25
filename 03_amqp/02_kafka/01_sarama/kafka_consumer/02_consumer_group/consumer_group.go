@@ -4,10 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 )
 
 /*
+
 版本要求：panic: kafka: invalid configuration (consumer groups require Version to be >= V0_10_2_0)
 
 */

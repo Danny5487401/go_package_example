@@ -96,8 +96,10 @@
   - 1.1 消费者：推拉模式
   - 1.1 生产者
 - 2 [kafka](03_amqp/02_kafka/kafka_intro.md)
-  - [2.1 客户端sarama](03_amqp/02_kafka/01_sarama_tail_demo/sarama.md)
-  - 2.2 [客户端confluent-kafka-go源码分析](03_amqp/02_kafka/02_confluent-kafka/confluent_kafka_source_code.md)
+  - [2.1 客户端 sarama](03_amqp/02_kafka/01_sarama/sarama.md)
+    - 2.1.1 生产者
+    - 2.1.2 消费者
+  - [2.2 客户端confluent-kafka-go](03_amqp/02_kafka/02_confluent-kafka/confluent_kafka_source_code.md)
     - 2.2.1 生产者
     - 2.2.2 消费者
 - 3 rocketmq

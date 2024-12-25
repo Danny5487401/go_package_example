@@ -6,11 +6,11 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 )
 
 /*
-	消费者；Consumer or Consumer-Group API.
+消费者；Consumer or Consumer-Group API.
 */
 var Addr = []string{"tencent.danny.games:9092", "tencent.danny.games:9093", "tencent.danny.games:9094"}
 

@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/Shopify/sarama"
+	"github.com/IBM/sarama"
 )
 
 // Addr 集群地址
@@ -12,6 +12,7 @@ const Topic = "danny_kafka_log"
 
 /*
 生产者：两种AsyncProducer or the SyncProducer.
+
 	1.The AsyncProducer accepts messages on a channel and produces them asynchronously in the background as efficiently as possible; it is preferred in most cases.
 	异步，在大部分情况下推荐
 	2.The SyncProducer provides a method which will block until Kafka acknowledges the message as produced
@@ -21,7 +22,7 @@ func main() {
 	config := sarama.NewConfig()
 	config.Producer.RequiredAcks = sarama.WaitForAll          // 发送完数据需要leader和follower确认
 	config.Producer.Partitioner = sarama.NewRandomPartitioner // 新选出一个分区--随机
-	config.Producer.Return.Successes = true                   //成功交付的消息将在success channel 返回
+	config.Producer.Return.Successes = true                   // 成功交付的消息将在success channel 返回
 
 	// 构建一个消息
 	msg := &sarama.ProducerMessage{}

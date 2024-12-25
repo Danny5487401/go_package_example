@@ -24,11 +24,12 @@
     - [为什么Kafka不支持读写分离？](#%E4%B8%BA%E4%BB%80%E4%B9%88kafka%E4%B8%8D%E6%94%AF%E6%8C%81%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB)
     - [Kafka的那些设计让它有如此高的性能](#kafka%E7%9A%84%E9%82%A3%E4%BA%9B%E8%AE%BE%E8%AE%A1%E8%AE%A9%E5%AE%83%E6%9C%89%E5%A6%82%E6%AD%A4%E9%AB%98%E7%9A%84%E6%80%A7%E8%83%BD)
     - [kafka中的事务](#kafka%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1)
+  - [十一 kafka主流golang客户端](#%E5%8D%81%E4%B8%80-kafka%E4%B8%BB%E6%B5%81golang%E5%AE%A2%E6%88%B7%E7%AB%AF)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Kafka
-建议参考阿里文档：https://help.aliyun.com/document_detail/68166.html?spm=a2c4g.11186623.6.760.4d62203aT0ks10#title-k03-if4-cs8
 
 ## 一. 基本概念
 ![](.kafka_intro_images/kafka_structure.png)
@@ -386,3 +387,15 @@ TransactionCoordinator 在收到 EndTxnRequest 请求后会执行如下操作：
    如果生产者开启事务并向某个分区值发送3条消息 msg1、msg2 和 msg3，在执行 commitTransaction() 或 abortTransaction() 方法前，
    设置为“read_committed”的消费端应用是消费不到这些消息的，不过在 KafkaConsumer 内部会缓存这些消息，直到生产者执行 commitTransaction() 方法之后它才能将这些消息推送给消费端应用。
    反之，如果生产者执行了 abortTransaction() 方法，那么 KafkaConsumer 会将这些缓存的消息丢弃而不推送给消费端应用。
+
+
+## 十一 kafka主流golang客户端
+
+
+- github.com/confluentinc/confluent-kafka-go 是confluent公司开发的kafka golang sdk，由于confluent公司维护,cgo 包装librdkafka
+- github.com/IBM/sarama IBM组织 , 暂不支持contexts, 值作为指针分配会造成内存动态分配,从而更高的内存占用率
+- github.com/segmentio/kafka-go 
+- github.com/lovoo/goka 
+
+## 参考
+

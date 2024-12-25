@@ -2,15 +2,16 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [github.com/edenhill/librdkafka](#githubcomedenhilllibrdkafka)
+- [github.com/confluentinc/confluent-kafka-go](#githubcomconfluentincconfluent-kafka-go)
   - [生产者](#%E7%94%9F%E4%BA%A7%E8%80%85)
   - [消费者](#%E6%B6%88%E8%B4%B9%E8%80%85)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# github.com/edenhill/librdkafka 
-该库基于 librdkafka C 库，性能非常优秀，但安装和使用略显复杂。
+# github.com/confluentinc/confluent-kafka-go
+
+该库基于 github.com/edenhill/librdkafka  C 库，性能非常优秀，但安装和使用略显复杂。
 
 
 ## 生产者
