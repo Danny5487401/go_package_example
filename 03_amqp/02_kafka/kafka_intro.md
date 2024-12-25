@@ -4,18 +4,24 @@
 
 - [Kafka](#kafka)
   - [一. 基本概念](#%E4%B8%80-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5)
-    - [AR,ISR，OSR](#arisrosr)
+    - [AR, ISR, OSR](#ar-isr-osr)
     - [HW高水位High Watermark](#hw%E9%AB%98%E6%B0%B4%E4%BD%8Dhigh-watermark)
     - [LEO(Log End Offset)](#leolog-end-offset)
     - [ISR集合，以及HW和LEO之间的关系](#isr%E9%9B%86%E5%90%88%E4%BB%A5%E5%8F%8Ahw%E5%92%8Cleo%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB)
   - [二. producer发布消息](#%E4%BA%8C-producer%E5%8F%91%E5%B8%83%E6%B6%88%E6%81%AF)
-  - [三. broker保存消息](#%E4%B8%89-broker%E4%BF%9D%E5%AD%98%E6%B6%88%E6%81%AF)
+    - [producer delivery guarantee生产者发送保证](#producer-delivery-guarantee%E7%94%9F%E4%BA%A7%E8%80%85%E5%8F%91%E9%80%81%E4%BF%9D%E8%AF%81)
+  - [三. broker 保存消息](#%E4%B8%89-broker-%E4%BF%9D%E5%AD%98%E6%B6%88%E6%81%AF)
   - [四. 消费者](#%E5%9B%9B-%E6%B6%88%E8%B4%B9%E8%80%85)
+    - [两套 consumer API](#%E4%B8%A4%E5%A5%97-consumer-api)
+    - [消费组: 消费者是以消费者组的形式对外消费的。](#%E6%B6%88%E8%B4%B9%E7%BB%84-%E6%B6%88%E8%B4%B9%E8%80%85%E6%98%AF%E4%BB%A5%E6%B6%88%E8%B4%B9%E8%80%85%E7%BB%84%E7%9A%84%E5%BD%A2%E5%BC%8F%E5%AF%B9%E5%A4%96%E6%B6%88%E8%B4%B9%E7%9A%84)
   - [五. kafka高可用HA](#%E4%BA%94-kafka%E9%AB%98%E5%8F%AF%E7%94%A8ha)
-    - [kafka 多副本](#kafka-%E5%A4%9A%E5%89%AF%E6%9C%AC)
+    - [副本 replication](#%E5%89%AF%E6%9C%AC-replication)
     - [宕机的场景](#%E5%AE%95%E6%9C%BA%E7%9A%84%E5%9C%BA%E6%99%AF)
   - [六. 开发注意事项](#%E5%85%AD-%E5%BC%80%E5%8F%91%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
   - [七. 位移主题](#%E4%B8%83-%E4%BD%8D%E7%A7%BB%E4%B8%BB%E9%A2%98)
+    - [位移主题的消息格式](#%E4%BD%8D%E7%A7%BB%E4%B8%BB%E9%A2%98%E7%9A%84%E6%B6%88%E6%81%AF%E6%A0%BC%E5%BC%8F)
+    - [消费者在消费了信息之后，该把位移发送到哪呢？](#%E6%B6%88%E8%B4%B9%E8%80%85%E5%9C%A8%E6%B6%88%E8%B4%B9%E4%BA%86%E4%BF%A1%E6%81%AF%E4%B9%8B%E5%90%8E%E8%AF%A5%E6%8A%8A%E4%BD%8D%E7%A7%BB%E5%8F%91%E9%80%81%E5%88%B0%E5%93%AA%E5%91%A2)
+    - [位移的提交](#%E4%BD%8D%E7%A7%BB%E7%9A%84%E6%8F%90%E4%BA%A4)
   - [八. 安全认证](#%E5%85%AB-%E5%AE%89%E5%85%A8%E8%AE%A4%E8%AF%81)
   - [九. 消息重复和消费幂等](#%E4%B9%9D-%E6%B6%88%E6%81%AF%E9%87%8D%E5%A4%8D%E5%92%8C%E6%B6%88%E8%B4%B9%E5%B9%82%E7%AD%89)
     - [消费阻塞以及堆积](#%E6%B6%88%E8%B4%B9%E9%98%BB%E5%A1%9E%E4%BB%A5%E5%8F%8A%E5%A0%86%E7%A7%AF)
@@ -30,11 +36,21 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Kafka
+Apache Kafka是消息引擎系统，也是一个分布式流处理平台（Distributed Streaming Platform）.
+
+再强调一遍，Kafka是消息引擎系统，也是分布式流处理平台。
 
 ## 一. 基本概念
+3.0 之前版本 
 ![](.kafka_intro_images/kafka_structure.png)
-	服务端：Broker相当于Kafka的服务端，你可以理解为是队列存在的地方，生产者把消息发送到Broker中，消费者从Broker中获取消息
-	客户端:生产者与消费者
+服务端：Broker相当于Kafka的服务端，你可以理解为是队列存在的地方，生产者把消息发送到Broker中，消费者从Broker中获取消息
+客户端:生产者与消费者
+
+![](.kafka_intro_images/kafka_3.0_structure.png)
+kafka 3 的版本:当中已经彻底去掉了对zk的依赖,KIP-500议案提出了在Kafka中处理元数据的更好方法。基本思想是"Kafka on Kafka"，将Kafka的元数据存储在Kafka本身中，无需增加额外的外部存储比如ZooKeeper等。
+在kafka3.0的新的版本当中，使用了新的KRaft协议，使用该协议来保证在元数据仲裁中准确的复制元数据，这个协议类似于zk当中的zab协议以及类似于Raft协议，但是KRaft协议使用的是基于事件驱动的模式，与ZAB协议和Raft协议还有点不一样.
+
+![](.kafka_intro_images/kafka_definition.png)
 1. producer： 消息生产者，发布消息到 kafka 集群的终端或服务。
 2. broker：kafka 集群中包含的服务器。
 3. topic： 每条发布到 kafka 集群的消息属于的类别，即 kafka 是面向 topic 的。
@@ -49,9 +65,9 @@
 11. zookeeper： kafka 通过 zookeeper 来存储集群的 meta 信息，kafka3.0去除了。
 12. leader epoch:  leader 的纪元信息（epoch），初始值为0。每当 leader 变更一次，leader epoch 的值就会加1，相当于为 leader 增设了一个版本号。
 
-### AR,ISR，OSR
-1. AR（Assigned Replicas）:分区中的所有副本统称。
-2. ISR（In-Sync Replicas）:所有与 leader 副本保持一定程度同步的副本（包括 leader 副本在内），ISR 集合是 AR 集合中的一个子集。
+### AR, ISR, OSR
+1. AR（Assigned Replicas): 分区中的所有副本统称。
+2. ISR（In-Sync Replicas): 所有与 leader 副本保持一定程度同步的副本（包括 leader 副本在内），ISR 集合是 AR 集合中的一个子集。
 3. OSR（Out-of-Sync Replicas）：与leader副本同步滞后过多的副本（不包括leader副本）
 4. leader 副本: 负责维护和跟踪 ISR 集合中所有 follower 副本的滞后状态，当 follower 副本落后太多或失效时，leader 副本会把它从 ISR 集合中剔除。
 
@@ -91,12 +107,13 @@
    - c. leader 将消息写入本地 log
    - d. followers 从 leader pull 消息，写入本地 log 后 leader 发送 ACK
    - e. leader 收到所有 ISR 中的 replica 的 ACK 后，增加 HW（high watermark，最后 commit 的 offset） 并向 producer 发送 ACK
-4. producer delivery guarantee生产者发送保证
-   - a. At most once 消息可能会丢，但绝不会重复传输
-   - b. At least one 消息绝不会丢，但可能会重复传输
-   - c. Exactly once 每条消息肯定会被传输一次且仅传输一次
+### producer delivery guarantee生产者发送保证
+Kafka默认提供的交付可靠性保障是第二种，即至少一次
+- a. At most once 消息可能会丢，但绝不会重复传输
+- b. At least one 消息绝不会丢，但可能会重复传输
+- c. Exactly once 每条消息肯定会被传输一次且仅传输一次
 
-## 三. broker保存消息
+## 三. broker 保存消息
 
 所理解的“消息”，在Kafka中被称为日志。
 在每一个broker中，保存了多个名字为{Topic}-{Partition}的文件夹，例如Test-1、Test-2.这里的意思是，这个broker中能够处理topic为Test，分区为1和2的消息
@@ -129,12 +146,11 @@
     三种类型的文件，*.log、*.index、*.timeindex。
     - log格式的文件记录了消息
     - index是偏移量索引
-    - timeindex是时间戳索引。  
+    - timeindex 是时间戳索引。  
     broker在接收到生产者发过来的消息的时候，需要将消息写在最后的Log Segment中。这样还带来了一个好处，消息的写入是顺序的IO。也因为如此，最后的一个Log Segment，被称为“active Log Segment”
 
-      
 ## 四. 消费者
-1. kafka 提供了两套 consumer API：
+### 两套 consumer API
 - a.  The high-level Consumer API
 - b.  The SimpleConsumer API   
   
@@ -161,8 +177,7 @@ SimpleConsumer API 的一般流程如下
 - 4 fetch 数据
 - 5 识别 leader 的变化，并对之作出必要的响应
 
-2. 消费组   
-其实在Kafka中，消费者是以消费者组的形式对外消费的。   
+### 消费组: 消费者是以消费者组的形式对外消费的。
 原因：   
 我们作一个假设，假设没有消费者组这种概念，我们现在有10个消费者订阅了同一个主题，那么当这个主题有新的消息之后，我们这10个消费者是不是应该去“抢消息”进行消费呢？  
    1. 这是一种浪费资源的表现。所以消费者组，也可以认为是一种更加合理分配资源，进行负载均衡的设计。
@@ -194,15 +209,15 @@ SimpleConsumer API 的一般流程如下
                             比如，consumer 拿到数据后可能把数据放到 HDFS，如果把最新的 offset 和数据本身一起写到 HDFS，那就可以保证数据的输出和 offset 的更新要么都完成，要么都不完成，
                             间接实现 Exactly once。（目前就 high-level API而言，offset 是存于Zookeeper 中的，无法存于HDFS，而SimpleConsuemr API的 offset 是由自己去维护的，可以将之存于 HDFS 中）
 
-   7. 消费者重平衡consumer rebalance    
+   7. 消费者重平衡 consumer rebalance    
 
 定义：某个消费组内的消费者就如何消费某个主题的所有分区达成一个共识的过程,
 但是这个过程对Kafka的吞吐率影响是巨大的，因为这个过程有点像GC中的STW（世界停止），在Rebalance的时候，所有的消费者只能去做重平衡这一件事情，不能消费任何的消息。 
 下面我们来说说哪些情况可能会导致Rebalance：
 
-- 1. 组内成员数量发生了变化
-- 2. 订阅主题的数量发生了变化
-- 3. 订阅主题的分区数量发生了变化     
+- 1 组内成员数量发生了变化.比如有新的Consumer实例加入组或者离开组，抑或是有Consumer实例崩溃被“踢出”组。
+- 2 订阅主题的数量发生了变化.比如consumer.subscribe(Pattern.compile(“t.*c”))就表明该Group订阅所有以字母t开头、字母c结尾的主题。在Consumer Group的运行过程中，你新创建了一个满足这样条件的主题，那么该Group就会发生Rebalance
+- 3 订阅主题的分区数量发生了变化.Kafka当前只能允许增加一个主题的分区数。
   
 而且在Rebalance的时候，假设有消费者退出了，导致多出了一些分区，Kafka并不是把这几个多出来的分区分配给原来的那些消费者，而是所有的消费者一起参与重新分配所有的分区
 当有新的消费者加入的时候，也不是原本的每个消费者分出一些分区给新的消费者，而是所有的消费者一起参与重新分配所有的分区。
@@ -213,18 +228,20 @@ SimpleConsumer API 的一般流程如下
 - c. N=size(PT)/size(CG)，向上取整
 - d. 解除 Ci 对原来分配的 partition 的消费权（i从0开始）
 - e. 将第i*N到（i+1）*N-1个 partition 分配给 Ci
+
 ## 五. kafka高可用HA
-1. 复制replication   
+### 副本 replication   
    同一个 partition 可能会有多个 replica（对应 server.properties 配置中的 default.replication.factor=N）。
-   没有 replica 的情况下，一旦 broker 宕机，其上所有 patition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 patition。
+   没有 replica 的情况下，一旦 broker 宕机，其上所有 partition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 partition。
    引入replication 之后，同一个 partition 可能会有多个 replica，而这时需要在这些 replica 之间选出一个 leader，
    producer 和 consumer 只与这个 leader 交互，其它 replica 作为 follower 从 leader 中复制数据   
-   复制算法：
+
+复制算法：
     - a. 将所有 broker（假设共 n 个 broker）和待分配的 partition 排序
     - b. 将第 i 个 partition 分配到第（i mod n）个 broker 上
     - c. 将第 i 个 partition 的第 j 个 replica 分配到第（(i + j) mode n）个 broker上
 
-### kafka 多副本
+kafka 多副本: 
 Kafka 为分区引入了多副本（Replica）机制，通过增加副本数量可以提升容灾能力。
 同一分区的不同副本中保存的是相同的消息（当然在同一时刻，副本之间可能并非完全一样），副本之间是“一主多从”的关系，其中leader副本负责处理读写请求，follower副本只负责与leader副本的消息同步。
 副本处于不同的broker中，当leader副本出现故障时，从follower副本中重新选举新的leader副本对外提供服务。Kafka通过多副本机制实现了故障的自动转移，当Kafka集群中某个broker失效时仍然能保证服务可用。
@@ -276,31 +293,32 @@ advertised.listeners 是 broker 给 producer 和 consumer 连接使用的，如�
 
 ## 七. 位移主题   
 在Kafka中的主题名称是__consumer_offsets。因为位移主题也是一个主题。
-1. 问题：
-    讨论一下发往位移主题的消息格式。因为我们是希望保存位移，所以很容易会想到这是一个KV结构。那么Key中应该保存哪些消息呢？
-结论：
-    key-value结构
+### 位移主题的消息格式
+因为我们是希望保存位移，所以很容易会想到这是一个KV结构。那么Key中应该保存哪些消息呢？
+结论： key-value结构
+
     Key中包含了主题名，分区名，消费者组名。其实在这里是不需要保存消费者id之类的信息的，也就是说只需要具体到是哪个消费者组在哪个主题的哪个分区消费了多少数据，就足够。
     Value中，只需要保存消费位移，就足够了.消费者是可能发生变动的，我们的目的是让消费者发生变动后，能知道从哪里继续消费
-2. 问题：
-    位移主题也是一个主题，所以必然也会有分区，也会有副本。那么消费者在消费了信息之后，该把位移发送到哪呢？
-结论：
-    Kafka中的位移主题会在第一个消费者被创建的时候创建，默认会有50个分区。消费者在提交位移的时候，会根据自己组id的hash值模位移主题的分区数，
-    所得到的结果就是位移信息该提交的分区id，然后找到这个分区id的leader节点，将位移信息提交到这个leader节点所在的broker中
-3. 位移的提交
-    位移的提交与消息丢失和重复消费
-    虽然有了位移主题这样的设计，但是并不代表了消息一定不会被重复消费，也不代表消息一定不会丢失。
-    另外，Kafka会严格的执行位移主题中所提交的信息。例如已经消费了0-20的消息，如果你提交的位移是100，那么下一次拉取的信息一定是从100开始的，20-99的消息将会丢失。又比如你提交的位移是10，那么10-20的消息将会被重复消费
 
-    提交方式：一种是自动提交，一种是手动提交    
-    自动提交：   
-      1. 在某一时刻提交了位移100，随后你拉取了100-150的消息，但是还没有到下一次提交位移的时候，消费者宕机了。可能这个时候只消费了100-120的消息，那么在消费者重启后，因为120的位移没有提交，所以这部分的消息会被重复消费一次。
-      2. 再设想一种情况，你拉取了100-150的消息，这个时候到了自动提交的时间，提交了150的这个位移，而这个时候消费者宕机了，重启之后会从150开始拉取信息处理，那么在这之前的信息将会丢失
-   
-    手动提交：  
-    手动提交又分为同步提交和异步提交两种提交方式。
-    1. 同步提交会直到消息被写入了位移主题，才会返回，这样是安全的，但是可能造成的问题是TPS降低。
-    2. 异步提交是触发了提交这个操作，就会返回。这样速度是很快的，但是可能会造成提交失败的情况
+### 消费者在消费了信息之后，该把位移发送到哪呢？
+Kafka中的位移主题会在第一个消费者被创建的时候创建，默认分区数是50，副本数是3。消费者在提交位移的时候，会根据自己组id的hash值模位移主题的分区数，
+所得到的结果就是位移信息该提交的分区id，然后找到这个分区id的leader节点，将位移信息提交到这个leader节点所在的broker中
+
+### 位移的提交
+位移的提交与消息丢失和重复消费
+虽然有了位移主题这样的设计，但是并不代表了消息一定不会被重复消费，也不代表消息一定不会丢失。
+另外，Kafka会严格的执行位移主题中所提交的信息。例如已经消费了0-20的消息，如果你提交的位移是100，那么下一次拉取的信息一定是从100开始的，20-99的消息将会丢失。又比如你提交的位移是10，那么10-20的消息将会被重复消费
+
+提交方式：一种是自动提交，一种是手动提交  
+
+自动提交： enable.auto.commit  
+1. 在某一时刻提交了位移100，随后你拉取了100-150的消息，但是还没有到下一次提交位移的时候，消费者宕机了。可能这个时候只消费了100-120的消息，那么在消费者重启后，因为120的位移没有提交，所以这部分的消息会被重复消费一次。
+2. 再设想一种情况，你拉取了100-150的消息，这个时候到了自动提交的时间，提交了150的这个位移，而这个时候消费者宕机了，重启之后会从150开始拉取信息处理，那么在这之前的信息将会丢失
+
+手动提交：  
+手动提交又分为同步提交和异步提交两种提交方式。
+1. 同步提交会直到消息被写入了位移主题，才会返回，这样是安全的，但是可能造成的问题是TPS降低。
+2. 异步提交是触发了提交这个操作，就会返回。这样速度是很快的，但是可能会造成提交失败的情况
 
 ## 八. 安全认证
 1. GSSAPI： 使用的Kerberos认证，可以集成目录服务，比如AD。从Kafka0.9版本开始支持
@@ -371,13 +389,20 @@ advertised.listeners 是 broker 给 producer 和 consumer 连接使用的，如�
 
 Kafka中的事务可以使应用程序将消费消息、生产消息、提交消费位移当作原子操作来处理，同时成功或失败，即使该生产或消费会跨多个分区。
 
+设置事务型Producer的方法也很简单，满足两个要求即可：
+
+- 和幂等性Producer一样，开启enable.idempotence = true。
+- 设置Producer端参数transactional. id。最好为其设置一个有意义的名字。
+
+
 生产者必须提供唯一的transactionalId，启动后请求事务协调器获取一个PID，transactionalId与PID一一对应。
 
 每次发送数据给<Topic, Partition>前，需要先向事务协调器发送AddPartitionsToTxnRequest，事务协调器会将该<Transaction, Topic, Partition>存于__transaction_state内，并将其状态置为BEGIN。
 
 在处理完 AddOffsetsToTxnRequest 之后，生产者还会发送 TxnOffsetCommitRequest 请求给 GroupCoordinator，从而将本次事务中包含的消费位移信息 offsets 存储到主题 __consumer_offsets 中
 
-一旦上述数据写入操作完成，应用程序必须调用KafkaProducer的commitTransaction方法或者abortTransaction方法以结束当前事务。无论调用 commitTransaction() 方法还是 abortTransaction() 方法，生产者都会向 TransactionCoordinator 发送 EndTxnRequest 请求。
+一旦上述数据写入操作完成，应用程序必须调用KafkaProducer的commitTransaction方法或者abortTransaction方法以结束当前事务。
+无论调用 commitTransaction() 方法还是 abortTransaction() 方法，生产者都会向 TransactionCoordinator 发送 EndTxnRequest 请求。
 TransactionCoordinator 在收到 EndTxnRequest 请求后会执行如下操作：
 
 1. 将 PREPARE_COMMIT 或 PREPARE_ABORT 消息写入主题 __transaction_state
@@ -399,3 +424,4 @@ TransactionCoordinator 在收到 EndTxnRequest 请求后会执行如下操作：
 
 ## 参考
 
+- [Kafka 核心技术与实战](https://time.geekbang.org/column/intro/191?tab=catalog)

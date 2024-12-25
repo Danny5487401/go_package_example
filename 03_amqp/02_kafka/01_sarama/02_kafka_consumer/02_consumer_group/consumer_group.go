@@ -29,7 +29,7 @@ func (h exampleConsumerGroupHandler) ConsumeClaim(sess sarama.ConsumerGroupSessi
 }
 
 func main() {
-	config := sarama.NewConfig()
+	config := sarama.NewConfig() // 默认 c.Consumer.Offsets.AutoCommit.Enable = true
 	config.Consumer.Return.Errors = true
 
 	group, err := sarama.NewConsumerGroup(Addr, "my-group", config)

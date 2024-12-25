@@ -10,19 +10,19 @@ import (
 )
 
 var (
-	broker       = "tencent.danny.games"
-	resourceType = "TOPIC"
-	resourceName = "user-active" //这是topic名称
+	broker            = "tencent.danny.games"
+	topicResourceType = "TOPIC"
+	resourceName      = "user-active" // 这是topic名称
 )
 
 func main() {
 	// 资源类型any, broker, topic, group\n
-	resourceType, err := kafka.ResourceTypeFromString(resourceType)
+	trt, err := kafka.ResourceTypeFromString(topicResourceType)
 	if err != nil {
-		fmt.Printf("Invalid resource type: %s\n", resourceType)
+		fmt.Printf("Invalid resource type: %s\n", topicResourceType)
 		os.Exit(1)
 	}
-	// 资源名称broker id or topic name
+	// 资源名称 broker id or topic name
 	resourceName := resourceName
 
 	// 创建管理员客户端
@@ -34,6 +34,7 @@ func main() {
 		fmt.Printf("Failed to create Admin client: %s\n", err)
 		os.Exit(1)
 	}
+	defer a.Close()
 
 	// Contexts are used to abort or limit the amount of time
 	// the Admin call blocks waiting for a result.
@@ -43,11 +44,11 @@ func main() {
 	dur, _ := time.ParseDuration("20s")
 	// 获取当前集群的资源配置
 	results, err := a.DescribeConfigs(ctx,
-		[]kafka.ConfigResource{{Type: resourceType, Name: resourceName}},
+		[]kafka.ConfigResource{{Type: trt, Name: resourceName}},
 		kafka.SetAdminRequestTimeout(dur))
 	if err != nil {
 		fmt.Printf("Failed to DescribeConfigs(%s, %s): %s\n",
-			resourceType, resourceName, err)
+			trt, resourceName, err)
 		os.Exit(1)
 	}
 
@@ -62,5 +63,4 @@ func main() {
 		}
 	}
 
-	a.Close()
 }

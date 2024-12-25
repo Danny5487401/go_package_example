@@ -10,7 +10,7 @@
   - [第四章 服务注册及配置文件中心 Nacos](#%E7%AC%AC%E5%9B%9B%E7%AB%A0-%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E5%8F%8A%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E4%B8%AD%E5%BF%83-nacos)
   - [第五章 关系型数据库](#%E7%AC%AC%E4%BA%94%E7%AB%A0-%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93)
   - [第六章 获取对外可用IP和端口](#%E7%AC%AC%E5%85%AD%E7%AB%A0-%E8%8E%B7%E5%8F%96%E5%AF%B9%E5%A4%96%E5%8F%AF%E7%94%A8ip%E5%92%8C%E7%AB%AF%E5%8F%A3)
-  - [第七章 Gin前端form验证器](#%E7%AC%AC%E4%B8%83%E7%AB%A0-gin%E5%89%8D%E7%AB%AFform%E9%AA%8C%E8%AF%81%E5%99%A8)
+  - [第七章 验证器 go-playground/validator](#%E7%AC%AC%E4%B8%83%E7%AB%A0-%E9%AA%8C%E8%AF%81%E5%99%A8-go-playgroundvalidator)
   - [第八章 GRPC编程及调优](#%E7%AC%AC%E5%85%AB%E7%AB%A0-grpc%E7%BC%96%E7%A8%8B%E5%8F%8A%E8%B0%83%E4%BC%98)
   - [第九章 Nosql 非关系型数据库](#%E7%AC%AC%E4%B9%9D%E7%AB%A0-nosql-%E9%9D%9E%E5%85%B3%E7%B3%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%BA%93)
   - [第十章 链路追踪(Distributed Tracing)](#%E7%AC%AC%E5%8D%81%E7%AB%A0-%E9%93%BE%E8%B7%AF%E8%BF%BD%E8%B8%AAdistributed-tracing)
@@ -95,11 +95,11 @@
 - [1 rabbitmq](03_amqp/01_rabbitmq/introduction.md)
   - 1.1 消费者：推拉模式
   - 1.1 生产者
-- 2 [kafka](03_amqp/02_kafka/kafka_intro.md)
+- [2 kafka](03_amqp/02_kafka/kafka_intro.md)
   - [2.1 客户端 sarama](03_amqp/02_kafka/01_sarama/sarama.md)
     - 2.1.1 生产者
     - 2.1.2 消费者
-  - [2.2 客户端confluent-kafka-go](03_amqp/02_kafka/02_confluent-kafka/confluent_kafka_source_code.md)
+  - [2.2 客户端 confluent-kafka-go](03_amqp/02_kafka/02_confluent-kafka/confluent_kafka_source_code.md)
     - 2.2.1 生产者
     - 2.2.2 消费者
 - 3 rocketmq
@@ -136,7 +136,7 @@
 ## 第六章 获取对外可用IP和端口
 - [通过google, 国内移动、电信和联通通用的DNS获取对外Ip和端口](06_get_available_ip_port/get_ip/main.go)
 
-## 第七章 Gin前端form验证器
+## [第七章 验证器 go-playground/validator](07_gin_form_validator/validator.md)
 - [1 验证器校验错误英转中](07_gin_form_validator/err_en_to_ch_translate/main.go)
 - [2 前端数据校验](07_gin_form_validator/simpleForm/main.go)
 

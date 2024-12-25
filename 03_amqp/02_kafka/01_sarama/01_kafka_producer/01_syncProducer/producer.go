@@ -10,16 +10,11 @@ var Addr = []string{"tencent.danny.games:9092", "tencent.danny.games:9093", "ten
 
 const Topic = "danny_kafka_log"
 
-/*
-生产者：两种AsyncProducer or the SyncProducer.
-
-	1.The AsyncProducer accepts messages on a channel and produces them asynchronously in the background as efficiently as possible; it is preferred in most cases.
-	异步，在大部分情况下推荐
-	2.The SyncProducer provides a method which will block until Kafka acknowledges the message as produced
-	同步阻塞，等待ack
-*/
 func main() {
+	// 默认配置
 	config := sarama.NewConfig()
+
+	// 生产者配置
 	config.Producer.RequiredAcks = sarama.WaitForAll          // 发送完数据需要leader和follower确认
 	config.Producer.Partitioner = sarama.NewRandomPartitioner // 新选出一个分区--随机
 	config.Producer.Return.Successes = true                   // 成功交付的消息将在success channel 返回

@@ -14,7 +14,6 @@ func TestSquirrel(t *testing.T) {
 	sql, args, err := active.ToSql()
 
 	if err == nil {
-
 		t.Logf("sql %v : ,args:%v ", sql, args)
 	}
 

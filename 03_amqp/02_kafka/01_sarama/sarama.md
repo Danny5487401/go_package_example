@@ -14,8 +14,14 @@
 
 
 
-
 ## 生产者
+两种生产者：AsyncProducer(异步，在大部分情况下推荐) or the SyncProducer(同步阻塞，等待ack).
+
+1.The AsyncProducer accepts messages on a channel and produces them asynchronously in the background as efficiently as possible; it is preferred in most cases.
+
+2.The SyncProducer provides a method which will block until Kafka acknowledges the message as produced
+
+
 
 同步阻塞生产者: 效率较低
 ```go
@@ -53,6 +59,119 @@ type SyncProducer interface {
 
 	// AddMessageToTxn add message offsets to current transaction.
 	AddMessageToTxn(msg *ConsumerMessage, groupId string, metadata *string) error
+}
+
+```
+
+
+分区处理
+```go
+func (tp *topicProducer) partitionMessage(msg *ProducerMessage) error {
+	var partitions []int32
+
+	err := tp.breaker.Run(func() (err error) {
+		requiresConsistency := false
+		if ep, ok := tp.partitioner.(DynamicConsistencyPartitioner); ok {
+			requiresConsistency = ep.MessageRequiresConsistency(msg)
+		} else {
+			requiresConsistency = tp.partitioner.RequiresConsistency()
+		}
+
+		if requiresConsistency {
+			partitions, err = tp.parent.client.Partitions(msg.Topic)
+		} else {
+			partitions, err = tp.parent.client.WritablePartitions(msg.Topic)
+		}
+		return
+	})
+	if err != nil {
+		return err
+	}
+
+	numPartitions := int32(len(partitions))
+
+	if numPartitions == 0 {
+		return ErrLeaderNotAvailable
+	}
+
+	choice, err := tp.partitioner.Partition(msg, numPartitions)
+
+	if err != nil {
+		return err
+	} else if choice < 0 || choice >= numPartitions {
+		return ErrInvalidPartition
+	}
+
+	msg.Partition = partitions[choice]
+
+	return nil
+}
+
+```
+
+压缩处理: 在Kafka 2.1.0版本之前，Kafka支持3种压缩算法：GZIP、Snappy和LZ4。从2.1.0开始，Kafka正式支持Zstandard算法（简写为zstd）。它是Facebook开源的一个压缩算法，能够提供超高的压缩比（compression ratio）
+
+```go
+func compress(cc CompressionCodec, level int, data []byte) ([]byte, error) {
+	switch cc {
+	case CompressionNone:
+		return data, nil
+	case CompressionGZIP:
+		var (
+			err    error
+			buf    bytes.Buffer
+			writer *gzip.Writer
+		)
+
+		switch level {
+		case CompressionLevelDefault:
+			writer = gzipWriterPool.Get().(*gzip.Writer)
+			defer gzipWriterPool.Put(writer)
+			writer.Reset(&buf)
+		case 1:
+			writer = gzipWriterPoolForCompressionLevel1.Get().(*gzip.Writer)
+			defer gzipWriterPoolForCompressionLevel1.Put(writer)
+			writer.Reset(&buf)
+        //...
+
+		case 9:
+			writer = gzipWriterPoolForCompressionLevel9.Get().(*gzip.Writer)
+			defer gzipWriterPoolForCompressionLevel9.Put(writer)
+			writer.Reset(&buf)
+		default:
+			writer, err = gzip.NewWriterLevel(&buf, level)
+			if err != nil {
+				return nil, err
+			}
+		}
+		if _, err := writer.Write(data); err != nil {
+			return nil, err
+		}
+		if err := writer.Close(); err != nil {
+			return nil, err
+		}
+		return buf.Bytes(), nil
+	case CompressionSnappy:
+		return snappy.Encode(data), nil
+	case CompressionLZ4:
+		writer := lz4WriterPool.Get().(*lz4.Writer)
+		defer lz4WriterPool.Put(writer)
+
+		var buf bytes.Buffer
+		writer.Reset(&buf)
+
+		if _, err := writer.Write(data); err != nil {
+			return nil, err
+		}
+		if err := writer.Close(); err != nil {
+			return nil, err
+		}
+		return buf.Bytes(), nil
+	case CompressionZSTD:
+		return zstdCompress(ZstdEncoderParams{level}, nil, data)
+	default:
+		return nil, PacketEncodingError{fmt.Sprintf("unsupported compression codec (%d)", cc)}
+	}
 }
 
 ```

@@ -13,6 +13,9 @@
 
 该库基于 github.com/edenhill/librdkafka  C 库，性能非常优秀，但安装和使用略显复杂。
 
+2014年，Kafka的3个创始人Jay Kreps、Naha Narkhede和饶军离开LinkedIn创办了Confluent公司，专注于提供基于Kafka的企业级流处理解决方案。
+Confluent Kafka提供了一些Apache Kafka没有的高级特性，比如跨数据中心备份、Schema注册中心以及集群监控工具等
+
 
 ## 生产者
 结构体
