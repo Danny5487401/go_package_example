@@ -19,19 +19,19 @@ type SignUpForm struct {
 	RePassword string `json:"re_password" binding:"required,eqfield=Password"` //跨字段
 }
 
-func main()  {
+func main() {
 	router := gin.Default()
 	router.POST("/signup", func(context *gin.Context) {
 		var signForm SignUpForm
-		if err:= context.ShouldBind(&signForm);err !=nil{
+		if err := context.ShouldBind(&signForm); err != nil {
 			fmt.Println(err.Error())
-			context.JSON(http.StatusBadRequest,gin.H{
-				"err":err.Error(),
+			context.JSON(http.StatusBadRequest, gin.H{
+				"err": err.Error(),
 			})
 			return
 		}
-		context.JSON(http.StatusOK,gin.H{
-			"msg":"注册成功",
+		context.JSON(http.StatusOK, gin.H{
+			"msg": "注册成功",
 		})
 	})
 
@@ -40,8 +40,8 @@ func main()  {
 		var loginForm LoginForm
 		if err := c.ShouldBind(&loginForm); err != nil {
 			fmt.Println(err.Error())
-			c.JSON(http.StatusBadRequest,gin.H{
-				"err":err.Error(),
+			c.JSON(http.StatusBadRequest, gin.H{
+				"err": err.Error(),
 			})
 			return
 		}

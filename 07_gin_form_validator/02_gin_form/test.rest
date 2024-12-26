@@ -1,0 +1,9 @@
+### 注册
+POST localhost:8090/signup
+
+Content-Type: application/json
+
+{
+  "Age": 150,
+  "name": "Danny"
+}

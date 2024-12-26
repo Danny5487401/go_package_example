@@ -137,8 +137,9 @@
 - [通过google, 国内移动、电信和联通通用的DNS获取对外Ip和端口](06_get_available_ip_port/get_ip/main.go)
 
 ## [第七章 验证器 go-playground/validator](07_gin_form_validator/validator.md)
-- [1 验证器校验错误英转中](07_gin_form_validator/err_en_to_ch_translate/main.go)
-- [2 前端数据校验](07_gin_form_validator/simpleForm/main.go)
+- [1 dive 递归结构体字段验证](07_gin_form_validator/01_dive_validate/main.go)
+- [2 前端数据校验](07_gin_form_validator/02_gin_form/main.go)
+- [3 错误处理:验证器校验错误英转中](07_gin_form_validator/03_translate_err_from_en_to_ch/main.go)
 
 ## [第八章 GRPC编程及调优](08_grpc/grpc.md)
 *前置知识*
