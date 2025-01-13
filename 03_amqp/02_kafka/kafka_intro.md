@@ -5,15 +5,16 @@
 - [Kafka](#kafka)
   - [一. 基本概念](#%E4%B8%80-%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5)
     - [AR, ISR, OSR](#ar-isr-osr)
-    - [HW高水位High Watermark](#hw%E9%AB%98%E6%B0%B4%E4%BD%8Dhigh-watermark)
-    - [LEO(Log End Offset)](#leolog-end-offset)
-    - [ISR集合，以及HW和LEO之间的关系](#isr%E9%9B%86%E5%90%88%E4%BB%A5%E5%8F%8Ahw%E5%92%8Cleo%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB)
+    - [HW(High Watermark 高水位)](#hwhigh-watermark-%E9%AB%98%E6%B0%B4%E4%BD%8D)
+    - [LEO(Log End Offset 日志末端位移)](#leolog-end-offset-%E6%97%A5%E5%BF%97%E6%9C%AB%E7%AB%AF%E4%BD%8D%E7%A7%BB)
+    - [ISR，HW, LEO之间的关系](#isrhw-leo%E4%B9%8B%E9%97%B4%E7%9A%84%E5%85%B3%E7%B3%BB)
   - [二. producer发布消息](#%E4%BA%8C-producer%E5%8F%91%E5%B8%83%E6%B6%88%E6%81%AF)
     - [producer delivery guarantee生产者发送保证](#producer-delivery-guarantee%E7%94%9F%E4%BA%A7%E8%80%85%E5%8F%91%E9%80%81%E4%BF%9D%E8%AF%81)
   - [三. broker 保存消息](#%E4%B8%89-broker-%E4%BF%9D%E5%AD%98%E6%B6%88%E6%81%AF)
   - [四. 消费者](#%E5%9B%9B-%E6%B6%88%E8%B4%B9%E8%80%85)
     - [两套 consumer API](#%E4%B8%A4%E5%A5%97-consumer-api)
     - [消费组: 消费者是以消费者组的形式对外消费的。](#%E6%B6%88%E8%B4%B9%E7%BB%84-%E6%B6%88%E8%B4%B9%E8%80%85%E6%98%AF%E4%BB%A5%E6%B6%88%E8%B4%B9%E8%80%85%E7%BB%84%E7%9A%84%E5%BD%A2%E5%BC%8F%E5%AF%B9%E5%A4%96%E6%B6%88%E8%B4%B9%E7%9A%84)
+    - [消费者重平衡 consumer rebalance](#%E6%B6%88%E8%B4%B9%E8%80%85%E9%87%8D%E5%B9%B3%E8%A1%A1-consumer-rebalance)
   - [五. kafka高可用HA](#%E4%BA%94-kafka%E9%AB%98%E5%8F%AF%E7%94%A8ha)
     - [副本 replication](#%E5%89%AF%E6%9C%AC-replication)
     - [宕机的场景](#%E5%AE%95%E6%9C%BA%E7%9A%84%E5%9C%BA%E6%99%AF)
@@ -47,6 +48,7 @@ Apache Kafka是消息引擎系统，也是一个分布式流处理平台（Distr
 客户端:生产者与消费者
 
 ![](.kafka_intro_images/kafka_3.0_structure.png)
+
 kafka 3 的版本:当中已经彻底去掉了对zk的依赖,KIP-500议案提出了在Kafka中处理元数据的更好方法。基本思想是"Kafka on Kafka"，将Kafka的元数据存储在Kafka本身中，无需增加额外的外部存储比如ZooKeeper等。
 在kafka3.0的新的版本当中，使用了新的KRaft协议，使用该协议来保证在元数据仲裁中准确的复制元数据，这个协议类似于zk当中的zab协议以及类似于Raft协议，但是KRaft协议使用的是基于事件驱动的模式，与ZAB协议和Raft协议还有点不一样.
 
@@ -66,32 +68,41 @@ kafka 3 的版本:当中已经彻底去掉了对zk的依赖,KIP-500议案提出�
 12. leader epoch:  leader 的纪元信息（epoch），初始值为0。每当 leader 变更一次，leader epoch 的值就会加1，相当于为 leader 增设了一个版本号。
 
 ### AR, ISR, OSR
+追随者副本是不对外提供服务,方便实现“Read-your-writes”,当你使用生产者API向Kafka成功写入消息后，马上使用消费者API去读取刚才生产的消息;
+方便实现单调读（Monotonic Reads）,在多次消费消息时，它不会看到某条消息一会儿存在一会儿不存在。
 1. AR（Assigned Replicas): 分区中的所有副本统称。
-2. ISR（In-Sync Replicas): 所有与 leader 副本保持一定程度同步的副本（包括 leader 副本在内），ISR 集合是 AR 集合中的一个子集。
-3. OSR（Out-of-Sync Replicas）：与leader副本同步滞后过多的副本（不包括leader副本）
+2. ISR（In-Sync Replicas ISR副本): 所有与 leader 副本保持一定程度同步的副本（包括 leader 副本在内），ISR 集合是 AR 集合中的一个子集。
+3. OSR（Out-of-Sync Replicas 非同步副本）：与leader副本同步滞后过多的副本（不包括leader副本）
 4. leader 副本: 负责维护和跟踪 ISR 集合中所有 follower 副本的滞后状态，当 follower 副本落后太多或失效时，leader 副本会把它从 ISR 集合中剔除。
 
 如果 OSR 集合中有 follower 副本“追上”了 leader 副本，那么 leader 副本会把它从 OSR 集合转移至 ISR 集合 。
 默认情况下，当 leader 副本发生故障时，只有在 ISR 集合中的副本才有资格被选举为新的 leader，而在 OSR 集合中的副本则没有任何机会（不过这个原则也可以通过修改相应的参数配置来改变）。
 
 ![](.kafka_intro_images/hw.png)
-### HW高水位High Watermark
+### HW(High Watermark 高水位)
+高水位的作用主要有2个。
+
+1. 定义消息可见性，即用来标识分区下的哪些消息是可以被消费者消费的。
+2. 帮助Kafka完成副本同步
+
 它标识了一个特定的消息偏移量（offset），消费者只能拉取到这个offset之前的消息。
 
 它代表一个日志文件，这个日志文件中有 9 条消息，第一条消息的 offset（LogStartOffset）为0，最后一条消息的offset为8，offset为9的消息用虚线框表示，代表下一条待写入的消息。
 日志文件的HW为6，表示消费者只能拉取到offset在0至5之间的消息，而offset为6的消息对消费者而言是不可见的。
 
-### LEO(Log End Offset)
+### LEO(Log End Offset 日志末端位移)
 它标识当前日志文件中下一条待写入消息的offset，图中offset为9的位置即为当前日志文件的LEO，LEO的大小相当于当前日志分区中最后一条消息的offset值加1。
 分区ISR集合中的每个副本都会维护自身的LEO，而ISR集合中最小的LEO即为分区的HW，对消费者而言只能消费HW之前的消息。
 
-### ISR集合，以及HW和LEO之间的关系
+### ISR，HW, LEO之间的关系
 假设某个分区的ISR集合中有3个副本，即一个leader副本和2个follower副本，此时分区的LEO和HW都为3。消息3和消息4从生产者发出之后会被先存入leader副本
 
 ![](.kafka_intro_images/isr_process1.png)
 ![](.kafka_intro_images/isr_process2.png)
 ![](.kafka_intro_images/isr_process3.png)
 ![](.kafka_intro_images/isr_process4.png)
+
+Broker端参数replica.lag.time.max.ms参数值:当前默认值是10秒。这就是说，只要一个Follower副本落后Leader副本的时间不连续超过10秒，那么Kafka就认为该Follower副本与Leader是同步的，即使此时Follower副本中保存的消息明显少于Leader副本中的消息。
 
 ## 二. producer发布消息
 
@@ -210,7 +221,7 @@ SimpleConsumer API 的一般流程如下
                             间接实现 Exactly once。（目前就 high-level API而言，offset 是存于Zookeeper 中的，无法存于HDFS，而SimpleConsuemr API的 offset 是由自己去维护的，可以将之存于 HDFS 中）
 
    7. 消费者重平衡 consumer rebalance    
-
+### 消费者重平衡 consumer rebalance
 定义：某个消费组内的消费者就如何消费某个主题的所有分区达成一个共识的过程,
 但是这个过程对Kafka的吞吐率影响是巨大的，因为这个过程有点像GC中的STW（世界停止），在Rebalance的时候，所有的消费者只能去做重平衡这一件事情，不能消费任何的消息。 
 下面我们来说说哪些情况可能会导致Rebalance：
@@ -222,12 +233,19 @@ SimpleConsumer API 的一般流程如下
 而且在Rebalance的时候，假设有消费者退出了，导致多出了一些分区，Kafka并不是把这几个多出来的分区分配给原来的那些消费者，而是所有的消费者一起参与重新分配所有的分区
 当有新的消费者加入的时候，也不是原本的每个消费者分出一些分区给新的消费者，而是所有的消费者一起参与重新分配所有的分区。
 这样的分配策略听起来就很奇怪且影响效率，但是没有办法。
-不过社区新推出了StickyAssignor（粘性分配）策略，就可以做到我们上面假设的情况，但是目前还存在一些bug    
+
+不过社区于0.11.0.0版本推出了StickyAssignor（粘性分配）策略，就可以做到我们上面假设的情况，但是目前还存在一些bug    
 - a. 将目标 topic 下的所有 partition 排序，存于PT
 - b. 对某 consumer group 下所有 consumer 排序，存于 CG，第 i 个consumer 记为 Ci
 - c. N=size(PT)/size(CG)，向上取整
 - d. 解除 Ci 对原来分配的 partition 的消费权（i从0开始）
 - e. 将第i*N到（i+1）*N-1个 partition 分配给 Ci
+
+
+如何减少非必要重平衡?
+后面两个通常都是运维的主动操作，所以它们引发的Rebalance大都是不可避免的。接下来，我们主要关心因为组成员数量变化而引发的Rebalance该如何避免?
+1. 第一类非必要Rebalance是因为未能及时发送心跳，导致Consumer被“踢出”Group而引发的. 设置session.timeout.ms和heartbeat.interval.ms的值
+2. 第二类非必要Rebalance是Consumer消费时间过长导致的.设置 max.poll.interval.ms参数值
 
 ## 五. kafka高可用HA
 ### 副本 replication   

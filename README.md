@@ -299,6 +299,7 @@
 - [服务端server--鉴权分析](22_etcd/ectd_auth.md)
 - [服务端server--mvcc并发控制](22_etcd/etcd_mvcc.md)
 - [服务端server--watch机制](22_etcd/03_watch/etcd_watch.md)
+- [etcd 指标](22_etcd/etcd-metrics.md)
 - [1 基本操作CRUD及watch监听](22_etcd/01_CRUD/main.go)
 - [2 boltdb基本操作及在etcd中的源码分析](22_etcd/04_boltdb/boltdb.md)
 - [3 bbolt改善boldb](22_etcd/05_bbolt/bbolt.md)
@@ -365,7 +366,7 @@
 ## [第三十六章 Proto管理工具Buf](36_buf/buf_intro.md)
 
 ## [第三十七章 CI持续集成](37_CI/gitlabCI.md)
-- [1 runner 源码分析](37_CI/01_runner/runner.md)
+- [1 gitlab-runner 源码分析](37_CI/01_runner/runner.md)
 
 ## [第三十八章 Mergo实现 struct 与 map 之间转换-->k8s中应用](38_mergo/mergo.md)
 - [1 struct 与 map 之间转换](38_mergo/01_map_to_struct/main.go)

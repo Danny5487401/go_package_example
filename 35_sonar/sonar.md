@@ -16,13 +16,13 @@
     - [3. 静态扫描](#3-%E9%9D%99%E6%80%81%E6%89%AB%E6%8F%8F)
     - [4. 外部规则](#4-%E5%A4%96%E9%83%A8%E8%A7%84%E5%88%99)
       - [常用的Linter介绍](#%E5%B8%B8%E7%94%A8%E7%9A%84linter%E4%BB%8B%E7%BB%8D)
-      - [golint ：官方，deprecated](#golint-%E5%AE%98%E6%96%B9deprecated)
+      - [golint：官方，deprecated](#golint%E5%AE%98%E6%96%B9deprecated)
       - [gometalinter:不维护了](#gometalinter%E4%B8%8D%E7%BB%B4%E6%8A%A4%E4%BA%86)
       - [golangci-lint](#golangci-lint)
       - [特点](#%E7%89%B9%E7%82%B9)
       - [golangci-lint使用](#golangci-lint%E4%BD%BF%E7%94%A8)
   - [工作流转](#%E5%B7%A5%E4%BD%9C%E6%B5%81%E8%BD%AC)
-  - [参考连接](#%E5%8F%82%E8%80%83%E8%BF%9E%E6%8E%A5)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -146,7 +146,7 @@ sonar.go.govet.reportPaths=xx/xx/xx
 - varcheck - 未使⽤的全局变量和常量检查
 
 
-#### golint ：官方，deprecated
+#### golint：官方，deprecated
 golint生成覆盖率统计报告
 ```shell
 golint xx/xx > golint
@@ -223,6 +223,6 @@ golangci-lint run -c .golangci.yaml ./...
 7. 经理从分析中接收报告。Ops使用API自动执行配置并从SonarQube提取数据。运维人员使用JMX监视SonarQube Server。
 
 
-## 参考连接
+## 参考
 1. 官网：https://docs.sonarqube.org/latest/user-guide/concepts/
 2. 服务器搭建：https://icode9.com/content-4-1117481.html

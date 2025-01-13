@@ -23,6 +23,7 @@
       - [treeIndex索引模块](#treeindex%E7%B4%A2%E5%BC%95%E6%A8%A1%E5%9D%97)
       - [boltdb模块](#boltdb%E6%A8%A1%E5%9D%97)
       - [事务提交的过程](#%E4%BA%8B%E5%8A%A1%E6%8F%90%E4%BA%A4%E7%9A%84%E8%BF%87%E7%A8%8B)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -192,15 +193,15 @@ WAL 记录类型目前支持 5 种，分别是文件元数据记录、日志条�
 
 Raft 日志条目的数据结构信息
 ```go
-
+// Entry记录: 节点之间的传递是通过message进行的，每条消息中可以携带多条Entry记录,每条Entry对应一条一个独立的操作
 type Entry struct {
 	// Term 是 Leader 任期号，随着 Leader 选举增加
    Term             uint64    `protobuf:"varint，2，opt，name=Term" json:"Term"`   
    
-   // Index 是日志条目的索引，单调递增增加
-   Index            uint64    `protobuf:"varint，3，opt，name=Index" json:"Index"`
+   // Index 是日志条目的索引，单调递增增加,有了Term和Index之后，一个`log entry`就能被唯一标识。
+    Index            uint64    `protobuf:"varint，3，opt，name=Index" json:"Index"`
    
-   // Type 是日志类型，比如是普通的命令日志（EntryNormal）还是集群配置变更日志（EntryConfChange
+   // Type 是日志类型，比如是普通的命令日志（EntryNormal）还是集群配置变更日志（EntryConfChange)
    Type             EntryType `protobuf:"varint，1，opt，name=Type，enum=Raftpb.EntryType" json:"Type"`
    
    // Data 保存我们上面描述的 put 提案内容
@@ -276,3 +277,7 @@ etcd 的解决方案是合并再合并。
 
 在更新 boltdb 的时候，etcd 也会同步数据到 bucket buffer。因此 etcd 处理读请求的时候会优先从 bucket buffer 里面读取，
 其次再从 boltdb 读，通过 bucket buffer 实现读写性能提升，同时保证数据一致性
+
+
+
+## 参考
