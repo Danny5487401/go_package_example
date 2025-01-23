@@ -7,11 +7,12 @@
   - [Zookeeper角色：](#zookeeper%E8%A7%92%E8%89%B2)
   - [node节点](#node%E8%8A%82%E7%82%B9)
     - [节点类型](#%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8B)
-      - [1. PERSISTENT（持久节点)](#1-persistent%E6%8C%81%E4%B9%85%E8%8A%82%E7%82%B9)
+      - [1 PERSISTENT（持久节点)](#1-persistent%E6%8C%81%E4%B9%85%E8%8A%82%E7%82%B9)
       - [2 EPHEMERAL](#2-ephemeral)
       - [3 PERSISTENT_SEQUENTIAL](#3-persistent_sequential)
       - [4 EPHEMERAL_SEQUENTIAL](#4-ephemeral_sequential)
   - [Zookeeper的数据模型](#zookeeper%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B)
+  - [客户端基本使用](#%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -55,21 +56,12 @@ zookeeper 中节点叫znode存储结构上跟文件系统类似，以树级结�
 ### 节点类型
 临时节点（ephemeral）、持久节点（persistent）、顺序节点（sequence）。节点类型在创建时确定，之后不可修改。
 
-#### 1. PERSISTENT（持久节点)
+#### 1 PERSISTENT（持久节点)
 
 持久节点除非手动删除，否则节点一直存在于 Zookeeper 上
-```shell
-# create [-s] [-e] path data   
-# 其中 -s 为有序节点， -e 临时节点
-
-# 下面创建的就是持久节点
-create /test
-```
-
 
 #### 2 EPHEMERAL
 临时节点临时节点的生命周期与客户端会话绑定，一旦客户端会话失效（客户端与zookeeper 连接断开不一定会话失效），那么这个客户端创建的所有临时节点都会被移除
-
 
 
 #### 3 PERSISTENT_SEQUENTIAL
@@ -83,7 +75,52 @@ create /test
 Zookeeper数据模型的结构与Unix文件系统很类似，整体上可以看作是一颗树，每一个节点称做一个ZNode。
 每一个Znode默认能够存储1MB的数据，每个ZNode都可以通过其路径唯一标识。
 
+
+## 客户端基本使用
+
+```shell
+# 部署命令
+mkdir data
+docker run -d -e TZ="Asia/Shanghai" -p 2181:2181 -v $PWD/data:/data --name zookeeper --restart always zookeeper
+```
+
+```shell
+# 连接 zk 服务器
+zkCli.sh -server ip:port
+
+# 查看子节点-ls
+ls /brokers
+
+
+# create [-s] [-e] path data   
+# 其中 -s 为有序节点， -e 临时节点
+# 创建持久节点:创建一个名称为 china 的 znode，其值为 999
+create /china 999
+
+# 创建持久顺序节点:在/china 节点下创建了顺序子节点 beijing、 shanghai、 guangzhou，它们的数据内容分别为 bj、 sh、 gz
+create -s /china/beijing bj
+create -s /china/shanghai sh
+create -s /china/guangzhou gz
+
+# 创建临时节点
+create -e /china/aaa A
+
+# 创建临时顺序节点
+create -e  -s /china/bbb B
+
+# 获取节点信息 get
+## 获取持久节点数据
+get /china
+
+# 更新节点数据内容-set
+
+# 删除节点-delete
+```
+
+
+
 ## 参考
 
 - [ZAB协议概述与选主流程详解](https://github.com/h2pl/JavaTutorial/blob/master/docs/distributed/practice/%E6%90%9E%E6%87%82%E5%88%86%E5%B8%83%E5%BC%8F%E6%8A%80%E6%9C%AF%EF%BC%9AZAB%E5%8D%8F%E8%AE%AE%E6%A6%82%E8%BF%B0%E4%B8%8E%E9%80%89%E4%B8%BB%E6%B5%81%E7%A8%8B%E8%AF%A6%E8%A7%A3.md)
 - [zookeeper 全解](https://blog.csdn.net/General_zy/article/details/129233373)
+- [Zookeeper基础篇1-Zookeeper安装和客户端使用](https://juejin.cn/post/7098311052831653919)

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"time"
 
 	"github.com/go-zookeeper/zk"
@@ -14,29 +15,24 @@ import (
 func getConnect(zkList []string) (conn *zk.Conn) {
 	conn, _, err := zk.Connect(zkList, 10*time.Second)
 	if err != nil {
-		fmt.Println(err)
+		log.Fatalf("connect err : %v", err)
 	}
 	return
 }
 
-/**
- * 测试连接
- * @return
- */
-func test1() {
+func createNode() {
 	zkList := []string{"localhost:2181"}
 	conn := getConnect(zkList)
 
 	defer conn.Close()
-	var flags int32 = 0
+	var flags int32 = zk.FlagPersistent
 	//flags有4种取值：
-	//0:永久，除非手动删除
+	//zk.FlagPersistent=0:永久，除非手动删除
 	//zk.FlagEphemeral = 1:短暂，session断开则改节点也被删除
 	//zk.FlagSequence  = 2:会自动在节点后面添加序号
-	//3:Ephemeral和Sequence，即，短暂且自动添加序号
+	//FlagEphemeralSequential=3 ，即，短暂且自动添加序号
 	conn.Create("/go_servers", nil, flags, zk.WorldACL(zk.PermAll)) // zk.WorldACL(zk.PermAll)控制访问权限模式
 
-	time.Sleep(20 * time.Second)
 }
 
 /*
@@ -51,23 +47,9 @@ if err = conn.Delete(migrateLockPath, -1); err != nil {
 */
 
 /**
- * 测试临时节点
- * @return {[type]}
- */
-func test2() {
-	zkList := []string{"localhost:2181"}
-	conn := getConnect(zkList)
-
-	defer conn.Close()
-	conn.Create("/testadaadsasdsaw", nil, zk.FlagEphemeral, zk.WorldACL(zk.PermAll))
-
-	time.Sleep(20 * time.Second)
-}
-
-/**
  * 获取所有节点
  */
-func test3() {
+func listNode() {
 	zkList := []string{"localhost:2181"}
 	conn := getConnect(zkList)
 
@@ -81,5 +63,5 @@ func test3() {
 }
 
 func main() {
-	test3()
+	listNode()
 }
