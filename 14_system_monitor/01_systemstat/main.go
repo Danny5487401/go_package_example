@@ -1,6 +1,6 @@
 package main
 
-// 咱不适合在darwin系统下获取信息
+// 不适合在darwin系统下获取信息
 import (
 	"bitbucket.org/bertimus9/systemstat"
 	"fmt"

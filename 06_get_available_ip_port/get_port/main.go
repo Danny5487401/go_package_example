@@ -24,6 +24,7 @@ func main() {
 	port, err := GetFreePort()
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 	fmt.Println(port)
 }

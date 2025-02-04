@@ -2,12 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/micro/go-micro/config/encoder/json"
-	"github.com/micro/go-micro/config/encoder/yaml"
-	"github.com/micro/go-micro/config/source"
 	"time"
 
 	"github.com/micro/go-micro/config"
+	"github.com/micro/go-micro/config/encoder/json"
+	"github.com/micro/go-micro/config/encoder/yaml"
+	"github.com/micro/go-micro/config/source"
 	"github.com/micro/go-micro/config/source/file"
 )
 
@@ -16,12 +16,12 @@ func main() {
 	// 配置来源
 	jsonSource := file.NewSource(
 		//从文件中读取
-		file.WithPath("23_micro/01_Config/config/config.json"),
+		file.WithPath("23_micro/01_config/config/config.json"),
 		//指定json编码器
 		source.WithEncoder(json.NewEncoder()))
 
 	yamlSource := file.NewSource( //从文件中读取
-		file.WithPath("23_micro/01_Config/config/config.yaml"),
+		file.WithPath("23_micro/01_config/config/config.yaml"),
 		//指定json编码器
 		source.WithEncoder(yaml.NewEncoder()))
 
@@ -31,7 +31,7 @@ func main() {
 		return
 	}
 
-	var mysql Mysql
+	var mysql mysqlConfig
 
 	if err := config.Get("mysql", "database").Scan(&mysql); err != nil {
 		fmt.Println(err)
@@ -49,7 +49,7 @@ func main() {
 }
 
 // 定义我们的额数据结构
-type Mysql struct {
+type mysqlConfig struct {
 	Name    string `json:"name"`
 	Address string `json:"address"`
 	Port    int    `json:"port"`
