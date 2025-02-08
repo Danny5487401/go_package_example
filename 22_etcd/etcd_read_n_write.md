@@ -53,6 +53,7 @@ v2 API 使用 HTTP/1.x 协议，v3 API 使用 gRPC 协议。同时 v3 通过 etc
 
 
 ### 串行读与线性读
+![](.etcd_read_n_write_images/etcd_write_log_process.png)  
 ![](.etcd_read_n_write_images/serializable_read.png)   
 当 client 发起一个更新 hello 为 world 请求后，若 Leader 收到写请求，它会将此请求持久化到 WAL 日志，并广播给各个节点，若一半以上节点持久化成功，则该请求对应的日志条目被标识为已提交，etcdserver 模块异步从 Raft 模块获取已提交的日志条目，应用到状态机 (boltdb 等)。
 
