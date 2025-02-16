@@ -96,7 +96,7 @@
   - [6.1 vlevel 日志级别小于或等于 level 的日志打印处理](02_log/06_glog/01_vlevel)
   - [6.2 vmodule: 单独定制模块级别, log_backtrace_at: 打印堆栈](02_log/06_glog/02_vmodule_and_trace_location/main.go)
 - [7 klog-->glog 的 fork 版本,应用 k8s](02_log/07_klog/klog.md) 
-## 第三章 消息队列
+## [第三章 消息队列](03_amqp/amqp.md)
 - [1 rabbitmq](03_amqp/01_rabbitmq/introduction.md)
   - 1.1 消费者：推拉模式
   - 1.1 生产者
@@ -104,10 +104,10 @@
   - [2.1 客户端 sarama](03_amqp/02_kafka/01_sarama/sarama.md)
     - 2.1.1 生产者
     - 2.1.2 消费者
-  - [2.2 客户端 confluent-kafka-go](03_amqp/02_kafka/02_confluent-kafka/confluent_kafka_source_code.md)
+  - [2.2 客户端 confluent-kafka-go](03_amqp/02_kafka/02_confluent-kafka/confluent_kafka.md)
     - 2.2.1 生产者
     - 2.2.2 消费者
-- 3 rocketmq
+- [3 rocketmq](03_amqp/03_rocketmq/rocketmq.md)
   - 3.1 消费者：简单消费,延迟消费
   - 3.2 生产者：简单消息，延迟消息，事务消息
 - [4 Asynq 分布式延迟队列](03_amqp/04_asynq/asynq.md)
@@ -131,15 +131,15 @@
   - [2.3 事务处理](05_rds/02_xorm/transaction/transaction.go)
   - 2.4 crud
     - 插入Insert
-    - 原生sql
-    - 获取retrieve
-    - 更新update
+    - 原生 sql
+    - 获取 retrieve
+    - 更新 update
 - 3 database/sql 源码分析
-  - [3.1 converter把普通的值转化成driver.Value的接口](05_rds/03_database_sql/01_converter/converter.md)
+  - [3.1 converter 把普通的值转化成 driver.Value的接口](05_rds/03_database_sql/01_converter/converter.md)
 - [4 SQL生成库 Squirrel](05_rds/04_squirrel/quirrel.md)
 
 ## 第六章 获取对外可用IP和端口
-- [通过google, 国内移动、电信和联通通用的DNS获取对外Ip和端口](06_get_available_ip_port/get_ip/main.go)
+- [通过google, 国内移动、电信和联通通用的DNS获取对外 Ip 和 port ](06_get_available_ip_port/get_ip/main.go)
 
 ## [第七章 验证器 go-playground/validator](07_gin_form_validator/validator.md)
 - [1 dive 递归结构体字段验证](07_gin_form_validator/01_dive_validate/main.go)
