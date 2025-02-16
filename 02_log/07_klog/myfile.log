@@ -1,0 +1,5 @@
+Log file created at: 2025/02/15 22:07:13
+Running on machine: pythondeMBP
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0215 22:07:13.625633   84184 main.go:18] nice to meet you

@@ -11,6 +11,7 @@
     - [初始化](#%E5%88%9D%E5%A7%8B%E5%8C%96)
     - [获取](#%E8%8E%B7%E5%8F%96)
     - [CancelAt](#cancelat)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -350,3 +351,5 @@ func (r *Reservation) CancelAt(now time.Time) {
 	return
 }
 ```
+
+## 参考

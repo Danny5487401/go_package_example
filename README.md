@@ -92,6 +92,10 @@
   - [3.5 简单的基于Entry实现的hook函数-->无法接收到Fields的相关参数](02_log/03_zap/05_hook/main.go)
 - [4 logrus-->兼容 log 库](02_log/04_logrus/logrus.md)
 - [5 zerolog](02_log/05_zerolog/zerolog.md)
+- [6 C++日志库glog的golang版本](02_log/06_glog/glog.md)
+  - [6.1 vlevel 日志级别小于或等于 level 的日志打印处理](02_log/06_glog/01_vlevel)
+  - [6.2 vmodule: 单独定制模块级别, log_backtrace_at: 打印堆栈](02_log/06_glog/02_vmodule_and_trace_location/main.go)
+- [7 klog-->glog 的 fork 版本,应用 k8s](02_log/07_klog/klog.md) 
 ## 第三章 消息队列
 - [1 rabbitmq](03_amqp/01_rabbitmq/introduction.md)
   - 1.1 消费者：推拉模式
