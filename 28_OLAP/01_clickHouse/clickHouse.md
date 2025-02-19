@@ -108,15 +108,20 @@ ClickHouse并不像其他分布式系统那样，拥有高度自动化的分片�
 ## 架构设计
 ### 1. 单机结构
 ```shell
+$ cd /tmp
 $ mkdir ch_data ch_logs
-$ docker run -d \
+$ docker run --rm \
     -v $(realpath ./ch_data):/var/lib/clickhouse/ \
     -v $(realpath ./ch_logs):/var/log/clickhouse-server/ -p 18123:8123 -p19000:9000 \
-    --name some-clickhouse-server  --ulimit nofile=262144:262144 clickhouse/clickhouse-server:22.2.3.5
+    -e CLICKHOUSE_PASSWORD=admin -e CLICKHOUSE_USER=admin -e CLICKHOUSE_DB=my_database \
+    --name my-clickhouse-server  --ulimit nofile=262144:262144 clickhouse/clickhouse-server:25.1.4
+    
+$ docker exec -it my-clickhouse-server clickhouse-client
 ```
 
-$ docker exec -it some-clickhouse-server clickhouse-client
+
 ![](.clickHouse_images/single_machine_structure.png)
+
 1）Parser与Interpreter
 
 Parser和Interpreter是非常重要的两组接口：Parser分析器是将sql语句已递归的方式形成AST语法树的形式，并且不同类型的sql都会调用不同的parse实现类。

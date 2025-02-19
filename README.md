@@ -333,9 +333,9 @@
 
 ## 第二十八章 OLAP(Online Analytical Processing 联机分析处理)
 - [1 列数据库ClickHouse](28_OLAP/01_clickHouse/clickHouse.md)
-  - [1.1 标准库sql操作clickHouse](28_OLAP/01_clickHouse/01_database_sql/main.go)
-  - [1.2 扩展包sqlx操作clickHouse](28_OLAP/01_clickHouse/02_sqlx/main.go)
-  - [go-clickHouse源码分析](28_OLAP/01_clickHouse/go-clickHouse.md)
+  - [1.1 database/sql 接口操作 clickHouse](28_OLAP/01_clickHouse/01_database_sql/main.go)
+  - [1.2 原声接口操作 clickHouse](28_OLAP/01_clickHouse/02_native_interface/main.go)
+  - [go-clickHouse 源码分析](28_OLAP/01_clickHouse/go-clickHouse.md)
 
 ## [第二十九章 分布式锁及源码分析](29_distributed_lock/distributed_lock.md)
 - [1 redsync(RedLock 算法官方实现)](29_distributed_lock/01_redis_distributed_lock/main.go)

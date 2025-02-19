@@ -3,3 +3,80 @@ Running on machine: pythondeMBP
 Binary: Built with gc go1.23.0 for darwin/arm64
 Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
 I0215 22:07:13.625633   84184 main.go:18] nice to meet you
+Log file created at: 2025/02/18 15:13:50
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:13:50.214041   30383 main.go:18] nice to meet u :danny
+Log file created at: 2025/02/18 15:17:45
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:17:45.983953   30565 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:17:55
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:17:55.851572   30593 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:18:06
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:18:06.964811   30618 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:18:46
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:18:46.623685   30657 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:19:34
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:19:34.458077   30812 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:20:34
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:20:34.680147   30849 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:21:48
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:21:48.543127   30902 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:22:36
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:22:36.955701   30934 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:23:37
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:23:37.435739   30984 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:24:23
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:24:23.573186   31025 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:24:53
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:24:53.991990   31066 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:25:35
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:25:35.567809   31099 main.go:18] nice to meet u:danny
+I0218 15:25:35.568789   31099 main.go:19] klogv3
+Log file created at: 2025/02/18 15:25:43
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:25:43.503710   31125 main.go:18] nice to meet u:danny
+Log file created at: 2025/02/18 15:26:44
+Running on machine: adsl-99-14-47-87
+Binary: Built with gc go1.23.0 for darwin/arm64
+Log line format: [IWEF]mmdd hh:mm:ss.uuuuuu threadid file:line] msg
+I0218 15:26:44.603766   31214 main.go:18] nice to meet u:danny
+I0218 15:26:44.604502   31214 main.go:19] klogv3

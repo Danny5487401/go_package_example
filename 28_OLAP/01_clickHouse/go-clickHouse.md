@@ -2,16 +2,59 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [go-clickHouse 源码分析](#go-clickhouse-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-  - [初始化](#%E5%88%9D%E5%A7%8B%E5%8C%96)
+- [github.com/ClickHouse/clickhouse-go](#githubcomclickhouseclickhouse-go)
+  - [v1 对比 v2](#v1-%E5%AF%B9%E6%AF%94-v2)
+  - [特性](#%E7%89%B9%E6%80%A7)
+  - [两种接口](#%E4%B8%A4%E7%A7%8D%E6%8E%A5%E5%8F%A3)
+  - [v1 版本(不建议使用)](#v1-%E7%89%88%E6%9C%AC%E4%B8%8D%E5%BB%BA%E8%AE%AE%E4%BD%BF%E7%94%A8)
+  - [v2](#v2)
+  - [第三方应用-->grafana clickhouse plugin](#%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%94%E7%94%A8--grafana-clickhouse-plugin)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# go-clickHouse 源码分析
+# github.com/ClickHouse/clickhouse-go
 
-## 初始化
 
-注册插件
+
+## v1 对比 v2 
+https://github.com/ClickHouse/clickhouse-go/blob/main/v1_v2_CHANGES.md
+
+- v1 有精度损失
+- strings 在v2不允许插入Date or DateTime columns
+- 数组必须类型说明.[]any containing strings cannot be inserted into a string column
+- 默认连接策略不同, v2 使用 ConnOpenInOrder
+```go
+type ConnOpenStrategy uint8
+
+const (
+	ConnOpenInOrder ConnOpenStrategy = iota
+	ConnOpenRoundRobin
+	ConnOpenRandom
+)
+```
+
+
+## 特性
+
+ 
+- 可以 rows 反序列化成结构体 (ScanStruct, Select)
+- 可以 结构体 反序列化成 row  (AppendStruct)
+- 连接池
+- 批量写
+- LZ4/ZSTD 压缩支持
+- 兼容 database/sql (但是比 native interface 慢!)
+
+
+## 两种接口
+
+- native interface
+
+- std database/sql interface
+
+## v1 版本(不建议使用)
+
+初始化注册插件
 ```go
 // clickhouse-go@v1.5.1/bootstrap.go
 func init() {
@@ -68,71 +111,8 @@ func open(dsn string) (*clickhouse, error) {
 		connOpenStrategy  = connOpenRandom  //连接选择服务：默认随机
 		checkConnLiveness = true
 	)
-	if len(database) == 0 {
-		database = DefaultDatabase
-	}
-	if len(username) == 0 {
-		username = DefaultUsername
-	}
-	if v, err := strconv.ParseBool(query.Get("no_delay")); err == nil {
-		noDelay = v
-	}
-	tlsConfig := getTLSConfigClone(tlsConfigName)
-	if tlsConfigName != "" && tlsConfig == nil {
-		return nil, fmt.Errorf("invalid tls_config - no config registered under name %s", tlsConfigName)
-	}
-	secure = tlsConfig != nil
-	if v, err := strconv.ParseBool(query.Get("secure")); err == nil {
-		secure = v
-	}
-	if v, err := strconv.ParseBool(query.Get("skip_verify")); err == nil {
-		skipVerify = v
-	}
-	if duration, err := strconv.ParseFloat(query.Get("timeout"), 64); err == nil {
-		connTimeout = time.Duration(duration * float64(time.Second))
-	}
-	if duration, err := strconv.ParseFloat(query.Get("read_timeout"), 64); err == nil {
-		readTimeout = time.Duration(duration * float64(time.Second))
-	}
-	if duration, err := strconv.ParseFloat(query.Get("write_timeout"), 64); err == nil {
-		writeTimeout = time.Duration(duration * float64(time.Second))
-	}
-	if size, err := strconv.ParseInt(query.Get("block_size"), 10, 64); err == nil {
-		blockSize = int(size)
-	}
-	if altHosts := strings.Split(query.Get("alt_hosts"), ","); len(altHosts) != 0 {
-		for _, host := range altHosts {
-			if len(host) != 0 {
-				hosts = append(hosts, host)
-			}
-		}
-	}
-	switch query.Get("connection_open_strategy") {
-	case "random":
-		connOpenStrategy = connOpenRandom
-	case "in_order":
-		connOpenStrategy = connOpenInOrder
-	case "time_random":
-		connOpenStrategy = connOpenTimeRandom
-	}
-
-	settings, err := makeQuerySettings(query)
-	if err != nil {
-		return nil, err
-	}
-
-	if v, err := strconv.ParseBool(query.Get("compress")); err == nil {
-		compress = v
-	}
-
-	if v, err := strconv.ParseBool(query.Get("check_connection_liveness")); err == nil {
-		checkConnLiveness = v
-	}
-	if secure {
-		// There is no way to check the liveness of a secure connection, as long as there is no access to raw TCP net.Conn
-		checkConnLiveness = false
-	}
-
+    // ...
+	
 	var (
 		ch = clickhouse{
 			logf:              func(string, ...interface{}) {},
@@ -182,3 +162,144 @@ func open(dsn string) (*clickhouse, error) {
 	return &ch, nil
 }
 ```
+
+
+## v2
+
+
+## 第三方应用-->grafana clickhouse plugin
+```go
+// https://github.com/grafana/clickhouse-datasource/blob/28f86d02d120e38a11fff363fac846224580550b/pkg/plugin/driver.go
+func (h *Clickhouse) Connect(ctx context.Context, config backend.DataSourceInstanceSettings, message json.RawMessage) (*sql.DB, error) {
+	settings, err := LoadSettings(ctx, config)
+	if err != nil {
+		return nil, err
+	}
+
+	var tlsConfig *tls.Config
+	if settings.TlsAuthWithCACert || settings.TlsClientAuth {
+		tlsConfig, err = getTLSConfig(settings)
+		if err != nil {
+			return nil, err
+		}
+	} else if settings.Secure {
+		tlsConfig = &tls.Config{
+			InsecureSkipVerify: settings.InsecureSkipVerify,
+		}
+	}
+
+	t, err := strconv.Atoi(settings.DialTimeout)
+	if err != nil {
+		return nil, backend.DownstreamError(errors.New(fmt.Sprintf("invalid timeout: %s", settings.DialTimeout)))
+	}
+	qt, err := strconv.Atoi(settings.QueryTimeout)
+	if err != nil {
+		return nil, backend.DownstreamError(errors.New(fmt.Sprintf("invalid query timeout: %s", settings.QueryTimeout)))
+	}
+
+	protocol := clickhouse.Native
+	if settings.Protocol == "http" {
+		protocol = clickhouse.HTTP
+	}
+
+	compression := clickhouse.CompressionLZ4
+	if protocol == clickhouse.HTTP {
+		compression = clickhouse.CompressionGZIP
+	}
+
+	customSettings := make(clickhouse.Settings)
+	if settings.CustomSettings != nil {
+		for _, setting := range settings.CustomSettings {
+			customSettings[setting.Setting] = setting.Value
+		}
+	}
+
+	httpHeaders, err := extractForwardedHeadersFromMessage(message)
+	if err != nil {
+		return nil, err
+	}
+
+	// merge settings.HttpHeaders with message httpHeaders
+	for k, v := range settings.HttpHeaders {
+		httpHeaders[k] = v
+	}
+
+	opts := &clickhouse.Options{
+		Addr: []string{fmt.Sprintf("%s:%d", settings.Host, settings.Port)},
+		Auth: clickhouse.Auth{
+			Database: settings.DefaultDatabase,
+			Password: settings.Password,
+			Username: settings.Username,
+		},
+		ClientInfo: clickhouse.ClientInfo{
+			Products: getClientInfoProducts(ctx),
+		},
+		Compression: &clickhouse.Compression{
+			Method: compression,
+		},
+		DialTimeout: time.Duration(t) * time.Second,
+		HttpHeaders: httpHeaders,
+		HttpUrlPath: settings.Path,
+		Protocol:    protocol,
+		ReadTimeout: time.Duration(qt) * time.Second,
+		Settings:    customSettings,
+		TLS:         tlsConfig,
+	}
+
+	// dialCtx is used to create a connection to PDC, if it is enabled
+	dialCtx, err := getPDCDialContext(settings)
+	if err != nil {
+		return nil, err
+	}
+	if dialCtx != nil {
+		opts.DialContext = dialCtx
+	}
+
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(t)*time.Second)
+	defer cancel()
+
+	db := clickhouse.OpenDB(opts)
+
+	// Set connection pool settings
+	if i, err := strconv.Atoi(settings.ConnMaxLifetime); err == nil {
+		db.SetConnMaxLifetime(time.Duration(i) * time.Minute)
+	}
+	if i, err := strconv.Atoi(settings.MaxIdleConns); err == nil {
+		db.SetMaxIdleConns(i)
+	}
+	if i, err := strconv.Atoi(settings.MaxOpenConns); err == nil {
+		db.SetMaxOpenConns(i)
+	}
+
+	select {
+	case <-ctx.Done():
+		return nil, fmt.Errorf("the operation was cancelled before starting: %w", ctx.Err())
+	default:
+		// proceed
+	}
+
+	// `sqlds` normally calls `db.PingContext()` to check if the connection is alive,
+	// however, as ClickHouse returns its own non-standard `Exception` type, we need
+	// to handle it here so that we can log the error code, message and stack trace
+	if err := db.PingContext(ctx); err != nil {
+		if ctx.Err() != nil {
+			return nil, fmt.Errorf("the operation was cancelled during execution: %w", ctx.Err())
+		}
+
+		if exception, ok := err.(*clickhouse.Exception); ok {
+			log.DefaultLogger.Error("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
+		} else {
+			log.DefaultLogger.Error(err.Error())
+		}
+
+		return nil, err
+	}
+
+	return db, settings.isValid()
+}
+
+// Co
+```
+
+
+## 参考
