@@ -89,7 +89,6 @@ UNIT LOAD PATH
 
 ### service 
 ```service
-
 [Unit]
 
 Description=nginx - high performance web server
@@ -213,13 +212,6 @@ WantedBy=local-fs.target
 控制 systemd 的主要命令主要有以下几种：
 
 - systemctl 命令控制 systemd 的管理系统和服务的命令行工具
-- systemsdm 命令控制 systemd 的管理和服务的图形化工具
-- journalctl 命令查詢 systemd 日志系统
-- loginctl 命令控制 systemd 登入管理器
-- systemd-analyze 分析系统启动效能（类似开机时间)
-
-常用的 service 操作
-
 ```shell
 # 自启动
 systemctl enable nginx.service
@@ -272,6 +264,18 @@ systemctl poweroff    # 关机
 systemctl reboot       # 重启
 systemctl rescue    # 进入rescue模式
 ```
+
+- systemsdm 命令控制 systemd 的管理和服务的图形化工具
+- journalctl 命令查詢 systemd 日志系统
+- loginctl 命令控制 systemd 登入管理器
+```shell
+$ loginctl list-sessions    # 列出当前session
+$ loginctl list-users       # 列出当前登录用户
+$ loginctl show-user ruanyf # 列出显示指定用户的信息
+```
+- systemd-analyze 分析系统启动效能（类似开机时间)
+
+
 
 
 ## go-systemd
@@ -404,3 +408,4 @@ func Send(message string, priority Priority, vars map[string]string) error {
 - [Linux 的小伙伴 systemd 详解](https://blog.k8s.li/systemd.html)
 - [利用 systemd 部署 golang 项目](https://learnku.com/articles/34025)
 - [Systemd 学习资料](https://desistdaydream.github.io/docs/1.%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F/Systemd/)
+- [systemd.service 中文手册](https://www.cnblogs.com/duyinqiang/p/5696330.html)

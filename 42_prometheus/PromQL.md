@@ -2,10 +2,10 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [PromQL](#promql)
+- [PromQL(Prometheus Query Language)](#promqlprometheus-query-language)
   - [表达式类型](#%E8%A1%A8%E8%BE%BE%E5%BC%8F%E7%B1%BB%E5%9E%8B)
   - [范围查询](#%E8%8C%83%E5%9B%B4%E6%9F%A5%E8%AF%A2)
-  - [Offset modifier时间位移操作](#offset-modifier%E6%97%B6%E9%97%B4%E4%BD%8D%E7%A7%BB%E6%93%8D%E4%BD%9C)
+  - [Offset modifier 时间位移操作](#offset-modifier-%E6%97%B6%E9%97%B4%E4%BD%8D%E7%A7%BB%E6%93%8D%E4%BD%9C)
   - [聚合操作](#%E8%81%9A%E5%90%88%E6%93%8D%E4%BD%9C)
   - [标量(Scalar)和字符串(String)](#%E6%A0%87%E9%87%8Fscalar%E5%92%8C%E5%AD%97%E7%AC%A6%E4%B8%B2string)
   - [操作符](#%E6%93%8D%E4%BD%9C%E7%AC%A6)
@@ -23,7 +23,7 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 
-## PromQL
+## PromQL(Prometheus Query Language)
 Prometheus通过指标名称（metrics name）以及对应的一组标签（labelset）唯一定义一条时间序列。
 指标名称反映了监控样本的基本标识，而label则在这个基本特征上为采集到的数据提供了多种特征维度。用户可以基于这些特征维度过滤，聚合，统计从而产生新的计算后的一条时间序列。
 
@@ -32,16 +32,17 @@ PromQL是Prometheus内置的数据查询语言，其提供对时间序列数据�
 
 
 ### 表达式类型
-- 瞬时向量表达式。
-- 区间向量表达式
-- 标量(Scalar)
+PromQL的表达式中支持4种数据类型
+- 即时向量(Instant Vector):: 直接通过类似于PromQL表达式http_requests_total查询时间序列时，返回值中只会包含该时间序列中的最新的一个样本值，这样的返回结果我们称之为瞬时向量。而相应的这样的表达式称之为瞬时向量表达式。
+- 范围向量(Range Vector): 如果我们想过去一段时间范围内的样本数据时，我们则需要使用区间向量表达式。
+- 标量(Scalar): 只有一个数字，没有时序，例如 10
 - 字符串(String)
 
-### 范围查询
-直接通过类似于PromQL表达式http_requests_total查询时间序列时，返回值中只会包含该时间序列中的最新的一个样本值，这样的返回结果我们称之为瞬时向量。而相应的这样的表达式称之为瞬时向量表达式。
-
-而如果我们想过去一段时间范围内的样本数据时，我们则需要使用区间向量表达式。
 区间向量表达式和瞬时向量表达式之间的差异在于在区间向量表达式中我们需要定义时间选择的范围，时间范围通过时间范围选择器[]进行定义。例如，通过以下表达式可以选择最近5分钟内的所有样本数据：
+
+
+### 范围查询
+
 
 ```css
 http_requests_total{}[5m]
@@ -54,7 +55,7 @@ http_requests_total{}[5m]
 * w - 周
 * y - 年
 
-### Offset modifier时间位移操作
+### Offset modifier 时间位移操作
 在瞬时向量表达式或者区间向量表达式中，都是以当前时间为基准
 ```css
 http_request_total{} # 瞬时向量表达式，选择当前最新的数据
@@ -213,13 +214,17 @@ sum(http_requests_total) by (code,handler,job,method)
 ### 函数
 #### 计算counter指标增长率
 样本增长率反映出了样本变化的剧烈程度：
-```css
+```shell
+# 此函数和 rate() 完全一样，只是它没有将最终单位转换为 “每秒”(1/s)。每个规定的采样周期就是它的最终单位。increase(foo[5m])/ (5 * 60) 等同于rate(foo[5m])
 increase(node_cpu[2m]) / 120
 ```
 这里通过node_cpu[2m]获取时间序列最近两分钟的所有样本，increase计算出最近两分钟的增长量，最后除以时间120秒得到node_cpu样本在最近两分钟的平均增长率。并且这个值也近似于主机节点最近两分钟内的平均CPU使用率。
 
 rate函数可以直接计算区间向量v在时间窗口内平均增长速率。因此，通过以下表达式可以得到与increase函数相同的结果：
-```css
+```shell
+# 最后一个点  -  第一个点  = vulue
+# 最后一个时间戳  -  第一个时间戳 = time
+# resultValue = value / time
 rate(node_cpu[2m])
 ```
 需要注意的是使用rate或者increase函数去计算样本的平均增长速率，容易陷入“长尾问题”当中，其无法反应在时间窗口内样本数据的突发变化。
@@ -228,7 +233,10 @@ rate(node_cpu[2m])
 
 为了解决该问题，PromQL提供了另外一个灵敏度更高的函数irate(v range-vector)。irate同样用于计算区间向量的计算率，但是其反应出的是瞬时增长率。
 irate函数是通过区间向量中最后两个样本数据来计算区间向量的增长速率。这种方式可以避免在时间窗口范围内的“长尾问题”，并且体现出更好的灵敏度，通过irate函数绘制的图标能够更好的反应样本数据的瞬时变化状态。
-```css
+```shell
+#value = end2 - end1 (最后两个点,用大的减去小的)
+#time = time2 - time1
+#resultValue = value / time
 irate(node_cpu[2m])
 ```
 

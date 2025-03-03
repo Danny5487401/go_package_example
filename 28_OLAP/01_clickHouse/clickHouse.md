@@ -17,8 +17,6 @@
       - [Replicated MergeTree引擎](#replicated-mergetree%E5%BC%95%E6%93%8E)
       - [Distributed 引擎](#distributed-%E5%BC%95%E6%93%8E)
   - [性能](#%E6%80%A7%E8%83%BD)
-  - [表引擎](#%E8%A1%A8%E5%BC%95%E6%93%8E)
-    - [MergeTree引擎](#mergetree%E5%BC%95%E6%93%8E)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -190,7 +188,7 @@ Column提供了数据的读取能力，而DataType知道如何正反序列化，
 </yandex>
 ```
 以上集群配置完之后，想要用到Clickhouse的集群能力，还需要使用Replicated MergeTree+Distributed引擎，该引擎是"本地表 + 分布式表"的方式，因此可以实现多分片多副本
-####  Replicated MergeTree引擎
+#### Replicated MergeTree引擎
 
 使用ReplicatedMergeTree就是将MergeTree引擎的数据通过Zookeeper调节，达到副本的效果。
 比如上述配置中，我们首先可以在cluster1中的每个节点上创建ReplicatedMergeTree表，通过配置文件，可以看到Clickhouse-node1和Clickhouse-node2是在同一个shard里的，
@@ -217,29 +215,8 @@ Column提供了数据的读取能力，而DataType知道如何正反序列化，
 3）其他：并发，官网默认配置为100。由于是大数据分析数据库主要适用于olap场景，对并发支持略差多个大数据查询可能会直接将cpu等资源占满，故并发实际达不到100
 
 
-## 表引擎
-
-表引擎（即表的类型）决定了：
-
-- 数据的存储方式和位置，写到哪里以及从哪里读取数据
-- 支持哪些查询以及如何支持。
-- 并发数据访问。
-- 索引的使用（如果存在）。
-- 是否可以执行多线程请求。
-- 数据复制参数。
-### MergeTree引擎
-MergeTree这个名词是在我们耳熟能详的LSM Tree之上做减法而来——去掉了MemTable和Log。也就是说，向MergeTree引擎族的表插入数据时，数据会不经过缓冲而直接写到磁盘。
-
-> MergeTree is not an LSM tree because it doesn’t contain "memtable" and "log": inserted data is written directly to the filesystem. 
-> This makes it suitable only to INSERT data in batches, not by individual row and not very frequently – about once per second is ok, but a thousand times a second is not. 
-> We did it this way for simplicity’s sake, and because we are already inserting data in batches in our applications.
-
-
-社区通过 https://github.com/ClickHouse/ClickHouse/pull/8290  和 https://github.com/ClickHouse/ClickHouse/pull/10697 两个PR实现了名为Polymorphic Parts的特性，使得MergeTree引擎能够更好地处理频繁的小批量写入，但同时也标志着MergeTree的内核开始向真正的LSM Tree靠拢。
-
 
 ## 参考
 
 - [docker 安装 clickhouse](https://hub.docker.com/_/clickhouse)
 - [透过ClickHouse学习列式存储数据库](https://www.luozhiyun.com/archives/837)
-- [官方文档:表引擎](https://clickhouse.com/docs/zh/engines/table-engines)

@@ -10,8 +10,8 @@
     - [指标类型](#%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B)
       - [1. Counter计数器](#1-counter%E8%AE%A1%E6%95%B0%E5%99%A8)
       - [2. Gauge仪表盘](#2-gauge%E4%BB%AA%E8%A1%A8%E7%9B%98)
-      - [3. Histogram直方图](#3-histogram%E7%9B%B4%E6%96%B9%E5%9B%BE)
-      - [4. Summary摘要](#4-summary%E6%91%98%E8%A6%81)
+      - [3. Histogram 直方图](#3-histogram-%E7%9B%B4%E6%96%B9%E5%9B%BE)
+      - [4. Summary 摘要](#4-summary-%E6%91%98%E8%A6%81)
     - [作业和实例](#%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B)
   - [部署](#%E9%83%A8%E7%BD%B2)
   - [prometheus/client_golang 源码分析](#prometheusclient_golang-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
@@ -103,7 +103,7 @@ topk(10, http_requests_total)
 dalta(cpu_temp_celsius{host="zeus"}[2h])
 ```
 
-#### 3. Histogram直方图
+#### 3. Histogram 直方图
 
 如果大多数 API 请求都维持在 100ms 的响应时间范围内，而个别请求的响应时间需要 5s，那么就会导致某些 WEB 页面的响应时间落到中位数的情况，而这种现象被称为长尾问题。
 
@@ -117,8 +117,8 @@ dalta(cpu_temp_celsius{host="zeus"}[2h])
 - 所有事件产生值的大小的总和<basename>_sum：比如发生的2次http请求总的响应时间为150ms
 - 事件产生的值分布在bucket中的次数<basename>_bucket{le="上限"}：比如响应时间0-100ms的请求1次，100-200ms的请求1次，其他的0次
 
-#### 4. Summary摘要
-与 Histogram 类型类似，用于表示一段时间内的数据采样结果（通常是请求持续时间或响应大小等），但它直接存储了分位数（通过客户端计算，然后展示出来），而不是通过区间来计算
+#### 4. Summary 摘要
+与 Histogram 类型类似，用于表示一段时间内的数据采样结果（通常是请求持续时间或响应大小等），但它直接存储了分位数（通过客户端计算，然后展示出来），而不是通过区间来计算.
 
 Summary和Histogram都提供了对于事件的计数_count以及值的汇总_sum，因此使用_count,和_sum时间序列可以计算出相同的内容。
 

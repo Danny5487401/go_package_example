@@ -5,12 +5,14 @@
 - [lumberjack](#lumberjack)
   - [logger对象](#logger%E5%AF%B9%E8%B1%A1)
   - [第三方应用-->k8s](#%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%94%E7%94%A8--k8s)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # lumberjack
 
-zap的重点在于对日志内容的组装和控制，没有实现对于日志文件的管理。而lumberjack就是一个用来管理日志文件的利器，经常与各种日志组件配合起来使用，实现日志的老化压缩，文件分割等等功能
+zap的重点在于对日志内容的组装和控制，没有实现对于日志文件的管理。
+而lumberjack就是一个用来管理日志文件的利器，经常与各种日志组件配合起来使用，实现日志的老化压缩，文件分割等等功能.
 
 ## logger对象
 
@@ -344,3 +346,8 @@ func (o *AuditLogOptions) getWriter() (io.Writer, error) {
 	}, nil
 }
 ```
+
+
+
+## 参考
+- [日志切割组件库lumberjack介绍](https://daryeon.github.io/post/go-library-lumberjack/)
