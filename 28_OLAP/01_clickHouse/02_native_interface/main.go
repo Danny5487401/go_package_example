@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -11,14 +12,11 @@ import (
 
 func main() {
 
-	dsn := "clickhouse://admin:admin@127.0.0.1:19000/my_database?dial_timeout=200ms&max_execution_time=60"
+	dsn := "clickhouse://default:K5cCigzWXk@my-clickhouse.clickhouse.svc.cluster.local:9000/my_database?dial_timeout=1000ms&max_execution_time=60"
 	options, err := clickhouse.ParseDSN(dsn)
 	if err != nil {
 		log.Fatal(err)
 	}
-	options.MaxIdleConns = 0
-	options.MaxOpenConns = 0
-	options.ConnMaxLifetime = 0
 	ctx := context.Background()
 	// 配置连接参数
 	db, err := clickhouse.Open(options)
@@ -26,10 +24,11 @@ func main() {
 		log.Fatal(err)
 	}
 	if err := db.Ping(ctx); err != nil {
-		if exception, ok := err.(*clickhouse.Exception); ok {
+		var exception *clickhouse.Exception
+		if errors.As(err, &exception) {
 			fmt.Printf("[%d] %s \n%s\n", exception.Code, exception.Message, exception.StackTrace)
 		} else {
-			fmt.Printf("err : %v \n", err)
+			log.Fatal(err)
 		}
 		return
 	}

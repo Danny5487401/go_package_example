@@ -46,6 +46,16 @@ const (
 - 兼容 database/sql (但是比 native interface 慢!)
 
 
+## dsn 配置
+```
+clickhouse://username:password@host1:9000,host2:9000/database?dial_timeout=200ms&max_execution_time=60
+
+```
+https://github.com/ClickHouse/clickhouse-go/?tab=readme-ov-file#dsn 
+- dial_timeout 默认30s
+- connection_open_strategy: 默认 in_order
+- compress : 默认未压缩
+
 ## 两种接口
 
 - native interface

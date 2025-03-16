@@ -17,9 +17,9 @@
 ## 生产者
 两种生产者：AsyncProducer(异步，在大部分情况下推荐) or the SyncProducer(同步阻塞，等待ack).
 
-1.The AsyncProducer accepts messages on a channel and produces them asynchronously in the background as efficiently as possible; it is preferred in most cases.
+1. The AsyncProducer accepts messages on a channel and produces them asynchronously in the background as efficiently as possible; it is preferred in most cases.
 
-2.The SyncProducer provides a method which will block until Kafka acknowledges the message as produced
+2. The SyncProducer provides a method which will block until Kafka acknowledges the message as produced
 
 
 
@@ -109,7 +109,8 @@ func (tp *topicProducer) partitionMessage(msg *ProducerMessage) error {
 
 ```
 
-压缩处理: 在Kafka 2.1.0版本之前，Kafka支持3种压缩算法：GZIP、Snappy和LZ4。从2.1.0开始，Kafka正式支持Zstandard算法（简写为zstd）。它是Facebook开源的一个压缩算法，能够提供超高的压缩比（compression ratio）
+压缩处理: 在Kafka 2.1.0版本之前，Kafka支持3种压缩算法：GZIP、Snappy和LZ4。
+从 2.1.0开始，Kafka正式支持Zstandard算法（简写为zstd）。它是Facebook开源的一个压缩算法，能够提供超高的压缩比（compression ratio）
 
 ```go
 func compress(cc CompressionCodec, level int, data []byte) ([]byte, error) {
@@ -298,4 +299,4 @@ type ConsumerGroup interface {
 
 ## 参考
 
-- [腾讯云Sarama Go 使用案例](https://cloud.tencent.com/document/product/597/104883)
+- [腾讯云 Sarama Go 使用案例](https://cloud.tencent.com/document/product/597/104883)

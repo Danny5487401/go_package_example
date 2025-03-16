@@ -26,7 +26,7 @@ ClickHouse 的名字由来: ClickHouse 最初的设计目标是为了服务于�
 Metrica 在采集数据的过程中，一次页面点击（Click），就会产生一个事件（Event），就是基于页面的点击事件流（Stream），然后面向数据仓库进行 OLAP 分析。
 所以 ClickHouse 的全称是 Click Stream、Data WareHouse，简称 ClickHouse
 
-## 完备的 DBMS 功能(DataBase Management System，数据库管理系统)
+## 完备的 DBMS 功能(DataBase Management System 数据库管理系统)
 功能：
 - DDL（Data Definition Language数据定义语言）：可以动态地创建、修改或者删除数据库、表和视图，而无需重启服务
 - DML（Data Manipulation Language数据操作语言）：可以动态地查询、插入、修改或删除数据
@@ -62,7 +62,9 @@ SELECT A1, A2, A3, A4, A5 from A;
 ```
 数据库每次都会逐行扫描、并获取每行数据的全部字段，这里就是 50 个，然后再从中返回前 5 个字段。因此不难发现，尽管只需要前 5 个字段，但由于数据是按行进行组织的，实际上还是扫描了所有的字段。
 但如果数据是按列进行存储，则不会出现这样的问题，由于数据按列进行组织，数据库可以直接选择 A1 ~ A5 这 5 列的数据并返回，从而避免多余的数据扫描.
-![](.clickHouse_images/row_n_column_saving.png)  
+
+![](.clickHouse_images/row_n_column_saving.png)
+
 如果是按行存储的话，那么假设我们要计算 age 这一列的平均值，就需要一行一行扫描，所以最终会至少扫描 11 个值（ 3 + 3 + 3 + 2 ）才能找到 age 这一列所存储的 4 个值。
 这意味着我们要花费更多的时间等待 IO 完成，而且读完之后还要扔掉很多（因为我们只需要部分字段）。
 但如果是按列存储的话，我们只需要获取 age 这一列的连续快，即可得到我们想要的 4 个值，所以这种操作速度更快、效率更高
@@ -116,6 +118,11 @@ $ docker run --rm \
     
 $ docker exec -it my-clickhouse-server clickhouse-client
 ```
+端口说明: https://clickhouse.com/docs/zh/guides/sre/network-ports
+- 2181: ZooKeeper 默认服务端口
+- 8123: HTTP 默认端口
+- 9000:原生协议端口（也称为 ClickHouse TCP 协议）。 被 ClickHouse 应用程序和进程使用，如 clickhouse-server, clickhouse-client, 和原生 ClickHouse 工具。用于分布式查询的服务器间通信
+
 
 
 ![](.clickHouse_images/single_machine_structure.png)
@@ -152,60 +159,146 @@ ClickHouse内部的数据操作是面向Block对象进行的，并且采用了�
 Column提供了数据的读取能力，而DataType知道如何正反序列化，所以Block在这些对象的基础之上实现了进一步的抽象和封装，从而简化了整个使用的过程，仅通过Block对象就能完成一系列的数据操作。
 在具体的实现过程中，Block并没有直接聚合Column和DataType对象，而是通过ColumnWith TypeAndName对象进行间接引
 
-### 2. Clickhouse集群架构设计
-简单的配置为例
-```xml
-<yandex>
- <clickhouse_remote_servers>
- <cluster1>
- <shard>
- <internal_replication>true</internal_replication>
- <replica>
- <host>clickhouse-node1</host>
- <port>9000</port>
- </replica>
- <replica>
- <host>clickhouse-node2</host>
- <port>9001</port>
- </replica>
- </shard>
- <shard>
- <internal_replication>true</internal_replication>
- <replica>
- <host>clickhouse-node3</host>
- <port>9000</port>
- </replica>
- <replica>
- <host>clickhouse-node4</host>
- <port>9001</port>
- </replica>
- </shard>
- ...
- </cluster1>
- ...
- </clickhouse_remote_servers>
- ...
-</yandex>
+### 2. Clickhouse 集群架构设计
+https://github.com/bitnami/charts/tree/main/bitnami/clickhouse
+
+```shell
+(⎈|kubeasz-test:clickhouse)➜ cat values.yaml
+global:
+  security:
+    allowInsecureImages: true
+image:
+  registry: swr.cn-north-4.myhuaweicloud.com
+  repository: ddn-k8s/docker.io/bitnami/clickhouse
+  tag: 24.8.4
+
+zookeeper:
+  enabled: true
+  image:
+    registry: swr.cn-north-4.myhuaweicloud.com
+    repository: ddn-k8s/docker.io/bitnami/zookeeper
+    tag: 3.9.2-debian-12-r11
+podSecurityContext:
+  enabled: false
+containerSecurityContext:
+  enabled: false
+
+resources:
+  requests:
+    cpu: 500m
+    memory: 512Mi
+  limits:
+    cpu: 2
+    memory: 2024Mi
+shards: 2
+replicaCount: 2
+(⎈|kubeasz-test:clickhouse)➜  helm install -f values.yaml my-clickhouse oci://registry-1.docker.io/bitnamicharts/clickhouse
+```
+
+
+查看生成的配置
+```shell
+(⎈|kubeasz-test:clickhouse)➜  ~ kubectl get cm -n clickhouse my-clickhouse -o yaml | yq -r '.data["00_default_overrides.xml"]'
+<clickhouse>
+  <!-- Macros -->
+  <macros>
+    <shard from_env="CLICKHOUSE_SHARD_ID"></shard>
+    <replica from_env="CLICKHOUSE_REPLICA_ID"></replica>
+    <layer>my-clickhouse</layer>
+  </macros>
+  <!-- Log Level -->
+  <logger>
+    <level>information</level>
+  </logger>
+  <!-- Cluster configuration - Any update of the shards and replicas requires helm upgrade -->
+  <remote_servers>
+    <default>
+      <shard>
+          <replica>
+              <host>my-clickhouse-shard0-0.my-clickhouse-headless.clickhouse.svc.cluster.local</host>
+              <port>9000</port>
+              <user from_env="CLICKHOUSE_ADMIN_USER"></user>
+              <password from_env="CLICKHOUSE_ADMIN_PASSWORD"></password>
+          </replica>
+          <replica>
+              <host>my-clickhouse-shard0-1.my-clickhouse-headless.clickhouse.svc.cluster.local</host>
+              <port>9000</port>
+              <user from_env="CLICKHOUSE_ADMIN_USER"></user>
+              <password from_env="CLICKHOUSE_ADMIN_PASSWORD"></password>
+          </replica>
+      </shard>
+      <shard>
+          <replica>
+              <host>my-clickhouse-shard1-0.my-clickhouse-headless.clickhouse.svc.cluster.local</host>
+              <port>9000</port>
+              <user from_env="CLICKHOUSE_ADMIN_USER"></user>
+              <password from_env="CLICKHOUSE_ADMIN_PASSWORD"></password>
+          </replica>
+          <replica>
+              <host>my-clickhouse-shard1-1.my-clickhouse-headless.clickhouse.svc.cluster.local</host>
+              <port>9000</port>
+              <user from_env="CLICKHOUSE_ADMIN_USER"></user>
+              <password from_env="CLICKHOUSE_ADMIN_PASSWORD"></password>
+          </replica>
+      </shard>
+    </default>
+  </remote_servers>
+  <!-- Zookeeper configuration -->
+  <zookeeper>
+
+    <node>
+      <host from_env="KEEPER_NODE_0"></host>
+      <port>2181</port>
+    </node>
+    <node>
+      <host from_env="KEEPER_NODE_1"></host>
+      <port>2181</port>
+    </node>
+    <node>
+      <host from_env="KEEPER_NODE_2"></host>
+      <port>2181</port>
+    </node>
+  </zookeeper>
+  <listen_host>0.0.0.0</listen_host>
+  <listen_host>::</listen_host>
+  <listen_try>1</listen_try>
+</clickhouse>
+
 ```
 以上集群配置完之后，想要用到Clickhouse的集群能力，还需要使用Replicated MergeTree+Distributed引擎，该引擎是"本地表 + 分布式表"的方式，因此可以实现多分片多副本
-#### Replicated MergeTree引擎
 
-使用ReplicatedMergeTree就是将MergeTree引擎的数据通过Zookeeper调节，达到副本的效果。
-比如上述配置中，我们首先可以在cluster1中的每个节点上创建ReplicatedMergeTree表，通过配置文件，可以看到Clickhouse-node1和Clickhouse-node2是在同一个shard里的，
-每个shard标签里的replica就代表复制节点。这时我们创建表时将两个副本指定在同一个zookeeper目录下，那么写入到node1的数据会复制到node2，写入node2的数据会同步到node1，达到预计的复制效果。
 
-#### Distributed 引擎
-![](.clickHouse_images/local_table_n_remote_table.png)
-使用Distributed引擎的表本身不存储任何数据，但允许在多个服务器上进行分布式查询处理，读取是自动并行的。
-在读取期间，会使用远程服务器上的表索引（也就是我们上述使用的Replicated*MergeTree引擎）
+![img.png](distributed_table.png)
+Clickhouse先在每个 Shard 每个节点上创建本地表（即 Shard 的副本），本地表只在对应节点内可见；然后再创建分布式表[Distributed]，映射到前面创建的本地表。
 
-是一个2分片2副本的架构，使用的是Replicated*Merge Tree + Distributed引擎模式。红色的数字代表节点的话，也就是节点1和2互为副本，3和4互为副本。
+用户在访问分布式表时，ClickHouse 会自动根据集群架构信息，把请求转发给对应的本地表.
 
-图中events为Distributed引擎表，也叫分布式表；events_loc al为Replicated*MergeTree引擎表，也叫本地表。
-该图中，分布式表只在节点3中创建，线上环境一般会在每个节点上都创建一个分布式表（不会消耗资源，因为分布式表不会存储数据）。
+```clickhouse
+CREATE DATABASE db1 ON CLUSTER default;
+-- 使用 MergeTree 表引擎在集群上创建一个表
+CREATE TABLE db1.table1 ON CLUSTER default
+(
+    `id` UInt64,
+    `column1` String
+)
+    ENGINE = MergeTree
+        ORDER BY id;
 
-执行查询时，会访问一个节点的分布式表，该图中访问的是节点3中分布式表。然后分布式表会分别的读取2个分片的数据，在这里，它读取了节点3和节点2的本地表数据，这两个节点加在一块就是完整的数据。
-汇总查询后将结果（Result Set）返回
+INSERT INTO db1.table1 (id, column1) VALUES (1, 'abc');
+INSERT INTO db1.table1 (id, column1) VALUES (2, 'def');
+
+-- 创建一个分布式表以查询两个节点的两个分片
+CREATE TABLE db1.table1_dist ON CLUSTER default
+(
+    `id` UInt64,
+    `column1` String
+)
+    ENGINE = Distributed('default', 'db1', 'table1', rand())
+
+SELECT * FROM db1.table1_dist;
+
+```
+
 
 ## 性能
 1）插入：单机100-150M/s的插入速度；

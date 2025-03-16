@@ -25,7 +25,7 @@
 ClickHouse 拥有非常庞大的表引擎体系，总共有合并树、外部存储、内存、文件、接口和其它 6 大类 20 多种表引擎，而在这众多的表引擎中，又属合并树（MergeTree）表引擎及其家族系列（*MergeTree）最为强大，在生产环境中绝大部分场景都会使用此引擎。
  
 
-## MergeTree引擎
+## MergeTree 合并树引擎
 MergeTree这个名词是在我们耳熟能详的LSM Tree之上做减法而来——去掉了MemTable和Log。也就是说，向MergeTree引擎族的表插入数据时，数据会不经过缓冲而直接写到磁盘。
 
 > MergeTree is not an LSM tree because it doesn’t contain "memtable" and "log": inserted data is written directly to the filesystem.
@@ -65,13 +65,16 @@ ORDER BY expr
 [SETTINGS name = value, ...]
 ```
 
-- PARTITON BY：选填，表示分区键，用于指定表数据以何种标准进行分区。分区键既可以是单个字段、也可以通过元组的形式指定多个字段，同时也支持使用列表达式。
+- PARTITION BY：选填，表示分区键，用于指定表数据以何种标准进行分区。分区键既可以是单个字段、也可以通过元组的形式指定多个字段，同时也支持使用列表达式。
 - ORDER BY：必填，表示排序键，用于指定在一个分区内，数据以何种标准进行排序。排序键既可以是单个字段，例如 ORDER BY CounterID，也可以是通过元组声明的多个字段，例如 ORDER BY (CounterID, EventDate)。
-- setting 配置
+- SAMPLE BY ：抽样表达式，如果要用抽样表达式，主键中必须包含这个表达式。
+- setting 影响 性能的额外参数
   - index_granularity：对于 MergeTree 而言是一个非常重要的参数，它表示索引的粒度，默认值为 8192。所以 ClickHouse 根据主键生成的索引实际上稀疏索引，默认情况下是每隔 8192 行数据才生成一条索引
 
 
-## MergeTree 数据表的存储结构
+
+
+### MergeTree 数据表的存储结构
 
 数据存储格式  Wide or Compact format. 
 - In Wide format 每列在不同的文件
@@ -134,8 +137,60 @@ root@635e708a264a:/var/lib/clickhouse# cat data/helloworld/user_activity_event/2
 
 - partition.dat 和 minmax_[Column].idx：如果使用了分区键，例如上面的 PARTITION BY toYYYYMM(JoinTime)，则会额外生成 partition.dat 与 minmax_JoinTime.idx 索引文件，它们均使用二进制格式存储。partition.dat 用于保存当前分区下分区表达式最终生成的值，而 minmax_[Column].idx 则负责记录当前分区下分区字段对应原始数据的最小值和最大值。举个栗子，假设我们往上面的 user_activity_event 表中插入了 5 条数据，JoinTime 分别 2020-05-05、2020-05-15、2020-05-31、2020-05-03、2020-05-24，显然这 5 条都会进入到同一个分区，因为 toYYYMM 之后它们的结果是相同的，都是 2020-05，而 partition.dat 中存储的就是 2020-05，也就是分区表达式最终生成的值；同时还会有一个 minmax_JoinTime.idx 文件，里面存储的就是 2020-05-03 2020-05-31，也就是分区字段对应的原始数据的最小值和最大值
 
+### ReplacingMergeTree引擎
+该引擎和 MergeTree 的不同之处在于它会删除排序键值(ORDER BY)相同的重复项.
+在设置表引擎时，比MergeTree多了一个参数：ver-版本列，ENGINE = ReplacingMergeTree([ver]) 。
+
+
+
+## Replicated MergeTree 引擎
+
+使用ReplicatedMergeTree就是将MergeTree引擎的数据通过Zookeeper调节，达到副本的效果。
+比如我们首先可以在cluster1中的每个节点上创建ReplicatedMergeTree表，通过配置文件，可以看到Clickhouse-node1和Clickhouse-node2是在同一个shard里的，
+每个shard标签里的replica就代表复制节点。这时我们创建表时将两个副本指定在同一个zookeeper目录下，那么写入到node1的数据会复制到node2，写入node2的数据会同步到node1，达到预计的复制效果。
+
+```clickhouse
+CREATE TABLE table_name
+(
+    EventDate DateTime,
+    CounterID UInt32,
+    UserID UInt32
+)ENGINE=ReplicatedMergeTree('/clickhouse/tables/{layer}-{shard}/table_name', '{replica}')  -- 这里
+PARTITION BY toYYYYMM(EventDate)
+ORDER BY (CounterID, EventDate, intHash32(UserID))
+SAMPLE BY intHash32(UserID)
+
+```
+示例中的取值，采用了变量{layer}、{shard}、{replica}，他们的值取得是配置文件中的值
+
+
+
+## Distributed 引擎
+分布式表引擎，本身不存储数据，也不占用存储空间，在定义时需要指定字段，但必须与要映射的表的结构相同。
+允许在多个服务器上进行分布式查询处理，读取是自动并行的。
+在读取期间，会使用远程服务器上的表索引（也就是我们上述使用的Replicated*MergeTree引擎）
+
+```clickhouse
+CREATE TABLE IF NOT EXISTS {distributed_table} as {local_table}
+  ENGINE = Distributed({cluster}, '{local_database}', '{local_table}', rand())
+
+```
+- distributed_table：分布式表的表名
+- local_table：本地表名
+- as local_table：保持分布式表与本地表的表结构一致。此处也可以用 （column dataType）这种定义表结构方式代替
+- cluster：集群名
+
+![](.clickHouse_images/local_table_n_remote_table.png)
+图是一个2分片2副本的架构，使用的是Replicated*Merge Tree + Distributed引擎模式。红色的数字代表节点的话，也就是节点1和2互为副本，3和4互为副本。
+
+图中events为Distributed引擎表，也叫分布式表；events_loc al为Replicated*MergeTree引擎表，也叫本地表。
+该图中，分布式表只在节点3中创建，线上环境一般会在每个节点上都创建一个分布式表（不会消耗资源，因为分布式表不会存储数据）。
+
+执行查询时，会访问一个节点的分布式表，该图中访问的是节点3中分布式表。然后分布式表会分别的读取2个分片的数据，在这里，它读取了节点3和节点2的本地表数据，这两个节点加在一块就是完整的数据。
+汇总查询后将结果（Result Set）返回
 
 
 ## 参考
+- https://clickhouse.com/docs/zh/engines/table-engines
 - [MergeTree 的深度原理解析](https://www.cnblogs.com/traditional/p/15218743.html)
-- [官方文档:表引擎](https://clickhouse.com/docs/zh/engines/table-engines)
+- [ClickHouse技术研究及语法简介](https://juejin.cn/post/7246796364432048184)

@@ -42,7 +42,7 @@ Apache Kafka是消息引擎系统，也是一个分布式流处理平台（Distr
 再强调一遍，Kafka是消息引擎系统，也是分布式流处理平台。
 
 ## 一. 基本概念
-3.0 之前版本 
+3.0 之前版本   
 ![](.kafka_intro_images/kafka_structure.png)
 服务端：Broker相当于Kafka的服务端，你可以理解为是队列存在的地方，生产者把消息发送到Broker中，消费者从Broker中获取消息
 客户端:生产者与消费者
@@ -243,21 +243,21 @@ SimpleConsumer API 的一般流程如下
 
 
 如何减少非必要重平衡?
-后面两个通常都是运维的主动操作，所以它们引发的Rebalance大都是不可避免的。接下来，我们主要关心因为组成员数量变化而引发的Rebalance该如何避免?
-1. 第一类非必要Rebalance是因为未能及时发送心跳，导致Consumer被“踢出”Group而引发的. 设置session.timeout.ms和heartbeat.interval.ms的值
-2. 第二类非必要Rebalance是Consumer消费时间过长导致的.设置 max.poll.interval.ms参数值
+后面两个通常都是运维的主动操作，所以它们引发的 Rebalance 大都是不可避免的。接下来，我们主要关心因为组成员数量变化而引发的Rebalance该如何避免?
+1. 第一类非必要 Rebalance 是因为未能及时发送心跳，导致Consumer被“踢出”Group而引发的. 设置session.timeout.ms和heartbeat.interval.ms的值
+2. 第二类非必要 Rebalance 是Consumer消费时间过长导致的.设置 max.poll.interval.ms参数值
 
-## 五. kafka高可用HA
+## 五. kafka 高可用 HA
 ### 副本 replication   
-   同一个 partition 可能会有多个 replica（对应 server.properties 配置中的 default.replication.factor=N）。
-   没有 replica 的情况下，一旦 broker 宕机，其上所有 partition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 partition。
-   引入replication 之后，同一个 partition 可能会有多个 replica，而这时需要在这些 replica 之间选出一个 leader，
-   producer 和 consumer 只与这个 leader 交互，其它 replica 作为 follower 从 leader 中复制数据   
+同一个 partition 可能会有多个 replica（对应 server.properties 配置中的 default.replication.factor=N）。
+没有 replica 的情况下，一旦 broker 宕机，其上所有 partition 的数据都不可被消费，同时 producer 也不能再将数据存于其上的 partition。
+引入replication 之后，同一个 partition 可能会有多个 replica，而这时需要在这些 replica 之间选出一个 leader，
+producer 和 consumer 只与这个 leader 交互，其它 replica 作为 follower 从 leader 中复制数据   
 
 复制算法：
-    - a. 将所有 broker（假设共 n 个 broker）和待分配的 partition 排序
-    - b. 将第 i 个 partition 分配到第（i mod n）个 broker 上
-    - c. 将第 i 个 partition 的第 j 个 replica 分配到第（(i + j) mode n）个 broker上
+- a. 将所有 broker（假设共 n 个 broker）和待分配的 partition 排序
+- b. 将第 i 个 partition 分配到第（i mod n）个 broker 上
+- c. 将第 i 个 partition 的第 j 个 replica 分配到第（(i + j) mode n）个 broker上
 
 kafka 多副本: 
 Kafka 为分区引入了多副本（Replica）机制，通过增加副本数量可以提升容灾能力。
@@ -339,10 +339,12 @@ Kafka中的位移主题会在第一个消费者被创建的时候创建，默认
 2. 异步提交是触发了提交这个操作，就会返回。这样速度是很快的，但是可能会造成提交失败的情况
 
 ## 八. 安全认证
+SASL(Simple Authentication and Security Layer 简单验证和安全层):用来认证 C/S 模式也就是服务器与客户端的一种认证机制,通俗的话来讲就是让服务器知道连接进来的客户端的身份是谁。
+而 SASL 只是一种模式，需要依赖于具体的连接媒介，比如 JAAS(java Authentication Authorization Service)客户端、GSSAPI(Kerberos)、PLAIN、SCRAM-SHA-256、SCRAM-SHA-512、OAuthBearer 等等 
 1. GSSAPI： 使用的Kerberos认证，可以集成目录服务，比如AD。从Kafka0.9版本开始支持
 2. PLAIN： 使用简单用户名和密码形式。从Kafka0.10版本开始支持
-3. SCRAM： 主要解决PLAIN动态更新问题以及安全机制，从Kafka0.10.2开始支持
-4. OAUTHBEARER： 基于OAuth 2认证框架，从Kafka2.0版本开始支持
+3. SCRAM(Salted Challenge Response Authentication Mechanism)： 主要解决PLAIN动态更新问题以及安全机制，从Kafka0.10.2开始支持
+4. OAUTHBEARER：基于OAuth 2认证框架，从Kafka2.0版本开始支持
 
 ## 九. 消息重复和消费幂等
 消息队列Kafka版消费的语义是at least once， 也就是至少投递一次，保证消息不丢失，但是无法保证消息不重复。在出现网络问题、客户端重启时均有可能造成少量重复消息，此时应用消费端如果对消息重复比较敏感（例如订单交易类），则应该做消息幂等。
@@ -432,7 +434,7 @@ TransactionCoordinator 在收到 EndTxnRequest 请求后会执行如下操作：
    反之，如果生产者执行了 abortTransaction() 方法，那么 KafkaConsumer 会将这些缓存的消息丢弃而不推送给消费端应用。
 
 
-## 十一 kafka主流golang客户端
+## 十一 kafka主流 golang 客户端
 
 
 - github.com/confluentinc/confluent-kafka-go 是confluent公司开发的kafka golang sdk，由于confluent公司维护,cgo 包装librdkafka

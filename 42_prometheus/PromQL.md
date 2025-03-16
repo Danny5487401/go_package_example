@@ -71,7 +71,7 @@ http_request_total{}[1d] offset 1d
 
 ### 聚合操作
 一般来说，如果描述样本特征的标签(label)在并非唯一的情况下，通过PromQL查询数据，会返回多条满足这些特征维度的时间序列。而PromQL提供的聚合操作可以用来对这些时间序列进行处理，形成一条新的时间序列
-```css
+```promql
 # 查询系统所有http请求的总量
 sum(http_request_total)
 
@@ -289,3 +289,7 @@ sum(avg_over_time(go_goroutines{job=“prometheus”}[5m])) by (instance)
 - sum(…) by (instance)：序列纵向分组合并序列（包含相同的 instance 会分配到一组）
 - avg_over_time(…)
 - go_goroutines{job=“prometheus”}[5m] 
+
+
+
+## 参考
