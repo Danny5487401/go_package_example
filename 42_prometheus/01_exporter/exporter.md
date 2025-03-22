@@ -4,6 +4,9 @@
 
 - [exporter](#exporter)
   - [来源](#%E6%9D%A5%E6%BA%90)
+  - [Registry 结构体](#registry-%E7%BB%93%E6%9E%84%E4%BD%93)
+  - [注册指标](#%E6%B3%A8%E5%86%8C%E6%8C%87%E6%A0%87)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -25,7 +28,8 @@
 - 用户自定义的
 
 除了直接使用社区提供的Exporter程序以外，用户还可以基于Prometheus提供的Client Library创建自己的Exporter程序，
-目前Promthues社区官方提供了对以下编程语言的支持：Go、Java/Scala、Python、Ruby。同时还有第三方实现的如：Bash、C++、Common Lisp、Erlang,、Haskeel、Lua、Node.js、PHP、Rust等。
+目前Prometheus社区官方提供了对以下编程语言的支持：Go、Java/Scala、Python、Ruby。
+同时还有第三方实现的如：Bash、C++、Common Lisp、Erlang,、Haskeel、Lua、Node.js、PHP、Rust等。
 
 
 Exporter返回的样本数据，主要由三个部分组成：样本的一般注释信息（HELP），样本的类型注释信息（TYPE）和样本。Prometheus会对Exporter响应的内容逐行解析
@@ -215,4 +219,7 @@ func (r *Registry) Register(c Collector) error {
 	return nil
 }
 ```
+
+
+## 参考
 

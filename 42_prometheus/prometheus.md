@@ -8,23 +8,21 @@
     - [样本](#%E6%A0%B7%E6%9C%AC)
     - [指标名和标签](#%E6%8C%87%E6%A0%87%E5%90%8D%E5%92%8C%E6%A0%87%E7%AD%BE)
     - [指标类型](#%E6%8C%87%E6%A0%87%E7%B1%BB%E5%9E%8B)
-      - [1. Counter计数器](#1-counter%E8%AE%A1%E6%95%B0%E5%99%A8)
-      - [2. Gauge仪表盘](#2-gauge%E4%BB%AA%E8%A1%A8%E7%9B%98)
+      - [1. Counter 计数器](#1-counter-%E8%AE%A1%E6%95%B0%E5%99%A8)
+      - [2. Gauge 仪表盘](#2-gauge-%E4%BB%AA%E8%A1%A8%E7%9B%98)
       - [3. Histogram 直方图](#3-histogram-%E7%9B%B4%E6%96%B9%E5%9B%BE)
       - [4. Summary 摘要](#4-summary-%E6%91%98%E8%A6%81)
-    - [作业和实例](#%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B)
-  - [部署](#%E9%83%A8%E7%BD%B2)
+    - [指标使用](#%E6%8C%87%E6%A0%87%E4%BD%BF%E7%94%A8)
   - [prometheus/client_golang 源码分析](#prometheusclient_golang-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-    - [Metrics](#metrics)
+    - [Metrics 注册](#metrics-%E6%B3%A8%E5%86%8C)
     - [collector](#collector)
     - [Custom Collectors and constant Metrics](#custom-collectors-and-constant-metrics)
     - [Advanced Uses of the Registry](#advanced-uses-of-the-registry)
-    - [counter相关函数](#counter%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0)
+    - [counter 相关函数](#counter-%E7%9B%B8%E5%85%B3%E5%87%BD%E6%95%B0)
     - [WithLabelValues方法](#withlabelvalues%E6%96%B9%E6%B3%95)
     - [Registry 的高级用法](#registry-%E7%9A%84%E9%AB%98%E7%BA%A7%E7%94%A8%E6%B3%95)
-  - [Prometheus拉取Exporter的哪些数据](#prometheus%E6%8B%89%E5%8F%96exporter%E7%9A%84%E5%93%AA%E4%BA%9B%E6%95%B0%E6%8D%AE)
-    - [promhttp 包](#promhttp-%E5%8C%85)
-  - [参考链接](#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5)
+    - [client_golang/prometheus/promhttp 包](#client_golangprometheuspromhttp-%E5%8C%85)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -82,28 +80,100 @@ http_requests_total{host="192.10.0.1", method="POST", handler="/messages"}
 
 
 ### 指标类型
-Prometheus client库提供四种核心度量标准类型。注意是客户端。Prometheus服务端没有区分类型，将所有数据展平为无类型时间序列.
+Prometheus client库提供四种核心度量标准类型。注意是客户端。
+Prometheus服务端没有区分类型，将所有数据展平为无类型时间序列.
 
-#### 1. Counter计数器
+prometheus一共有5种metric类型，前四种为：Counter，Gauge，Summary 和Histogram，每种类型都有对应的vector版本：GaugeVec, CounterVec, SummaryVec, HistogramVec.
+vector版本细化了prometheus数据模型，增加了label维度。
+第5种metric为Untyped，它的运作方式类似Gauge，区别在于它只向prometheus服务器发送类型信号。
+
+只有基础metric类型实现了Metric接口，metric和它们的vector版本都实现了collector接口。collector负责一系列metrics的采集，但是为了方便，metric也可以“收集自己”。
+注意：Gauge, Counter, Summary, Histogram, 和Untyped自身就是接口，而GaugeVec, CounterVec, SummaryVec, HistogramVec, 和UntypedVec则不是接口。
+
+
+
+
+#### 1. Counter 计数器
 表示一种累积型指标，该指标只能单调递增或在重新启动时重置为零，例如，您可以使用计数器来表示所服务的请求数，已完成的任务或错误.
 
+```go
+type Counter interface {
+	Metric
+	Collector
+
+	// Inc increments the counter by 1. Use Add to increment it by arbitrary
+	// non-negative values.
+	Inc()
+	// Add adds the given value to the counter. It panics if the value is <
+	// 0.
+	Add(float64)
+}
+
+```
+
 Counter 类型数据可以让用户方便的了解事件产生的速率的变化，在 PromQL 内置的相关操作函数可以提供相应的分析，比如以 HTTP 应用请求量来进行说明：
-```shell
-//通过rate()函数获取HTTP请求量的增长率
+```promql
+// 通过rate()函数获取HTTP请求量的增长率
 rate(http_requests_total[5m])
-//查询当前系统中，访问量前10的HTTP地址
+// 查询当前系统中，访问量前10的HTTP地址
 topk(10, http_requests_total)
 ```
 
-#### 2. Gauge仪表盘
+#### 2. Gauge 仪表盘
 是最简单的度量类型，只有一个简单的返回值，可增可减，也可以set为指定的值。所以Gauge通常用于反映当前状态，比如当前温度或当前内存使用情况；当然也可以用于“可增加可减少”的计数指标。
 
+```go
+type Gauge interface {
+	Metric
+	Collector
+
+	// Set sets the Gauge to an arbitrary value.
+	Set(float64)
+	// Inc increments the Gauge by 1. Use Add to increment it by arbitrary
+	// values.
+	Inc()
+	// Dec decrements the Gauge by 1. Use Sub to decrement it by arbitrary
+	// values.
+	Dec()
+	// Add adds the given value to the Gauge. (The value can be negative,
+	// resulting in a decrease of the Gauge.)
+	Add(float64)
+	// Sub subtracts the given value from the Gauge. (The value can be
+	// negative, resulting in an increase of the Gauge.)
+	Sub(float64)
+
+	// SetToCurrentTime sets the Gauge to the current Unix time in seconds.
+	SetToCurrentTime()
+}
+
+```
+
 对于 Gauge 类型的监控指标，通过 PromQL 内置函数 delta() 可以获取样本在一段时间内的变化情况，例如，计算 CPU 温度在两小时内的差异：
-```shell
+```promql
 dalta(cpu_temp_celsius{host="zeus"}[2h])
 ```
 
 #### 3. Histogram 直方图
+
+```go
+type Histogram interface {
+	Metric
+	Collector
+
+	// Observe adds a single observation to the histogram. Observations are
+	// usually positive or zero. Negative observations are accepted but
+	// prevent current versions of Prometheus from properly detecting
+	// counter resets in the sum of observations. (The experimental Native
+	// Histograms handle negative observations properly.) See
+	// https://prometheus.io/docs/practices/histograms/#count-and-sum-of-observations
+	// for details.
+	Observe(float64)
+}
+
+// bucketLabel is used for the label that defines the upper bound of a
+// bucket of a histogram ("le" -> "less or equal").
+const bucketLabel = "le"
+```
 
 如果大多数 API 请求都维持在 100ms 的响应时间范围内，而个别请求的响应时间需要 5s，那么就会导致某些 WEB 页面的响应时间落到中位数的情况，而这种现象被称为长尾问题。
 
@@ -118,6 +188,20 @@ dalta(cpu_temp_celsius{host="zeus"}[2h])
 - 事件产生的值分布在bucket中的次数<basename>_bucket{le="上限"}：比如响应时间0-100ms的请求1次，100-200ms的请求1次，其他的0次
 
 #### 4. Summary 摘要
+```go
+type Summary interface {
+	Metric
+	Collector
+
+	// Observe adds a single observation to the summary. Observations are
+	// usually positive or zero. Negative observations are accepted but
+	// prevent current versions of Prometheus from properly detecting
+	// counter resets in the sum of observations. See
+	// https://prometheus.io/docs/practices/histograms/#count-and-sum-of-observations
+	// for details.
+	Observe(float64)
+}
+```
 与 Histogram 类型类似，用于表示一段时间内的数据采样结果（通常是请求持续时间或响应大小等），但它直接存储了分位数（通过客户端计算，然后展示出来），而不是通过区间来计算.
 
 Summary和Histogram都提供了对于事件的计数_count以及值的汇总_sum，因此使用_count,和_sum时间序列可以计算出相同的内容。
@@ -143,100 +227,9 @@ With(labels Labels)  // 与 GetMetricWithLabels 相同,但如果出现错误,则
 WithLabelValues(lvs ...string)  // 与 GetMetricWithLabelValues 相同,但如果出现错误,则引发 panics
 ```
 
-### 作业和实例
-在prometheus.yml配置文件中，添加如下配置
-```yaml
-scrape_configs:
-  - job_name: 'prometheus'
-    static_configs:
-      - targets: ['localhost:9090']
-  - job_name: 'node'
-    static_configs:
-      - targets: ['localhost:9100']
-```
+### 指标使用
 
-当前在每一个Job中主要使用了静态配置(static_configs)的方式定义监控目标。
-除了静态配置每一个Job的采集Instance地址以外，Prometheus还支持与DNS、Consul、E2C、Kubernetes等进行集成实现自动发现Instance实例，并从这些Instance上获取监控数据。
-
-在Prometheus配置中，一个可以拉取数据的端点IP:Port叫做一个实例（instance），而具有多个相同类型实例的集合称作一个作业（job）
-```yaml
-- job: api-server
-  - instance 1: 1.2.3.4:5670
-  - instance 2: 1.2.3.4:5671
-  - instance 3: 5.6.7.8:5670
-  - instance 4: 5.6.7.8:5671
-
-```
-在Prometheus中，每一个暴露监控样本数据的HTTP服务称为一个实例。例如在当前主机上运行的node exporter可以被称为一个实例(Instance)
-
-
-当Prometheus拉取指标数据时，会自动生成一些标签（label）用于区别抓取的来源：
-![](.prometheus_images/target_in_ui.png)
-- job：配置的作业名；
-- instance：配置的实例名，若没有实例名，则是抓取的IP:Port
-
-对于每一个实例（instance）的抓取，Prometheus会默认保存以下数据：
-
-- up{job="<job>", instance="<instance>"}：如果实例是健康的，即可达，值为1，否则为0；
-- scrape_duration_seconds{job="<job>", instance="<instance>"}：抓取耗时；
-- scrape_samples_post_metric_relabeling{job="<job>", instance="<instance>"}：指标重新标记后剩余的样本数。
-- scrape_samples_scraped{job="<job>", instance="<instance>"}：实例暴露的样本数
-该up指标对于监控实例健康状态很有用。
-
-
-
-
-## 部署
-使用prometheus的docker环境
-```yaml
-# prometheus.yml
-global:
-  scrape_interval:     15s # By default, scrape targets every 15 seconds.
-
-  # Attach these labels to any time series or alerts when communicating with
-  # external systems (federation, remote storage, Alertmanager).
-  external_labels:
-    monitor: 'codelab-monitor'
-
-# A scrape configuration containing exactly one endpoint to scrape:
-# Here it's Prometheus itself.
-scrape_configs:
-  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
-- job_name: "go-test"
-  scrape_interval: 60s
-  scrape_timeout: 60s
-  metrics_path: "/metrics"
-
-  static_configs:
-  - targets: ["localhost:8888"]
-
-```
-
-可以看到配置文件中指定了一个job_name，所要监控的任务即视为一个job, scrape_interval和scrape_timeout是pro进行数据采集的时间间隔和频率，metrics_path指定了访问数据的http路径，target是目标的ip:port,这里使用的是同一台主机上的8888端口
-
-```shell
-docker run -p 9090:9090 -v /Users/python/Desktop/github.com/Danny5487401/go_advanced_code/chapter02_goroutine/02_runtime/07prometheus/client/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
-```
-![](.prometheus_images/prometheus_panel.png)
-启动之后可以访问web页面http://localhost:9090/graph,在status下拉菜单中可以看到配置文件和目标的状态，此时目标状态为DOWN，因为我们所需要监控的服务还没有启动起来，那就赶紧步入正文，用pro golang client来实现程序吧。
-
-![](.prometheus_images/server_state.png)
-
-启动后状态
-![](.prometheus_images/server_state2.png)
-
-## prometheus/client_golang 源码分析
-![](.prometheus_images/client_golang_structure.png)
-
-prometheus包提供了用于实现监控代码的metric原型和用于注册metric的registry。子包（promhttp）允许通过HTTP来暴露注册的metric或将注册的metric推送到Pushgateway。
-
-### Metrics
-
-- prometheus一共有5种metric类型，前四种为：Counter，Gauge，Summary 和Histogram，每种类型都有对应的vector版本：GaugeVec, CounterVec, SummaryVec, HistogramVec，vector版本细化了prometheus数据模型，增加了label维度。第5种metric为Untyped，它的运作方式类似Gauge，区别在于它只向prometheus服务器发送类型信号。
-
-- 只有基础metric类型实现了Metric接口，metric和它们的vector版本都实现了collector接口。collector负责一系列metrics的采集，但是为了方便，metric也可以“收集自己”。注意：Gauge, Counter, Summary, Histogram, 和Untyped自身就是接口，而GaugeVec, CounterVec, SummaryVec, HistogramVec, 和UntypedVec则不是接口。
-
-- 为了创建metric和它们的vector版本，需要选择合适的opts结构体，如GaugeOpts, CounterOpts, SummaryOpts, HistogramOpts, 或UntypedOpts.
+为了创建metric和它们的vector版本，需要选择合适的opts结构体，如GaugeOpts, CounterOpts, SummaryOpts, HistogramOpts, 或UntypedOpts.
 
 ```go
 // 其中 GaugeOpts, CounterOpts 实际上均为 Opts 的别名
@@ -301,6 +294,27 @@ type SummaryOpts struct {
 }
 ```
 
+
+
+
+
+
+## prometheus/client_golang 源码分析
+![](.prometheus_images/client_golang_structure.png)
+
+prometheus包提供了用于实现监控代码的metric原型和用于注册metric的registry。子包（promhttp）允许通过HTTP来暴露注册的metric或将注册的metric推送到Pushgateway。
+
+### Metrics 注册
+
+```go
+func MustRegister(cs ...Collector) {
+	DefaultRegisterer.MustRegister(cs...)
+}
+
+```
+
+
+
 ### collector
 接口定义
 ```go
@@ -313,12 +327,76 @@ type Collector interface {
 }
 ```
 
+详细注册
+```go
+func (r *Registry) Register(c Collector) error {
+	var (
+		descChan           = make(chan *Desc, capDescChan)
+		newDescIDs         = map[uint64]struct{}{}
+		newDimHashesByName = map[string]uint64{}
+		collectorID        uint64 // All desc IDs XOR'd together.
+		duplicateDescErr   error
+	)
+	go func() {
+		c.Describe(descChan)
+		close(descChan)
+	}()
+	r.mtx.Lock()
+	defer func() {
+		// Drain channel in case of premature return to not leak a goroutine.
+		for range descChan {
+		}
+		r.mtx.Unlock()
+	}()
+	// Conduct various tests...
+	for desc := range descChan {
+		// ...
+		// 校验并注册 
+		
+	}
+	// A Collector yielding no Desc at all is considered unchecked.
+	if len(newDescIDs) == 0 {
+		r.uncheckedCollectors = append(r.uncheckedCollectors, c)
+		return nil
+	}
+	if existing, exists := r.collectorsByID[collectorID]; exists {
+		switch e := existing.(type) {
+		case *wrappingCollector:
+			return AlreadyRegisteredError{
+				ExistingCollector: e.unwrapRecursively(),
+				NewCollector:      c,
+			}
+		default:
+			return AlreadyRegisteredError{
+				ExistingCollector: e,
+				NewCollector:      c,
+			}
+		}
+	}
+	// If the collectorID is new, but at least one of the descs existed
+	// before, we are in trouble.
+	if duplicateDescErr != nil {
+		return duplicateDescErr
+	}
+
+	// 只有所有的测试通过后,才真正注册
+	r.collectorsByID[collectorID] = c
+	for hash := range newDescIDs {
+		r.descIDs[hash] = struct{}{}
+	}
+	for name, dimHash := range newDimHashesByName {
+		r.dimHashesByName[name] = dimHash
+	}
+	return nil
+}
+```
+
+
 ### Custom Collectors and constant Metrics
 
 实现自己的metric，一般只需要实现自己的collector即可。
 如果已经有了现成的metric（prometheus上下文之外创建的），则无需使用Metric类型接口，只需要在采集期间将现有的metric映射到prometheus metric即可，此时可以使用 NewConstMetric, NewConstHistogram, and NewConstSummary (以及对应的Must… 版本)来创建metric实例，以上操作在collect方法中实现。
 describe方法用于返回独立的Desc实例，NewDesc用于创建这些metric实例。（NewDesc用于创建prometheus识别的metric）
-
 
 ### Advanced Uses of the Registry
 
@@ -332,7 +410,7 @@ describe方法用于返回独立的Desc实例，NewDesc用于创建这些metric�
 
 - DefaultRegisterer注册了Go runtime metrics （通过NewGoCollector）和用于process metrics 的collector（通过NewProcessCollector）。通过custom registry可以自己决定注册的collector。
 
-### counter相关函数
+### counter 相关函数
 ```go
 func (c *counter) Add(v float64) {
 	if v < 0 {
@@ -357,8 +435,9 @@ func (c *counter) Add(v float64) {
 Add 中修改共享数据时采用了“无锁”实现，相比“有锁 (Mutex)”实现可以更充分利用多核处理器的并行计算能力，性能相比加 Mutex 的实现会有很大提升
 
 
-
 ### WithLabelValues方法
+每种标准数据结构还对应了 Vec 结构，通过 Vec 可以简洁的定义一组相同性质的 Metric，在采集数据的时候传入一组自定义的 Label/Value 获取具体的 Metric（Counter/Gauge/Histogram/Summary）
+
 1个指标由Metric name + Labels共同确定。
 
 若Metric name相同，但Label的值不同，则是不同的Metric。
@@ -416,31 +495,42 @@ type metricWithLabelValues struct {
 ### Registry 的高级用法
 prometheus 包提供了 MustRegister() 函数用于注册 Collector, 但如果注册过程中发生错误，程序会引发 panics. 而使用 Register() 函数可以实现注册 Collector 的同时处理可能发生的错误.
 
-
 prometheus 通过 NewGoCollector() 和 NewProcessCollector() 函数创建 Go 运行时数据指标的 Collector 和进程数据指标的 Collector.
 
-## Prometheus拉取Exporter的哪些数据
 
-### promhttp 包
+### client_golang/prometheus/promhttp 包
 promhttp 包允许创建 http.Handler 实例通过 HTTP 公开 Prometheus 数据指标
 
+
+获取handler
 ```go
+import (
+
+
+    "github.com/prometheus/client_golang/prometheus/promhttp"
+)
 // Prometheus拉取的入口
 http.Handle("/metrics", promhttp.Handler())
+```
 
-// http.go promhttp.Handler()
+收集指标具体实现
+```go
+
+// 注册handler 
 func Handler() http.Handler {
+	// 补充两个额外指标 promhttp_metric_handler_requests_total, promhttp_metric_handler_requests_in_flight
 	return InstrumentMetricHandler(
 		prometheus.DefaultRegisterer, HandlerFor(prometheus.DefaultGatherer, HandlerOpts{}),
 	)
 }
 
-
 // http.go HandlerFor
 func HandlerFor(reg prometheus.Gatherer, opts HandlerOpts) http.Handler {
-	// 省略部分代码
-	mfs, err := reg.Gather() // 收集Metric信息
-	// 省略部分代码
+	// ...
+    h := http.HandlerFunc(func(rsp http.ResponseWriter, req *http.Request) {
+	    mfs, err := reg.Gather() // 收集Metric信息
+    }
+	// ...
 }
 
 // prometheus.DefaultGatherer
@@ -455,7 +545,7 @@ var (
 // Gather implements Gatherer. 负责收集metrics信息
 func (r *Registry) Gather() ([]*dto.MetricFamily, error) {
 	// 省略部分代码
-    // 声明Counter类型的Metric后，需要MustRegist注册到Registry，最终就是保存在collectorsByID里
+    // 声明Counter类型的Metric后，需要MustRegistry注册到Registry，最终就是保存在collectorsByID里
     // Counter类型本身就是一个collector
 	for _, collector := range r.collectorsByID {
 		checkedCollectors <- collector
@@ -501,8 +591,9 @@ func (m *metricMap) Collect(ch chan<- Metric) {
 
 
 
-## 参考链接
-1. https://prometheus.fuckcloudnative.io/di-yi-zhang-jie-shao/overview#:~:text=%E2%80%8BPrometheus%20%E6%98%AF%E7%94%B1%E5%89%8D,%E4%BA%8E%E4%BB%BB%E4%BD%95%E5%85%AC%E5%8F%B8%E8%BF%9B%E8%A1%8C%E7%BB%B4%E6%8A%A4%E3%80%82
-2. https://www.infoq.cn/article/prometheus-theory-source-code
-3. https://yunlzheng.gitbook.io/prometheus-book/parti-prometheus-ji-chu/promql/prometheus-promql-functions
-4. 官网https://prometheus.io/docs/prometheus/latest/querying/functions/
+
+## 参考
+- https://prometheus.io/docs/prometheus/latest/querying/functions/
+- [Prometheus 中文文档](https://prometheus.fuckcloudnative.io/di-yi-zhang-jie-shao/overview#:~:text=%E2%80%8BPrometheus%20%E6%98%AF%E7%94%B1%E5%89%8D,%E4%BA%8E%E4%BB%BB%E4%BD%95%E5%85%AC%E5%8F%B8%E8%BF%9B%E8%A1%8C%E7%BB%B4%E6%8A%A4%E3%80%82)
+- [Prometheus 原理和源码分析](https://www.infoq.cn/article/prometheus-theory-source-code)
+- [prometheus-book](https://yunlzheng.gitbook.io/prometheus-book/parti-prometheus-ji-chu/promql/prometheus-promql-functions)

@@ -19,6 +19,7 @@
     - [计算counter指标增长率](#%E8%AE%A1%E7%AE%97counter%E6%8C%87%E6%A0%87%E5%A2%9E%E9%95%BF%E7%8E%87)
     - [动态标签替换](#%E5%8A%A8%E6%80%81%E6%A0%87%E7%AD%BE%E6%9B%BF%E6%8D%A2)
   - [案例](#%E6%A1%88%E4%BE%8B)
+- [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -191,7 +192,7 @@ method_code:http_errors:rate5m / ignoring(code) group_left method:http_requests:
 * count_values (对value进行计数)
 * bottomk (后n条时序)
 * topk (前n条时序)
-* quantile (分位数
+* quantile (分位数)
 
 使用聚合操作的语法如下：
 ```css
@@ -239,6 +240,26 @@ irate函数是通过区间向量中最后两个样本数据来计算区间向量
 #resultValue = value / time
 irate(node_cpu[2m])
 ```
+
+实际delta/rate/increase共享了相同的计算逻辑
+```go
+// === delta(Matrix parser.ValueTypeMatrix) Vector ===
+func funcDelta(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
+	return extrapolatedRate(vals, args, enh, false, false)
+}
+
+// === rate(node parser.ValueTypeMatrix) Vector ===
+func funcRate(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
+	return extrapolatedRate(vals, args, enh, true, true)
+}
+
+// === increase(node parser.ValueTypeMatrix) Vector ===
+func funcIncrease(vals []parser.Value, args parser.Expressions, enh *EvalNodeHelper) Vector {
+	return extrapolatedRate(vals, args, enh, true, false)
+}
+
+```
+
 
 #### 动态标签替换
 一般来说来说，使用PromQL查询到时间序列后，可视化工具会根据时间序列的标签来渲染图表。例如通过up指标可以获取到当前所有运行的Exporter实例以及其状态：

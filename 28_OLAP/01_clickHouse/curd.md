@@ -5,8 +5,7 @@
 - [curd](#curd)
   - [create](#create)
   - [insert](#insert)
-  - [update](#update)
-  - [delete](#delete)
+  - [update and delete](#update-and-delete)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 

@@ -39,7 +39,7 @@
   - [第三十三章 压缩](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%8E%8B%E7%BC%A9)
   - [第三十四章 本地缓存](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%9B%9B%E7%AB%A0-%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98)
   - [第三十五章 sonar静态代码质量分析-涉及与golangci-lint对比使用](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%BA%94%E7%AB%A0-sonar%E9%9D%99%E6%80%81%E4%BB%A3%E7%A0%81%E8%B4%A8%E9%87%8F%E5%88%86%E6%9E%90-%E6%B6%89%E5%8F%8A%E4%B8%8Egolangci-lint%E5%AF%B9%E6%AF%94%E4%BD%BF%E7%94%A8)
-  - [第三十六章 Proto管理工具Buf](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%85%AD%E7%AB%A0-proto%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7buf)
+  - [第三十六章 Proto管理工具 Buf](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%85%AD%E7%AB%A0-proto%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7-buf)
   - [第三十七章 CI持续集成](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%83%E7%AB%A0-ci%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90)
   - [第三十八章 Mergo实现 struct 与 map 之间转换-->k8s中应用](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%85%AB%E7%AB%A0-mergo%E5%AE%9E%E7%8E%B0-struct-%E4%B8%8E-map-%E4%B9%8B%E9%97%B4%E8%BD%AC%E6%8D%A2--k8s%E4%B8%AD%E5%BA%94%E7%94%A8)
   - [第三十九章 权限管理 casbin](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B9%9D%E7%AB%A0-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86-casbin)
@@ -336,9 +336,9 @@
 - [1 列数据库 ClickHouse](28_OLAP/01_clickHouse/clickHouse.md)
   - [1.1 database/sql 接口操作 clickHouse](28_OLAP/01_clickHouse/01_database_sql/main.go)
   - [1.2 原声接口操作 clickHouse](28_OLAP/01_clickHouse/02_native_interface/main.go)
-  - [go-clickHouse 源码分析](28_OLAP/01_clickHouse/go-clickHouse.md)
-  - [表引擎](28_OLAP/01_clickHouse/engine.md)
-  - [基本命令](28_OLAP/01_clickHouse/curd.md)
+  - [驱动 go-clickHouse 源码分析](28_OLAP/01_clickHouse/go-clickHouse.md)
+  - [clickhouse 表引擎](28_OLAP/01_clickHouse/engine.md)
+  - [clickhouse 基本命令](28_OLAP/01_clickHouse/curd.md)
 
 ## [第二十九章 分布式锁及源码分析](29_distributed_lock/distributed_lock.md)
 - [1 redsync(RedLock 算法官方实现)](29_distributed_lock/01_redis_distributed_lock/main.go)
@@ -371,7 +371,7 @@
 
 ## [第三十五章 sonar静态代码质量分析-涉及与golangci-lint对比使用](35_sonar/sonar.md)
 
-## [第三十六章 Proto管理工具Buf](36_buf/buf_intro.md)
+## [第三十六章 Proto管理工具 Buf](36_buf/buf_intro.md)
 
 ## [第三十七章 CI持续集成](37_CI/gitlabCI.md)
 - [1 gitlab-runner 源码分析](37_CI/01_runner/runner.md)
@@ -396,14 +396,13 @@
 
 ## [第四十一章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](41_go_plugin/go-plugin.md)
 
-## [第四十二章 prometheus](42_prometheus/prometheus.md) 
-- 部署方式
-  - [手工部署](42_prometheus/k8s_deploy/manual)
-  - [operator 部署](42_prometheus/k8s_deploy/opeartor)
+## [第四十二章 prometheus](42_prometheus/prometheus.md)
 - [1 exporter](42_prometheus/01_exporter/exporter.md)
   - [1.1 内置 collector](42_prometheus/01_exporter/01_embeded_collector/main.go)
   - [1.2 使用自定义 collector](42_prometheus/01_exporter/02_customized_collector/main.go)
-- [2 Prometheus Operator](42_prometheus/k8s_deploy/opeartor/operator.md)
+- [2 Prometheus Operator](42_prometheus/k8s_deploy/deploy.md))
+  - [2.1 原始 yaml --> 测试环境](42_prometheus/k8s_deploy/manual)
+  - [2.2 Prometheus Operator --> 生产环境](42_prometheus/k8s_deploy/opeartor)
 - [3 AlertManager](42_prometheus/alert_manager.md)
 - [4 PromQL(Prometheus Query Language)](42_prometheus/PromQL.md)
 

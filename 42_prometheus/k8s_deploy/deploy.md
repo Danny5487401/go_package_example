@@ -3,9 +3,13 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [prometheus Operator](#prometheus-operator)
+  - [prometheus 部署](#prometheus-%E9%83%A8%E7%BD%B2)
+    - [测试环境: 使用 prometheus 的docker环境](#%E6%B5%8B%E8%AF%95%E7%8E%AF%E5%A2%83-%E4%BD%BF%E7%94%A8-prometheus-%E7%9A%84docker%E7%8E%AF%E5%A2%83)
+      - [作业和实例](#%E4%BD%9C%E4%B8%9A%E5%92%8C%E5%AE%9E%E4%BE%8B)
+    - [生产环境: 使用 prometheus-operator](#%E7%94%9F%E4%BA%A7%E7%8E%AF%E5%A2%83-%E4%BD%BF%E7%94%A8-prometheus-operator)
   - [背景](#%E8%83%8C%E6%99%AF)
   - [工作原理](#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86)
-  - [Operator能做什么](#operator%E8%83%BD%E5%81%9A%E4%BB%80%E4%B9%88)
+  - [Operator 能做什么](#operator-%E8%83%BD%E5%81%9A%E4%BB%80%E4%B9%88)
   - [安装](#%E5%AE%89%E8%A3%85)
   - [操作](#%E6%93%8D%E4%BD%9C)
     - [使用后效果](#%E4%BD%BF%E7%94%A8%E5%90%8E%E6%95%88%E6%9E%9C)
@@ -13,6 +17,91 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # prometheus Operator
+
+## prometheus 部署
+
+### 测试环境: 使用 prometheus 的docker环境
+```yaml
+# prometheus.yml
+global:
+  scrape_interval:     15s # By default, scrape targets every 15 seconds.
+
+  # Attach these labels to any time series or alerts when communicating with
+  # external systems (federation, remote storage, Alertmanager).
+  external_labels:
+    monitor: 'codelab-monitor'
+
+# A scrape configuration containing exactly one endpoint to scrape:
+# Here it's Prometheus itself.
+scrape_configs:
+  # The job name is added as a label `job=<job_name>` to any timeseries scraped from this config.
+- job_name: "go-test"
+  scrape_interval: 60s
+  scrape_timeout: 60s
+  metrics_path: "/metrics"
+
+  static_configs:
+  - targets: ["localhost:8888"]
+
+```
+
+可以看到配置文件中指定了一个job_name，所要监控的任务即视为一个job, scrape_interval和scrape_timeout是pro进行数据采集的时间间隔和频率，metrics_path指定了访问数据的http路径，target是目标的ip:port,这里使用的是同一台主机上的8888端口
+
+```shell
+docker run -p 9090:9090 -v /Users/python/Desktop/github.com/Danny5487401/go_advanced_code/chapter02_goroutine/02_runtime/07prometheus/client/prometheus.yml:/etc/prometheus/prometheus.yml prom/prometheus
+```
+![](.prometheus_images/prometheus_panel.png)
+
+启动之后可以访问web页面http://localhost:9090/graph,在status下拉菜单中可以看到配置文件和目标的状态，此时目标状态为DOWN，因为我们所需要监控的服务还没有启动起来，那就赶紧步入正文，用pro golang client来实现程序吧。
+
+![](.prometheus_images/server_state.png)
+
+启动后状态
+![](.prometheus_images/server_state2.png)
+
+
+#### 作业和实例
+在prometheus.yml配置文件中，添加如下配置
+```yaml
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+  - job_name: 'node'
+    static_configs:
+      - targets: ['localhost:9100']
+```
+
+当前在每一个Job中主要使用了静态配置(static_configs)的方式定义监控目标。
+除了静态配置每一个Job的采集Instance地址以外，Prometheus还支持与DNS、Consul、E2C、Kubernetes等进行集成实现自动发现Instance实例，并从这些Instance上获取监控数据。
+
+在Prometheus配置中，一个可以拉取数据的端点IP:Port叫做一个实例（instance），而具有多个相同类型实例的集合称作一个作业（job）
+```yaml
+- job: api-server
+- instance 1: 1.2.3.4:5670
+- instance 2: 1.2.3.4:5671
+- instance 3: 5.6.7.8:5670
+- instance 4: 5.6.7.8:5671
+
+```
+在Prometheus中，每一个暴露监控样本数据的HTTP服务称为一个实例。例如在当前主机上运行的node exporter可以被称为一个实例(Instance)
+
+
+当Prometheus拉取指标数据时，会自动生成一些标签（label）用于区别抓取的来源：
+![](.prometheus_images/target_in_ui.png)
+- job：配置的作业名；
+- instance：配置的实例名，若没有实例名，则是抓取的IP:Port
+
+对于每一个实例（instance）的抓取，Prometheus会默认保存以下数据：
+
+- up{job="<job>", instance="<instance>"}：如果实例是健康的，即可达，值为1，否则为0；
+- scrape_duration_seconds{job="<job>", instance="<instance>"}：抓取耗时；
+- scrape_samples_post_metric_relabeling{job="<job>", instance="<instance>"}：指标重新标记后剩余的样本数。
+- scrape_samples_scraped{job="<job>", instance="<instance>"}：实例暴露的样本数
+  该up指标对于监控实例健康状态很有用。
+
+### 生产环境: 使用 prometheus-operator
+
 
 ## 背景
 为了在Kubernetes能够方便的管理和部署Prometheus，我们使用ConfigMap了管理Prometheus配置文件。
@@ -34,7 +123,7 @@
 
 Prometheus的本职就是一组用户自定义的CRD资源以及Controller的实现，Prometheus Operator负责监听这些自定义资源的变化，并且根据这些资源的定义自动化的完成如Prometheus Server自身以及配置的自动化管理工作
 
-## Operator能做什么
+## Operator 能做什么
 
 Prometheus Operator为我们提供了哪些自定义的Kubernetes资源，列出了Prometheus Operator目前提供的️资源：
 
@@ -62,7 +151,6 @@ $ kubectl -n monitoring get pods
 NAME                                   READY     STATUS    RESTARTS   AGE
 prometheus-operator-6db8dbb7dd-2hz55   1/1       Running   0          19s
 ```
-
 
 ##  操作
 1. 部署正常的业务http 服务:deployment-app.yaml

@@ -3,7 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [ClickHouse](#clickhouse)
-  - [完备的 DBMS 功能(DataBase Management System，数据库管理系统)](#%E5%AE%8C%E5%A4%87%E7%9A%84-dbms-%E5%8A%9F%E8%83%BDdatabase-management-system%E6%95%B0%E6%8D%AE%E5%BA%93%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F)
+  - [完备的 DBMS 功能(DataBase Management System 数据库管理系统)](#%E5%AE%8C%E5%A4%87%E7%9A%84-dbms-%E5%8A%9F%E8%83%BDdatabase-management-system-%E6%95%B0%E6%8D%AE%E5%BA%93%E7%AE%A1%E7%90%86%E7%B3%BB%E7%BB%9F)
   - [应用场景](#%E5%BA%94%E7%94%A8%E5%9C%BA%E6%99%AF)
   - [列式存储与数据压缩](#%E5%88%97%E5%BC%8F%E5%AD%98%E5%82%A8%E4%B8%8E%E6%95%B0%E6%8D%AE%E5%8E%8B%E7%BC%A9)
     - [列式存储](#%E5%88%97%E5%BC%8F%E5%AD%98%E5%82%A8)
@@ -13,9 +13,7 @@
   - [数据分片与分布式查询](#%E6%95%B0%E6%8D%AE%E5%88%86%E7%89%87%E4%B8%8E%E5%88%86%E5%B8%83%E5%BC%8F%E6%9F%A5%E8%AF%A2)
   - [架构设计](#%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1)
     - [1. 单机结构](#1-%E5%8D%95%E6%9C%BA%E7%BB%93%E6%9E%84)
-    - [2. Clickhouse集群架构设计](#2-clickhouse%E9%9B%86%E7%BE%A4%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1)
-      - [Replicated MergeTree引擎](#replicated-mergetree%E5%BC%95%E6%93%8E)
-      - [Distributed 引擎](#distributed-%E5%BC%95%E6%93%8E)
+    - [2. Clickhouse 集群架构设计](#2-clickhouse-%E9%9B%86%E7%BE%A4%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1)
   - [性能](#%E6%80%A7%E8%83%BD)
   - [参考](#%E5%8F%82%E8%80%83)
 

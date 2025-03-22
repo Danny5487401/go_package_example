@@ -3,8 +3,11 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [表引擎](#%E8%A1%A8%E5%BC%95%E6%93%8E)
-  - [MergeTree引擎](#mergetree%E5%BC%95%E6%93%8E)
-  - [MergeTree 数据表的存储结构](#mergetree-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
+  - [MergeTree 合并树引擎](#mergetree-%E5%90%88%E5%B9%B6%E6%A0%91%E5%BC%95%E6%93%8E)
+    - [MergeTree 数据表的存储结构](#mergetree-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
+    - [ReplacingMergeTree引擎](#replacingmergetree%E5%BC%95%E6%93%8E)
+  - [Replicated MergeTree 引擎](#replicated-mergetree-%E5%BC%95%E6%93%8E)
+  - [Distributed 引擎](#distributed-%E5%BC%95%E6%93%8E)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->

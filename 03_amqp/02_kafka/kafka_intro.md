@@ -15,7 +15,7 @@
     - [两套 consumer API](#%E4%B8%A4%E5%A5%97-consumer-api)
     - [消费组: 消费者是以消费者组的形式对外消费的。](#%E6%B6%88%E8%B4%B9%E7%BB%84-%E6%B6%88%E8%B4%B9%E8%80%85%E6%98%AF%E4%BB%A5%E6%B6%88%E8%B4%B9%E8%80%85%E7%BB%84%E7%9A%84%E5%BD%A2%E5%BC%8F%E5%AF%B9%E5%A4%96%E6%B6%88%E8%B4%B9%E7%9A%84)
     - [消费者重平衡 consumer rebalance](#%E6%B6%88%E8%B4%B9%E8%80%85%E9%87%8D%E5%B9%B3%E8%A1%A1-consumer-rebalance)
-  - [五. kafka高可用HA](#%E4%BA%94-kafka%E9%AB%98%E5%8F%AF%E7%94%A8ha)
+  - [五. kafka 高可用 HA](#%E4%BA%94-kafka-%E9%AB%98%E5%8F%AF%E7%94%A8-ha)
     - [副本 replication](#%E5%89%AF%E6%9C%AC-replication)
     - [宕机的场景](#%E5%AE%95%E6%9C%BA%E7%9A%84%E5%9C%BA%E6%99%AF)
   - [六. 开发注意事项](#%E5%85%AD-%E5%BC%80%E5%8F%91%E6%B3%A8%E6%84%8F%E4%BA%8B%E9%A1%B9)
@@ -31,7 +31,7 @@
     - [为什么Kafka不支持读写分离？](#%E4%B8%BA%E4%BB%80%E4%B9%88kafka%E4%B8%8D%E6%94%AF%E6%8C%81%E8%AF%BB%E5%86%99%E5%88%86%E7%A6%BB)
     - [Kafka的那些设计让它有如此高的性能](#kafka%E7%9A%84%E9%82%A3%E4%BA%9B%E8%AE%BE%E8%AE%A1%E8%AE%A9%E5%AE%83%E6%9C%89%E5%A6%82%E6%AD%A4%E9%AB%98%E7%9A%84%E6%80%A7%E8%83%BD)
     - [kafka中的事务](#kafka%E4%B8%AD%E7%9A%84%E4%BA%8B%E5%8A%A1)
-  - [十一 kafka主流golang客户端](#%E5%8D%81%E4%B8%80-kafka%E4%B8%BB%E6%B5%81golang%E5%AE%A2%E6%88%B7%E7%AB%AF)
+  - [十一 kafka主流 golang 客户端](#%E5%8D%81%E4%B8%80-kafka%E4%B8%BB%E6%B5%81-golang-%E5%AE%A2%E6%88%B7%E7%AB%AF)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
