@@ -2,10 +2,10 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [序列化Marshal和反序列化UnMarshal](#%E5%BA%8F%E5%88%97%E5%8C%96marshal%E5%92%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96unmarshal)
+- [序列化 Marshal 和反序列化 UnMarshal](#%E5%BA%8F%E5%88%97%E5%8C%96-marshal-%E5%92%8C%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-unmarshal)
   - [常见序列化协议](#%E5%B8%B8%E8%A7%81%E5%BA%8F%E5%88%97%E5%8C%96%E5%8D%8F%E8%AE%AE)
     - [xml（Extensible Markup Language）](#xmlextensible-markup-language)
-    - [JSON(JavaScript Object Notation, JS 对象标记)](#jsonjavascript-object-notation-js-%E5%AF%B9%E8%B1%A1%E6%A0%87%E8%AE%B0)
+    - [JSON(JavaScript Object Notation JS 对象标记)](#jsonjavascript-object-notation-js-%E5%AF%B9%E8%B1%A1%E6%A0%87%E8%AE%B0)
     - [Thrift](#thrift)
     - [Avro](#avro)
     - [Protobuf](#protobuf)
@@ -14,7 +14,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# 序列化Marshal和反序列化UnMarshal
+# 序列化 Marshal 和反序列化 UnMarshal
 
 - 序列化（编码）是将对象序列化为二进制形式（字节数组），主要用于网络传输、数据持久化等；
 - 而反序列化（解码）则是将从网络、磁盘等读取的字节数组还原成原始对象，主要用于网络传输对象的解码，以便完成远程调用。
@@ -29,7 +29,7 @@
 
 适用场景：当做配置文件存储数据，实时数据转换。
 
-### JSON(JavaScript Object Notation, JS 对象标记) 
+### JSON(JavaScript Object Notation JS 对象标记) 
 是一种轻量级的数据交换格式，
 - 优点：兼容性高、数据格式比较简单，易于读写、序列化后数据较小，可扩展性好，兼容性好、与XML相比，其协议比较简单，解析速度比较快。
 - 缺点：数据的描述性比XML差、不适合性能要求为ms级别的情况、额外空间开销比较大。

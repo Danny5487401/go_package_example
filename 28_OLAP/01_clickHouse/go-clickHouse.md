@@ -63,6 +63,9 @@ https://github.com/ClickHouse/clickhouse-go/?tab=readme-ov-file#dsn
 
 - std database/sql interface
 
+协议 
+- http 协议(实验性) ,只支持 `database/sql
+
 ## v1 版本(不建议使用)
 
 初始化注册插件
@@ -176,6 +179,8 @@ func open(dsn string) (*clickhouse, error) {
 
 
 ## v2
+
+
 
 
 ## 第三方应用-->grafana clickhouse plugin

@@ -19,7 +19,7 @@
   - [第十三章 序列化反序列化-涉及多种协议](#%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%BA%8F%E5%88%97%E5%8C%96%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-%E6%B6%89%E5%8F%8A%E5%A4%9A%E7%A7%8D%E5%8D%8F%E8%AE%AE)
   - [第十四章 系统监控](#%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E7%B3%BB%E7%BB%9F%E7%9B%91%E6%8E%A7)
   - [第十五章 分布式事务](#%E7%AC%AC%E5%8D%81%E4%BA%94%E7%AB%A0-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1)
-  - [第十六章 数据复制](#%E7%AC%AC%E5%8D%81%E5%85%AD%E7%AB%A0-%E6%95%B0%E6%8D%AE%E5%A4%8D%E5%88%B6)
+  - [第十六章 copier(不同类型数据复制)](#%E7%AC%AC%E5%8D%81%E5%85%AD%E7%AB%A0-copier%E4%B8%8D%E5%90%8C%E7%B1%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%A4%8D%E5%88%B6)
   - [第十七章 数据加解密](#%E7%AC%AC%E5%8D%81%E4%B8%83%E7%AB%A0-%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%A7%A3%E5%AF%86)
   - [第十八章 日志收集项目 log_collect](#%E7%AC%AC%E5%8D%81%E5%85%AB%E7%AB%A0-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86%E9%A1%B9%E7%9B%AE-log_collect)
   - [第十九章 熔断,限流及降级](#%E7%AC%AC%E5%8D%81%E4%B9%9D%E7%AB%A0-%E7%86%94%E6%96%AD%E9%99%90%E6%B5%81%E5%8F%8A%E9%99%8D%E7%BA%A7)
@@ -234,7 +234,7 @@
     - [2.2.2 json 字符串数组](13_serialize/02_jsoniter/Unmarshal/02_jsonArray/main.go)
     - [2.2.3 json.RawMessage 二次反序列化](13_serialize/02_jsoniter/Unmarshal/03_RawMessage/main.go)
     - [2.2.4 extra.SupportPrivateFields() 解析私有的字段](13_serialize/02_jsoniter/Unmarshal/04_private_field/main.go)
-- 3 mapstructure 将通用的map值解码为结构体
+- [3 mapstructure 将通用的 map 值解码为 struct ](13_serialize/03_mapstructure/mapstructure.md)
   - [3.1 无tag标签](13_serialize/03_mapstructure/01_without_tag/main.go)
   - [3.2 带tag标签mapstructure](13_serialize/03_mapstructure/02_tag/main.go)
   - [3.3 embeded内嵌标签squash](13_serialize/03_mapstructure/03_embeded/main.go)
@@ -244,14 +244,16 @@
   - [3.7 错误](13_serialize/03_mapstructure/07_error/main.go)
   - [3.8 弱解析](13_serialize/03_mapstructure/08_weekDecode/main.go)
   - [3.9 自定义解析器](13_serialize/03_mapstructure/09_decoder/main.go)
+- [4 json patch 两种标准](13_serialize/04_json_patch/json_patch.md)
+  - [4.1 github.com/evanphx/json-patch/v5 使用](13_serialize/04_json_patch/main.go)
 
 ## 第十四章 系统监控
 - [1 systemstat包(适合linux系统，已断更)](14_system_monitor/01_systemstat/main.go)
 - [2 gopsutil](14_system_monitor/02_gopsutil/gopsutil.md)
+  - [cpu,mem,disk](14_system_monitor/02_gopsutil/01_disk_n_cpu_n_mem/main.go)
   - 进程信息获取
-    - [物理机和虚拟机](14_system_monitor/02_gopsutil/process/in_host/main.go)
+    - [物理机和虚拟机](14_system_monitor/02_gopsutil/02_process/in_host/main.go)
     - [容器环境](14_system_monitor/02_gopsutil/process/in_container/main.go)
-  - [cpu,mem,disk](14_system_monitor/02_gopsutil/disk_n_cpu_n_mem/main.go)
 
 ## [第十五章 分布式事务](15_distributed_transaction/distributed_transaction.md)
 - Note: 使用DTM的代码作为案例 
@@ -260,8 +262,7 @@
 - [3 TCC事务](15_distributed_transaction/03_tcc/tcc.md)
 - [4 etcd的STM](15_distributed_transaction/04_stm/stm.md)
 
-## 第十六章 数据复制
-- [1 copier(不同类型数据复制)](16_dataCopy/copier/copier.md)
+## [第十六章 copier(不同类型数据复制)](16_dataCopy/copier.md)
 
 ## 第十七章 数据加解密
 - 1 phpserialize(不推荐)

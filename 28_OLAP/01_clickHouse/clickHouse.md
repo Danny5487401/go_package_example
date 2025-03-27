@@ -9,7 +9,6 @@
     - [列式存储](#%E5%88%97%E5%BC%8F%E5%AD%98%E5%82%A8)
     - [压缩](#%E5%8E%8B%E7%BC%A9)
   - [向量化执行引擎](#%E5%90%91%E9%87%8F%E5%8C%96%E6%89%A7%E8%A1%8C%E5%BC%95%E6%93%8E)
-    - [多样化的表引擎](#%E5%A4%9A%E6%A0%B7%E5%8C%96%E7%9A%84%E8%A1%A8%E5%BC%95%E6%93%8E)
   - [数据分片与分布式查询](#%E6%95%B0%E6%8D%AE%E5%88%86%E7%89%87%E4%B8%8E%E5%88%86%E5%B8%83%E5%BC%8F%E6%9F%A5%E8%AF%A2)
   - [架构设计](#%E6%9E%B6%E6%9E%84%E8%AE%BE%E8%AE%A1)
     - [1. 单机结构](#1-%E5%8D%95%E6%9C%BA%E7%BB%93%E6%9E%84)
@@ -91,19 +90,18 @@ ClickHouse 就是一款使用列式存储的数据库，数据按列进行组织
 为了实现向量化执行，需要利用 CPU 的 SIMD 指令。SIMD 的全称是：Single Instruction Multiple Data，即用单条指令操作多条数据。
 现代计算机系统概念中，它是通过数据并行以提高性能的一种实现方式（其它的还有指令级并行和线程级并行），它的原理是在 CPU 寄存器层面实现数据的并行计算。
 
-### 多样化的表引擎
-ClickHouse 并不是直接就一蹴而就的，Metrica 产品的最初架构是基于MySQL实现的，所以在 ClickHouse 的设计中，能够察觉到一些 MySQL 的影子，
-表引擎的设计就是其中之一。与 MySQL 类似，ClickHouse 也将存储部分进行了抽象，把存储引擎作为一层独立的接口，并且拥有合并树、内存、文件、接口等 20 多种引擎。
-其中每一种引擎都有着各自的特点，用户可以根据实际业务场景的需求，选择合适的引擎。
 
-通常而言，一个通用系统意味着更广泛的实用性，能够适应更多的场景。但通用的另一种解释是平庸，因为它无法在所有场景中都做到极致。
 
 ## 数据分片与分布式查询
 Clickhouse拥有分布式能力，自然支持数据分片，数据分片是将数据进行横向切分，这是一种在面对海量数据的场景下，解决存储和查询瓶颈的有效手段。
-ClickHouse并不像其他分布式系统那样，拥有高度自动化的分片功能。 ClickHouse提供了本地表 ( Local Table ) 与分布式表 ( Distributed Table ) 的概念。
-一张本地表等同于一份数据的分片。而分布式表本身不存储任何数据，它是本地表的访问代理，其作用类似分库中间件。借助分布式表，能够代理访问多个数据分片，从而实现分布式查询。
+ClickHouse并不像其他分布式系统那样，拥有高度自动化的分片功能。 
+ClickHouse提供了本地表 ( Local Table ) 与分布式表 ( Distributed Table ) 的概念。
+一张本地表等同于一份数据的分片shard。而分布式表本身不存储任何数据，它是本地表的访问代理，其作用类似分库中间件。借助分布式表，能够代理访问多个数据分片，从而实现分布式查询。
+
+
 
 ## 架构设计
+
 ### 1. 单机结构
 ```shell
 $ cd /tmp
@@ -191,7 +189,15 @@ resources:
 shards: 2
 replicaCount: 2
 (⎈|kubeasz-test:clickhouse)➜  helm install -f values.yaml my-clickhouse oci://registry-1.docker.io/bitnamicharts/clickhouse
+(⎈|kubeasz-test:clickhouse)➜  ~ helm ls
+NAME     	NAMESPACE 	REVISION	UPDATED                            	STATUS  	CHART       	APP VERSION
+my-kruise	clickhouse	1       	2025-03-16 19:07:32.25284 +0800 CST	deployed	kruise-1.7.1	1.7.1
 ```
+
+ZooKeeper 是第一个知名的开源协调系统之一。它是用 Java 实现的，具有相当简单且强大的数据模型。
+ZooKeeper 的协调算法 ZooKeeper Atomic Broadcast (ZAB) 不提供读取的线性可化保证，因为每个 ZooKeeper 节点都是本地处理读取请求。
+与 ZooKeeper 不同，ClickHouse Keeper 是用 C++ 编写的，并使用 RAFT 算法 的 实现。该算法允许读取和写入的线性可化，并在不同语言中有若干开源实现。
+
 
 
 查看生成的配置
@@ -210,7 +216,7 @@ replicaCount: 2
   </logger>
   <!-- Cluster configuration - Any update of the shards and replicas requires helm upgrade -->
   <remote_servers>
-    <default>
+    <my-clickhouse>
       <shard>
           <replica>
               <host>my-clickhouse-shard0-0.my-clickhouse-headless.clickhouse.svc.cluster.local</host>
@@ -239,7 +245,7 @@ replicaCount: 2
               <password from_env="CLICKHOUSE_ADMIN_PASSWORD"></password>
           </replica>
       </shard>
-    </default>
+    </my-clickhouse>
   </remote_servers>
   <!-- Zookeeper configuration -->
   <zookeeper>
@@ -261,13 +267,20 @@ replicaCount: 2
   <listen_host>::</listen_host>
   <listen_try>1</listen_try>
 </clickhouse>
-
 ```
+参数说明
+- 集群名字: my-clickhouse
+- 宏配置: 宏 shard 和 replica 减少了分布式 DDL 的复杂性。配置的值会自动替代您的 DDL 查询，从而简化您的 DDL。
+
+
+
+
 以上集群配置完之后，想要用到Clickhouse的集群能力，还需要使用Replicated MergeTree+Distributed引擎，该引擎是"本地表 + 分布式表"的方式，因此可以实现多分片多副本
 
 
 ![img.png](distributed_table.png)
-Clickhouse先在每个 Shard 每个节点上创建本地表（即 Shard 的副本），本地表只在对应节点内可见；然后再创建分布式表[Distributed]，映射到前面创建的本地表。
+Clickhouse先在每个 Shard 每个节点上创建本地表（即 Shard 的副本），本地表只在对应节点内可见；
+然后再创建分布式表[Distributed]，映射到前面创建的本地表。
 
 用户在访问分布式表时，ClickHouse 会自动根据集群架构信息，把请求转发给对应的本地表.
 

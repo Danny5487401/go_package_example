@@ -26,7 +26,13 @@
   
 
 ClickHouse 拥有非常庞大的表引擎体系，总共有合并树、外部存储、内存、文件、接口和其它 6 大类 20 多种表引擎，而在这众多的表引擎中，又属合并树（MergeTree）表引擎及其家族系列（*MergeTree）最为强大，在生产环境中绝大部分场景都会使用此引擎。
- 
+
+
+ClickHouse 并不是直接就一蹴而就的，Metrica 产品的最初架构是基于MySQL实现的，所以在 ClickHouse 的设计中，能够察觉到一些 MySQL 的影子，
+表引擎的设计就是其中之一。与 MySQL 类似，ClickHouse 也将存储部分进行了抽象，把存储引擎作为一层独立的接口，并且拥有合并树、内存、文件、接口等 20 多种引擎。
+其中每一种引擎都有着各自的特点，用户可以根据实际业务场景的需求，选择合适的引擎。
+
+通常而言，一个通用系统意味着更广泛的实用性，能够适应更多的场景。但通用的另一种解释是平庸，因为它无法在所有场景中都做到极致。
 
 ## MergeTree 合并树引擎
 MergeTree这个名词是在我们耳熟能详的LSM Tree之上做减法而来——去掉了MemTable和Log。也就是说，向MergeTree引擎族的表插入数据时，数据会不经过缓冲而直接写到磁盘。
@@ -83,7 +89,7 @@ ORDER BY expr
 - In Wide format 每列在不同的文件
 - in Compact format  所有列在一个文件
 
-```shell
+```clickhouse
 -- ClickHouse server version 25.1.4
 
 -- 该表负责存储用户参加过的活动，每参加一个活动，就会生成一条记录
@@ -138,7 +144,11 @@ root@635e708a264a:/var/lib/clickhouse# cat data/helloworld/user_activity_event/2
 1
 ```
 
-- partition.dat 和 minmax_[Column].idx：如果使用了分区键，例如上面的 PARTITION BY toYYYYMM(JoinTime)，则会额外生成 partition.dat 与 minmax_JoinTime.idx 索引文件，它们均使用二进制格式存储。partition.dat 用于保存当前分区下分区表达式最终生成的值，而 minmax_[Column].idx 则负责记录当前分区下分区字段对应原始数据的最小值和最大值。举个栗子，假设我们往上面的 user_activity_event 表中插入了 5 条数据，JoinTime 分别 2020-05-05、2020-05-15、2020-05-31、2020-05-03、2020-05-24，显然这 5 条都会进入到同一个分区，因为 toYYYMM 之后它们的结果是相同的，都是 2020-05，而 partition.dat 中存储的就是 2020-05，也就是分区表达式最终生成的值；同时还会有一个 minmax_JoinTime.idx 文件，里面存储的就是 2020-05-03 2020-05-31，也就是分区字段对应的原始数据的最小值和最大值
+- partition.dat 和 minmax_[Column].idx：如果使用了分区键，例如上面的 PARTITION BY toYYYYMM(JoinTime)，则会额外生成 partition.dat 与 minmax_JoinTime.idx 索引文件，它们均使用二进制格式存储。
+partition.dat 用于保存当前分区下分区表达式最终生成的值，而 minmax_[Column].idx 则负责记录当前分区下分区字段对应原始数据的最小值和最大值。
+举个例子，假设我们往上面的 user_activity_event 表中插入了 5 条数据，JoinTime 分别 2020-05-05、2020-05-15、2020-05-31、2020-05-03、2020-05-24，显然这 5 条都会进入到同一个分区，
+因为 toYYYMM 之后它们的结果是相同的，都是 2020-05，而 partition.dat 中存储的就是 2020-05，也就是分区表达式最终生成的值；
+同时还会有一个 minmax_JoinTime.idx 文件，里面存储的就是 2020-05-03 2020-05-31，也就是分区字段对应的原始数据的最小值和最大值
 
 ### ReplacingMergeTree引擎
 该引擎和 MergeTree 的不同之处在于它会删除排序键值(ORDER BY)相同的重复项.
@@ -182,6 +192,19 @@ CREATE TABLE IF NOT EXISTS {distributed_table} as {local_table}
 - local_table：本地表名
 - as local_table：保持分布式表与本地表的表结构一致。此处也可以用 （column dataType）这种定义表结构方式代替
 - cluster：集群名
+```clickhouse
+-- 我们指定集群名称（test_cluster），分片目标表的数据库名称（uk），分片目标表的名称（uk_price_paid_simple），以及用于 INSERT 路由的 分片键。
+-- 在此示例中，我们使用 rand 函数随机分配行到分片。然而，可以根据用例使用任何表达式——甚至复杂的表达式——作为分片键
+CREATE TABLE uk.uk_price_paid_simple_dist ON CLUSTER test_cluster
+(
+    date Date,
+    town LowCardinality(String),
+    street LowCardinality(String),
+    price UInt32
+)
+ENGINE = Distributed('test_cluster', 'uk', 'uk_price_paid_simple', rand());
+
+```
 
 ![](.clickHouse_images/local_table_n_remote_table.png)
 图是一个2分片2副本的架构，使用的是Replicated*Merge Tree + Distributed引擎模式。红色的数字代表节点的话，也就是节点1和2互为副本，3和4互为副本。

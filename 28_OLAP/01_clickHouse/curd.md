@@ -6,13 +6,18 @@
   - [create](#create)
   - [insert](#insert)
   - [update and delete](#update-and-delete)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # curd
 
+默认情况下，CREATE、DROP、ALTER 和 RENAME 查询仅影响执行它们的当前服务器。在集群设置中，可以使用 ON CLUSTER 子句以分布式方式运行此类查询。
+
 ## create
+
 ```clickhouse
+-- 数据库创建
 CREATE DATABASE [IF NOT EXISTS] db_name [ON CLUSTER cluster] [ENGINE = engine(...)] [COMMENT 'Comment']
 
 -- 创建本地表
@@ -109,3 +114,7 @@ ALTER TABLE [<database>.]<table> DELETE WHERE <filter_expr>
 ```clickhouse
 DELETE FROM [db.]table [ON CLUSTER cluster] [WHERE expr]
 ```
+
+
+## 参考
+- https://clickhouse.com/docs/zh/sql-reference/statements

@@ -23,6 +23,7 @@ require (
 	github.com/elliotchance/phpserialize v1.3.1
 	github.com/envoyproxy/protoc-gen-validate v1.0.4
 	github.com/etcd-io/bbolt v1.3.3
+	github.com/evanphx/json-patch/v5 v5.9.11
 	github.com/expr-lang/expr v1.16.9
 	github.com/felixge/httpsnoop v1.0.4
 	github.com/fsnotify/fsnotify v1.5.1
