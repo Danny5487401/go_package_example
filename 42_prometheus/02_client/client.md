@@ -48,6 +48,7 @@ vector 类型
 
 查询
 ```go
+// github.com/prometheus/client_golang@v1.11.0/api/prometheus/v1/api.go
 func (h *httpAPI) Query(ctx context.Context, query string, ts time.Time) (model.Value, Warnings, error) {
 	u := h.client.URL(epQuery, nil)
 	q := u.Query()
@@ -62,10 +63,50 @@ func (h *httpAPI) Query(ctx context.Context, query string, ts time.Time) (model.
 		return nil, warnings, err
 	}
 
+	// 类型转换 
 	var qres queryResult
 	return model.Value(qres.v), warnings, json.Unmarshal(body, &qres)
 }
 ```
+
+```go
+func (h *apiClientImpl) DoGetFallback(ctx context.Context, u *url.URL, args url.Values) (*http.Response, []byte, Warnings, error) {
+	req, err := http.NewRequest(http.MethodPost, u.String(), strings.NewReader(args.Encode()))
+	if err != nil {
+		return nil, nil, nil, err
+	}
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+
+	resp, body, warnings, err := h.Do(ctx, req)
+	if resp != nil && (resp.StatusCode == http.StatusMethodNotAllowed || resp.StatusCode == http.StatusNotImplemented) {
+		u.RawQuery = args.Encode()
+		req, err = http.NewRequest(http.MethodGet, u.String(), nil)
+		if err != nil {
+			return nil, nil, warnings, err
+		}
+
+	} else {
+		if err != nil {
+			return resp, body, warnings, err
+		}
+		return resp, body, warnings, nil
+	}
+	return h.Do(ctx, req)
+}
+```
+
+返回结果
+```go
+type queryResult struct {
+	Type   model.ValueType `json:"resultType"`
+	Result interface{}     `json:"result"`
+
+	// The decoded value.
+	v model.Value
+}
+```
+
+
 
 
 具体四种类型
@@ -182,16 +223,6 @@ type Sample struct {
 
 
 
-返回结果
-```go
-type queryResult struct {
-	Type   model.ValueType `json:"resultType"`
-	Result interface{}     `json:"result"`
-
-	// The decoded value.
-	v model.Value
-}
-```
 
 类型
 ```go

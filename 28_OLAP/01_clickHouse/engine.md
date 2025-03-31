@@ -5,7 +5,7 @@
 - [表引擎](#%E8%A1%A8%E5%BC%95%E6%93%8E)
   - [MergeTree 合并树引擎](#mergetree-%E5%90%88%E5%B9%B6%E6%A0%91%E5%BC%95%E6%93%8E)
     - [MergeTree 数据表的存储结构](#mergetree-%E6%95%B0%E6%8D%AE%E8%A1%A8%E7%9A%84%E5%AD%98%E5%82%A8%E7%BB%93%E6%9E%84)
-    - [ReplacingMergeTree引擎](#replacingmergetree%E5%BC%95%E6%93%8E)
+    - [ReplacingMergeTree 引擎](#replacingmergetree-%E5%BC%95%E6%93%8E)
   - [Replicated MergeTree 引擎](#replicated-mergetree-%E5%BC%95%E6%93%8E)
   - [Distributed 引擎](#distributed-%E5%BC%95%E6%93%8E)
   - [参考](#%E5%8F%82%E8%80%83)
@@ -150,9 +150,11 @@ partition.dat 用于保存当前分区下分区表达式最终生成的值，而
 因为 toYYYMM 之后它们的结果是相同的，都是 2020-05，而 partition.dat 中存储的就是 2020-05，也就是分区表达式最终生成的值；
 同时还会有一个 minmax_JoinTime.idx 文件，里面存储的就是 2020-05-03 2020-05-31，也就是分区字段对应的原始数据的最小值和最大值
 
-### ReplacingMergeTree引擎
+### ReplacingMergeTree 引擎
 该引擎和 MergeTree 的不同之处在于它会删除排序键值(ORDER BY)相同的重复项.
 在设置表引擎时，比MergeTree多了一个参数：ver-版本列，ENGINE = ReplacingMergeTree([ver]) 。
+
+值得注意的是，ReplacingMergeTree只是在一定程度上解决了数据重复问题，但是并不能完全保障数据不重复。
 
 
 

@@ -189,18 +189,18 @@ resources:
 shards: 2
 replicaCount: 2
 (⎈|kubeasz-test:clickhouse)➜  helm install -f values.yaml my-clickhouse oci://registry-1.docker.io/bitnamicharts/clickhouse
-(⎈|kubeasz-test:clickhouse)➜  ~ helm ls
-NAME     	NAMESPACE 	REVISION	UPDATED                            	STATUS  	CHART       	APP VERSION
-my-kruise	clickhouse	1       	2025-03-16 19:07:32.25284 +0800 CST	deployed	kruise-1.7.1	1.7.1
+(⎈|kubeasz-test:clickhouse)➜  clickhouse helm ls
+NAME         	NAMESPACE 	REVISION	UPDATED                             	STATUS  	CHART           	APP VERSION
+my-clickhouse	clickhouse	2       	2025-03-31 09:49:31.768305 +0800 CST	deployed	clickhouse-8.0.8	25.3.2
 ```
 
 ZooKeeper 是第一个知名的开源协调系统之一。它是用 Java 实现的，具有相当简单且强大的数据模型。
 ZooKeeper 的协调算法 ZooKeeper Atomic Broadcast (ZAB) 不提供读取的线性可化保证，因为每个 ZooKeeper 节点都是本地处理读取请求。
-与 ZooKeeper 不同，ClickHouse Keeper 是用 C++ 编写的，并使用 RAFT 算法 的 实现。该算法允许读取和写入的线性可化，并在不同语言中有若干开源实现。
+与 ZooKeeper 不同，ClickHouse Keeper 是用 C++ 编写的，并使用 RAFT 算法的实现。该算法允许读取和写入的线性可化，并在不同语言中有若干开源实现。
 
 
 
-查看生成的配置
+查看覆盖配置
 ```shell
 (⎈|kubeasz-test:clickhouse)➜  ~ kubectl get cm -n clickhouse my-clickhouse -o yaml | yq -r '.data["00_default_overrides.xml"]'
 <clickhouse>
@@ -271,6 +271,30 @@ ZooKeeper 的协调算法 ZooKeeper Atomic Broadcast (ZAB) 不提供读取的线
 参数说明
 - 集群名字: my-clickhouse
 - 宏配置: 宏 shard 和 replica 减少了分布式 DDL 的复杂性。配置的值会自动替代您的 DDL 查询，从而简化您的 DDL。
+- shard: 集群的分片（即 ClickHouse 节点），集群会有多个 shard，每个 shard 上都存有全部数据的一部分
+- replica: 每个 shard 的副本
+- zookeeper: node 表示一个 ZooKeeper 节点，可以设置多个
+
+
+实际生成配置
+```shell
+# 支持多配置文件管理，主配置文件为 config.xml，默认位于 /etc/clickhouse-server 目录下，其余的配置文件均需包含在 /etc/clickhouse-server/config.d 目录下
+$ ls /etc/clickhouse-server
+conf.d	config.xml  keeper_config.xml  users.d	users.xml
+
+$ ls /etc/clickhouse-server/conf.d/
+00_default_overrides.xml
+```
+
+其他常用配置
+```xml
+<!--最大连接数配置-->
+<max_connections>4096</max_connections>
+
+
+<!--        并发查询数配置-->
+<max_concurrent_queries>200</max_concurrent_queries>
+```
 
 
 
@@ -324,3 +348,4 @@ SELECT * FROM db1.table1_dist;
 
 - [docker 安装 clickhouse](https://hub.docker.com/_/clickhouse)
 - [透过ClickHouse学习列式存储数据库](https://www.luozhiyun.com/archives/837)
+- [4万字长文 | ClickHouse基础&实践&调优全视角解析](https://mp.weixin.qq.com/s/e0aZFakj8P93PqwGhwJfTQ)

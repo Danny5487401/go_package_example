@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/ClickHouse/clickhouse-go/v2/lib/driver"
 	"log"
 	"time"
 
@@ -12,11 +13,12 @@ import (
 
 func main() {
 
-	dsn := "clickhouse://default:K5cCigzWXk@my-clickhouse.clickhouse.svc.cluster.local:9000/my_database?dial_timeout=1000ms&max_execution_time=60"
+	dsn := "clickhouse://default:QYo91Dbgch@my-clickhouse.clickhouse.svc.cluster.local:9000/my_database?dial_timeout=1000ms&max_execution_time=60"
 	options, err := clickhouse.ParseDSN(dsn)
 	if err != nil {
 		log.Fatal(err)
 	}
+	options.MaxIdleConns = 10 // 默认是5
 	ctx := context.Background()
 	// 配置连接参数
 	db, err := clickhouse.Open(options)
@@ -52,8 +54,8 @@ func main() {
 		log.Fatal(err)
 	}
 
-	// 插入数据
-	stmt, err := db.PrepareBatch(ctx, "INSERT INTO example (country, os_id, browser_id, categories, action_day, action_time) VALUES (?, ?, ?, ?, ?, ?)")
+	// 批量插入数据
+	stmt, err := db.PrepareBatch(ctx, "INSERT INTO example (country, os_id, browser_id, categories, action_day, action_time) VALUES (?, ?, ?, ?, ?, ?)", driver.WithCloseOnFlush())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -75,7 +77,16 @@ func main() {
 	}
 
 	// 查询数据
-	rows, err := db.Query(ctx, "SELECT country, os_id, browser_id, categories, action_day, action_time FROM example")
+	totalRows := uint64(0)
+	queryCtx := clickhouse.Context(context.Background(), clickhouse.WithProgress(func(p *clickhouse.Progress) {
+		fmt.Println("progress: ", p)
+		totalRows += p.Rows
+	}), clickhouse.WithProfileInfo(func(p *clickhouse.ProfileInfo) {
+		fmt.Println("profile info: ", p)
+	}), clickhouse.WithLogs(func(log *clickhouse.Log) {
+		fmt.Println("log info: ", log)
+	}))
+	rows, err := db.Query(queryCtx, "SELECT country, os_id, browser_id, categories, action_day, action_time FROM example")
 	if err != nil {
 		log.Fatal(err)
 	}

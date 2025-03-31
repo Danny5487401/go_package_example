@@ -4,6 +4,7 @@
 
 - [监控](#%E7%9B%91%E6%8E%A7)
   - [内置监控](#%E5%86%85%E7%BD%AE%E7%9B%91%E6%8E%A7)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -13,6 +14,9 @@
 ## 内置监控 
 https://clickhouse.com/docs/zh/operations/monitoring ,通过 $HOST:$PORT/dashboard 访问
 
+```clickhouse
+SELECT title, query FROM system.dashboards WHERE dashboard = 'Overview'
+```
 显示以下指标：
 
 - 每秒查询数
@@ -30,3 +34,7 @@ https://clickhouse.com/docs/zh/operations/monitoring ,通过 $HOST:$PORT/dashboa
 - 每秒插入行数
 - 总 MergeTree 部件
 - 每个分区的最大部件数
+
+
+## 参考
+- [常用的运维SQL](https://blog.csdn.net/u010834071/article/details/108872542)
