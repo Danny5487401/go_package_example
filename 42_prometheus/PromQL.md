@@ -127,7 +127,7 @@ Note:当使用表达式count(http_requests_total)，返回的数据类型，依�
 #### 匹配模式
 ##### 1. 一对一 匹配模式会从操作符两边表达式获取的瞬时向量依次比较并找到唯一匹配(标签完全一致)的样本值
 
-在操作符两边表达式标签不一致的情况下，可以使用on(label list)或者ignoring(label list）来修改便签的匹配行为。使用ignoreing可以在匹配时忽略某些便签。而on则用于将匹配行为限定在某些便签之内。
+在操作符两边表达式标签不一致的情况下，可以使用on(label list)或者ignoring(label list）来修改便签的匹配行为。使用ignoring可以在匹配时忽略某些便签。而on则用于将匹配行为限定在某些便签之内。
 ```css
 <vector expr> <bin-op> ignoring(<label list>) <vector expr>
 <vector expr> <bin-op> on(<label list>) <vector expr>
@@ -314,3 +314,4 @@ sum(avg_over_time(go_goroutines{job=“prometheus”}[5m])) by (instance)
 
 
 ## 参考
+- https://prometheus.io/docs/prometheus/latest/querying/basics/

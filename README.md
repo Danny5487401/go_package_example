@@ -244,6 +244,7 @@
   - [3.7 错误](13_serialize/03_mapstructure/07_error/main.go)
   - [3.8 弱解析](13_serialize/03_mapstructure/08_weekDecode/main.go)
   - [3.9 自定义解析器](13_serialize/03_mapstructure/09_decoder/main.go)
+  - [3.10 time 类型 DecodeHookFunc ](13_serialize/03_mapstructure/10_time_decode_hook/main.go)
 - [4 json patch 两种标准](13_serialize/04_json_patch/json_patch.md)
   - [4.1 github.com/evanphx/json-patch/v5 使用](13_serialize/04_json_patch/main.go)
 

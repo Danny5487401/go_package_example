@@ -78,13 +78,16 @@ func main() {
 
 	// 查询数据
 	totalRows := uint64(0)
+	// 进度信息将报告在ClickHouse中已读取和处理的行和字节的统计信息。
+	// 相反，配置信息提供了返回给客户端的数据摘要，包括字节（未压缩）、行和块的总数。
+	// 最后，日志信息提供线程的统计信息，例如内存使用情况和数据速度。
 	queryCtx := clickhouse.Context(context.Background(), clickhouse.WithProgress(func(p *clickhouse.Progress) {
-		fmt.Println("progress: ", p)
+		fmt.Println("进度: ", p)
 		totalRows += p.Rows
 	}), clickhouse.WithProfileInfo(func(p *clickhouse.ProfileInfo) {
-		fmt.Println("profile info: ", p)
+		fmt.Println("配置信息: ", p)
 	}), clickhouse.WithLogs(func(log *clickhouse.Log) {
-		fmt.Println("log info: ", log)
+		fmt.Println("日志信息: ", log)
 	}))
 	rows, err := db.Query(queryCtx, "SELECT country, os_id, browser_id, categories, action_day, action_time FROM example")
 	if err != nil {

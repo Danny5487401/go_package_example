@@ -11,12 +11,20 @@
   - [v2](#v2)
     - [批量写入](#%E6%89%B9%E9%87%8F%E5%86%99%E5%85%A5)
   - [第三方应用-->grafana clickhouse plugin](#%E7%AC%AC%E4%B8%89%E6%96%B9%E5%BA%94%E7%94%A8--grafana-clickhouse-plugin)
+  - [性能提示](#%E6%80%A7%E8%83%BD%E6%8F%90%E7%A4%BA)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # github.com/ClickHouse/clickhouse-go
 
+* clickhouse-go - 高级语言客户端，支持Go标准的数据库/sql接口或本地接口。
+* ch-go - 低级客户端，仅支持本地接口。
+
+在需要每秒数百万次插入的插入重负载使用案例中，我们建议使用低级客户端 ch-go。
+该客户端避免了将数据从面向行的格式转换为列所需的附加开销，因为ClickHouse的本地格式要求。此外，它避免了任何反射或使用 interface{}（any）类型以简化使用。
+
+对于专注于聚合或较低吞吐插入工作负载的查询工作负载，clickhouse-go提供了一种熟悉的database/sql接口以及更简单的行语义。
 
 
 ## v1 对比 v2 
@@ -179,7 +187,7 @@ func (o *Options) fromDSN(in string) error {
 
 ## 两种接口
 
-- native interface
+- native interface(TCP)
 
 - std database/sql interface
 ```go
@@ -192,9 +200,20 @@ func init() {
 ```
 
 协议 
+
+```go
+// github.com/!click!house/clickhouse-go/v2@v2.32.1/clickhouse_options.go
+type Protocol int
+
+const (
+	Native Protocol = iota
+	HTTP
+)
+```
 - http 协议(实验性) ,只支持 `database/sql`
 
 ## v1 版本(不建议使用)
+v1 驱动程序已被弃用，并将不再提供功能更新或对新ClickHouse类型的支持。
 
 初始化注册插件
 ```go
@@ -391,6 +410,7 @@ func (ch *clickhouse) dial(ctx context.Context) (conn *connect, err error) {
 		return DialResult{conn}, err
 	}
 
+	// 默认实现的三种连接方式ConnOpenStrategy
 	dialStrategy := DefaultDialStrategy
 	if ch.opt.DialStrategy != nil {
 		dialStrategy = ch.opt.DialStrategy
@@ -405,11 +425,92 @@ func (ch *clickhouse) dial(ctx context.Context) (conn *connect, err error) {
 
 ```
 
+```go
+
+func dial(ctx context.Context, addr string, num int, opt *Options) (*connect, error) {
+	var (
+		err    error
+		conn   net.Conn
+		debugf = func(format string, v ...any) {}
+	)
+
+	switch {
+	case opt.DialContext != nil:
+		conn, err = opt.DialContext(ctx, addr)
+	default:
+		switch {
+		case opt.TLS != nil:
+			conn, err = tls.DialWithDialer(&net.Dialer{Timeout: opt.DialTimeout}, "tcp", addr, opt.TLS)
+		default:
+			// 默认使用 tcp 建立连接
+			conn, err = net.DialTimeout("tcp", addr, opt.DialTimeout)
+		}
+	}
+
+    // ...
+
+	var (
+		compression CompressionMethod
+		compressor  *compress.Writer
+	)
+	if opt.Compression != nil {
+		switch opt.Compression.Method {
+		case CompressionLZ4, CompressionLZ4HC, CompressionZSTD, CompressionNone:
+			compression = opt.Compression.Method
+		default:
+			return nil, fmt.Errorf("unsupported compression method for native protocol")
+		}
+
+		compressor = compress.NewWriter(compress.Level(opt.Compression.Level), compress.Method(opt.Compression.Method))
+	} else {
+		compression = CompressionNone
+		compressor = compress.NewWriter(compress.LevelZero, compress.None)
+	}
+
+	var (
+		connect = &connect{
+			id:                   num,
+			opt:                  opt,
+			conn:                 conn,
+			debugf:               debugf,
+			buffer:               new(chproto.Buffer),
+			reader:               chproto.NewReader(conn),
+			revision:             ClientTCPProtocolVersion,
+			structMap:            &structMap{},
+			compression:          compression,
+			connectedAt:          time.Now(),
+			compressor:           compressor,
+			readTimeout:          opt.ReadTimeout,
+			blockBufferSize:      opt.BlockBufferSize,
+			maxCompressionBuffer: opt.MaxCompressionBuffer,
+		}
+	)
+
+	if err := connect.handshake(opt.Auth.Database, opt.Auth.Username, opt.Auth.Password); err != nil {
+		return nil, err
+	}
+
+	if connect.revision >= proto.DBMS_MIN_PROTOCOL_VERSION_WITH_ADDENDUM {
+		if err := connect.sendAddendum(); err != nil {
+			return nil, err
+		}
+	}
+
+	// warn only on the first connection in the pool
+	if num == 1 && !resources.ClientMeta.IsSupportedClickHouseVersion(connect.server.Version) {
+		debugf("[handshake] WARNING: version %v of ClickHouse is not supported by this client - client supports %v", connect.server.Version, resources.ClientMeta.SupportedVersions())
+	}
+
+	return connect, nil
+}
+```
+
 
 
 ### 批量写入
 
 ```go
+// github.com/!click!house/clickhouse-go/v2@v2.32.1/clickhouse.go
 func (ch *clickhouse) PrepareBatch(ctx context.Context, query string, opts ...driver.PrepareBatchOption) (driver.Batch, error) {
 	// 获取连接
 	conn, err := ch.acquire(ctx)
@@ -445,6 +546,7 @@ func (c *connect) prepareBatch(ctx context.Context, query string, opts driver.Pr
 	var (
 		// 进展展示之类
 		onProcess  = options.onProcess()
+		// 解析 reader 数据
 		block, err = c.firstBlock(ctx, onProcess)
 	)
 	if err != nil {
@@ -476,6 +578,54 @@ func (c *connect) prepareBatch(ctx context.Context, query string, opts driver.Pr
 }
 
 ```
+实际调用解析数据
+
+```go
+func (c *connect) readData(ctx context.Context, packet byte, compressible bool) (*proto.Block, error) {
+	if c.isClosed() {
+		err := errors.New("attempted reading on closed connection")
+		c.debugf("[read data] err: %v", err)
+		return nil, err
+	}
+
+	if c.reader == nil {
+		err := errors.New("attempted reading on nil reader")
+		c.debugf("[read data] err: %v", err)
+		return nil, err
+	}
+
+	if _, err := c.reader.Str(); err != nil {
+		c.debugf("[read data] str error: %v", err)
+		return nil, err
+	}
+
+	if compressible && c.compression != CompressionNone {
+		c.reader.EnableCompression()
+		defer c.reader.DisableCompression()
+	}
+
+	opts := queryOptions(ctx)
+	location := c.server.Timezone
+	if opts.userLocation != nil {
+		location = opts.userLocation
+	}
+
+	// 解析数据
+	block := proto.Block{Timezone: location}
+	if err := block.Decode(c.reader, c.revision); err != nil {
+		c.debugf("[read data] decode error: %v", err)
+		return nil, err
+	}
+
+	block.Packet = packet
+	c.debugf("[read data] compression=%q. block: columns=%d, rows=%d", c.compression, len(block.Columns), block.Rows())
+	return &block, nil
+}
+```
+
+
+
+
 
 放入数据
 ```go
@@ -568,6 +718,58 @@ func (b *batch) Send() (err error) {
 	if err = b.closeQuery(); err != nil {
 		return err
 	}
+	return nil
+}
+```
+
+```go
+func (c *connect) sendData(block *proto.Block, name string) error {
+	if c.isClosed() {
+		err := errors.New("attempted sending on closed connection")
+		c.debugf("[send data] err: %v", err)
+		return err
+	}
+
+	c.debugf("[send data] compression=%q", c.compression)
+	c.buffer.PutByte(proto.ClientData)
+	c.buffer.PutString(name)
+
+	compressionOffset := len(c.buffer.Buf)
+
+	// 头部信息
+	if err := block.EncodeHeader(c.buffer, c.revision); err != nil {
+		return err
+	}
+
+	for i := range block.Columns {
+		if err := block.EncodeColumn(c.buffer, c.revision, i); err != nil {
+			return err
+		}
+		if len(c.buffer.Buf) >= c.maxCompressionBuffer {
+			if err := c.compressBuffer(compressionOffset); err != nil {
+				return err
+			}
+			c.debugf("[buff compress] buffer size: %d", len(c.buffer.Buf))
+			if err := c.flush(); err != nil {
+				return err
+			}
+			compressionOffset = 0
+		}
+	}
+
+	// 数据压缩
+	if err := c.compressBuffer(compressionOffset); err != nil {
+		return err
+	}
+
+	if err := c.flush(); err != nil {
+        // ... 
+	}
+
+	defer func() {
+		c.buffer.Reset()
+	}()
+
 	return nil
 }
 ```
@@ -707,8 +909,14 @@ func (h *Clickhouse) Connect(ctx context.Context, config backend.DataSourceInsta
 	return db, settings.isValid()
 }
 
-// Co
 ```
+
+## 性能提示
+- 尽可能利用 ClickHouse API，特别是在处理基本类型时。这可以避免大量的反射和间接调用。
+- 如果读取大数据集，考虑修改 BlockBufferSize。这将增加内存占用，但意味着在行迭代期间可以并行解码更多的块。默认值为 2 是保守的，并且最小化内存开销。更高的值将意味着更多的块驻留在内存中。这需要测试，因为不同的查询可能会产生不同的块大小。因此可以在查询级别通过上下文进行设置。
+- 插入数据时要明确类型。虽然客户端旨在灵活，例如允许字符串解析为 UUID 或 IP，但这需要数据验证，并在插入时产生开销。
+- 在可能的情况下，使用面向列的插入。这些应强类型化，避免客户端转换值的需要。
 
 
 ## 参考
+- https://clickhouse.com/docs/zh/integrations/go

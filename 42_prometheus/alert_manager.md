@@ -13,7 +13,7 @@
     - [route](#route)
     - [接收人（receivers)](#%E6%8E%A5%E6%94%B6%E4%BA%BAreceivers)
       - [集成邮件系统](#%E9%9B%86%E6%88%90%E9%82%AE%E4%BB%B6%E7%B3%BB%E7%BB%9F)
-  - [参考链接](#%E5%8F%82%E8%80%83%E9%93%BE%E6%8E%A5)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -246,5 +246,5 @@ email_configs:
 
 
 
-## 参考链接
-1. https://prometheus.io/docs/alerting/latest/overview/
+## 参考
+- https://prometheus.io/docs/alerting/latest/overview/
