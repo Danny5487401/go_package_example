@@ -5,7 +5,7 @@ import (
 	"net"
 )
 
-// 获取可用端口
+// 获取本地可用端口
 func GetFreePort() (int, error) {
 	addr, err := net.ResolveTCPAddr("tcp", "127.0.0.1:0")
 	if err != nil {

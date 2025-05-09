@@ -73,15 +73,15 @@ zookeeper 中节点叫znode存储结构上跟文件系统类似，以树级结�
 ## Zookeeper的数据模型
 ![](.zookeeper_images/zookeeper_data_structure.png)
 Zookeeper数据模型的结构与Unix文件系统很类似，整体上可以看作是一颗树，每一个节点称做一个ZNode。
-每一个Znode默认能够存储1MB的数据，每个ZNode都可以通过其路径唯一标识。
+每一个 Znode 默认能够存储1MB的数据，每个ZNode都可以通过其路径唯一标识。
 
 
 ## 客户端基本使用
 
 ```shell
 # 部署命令
-mkdir data
-docker run -d -e TZ="Asia/Shanghai" -p 2181:2181 -v $PWD/data:/data --name zookeeper --restart always zookeeper
+$ mkdir data
+$ docker run -d -e TZ="Asia/Shanghai" -p 2181:2181 -v $PWD/data:/data --name zookeeper --restart always zookeeper
 ```
 
 ```shell

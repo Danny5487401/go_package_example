@@ -140,7 +140,8 @@
 - [4 SQL生成库 Squirrel](05_rds/04_squirrel/quirrel.md)
 
 ## 第六章 获取对外可用IP和端口
-- [通过google, 国内移动、电信和联通通用的DNS获取对外 Ip 和 port ](06_get_available_ip_port/get_ip/main.go)
+- [1 通过google, 国内移动、电信和联通通用的DNS获取对外 Ip 和 port ](06_get_available_ip_port/get_ip/outboundIp_test.go)
+- [2 获取本地可用端口](06_get_available_ip_port/get_port/main.go)
 
 ## [第七章 验证器 go-playground/validator](07_gin_form_validator/validator.md)
 - [1 dive 递归结构体字段验证](07_gin_form_validator/01_dive_validate/main.go)
@@ -347,6 +348,7 @@
 - [2 etcd实现分布式锁](29_distributed_lock/02_etcd_distributed_lock/main.go)
 
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
+- [1 github.com/go-zookeeper/zk 使用](30_zookeeper/zookeeper.go)
 
 ## [第三十一章 分布式 Id](31_distributed_Id/distribued_id.md)
 - 1 UUID( Universally Unique Identifier 通用唯一标识码)
@@ -361,6 +363,8 @@
   - [hashicorp/raft 在consul实现](32_consensus_algorithm/02_raft/raft_in_consul.md)
   - [raft 在etcd实现原理分析](32_consensus_algorithm/02_raft/raft_in_etcd.md)
   - [2.1 使用 hashicorp/raft 调试应用](32_consensus_algorithm/02_raft/main.go)
+- [3 gossip 协议](32_consensus_algorithm/03_gossip/gossip.md)
+  - [3.1 github.com/hashicorp/memberlist 使用](32_consensus_algorithm/03_gossip/main.go)
 
 ## [第三十三章 压缩](33_compress/compress.md)
 - [1 snappy 压缩库-->prometheus 使用](33_compress/01_snappy/snappy.md)
