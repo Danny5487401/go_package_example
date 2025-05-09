@@ -627,7 +627,7 @@ func (c *connect) readData(ctx context.Context, packet byte, compressible bool) 
 
 
 
-放入数据
+放入数据方式一: Append(v ...any)
 ```go
 
 func (b *batch) Append(v ...any) error {
@@ -678,6 +678,86 @@ func (b *Block) Append(v ...any) (err error) {
 	return nil
 }
 ```
+
+
+放入数据方式二: AppendStruct(v any) error 有字段验证功能,最终也是调用Append(values...)
+
+
+```go
+// github.com/!click!house/clickhouse-go/v2@v2.32.1/conn_batch.go
+
+func (b *batch) AppendStruct(v any) error {
+	if b.err != nil {
+		return b.err
+	}
+	// 将 columnsName 字段去结构体中寻找数据
+	values, err := b.conn.structMap.Map("AppendStruct", b.block.ColumnsNames(), v, false)
+	if err != nil {
+		return err
+	}
+	// 实际调用Append
+	return b.Append(values...)
+}
+```
+
+
+```go
+func (m *structMap) Map(op string, columns []string, s any, ptr bool) ([]any, error) {
+	v := reflect.ValueOf(s)
+	if v.Kind() != reflect.Ptr {
+		return nil, &OpError{
+			Op:  op,
+			Err: fmt.Errorf("must pass a pointer, not a value, to %s destination", op),
+		}
+	}
+	if v.IsNil() {
+		return nil, &OpError{
+			Op:  op,
+			Err: fmt.Errorf("nil pointer passed to %s destination", op),
+		}
+	}
+	t := reflect.TypeOf(s)
+	if v = reflect.Indirect(v); t.Kind() == reflect.Ptr {
+		t = t.Elem()
+	}
+	if v.Kind() != reflect.Struct {
+		return nil, &OpError{
+			Op:  op,
+			Err: fmt.Errorf("%s expects a struct dest", op),
+		}
+	}
+
+	var (
+		index  map[string][]int
+		values = make([]any, 0, len(columns))
+	)
+
+	switch idx, found := m.cache.Load(t); {
+	case found:
+		index = idx.(map[string][]int)
+	default:
+		index = structIdx(t)
+		m.cache.Store(t, index)
+	}
+	for _, name := range columns {
+		idx, found := index[name]
+		if !found { // 字段验证
+			return nil, &OpError{
+				Op:  op,
+				Err: fmt.Errorf("missing destination name %q in %T", name, s),
+			}
+		}
+		switch field := v.FieldByIndex(idx); {
+		case ptr:
+			values = append(values, field.Addr().Interface())
+		default:
+			values = append(values, field.Interface())
+		}
+	}
+	return values, nil
+}
+```
+
 
 发送数据
 ```go

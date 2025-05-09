@@ -3,9 +3,11 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [curd](#curd)
+  - [数据类型](#%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B)
   - [create](#create)
   - [insert](#insert)
   - [update and delete](#update-and-delete)
+  - [clickhouse-client 使用](#clickhouse-client-%E4%BD%BF%E7%94%A8)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -13,6 +15,42 @@
 # curd
 
 默认情况下，CREATE、DROP、ALTER 和 RENAME 查询仅影响执行它们的当前服务器。在集群设置中，可以使用 ON CLUSTER 子句以分布式方式运行此类查询。
+
+
+## 数据类型
+
+- (Int) 和 (unsigned UInt):不区分 int,short, long
+
+- bool: 实际是UInt8.
+
+- Float32/Float64: 这会精度丢失,建议用 Decimal
+
+
+- Decimal: 建议只使用 Decimal32/Decimal64, 因为Decimal128由计算机模拟
+
+- String/FixedString : 没有 Varchar,blob,clob类型
+
+
+- Enum: 实际存储 Int8 or Int16
+
+- array
+
+- 时间: Date( 1970-01-01),DateTime(2019-01-01 00:00:00 ),DateTime64(2019-01-01 03:00:00.123)
+
+- Nullable:  It returns 1 if the corresponding value is NULL and 0 otherwise. 建议业务上,字符串用空替代Null, 整型用 -1 表示 Null
+```shell
+CREATE TABLE nullable (`n` Nullable(UInt32)) ENGINE = MergeTree ORDER BY tuple();
+
+INSERT INTO nullable VALUES (1) (NULL) (2) (NULL);
+
+SELECT n.null FROM nullable;
+┌─n.null─┐
+│      0 │
+│      1 │
+│      0 │
+│      1 │
+└────────┘
+```
 
 ## create
 
@@ -82,6 +120,7 @@ ENGINE = Distributed(default, db_name, ontime_local, rand());  -- 指定表引�
 ```
 
 
+
 ## insert
 
 
@@ -115,6 +154,95 @@ ALTER TABLE [<database>.]<table> DELETE WHERE <filter_expr>
 DELETE FROM [db.]table [ON CLUSTER cluster] [WHERE expr]
 ```
 
+
+
+## clickhouse-client 使用
+
+```shell
+I have no name!@my-clickhouse-shard0-0:/$ clickhouse-client --help
+Main options:
+  --help                                  print usage summary, combine with --verbose to display all options
+  --verbose                               print query and other debugging info
+  -V [ --version ]                        print version information and exit
+  --version-clean                         print version in machine-readable format and exit
+  -C [ --config-file ] arg                config-file path
+  -q [ --query ] arg                      Query. Can be specified multiple times (--query "SELECT 1" --query "SELECT 2") or once with multiple comma-separated queries (--query "SELECT
+                                          1; SELECT 2;"). In the latter case, INSERT queries with non-VALUE format must be separated by empty lines.
+  --queries-file arg                      file path with queries to execute; multiple files can be specified (--queries-file file1 file2...)
+  -n [ --multiquery ]                     Obsolete, does nothing
+  -m [ --multiline ]                      If specified, allow multiline queries (do not send the query on Enter)
+  -d [ --database ] arg                   database
+  --query_kind arg (=initial_query)       One of initial_query/secondary_query/no_query
+  --query_id arg                          query_id
+  --history_file arg                      path to history file
+  --stage arg (=complete)                 Request query processing up to specified stage: complete,fetch_columns,with_mergeable_state,with_mergeable_state_after_aggregation,with_merge
+                                          able_state_after_aggregation_and_limit
+  --progress [=arg(=tty)] (=default)      Print progress of queries execution - to TTY: tty|on|1|true|yes; to STDERR non-interactive mode: err; OFF: off|0|false|no; DEFAULT -
+                                          interactive to TTY, non-interactive is off
+  -A [ --disable_suggestion ]             Disable loading suggestion data. Note that suggestion data is loaded asynchronously through a second connection to ClickHouse server. Also it
+                                          is reasonable to disable suggestion if you want to paste a query with TAB characters. Shorthand option -A is for those who get used to mysql
+                                          client.
+  --wait_for_suggestions_to_load          Load suggestion data synchonously.
+  -t [ --time ]                           print query execution time to stderr in non-interactive mode (for benchmarks)
+  --memory-usage [=arg(=default)] (=none) print memory usage to stderr in non-interactive mode (for benchmarks). Values: 'none', 'default', 'readable'
+  --echo                                  in batch mode, print query before execution
+  --log-level arg                         log level
+  --server_logs_file arg                  put server logs into specified file
+  --suggestion_limit arg (=10000)         Suggestion limit for how many databases, tables and columns to fetch.
+  -f [ --format ] arg                     default output format (and input format for clickhouse-local)
+  --output-format arg                     default output format (this option has preference over --format)
+  -E [ --vertical ]                       vertical output format, same as --format=Vertical or FORMAT Vertical or \G at end of command
+  --highlight arg (=1)                    enable or disable basic syntax highlight in interactive command line
+  --ignore-error                          do not stop processing when an error occurs
+  --stacktrace                            print stack traces of exceptions
+  --hardware-utilization                  print hardware utilization information in progress bar
+  --print-profile-events                  Printing ProfileEvents packets
+  --profile-events-delay-ms arg (=0)      Delay between printing `ProfileEvents` packets (-1 - print only totals, 0 - print every single packet)
+  --processed-rows                        print the number of locally processed rows
+  --interactive                           Process queries-file or --query query and start interactive mode
+  --pager arg                             Pipe all output into this command (less or similar)
+  --max_memory_usage_in_client arg        Set memory limit in client/local server
+  --client_logs_file arg                  Path to a file for writing client logs. Currently we only have fatal logs (when the client crashes)
+  -c [ --config ] arg                     config-file path (another shorthand)
+  --connection arg                        connection to use (from the client config), by default connection name is hostname
+  -s [ --secure ]                         Use TLS connection
+  --no-secure                             Don't use TLS connection
+  -u [ --user ] arg (=default)            user
+  --password arg                          password
+  --ask-password                          ask-password
+  --ssh-key-file arg                      File containing the SSH private key for authenticate with the server.
+  --ssh-key-passphrase arg                Passphrase for the SSH private key specified by --ssh-key-file.
+  --quota_key arg                         A string to differentiate quotas when the user have keyed quotas configured on server
+  --jwt arg                               Use JWT for authentication
+  --max_client_network_bandwidth arg      the maximum speed of data exchange over the network for the client in bytes per second.
+  --compression arg                       enable or disable compression (enabled by default for remote communication and disabled for localhost communication).
+  --query-fuzzer-runs arg (=0)            After executing every SELECT query, do random mutations in it and run again specified number of times. This is used for testing to discover
+                                          unexpected corner cases.
+  --create-query-fuzzer-runs arg (=0)
+  --interleave-queries-file arg           file path with queries to execute before every file from 'queries-file'; multiple files can be specified (--queries-file file1 file2...);
+                                          this is needed to enable more aggressive fuzzing of newly added tests (see 'query-fuzzer-runs' option)
+  --opentelemetry-traceparent arg         OpenTelemetry traceparent header as described by W3C Trace Context recommendation
+  --opentelemetry-tracestate arg          OpenTelemetry tracestate header as described by W3C Trace Context recommendation
+  --no-warnings                           disable warnings when client connects to server
+  --fake-drop                             Ignore all DROP queries, should be used only for testing
+  --accept-invalid-certificate            Ignore certificate verification errors, equal to config parameters openSSL.client.invalidCertificateHandler.name=AcceptCertificateHandler and
+                                          openSSL.client.verificationMode=none
+
+External tables options:
+  --file arg                   data file or - for stdin
+  --name arg (=_data)          name of the table
+  --format arg (=TabSeparated) data format
+  --structure arg              structure
+  --types arg                  types
+
+Hosts and ports options:
+  -h [ --host ] arg (=localhost) Server hostname. Multiple hosts can be passed via multiple argumentsExample of usage: '--host host1 --host host2 --port port2 --host host3 ...'Each
+                                 '--port port' will be attached to the last seen host that doesn't have a port yet,if there is no such host, the port will be attached to the next
+                                 first host or to default host.
+  --port arg                     server ports
+
+In addition, --param_name=value can be specified for substitution of parameters for parametrized queries.
+```
 
 ## 参考
 - https://clickhouse.com/docs/zh/sql-reference/statements

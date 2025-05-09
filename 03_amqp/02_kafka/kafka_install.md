@@ -33,7 +33,7 @@ image:
   tag: 3.9
 
       
-(⎈|kubeasz-test:kafka)➜  kafka helm install my-kafka -f values.yaml oci://registry-1.docker.io/bitnamicharts/kafka
+(⎈|kubeasz-test:kafka)➜  kafka helm install my-kafka -f values.yaml oci://registry-1.docker.io/bitnamicharts/kafka -version 31.5.0
 (⎈|kubeasz-test:kafka)➜  kafka kubectl get secret my-kafka-user-passwords --namespace kafka -o jsonpath='{.data.client-passwords}' | base64 -d | cut -d , -f 1
 qwl2pTlW6e%
 

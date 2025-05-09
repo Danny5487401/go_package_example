@@ -75,5 +75,5 @@ func main() {
 		}
 	}()
 	http.Handle("/metrics", promhttp.Handler())
-	log.Fatal(http.ListenAndServe("127.0.0.1:8888", nil)) //多个进程不可监听同一个端口
+	log.Fatal(http.ListenAndServe("127.0.0.1:8866", nil)) //多个进程不可监听同一个端口
 }

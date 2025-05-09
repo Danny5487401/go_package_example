@@ -188,7 +188,7 @@ resources:
     memory: 2024Mi
 shards: 2
 replicaCount: 2
-(⎈|kubeasz-test:clickhouse)➜  helm install -f values.yaml my-clickhouse oci://registry-1.docker.io/bitnamicharts/clickhouse
+(⎈|kubeasz-test:clickhouse)➜  helm install -f values.yaml my-clickhouse oci://registry-1.docker.io/bitnamicharts/clickhouse -version 8.0.8
 (⎈|kubeasz-test:clickhouse)➜  clickhouse helm ls
 NAME         	NAMESPACE 	REVISION	UPDATED                             	STATUS  	CHART           	APP VERSION
 my-clickhouse	clickhouse	2       	2025-03-31 09:49:31.768305 +0800 CST	deployed	clickhouse-8.0.8	25.3.2
@@ -299,7 +299,25 @@ $ ls /etc/clickhouse-server/conf.d/
 
 
 
-以上集群配置完之后，想要用到Clickhouse的集群能力，还需要使用Replicated MergeTree+Distributed引擎，该引擎是"本地表 + 分布式表"的方式，因此可以实现多分片多副本
+以上集群配置完之后，想要用到Clickhouse的集群能力，还需要使用Replicated MergeTree+Distributed引擎，该引擎是"本地表 + 分布式表"的方式，因此可以实现多分片多副本.
+
+```clickhouse
+my-clickhouse-shard1-0.my-clickhouse-headless.clickhouse.svc.cluster.local :) select * from system.clusters;
+
+SELECT *
+FROM system.clusters
+
+Query id: c4eabc48-abbe-42f0-baea-91c4690d9738
+
+   ┌─cluster───────┬─shard_num─┬─shard_weight─┬─internal_replication─┬─replica_num─┬─host_name──────────────────────────────────────────────────────────────────┬─host_address──┬─port─┬─is_local─┬─user────┬─default_database─┬─errors_count─┬─slowdowns_count─┬─estimated_recovery_time─┬─database_shard_name─┬─database_replica_name─┬─is_active─┬─replication_lag─┬─recovery_time─┐
+1. │ my-clickhouse │         1 │            1 │                    0 │           1 │ my-clickhouse-shard0-0.my-clickhouse-headless.clickhouse.svc.cluster.local │ 192.168.0.139 │ 9000 │        0 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
+2. │ my-clickhouse │         1 │            1 │                    0 │           2 │ my-clickhouse-shard0-1.my-clickhouse-headless.clickhouse.svc.cluster.local │ 192.168.1.59  │ 9000 │        0 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
+3. │ my-clickhouse │         2 │            1 │                    0 │           1 │ my-clickhouse-shard1-0.my-clickhouse-headless.clickhouse.svc.cluster.local │ 192.168.2.149 │ 9000 │        1 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
+4. │ my-clickhouse │         2 │            1 │                    0 │           2 │ my-clickhouse-shard1-1.my-clickhouse-headless.clickhouse.svc.cluster.local │ 192.168.3.50  │ 9000 │        0 │ default │                  │            0 │               0 │                       0 │                     │                       │      ᴺᵁᴸᴸ │            ᴺᵁᴸᴸ │          ᴺᵁᴸᴸ │
+   └───────────────┴───────────┴──────────────┴──────────────────────┴─────────────┴────────────────────────────────────────────────────────────────────────────┴───────────────┴──────┴──────────┴─────────┴──────────────────┴──────────────┴─────────────────┴─────────────────────────┴─────────────────────┴───────────────────────┴───────────┴─────────────────┴───────────────┘
+
+4 rows in set. Elapsed: 0.004 sec.
+```
 
 
 ![img.png](distributed_table.png)
@@ -335,10 +353,11 @@ SELECT * FROM db1.table1_dist;
 ```
 
 
+
 ## 性能
 1）插入：单机100-150M/s的插入速度；
 
-2）查询：单字段groupby没有索引，1亿数据查询需要2.324s。有索引下，查询时间为0.101秒。可以看到Clickhouse的查询速度是及其快的，市面上常见的数据库基本都达不到这种性能；
+2）查询：单字段 groupby 没有索引，1亿数据查询需要2.324s。有索引下，查询时间为0.101秒。可以看到Clickhouse的查询速度是及其快的，市面上常见的数据库基本都达不到这种性能；
 
 3）其他：并发，官网默认配置为100。由于是大数据分析数据库主要适用于olap场景，对并发支持略差多个大数据查询可能会直接将cpu等资源占满，故并发实际达不到100
 
