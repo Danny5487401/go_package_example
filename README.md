@@ -45,7 +45,7 @@
   - [第三十九章 权限管理 casbin](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B9%9D%E7%AB%A0-%E6%9D%83%E9%99%90%E7%AE%A1%E7%90%86-casbin)
   - [第四十章 规则引擎 rule engine](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E7%AB%A0-%E8%A7%84%E5%88%99%E5%BC%95%E6%93%8E-rule-engine)
   - [第四十一章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%B8%80%E7%AB%A0-hashicorpgo-plugin-%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8--httprunner-40-%E4%BD%BF%E7%94%A8)
-  - [第四十二章 prometheus](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%BA%8C%E7%AB%A0-prometheus)
+  - [第四十二章 open-api](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%BA%8C%E7%AB%A0-open-api)
   - [第四十三章 go-systemd-->k8s 中使用](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%B8%89%E7%AB%A0-go-systemd--k8s-%E4%B8%AD%E4%BD%BF%E7%94%A8)
   - [参考](#%E5%8F%82%E8%80%83)
 
@@ -252,10 +252,22 @@
 ## 第十四章 系统监控
 - [1 systemstat包(适合linux系统，已断更)](14_system_monitor/01_systemstat/main.go)
 - [2 gopsutil](14_system_monitor/02_gopsutil/gopsutil.md)
-  - [cpu,mem,disk](14_system_monitor/02_gopsutil/01_disk_n_cpu_n_mem/main.go)
-  - 进程信息获取
-    - [物理机和虚拟机](14_system_monitor/02_gopsutil/02_process/in_host/main.go)
-    - [容器环境](14_system_monitor/02_gopsutil/process/in_container/main.go)
+  - [2.1 cpu,mem,disk](14_system_monitor/02_gopsutil/01_disk_n_cpu_n_mem/main.go)
+  - 2.2 进程信息获取
+    - [物理机和虚拟机](14_system_monitor/02_gopsutil/02_process/01_in_host/main.go)
+    - [容器环境](14_system_monitor/02_gopsutil/02_process/02_in_container/main.go)
+
+- [3 prometheus](14_system_monitor/03_prometheus/prometheus.md)
+  - [3.1 exporter](14_system_monitor/03_prometheus/01_exporter/exporter.md)
+    - [3.1.1 内置 collector](14_system_monitor/03_prometheus/01_exporter/01_embeded_collector/main.go)
+    - [3.1.2 使用自定义 collector](14_system_monitor/03_prometheus/01_exporter/02_customized_collector/main.go)
+  - [3.2 client](14_system_monitor/03_prometheus/02_client/client.md) 
+  - [3.3 k8s 部署](14_system_monitor/03_prometheus/03_k8s_deploy/deploy.md)
+    - [3.2.1 原始 yaml --> 测试环境](14_system_monitor/03_prometheus/03_k8s_deploy/01_manual)
+    - [3.2.2 Prometheus Operator --> 生产环境](14_system_monitor/03_prometheus/03_k8s_deploy/02_operator)
+  - [3.4 PromQL(Prometheus Query Language)](14_system_monitor/03_prometheus/PromQL.md)
+  - [3.5 监控指标查询性能调优](14_system_monitor/03_prometheus/query.md)
+- [4 AlertManager](14_system_monitor/04_alertmanager/alert_manager.md)
 
 ## [第十五章 分布式事务](15_distributed_transaction/distributed_transaction.md)
 - Note: 使用DTM的代码作为案例 
@@ -402,15 +414,7 @@
 
 ## [第四十一章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](41_go_plugin/go-plugin.md)
 
-## [第四十二章 prometheus](42_prometheus/prometheus.md)
-- [1 exporter](42_prometheus/01_exporter/exporter.md)
-  - [1.1 内置 collector](42_prometheus/01_exporter/01_embeded_collector/main.go)
-  - [1.2 使用自定义 collector](42_prometheus/01_exporter/02_customized_collector/main.go)
-- [2 Prometheus Operator](42_prometheus/k8s_deploy/deploy.md))
-  - [2.1 原始 yaml --> 测试环境](42_prometheus/k8s_deploy/manual)
-  - [2.2 Prometheus Operator --> 生产环境](42_prometheus/k8s_deploy/opeartor)
-- [3 AlertManager](42_prometheus/alert_manager.md)
-- [4 PromQL(Prometheus Query Language)](42_prometheus/PromQL.md)
+## [第四十二章 open-api](42_go-openapi/open-api.md)
 
 ## [第四十三章 go-systemd-->k8s 中使用](43_systemd/systemd.md)
 

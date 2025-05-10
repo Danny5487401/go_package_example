@@ -26,14 +26,12 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Println("redis address: ", config.Address)
-	fmt.Println("redis port: ", config.Port)
-	fmt.Println("redis db: ", config.DB)
+	fmt.Printf("redis info address: %+v \n", config) // redis info address: {Address:127.0.0.1 Port:6381 DB:1}
 
 	var m = make(map[string]interface{})
 	if err := mergo.Map(&m, defaultConfig); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(m)
+	fmt.Println(m) // map[address:127.0.0.1 dB:1 port:6381]
 }

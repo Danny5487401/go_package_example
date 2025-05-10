@@ -19,7 +19,7 @@
 
 ## 基本概念
 
-![img.png](posting_index_find_process.png)
+![img.png](.prometheus_images/posting_index_find_process.png)
 prometheus tsdb中的index以倒排索引的方式组织：
 
 * 给每个series分配1个id
@@ -41,7 +41,6 @@ type removedPostings struct {...} // 差集
 
 
 ## 数据存储形式
-
 
 ### 在内存中的组织
 
