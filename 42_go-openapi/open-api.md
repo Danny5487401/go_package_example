@@ -49,5 +49,5 @@ Swagger 生态系统始终由规范及其周围的核心开源工具组成，最
 ## 参考
 - https://github.com/swaggo/swag
 - https://github.com/go-swagger/go-swagger
-- [OpenAPI 规范 (中文版)](https://openapi.apifox.cn/)
+- [OpenAPI 3.0.0 规范 (中文版)](https://openapi.apifox.cn/)
 - [使用 OpenAPI 构建 API 文档](https://xie.infoq.cn/article/ac5194d741e079ba733cb7697)

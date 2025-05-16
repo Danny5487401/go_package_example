@@ -5,7 +5,7 @@
 - [github.com/imdario/mergo](#githubcomimdariomergo)
   - [源码分析](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
     - [Merge](#merge)
-    - [Map](#map)
+    - [Map: 结构体和 map 相互转换](#map-%E7%BB%93%E6%9E%84%E4%BD%93%E5%92%8C-map-%E7%9B%B8%E4%BA%92%E8%BD%AC%E6%8D%A2)
   - [应用](#%E5%BA%94%E7%94%A8)
   - [参考](#%E5%8F%82%E8%80%83)
 
@@ -34,7 +34,7 @@ type Config struct {
 ```
 
 ### Merge
-
+会将 src 的字段填写 dest 对应的空字段
 ```go
 func Merge(dst, src interface{}, opts ...func(*Config)) error {
 	return merge(dst, src, opts...)
@@ -132,12 +132,98 @@ func deepMerge(dst, src reflect.Value, visited map[uintptr]*visit, depth int, co
 ```
 
 
-### Map 
+### Map: 结构体和 map 相互转换
+```go
+// src 和 dest 必须 map 和 struct 相反的类型
+func Map(dst, src interface{}, opts ...func(*Config)) error {
+	return _map(dst, src, opts...)
+}
 
+func _map(dst, src interface{}, opts ...func(*Config)) error {
+	var (
+		vDst, vSrc reflect.Value
+		err        error
+	)
+	config := &Config{}
+
+	for _, opt := range opts {
+		opt(config)
+	}
+
+	if vDst, vSrc, err = resolveValues(dst, src); err != nil {
+		return err
+	}
+	// To be friction-less, we redirect equal-type arguments
+	// to deepMerge. Only because arguments can be anything.
+	if vSrc.Kind() == vDst.Kind() {
+		return deepMerge(vDst, vSrc, make(map[uintptr]*visit), 0, config)
+	}
+	//  结构体和 map 保证 src,dest 相反
+	switch vSrc.Kind() {
+	case reflect.Struct:
+		if vDst.Kind() != reflect.Map {
+			return ErrExpectedMapAsDestination
+		}
+	case reflect.Map:
+		if vDst.Kind() != reflect.Struct {
+			return ErrExpectedStructAsDestination
+		}
+	default:
+		return ErrNotSupported
+	}
+	return deepMap(vDst, vSrc, make(map[uintptr]*visit), 0, config)
+}
+
+```
+
+```go
+func deepMap(dst, src reflect.Value, visited map[uintptr]*visit, depth int, config *Config) (err error) {
+	overwrite := config.Overwrite
+	if dst.CanAddr() {
+		addr := dst.UnsafeAddr()
+		h := 17 * addr
+		seen := visited[h]
+		typ := dst.Type()
+		for p := seen; p != nil; p = p.next {
+			if p.ptr == addr && p.typ == typ {
+				return nil
+			}
+		}
+		// Remember, remember...
+		visited[h] = &visit{addr, typ, seen}
+	}
+	zeroValue := reflect.Value{}
+	switch dst.Kind() {
+	case reflect.Map: // struct -> map 
+		dstMap := dst.Interface().(map[string]interface{})
+		for i, n := 0, src.NumField(); i < n; i++ {
+			srcType := src.Type()
+			field := srcType.Field(i)
+			if !isExported(field) {
+				continue
+			}
+			fieldName := field.Name
+			fieldName = changeInitialCase(fieldName, unicode.ToLower) // 首字母小写
+			if v, ok := dstMap[fieldName]; !ok || (isEmptyValue(reflect.ValueOf(v)) || overwrite) {
+				dstMap[fieldName] = src.Field(i).Interface()
+			}
+		}
+	case reflect.Ptr:
+		if dst.IsNil() {
+			v := reflect.New(dst.Type().Elem())
+			dst.Set(v)
+		}
+		dst = dst.Elem()
+		fallthrough
+	case reflect.Struct:
+        // ... 
+	}
+	return
+}
+```
 
 ## 应用
 在 kubernetes 中应用
-
 
 
 ```go
@@ -153,7 +239,7 @@ func (rules *ClientConfigLoadingRules) Load() (*clientcmdapi.Config, error) {
 
 	kubeConfigFiles := []string{}
 
-    // 。。。。。
+    // ...
 
 	// first merge all of our maps
 	mapConfig := clientcmdapi.NewConfig()

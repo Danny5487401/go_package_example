@@ -266,7 +266,7 @@
     - [3.2.1 原始 yaml --> 测试环境](14_system_monitor/03_prometheus/03_k8s_deploy/01_manual)
     - [3.2.2 Prometheus Operator --> 生产环境](14_system_monitor/03_prometheus/03_k8s_deploy/02_operator)
   - [3.4 PromQL(Prometheus Query Language)](14_system_monitor/03_prometheus/PromQL.md)
-  - [3.5 监控指标查询性能调优](14_system_monitor/03_prometheus/query.md)
+  - [3.5 存储模型及监控指标查询性能调优](14_system_monitor/03_prometheus/query.md)
 - [4 AlertManager](14_system_monitor/04_alertmanager/alert_manager.md)
 
 ## [第十五章 分布式事务](15_distributed_transaction/distributed_transaction.md)

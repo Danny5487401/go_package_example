@@ -13,6 +13,7 @@
       - [4 EPHEMERAL_SEQUENTIAL](#4-ephemeral_sequential)
   - [Zookeeper的数据模型](#zookeeper%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B)
   - [客户端基本使用](#%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
+  - [github.com/go-zookeeper/zk](#githubcomgo-zookeeperzk)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -117,6 +118,68 @@ get /china
 # 删除节点-delete
 ```
 
+
+
+## github.com/go-zookeeper/zk
+
+
+连接
+
+```go
+// github.com/go-zookeeper/zk@v1.0.4/conn.go
+func Connect(servers []string, sessionTimeout time.Duration, options ...connOption) (*Conn, <-chan Event, error) {
+	if len(servers) == 0 {
+		return nil, nil, errors.New("zk: server list must not be empty")
+	}
+
+	// 格式优化,缺少端口 2181 会自动补充
+	srvs := FormatServers(servers)
+
+	// Randomize the order of the servers to avoid creating hotspots
+	stringShuffle(srvs)
+
+	ec := make(chan Event, eventChanSize)
+	conn := &Conn{
+		dialer:         net.DialTimeout,
+		hostProvider:   NewDNSHostProvider(),
+		conn:           nil,
+		state:          StateDisconnected,
+		eventChan:      ec,
+		shouldQuit:     make(chan struct{}),
+		connectTimeout: 1 * time.Second,
+		sendChan:       make(chan *request, sendChanSize),
+		requests:       make(map[int32]*request),
+		watchers:       make(map[watchPathType][]chan Event),
+		passwd:         emptyPassword,
+		logger:         DefaultLogger,
+		logInfo:        true, // default is true for backwards compatability
+		buf:            make([]byte, bufferSize),
+		resendZkAuthFn: resendZkAuth,
+	}
+
+	// Set provided options.
+	for _, option := range options {
+		option(conn)
+	}
+
+	if err := conn.hostProvider.Init(srvs); err != nil {
+		return nil, nil, err
+	}
+
+	conn.setTimeouts(int32(sessionTimeout / time.Millisecond))
+	// TODO: This context should be passed in by the caller to be the connection lifecycle context.
+	ctx := context.Background()
+
+	go func() {
+		// 连接操作
+		conn.loop(ctx)
+		conn.flushRequests(ErrClosing)
+		conn.invalidateWatches(ErrClosing)
+		close(conn.eventChan)
+	}()
+	return conn, ec, nil
+}
+```
 
 
 ## 参考

@@ -27,12 +27,15 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Prometheus
+Prometheus 是由 SoundCloud 开源监控告警解决方案
+
 ![](.prometheus_images/prometheus_structure.png)
 - Exporter :收集系统或进程信息，转换为 Prometheus 可以识别的数据指标，以 http 或 https 服务的方式暴露给 Prometheus
 - AlertManager ：接收 Prometheus 推送过来的告警信息，通过告警路由，向集成的组件 / 工具发送告警信息.
-- Prometheus Server: 负责实现对监控数据的获取，存储以及查询。Prometheus Server可以通过静态配置管理监控目标，也可以配合使用Service Discovery的方式动态管理监控目标，并从这些监控目标中获取数据。
-  其次Prometheus Server需要对采集到的监控数据进行存储，Prometheus Server本身就是一个时序数据库，将采集到的监控数据按照时间序列的方式存储在本地磁盘当中。
-  最后Prometheus Server对外提供了自定义的PromQL语言，实现对数据的查询以及分析。
+- Prometheus Server: 负责实现对监控数据的获取，存储以及查询。
+  - Prometheus Server可以通过静态配置管理监控目标，也可以配合使用Service Discovery的方式动态管理监控目标，并从这些监控目标中获取数据。 
+  - 其次Prometheus Server需要对采集到的监控数据进行存储，Prometheus Server本身就是一个时序数据库，将采集到的监控数据按照时间序列的方式存储在本地磁盘当中。 
+  - 最后Prometheus Server对外提供了自定义的PromQL语言，实现对数据的查询以及分析。
 - PushGateway: 用于支持临时任务的推送网关
 
 ## 基本概念
@@ -293,10 +296,6 @@ type SummaryOpts struct {
     BufCap uint32
 }
 ```
-
-
-
-
 
 
 ## prometheus/client_golang 源码分析

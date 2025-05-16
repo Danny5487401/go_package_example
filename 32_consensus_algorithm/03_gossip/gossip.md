@@ -555,6 +555,7 @@ type AliveDelegate interface {
 
 ### 第三方应用 --> alertmanager
 
+
 ```go
 // https://github.com/prometheus/alertmanager/blob/fad796931b792fc30f35bb18a580ae7323ef0241/cluster/cluster.go
 func Create(

@@ -18,6 +18,8 @@
   - [核心代码分析](#%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90)
     - [Alerts 接口](#alerts-%E6%8E%A5%E5%8F%A3)
     - [API接收alert](#api%E6%8E%A5%E6%94%B6alert)
+    - [Dispatcher](#dispatcher)
+  - [高可用](#%E9%AB%98%E5%8F%AF%E7%94%A8)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -144,11 +146,19 @@ route:
     match:
       team: frontend
 ```
+- group_by：指定一系列的label键值作为分组的依据，示例中利用cluster和alertname作为分组依据，则同一集群中，所有名称相同的告警都将统一通知。若不想对任何告警进行分组，则可以将该字段指定为'...'
+- group_wait：当相应的Group从创建到第一次发送通知的等待时间，默认为30s，该字段的目的为进行适当的等待从而在一次通知中发送尽量多的告警。在每次通知之后会将已经消除的告警从Group中移除。
+- group_interval：Group在第一次通知之后会周期性地尝试发送Group中告警信息，因为Group中可能有新的告警实例加入，本字段为该周期的时间间隔
+- repeat_interval：在Group没有发生更新的情况下重新发送通知的时间间隔
+
+
 
 默认情况下所有的告警都会发送给集群管理员default-receiver，因此在Alertmanager的配置文件的根路由中，对告警信息按照集群以及告警的名称对告警进行分组。
 
 如果告警时来源于数据库服务如MySQL或者Cassandra，此时则需要将告警发送给相应的数据库管理员(database-pager)。
 这里定义了一个单独子路由，如果告警中包含service标签，并且service为MySQL或者Cassandra,则向database-pager发送告警通知，由于这里没有定义group_by等属性，这些属性的配置信息将从上级路由继承，database-pager将会接收到按cluster和alertname进行分组的告警通知。
+
+
 
 
 ### 接收人（receivers)
@@ -205,6 +215,7 @@ email_configs:
 ## 应用举例
 
 ![](.alert_images/alert_property.png)
+
 ### 1. 告警分组
 分组机制可以将某一类型的告警信息合并成一个大的告警信息，避免发送太多的告警邮件。
 
@@ -226,6 +237,7 @@ groups:
       description: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minutes."
 
 ```
+在一个规则文件中可以指定若干个group，每个group内可以指定多条告警规则. 
 在每一个group中我们可以定义多个告警规则(rule)。一条告警规则主要由以下几部分组成：
 - alert：告警规则的名称。
 - expr：基于PromQL表达式告警触发条件，用于计算是否有时间序列满足该条件。
@@ -358,17 +370,18 @@ func (a *Alerts) Subscribe() provider.AlertIterator {
 
 	var (
 		done   = make(chan struct{})
-		alerts = a.alerts.List()
+		alerts = a.alerts.List() // 首先，得到store.Alerts中的所有告警；
 		ch     = make(chan *types.Alert, max(len(alerts), alertChannelLength))
 	)
 
 	for _, a := range alerts {
-		ch <- a
+		ch <- a // 然后，将告警发送到chan中
 	}
 
 	a.listeners[a.next] = listeningAlerts{alerts: ch, done: done}
 	a.next++
 
+	// 最后，包装chan到Iterator中返回
 	return provider.NewAlertIterator(ch, done, nil)
 }
 
@@ -420,8 +433,18 @@ func (a *Alerts) Put(alerts ...*types.Alert) error {
 
 	return nil
 }
-```
 
+
+func (a *Alerts) Set(alert *types.Alert) error {
+	a.Lock()
+	defer a.Unlock()
+
+	// store.Alerts中以map结构保存告警对象，保存在内存中
+	a.c[alert.Fingerprint()] = alert
+	return nil
+}
+
+```
 
 ### API接收alert
 ```go
@@ -454,6 +477,234 @@ func (api *API) postAlertsHandler(params alert_ops.PostAlertsParams) middleware.
 ```
 
 
+### Dispatcher
+```go
+func (d *Dispatcher) run(it provider.AlertIterator) {
+	cleanup := time.NewTicker(30 * time.Second)
+	defer cleanup.Stop()
+
+	defer it.Close()
+
+	for {
+		select {
+		case alert, ok := <-it.Next(): // 读取
+            // ...
+
+			now := time.Now()
+			for _, r := range d.route.Match(alert.Labels) {
+				d.processAlert(alert, r) //  处理
+			}
+			d.metrics.processingDuration.Observe(time.Since(now).Seconds())
+
+		case <-cleanup.C:
+            // ...
+
+		case <-d.ctx.Done():
+			return
+		}
+	}
+}
+
+// 处理报警
+func (d *Dispatcher) processAlert(alert *types.Alert, route *Route) {
+	groupLabels := getGroupLabels(alert, route)
+
+	fp := groupLabels.Fingerprint()
+
+	d.mtx.Lock()
+	defer d.mtx.Unlock()
+
+	routeGroups, ok := d.aggrGroupsPerRoute[route]
+	if !ok {
+		routeGroups = map[model.Fingerprint]*aggrGroup{}
+		d.aggrGroupsPerRoute[route] = routeGroups
+	}
+
+	ag, ok := routeGroups[fp]
+	if ok {
+		ag.insert(alert)
+		return
+	}
+
+	// If the group does not exist, create it. But check the limit first.
+	if limit := d.limits.MaxNumberOfAggregationGroups(); limit > 0 && d.aggrGroupsNum >= limit {
+		d.metrics.aggrGroupLimitReached.Inc()
+		level.Error(d.logger).Log("msg", "Too many aggregation groups, cannot create new group for alert", "groups", d.aggrGroupsNum, "limit", limit, "alert", alert.Name())
+		return
+	}
+
+	ag = newAggrGroup(d.ctx, groupLabels, route, d.timeout, d.logger)
+	routeGroups[fp] = ag
+	d.aggrGroupsNum++
+	d.metrics.aggrGroups.Inc()
+
+	// Insert the 1st alert in the group before starting the group's run()
+	// function, to make sure that when the run() will be executed the 1st
+	// alert is already there.
+	ag.insert(alert)
+
+	go ag.run(func(ctx context.Context, alerts ...*types.Alert) bool {
+		// 告警分发给notify模块
+		_, _, err := d.stage.Exec(ctx, d.logger, alerts...)
+		if err != nil {
+			lvl := level.Error(d.logger)
+			if ctx.Err() == context.Canceled {
+				// It is expected for the context to be canceled on
+				// configuration reload or shutdown. In this case, the
+				// message should only be logged at the debug level.
+				lvl = level.Debug(d.logger)
+			}
+			lvl.Log("msg", "Notify for alerts failed", "num_alerts", len(alerts), "err", err)
+		}
+		return err == nil
+	})
+}
+```
+
+stage对象，实际就是notify的pipeline
+```go
+// https://github.com/prometheus/alertmanager/blob/d155153305afc25471b9879928d8d93df77b12a8/cmd/alertmanager/main.go
+func run() int {
+	
+  // ...  
+  pipeline := pipelineBuilder.New(
+              receivers,
+              waitFunc,
+              inhibitor,
+              silencer,
+              timeIntervals,
+              notificationLog,
+              pipelinePeer,
+          )
+  // ...
+  disp = dispatch.NewDispatcher(alerts, routes, pipeline, marker, timeoutFunc, nil, logger, dispMetrics)
+}
+```
+
+```go
+func (pb *PipelineBuilder) New(
+	receivers map[string][]Integration,
+	wait func() time.Duration,
+	inhibitor *inhibit.Inhibitor,
+	silencer *silence.Silencer,
+	times map[string][]timeinterval.TimeInterval,
+	notificationLog NotificationLog,
+	peer Peer,
+) RoutingStage {
+	rs := make(RoutingStage, len(receivers))
+
+	ms := NewGossipSettleStage(peer)
+	is := NewMuteStage(inhibitor)
+	ss := NewMuteStage(silencer)
+	tms := NewTimeMuteStage(times)
+	tas := NewTimeActiveStage(times)
+
+	for name := range receivers 
+	    // 创建接收者 stage
+		st := createReceiverStage(name, receivers[name], wait, notificationLog, pb.metrics)
+		rs[name] = MultiStage{ms, is, tas, tms, ss, st}
+	}
+	return rs
+}
+
+
+func createReceiverStage(
+	name string,
+	integrations []Integration,
+	wait func() time.Duration,
+	notificationLog NotificationLog,
+	metrics *Metrics,
+) Stage {
+	var fs FanoutStage
+	for i := range integrations {
+		recv := &nflogpb.Receiver{
+			GroupName:   name,
+			Integration: integrations[i].Name(),
+			Idx:         uint32(integrations[i].Index()),
+		}
+		var s MultiStage
+		s = append(s, NewWaitStage(wait))
+		s = append(s, NewDedupStage(&integrations[i], notificationLog, recv))
+		s = append(s, NewRetryStage(integrations[i], name, metrics))
+		s = append(s, NewSetNotifiesStage(notificationLog, recv))
+
+		fs = append(fs, s)
+	}
+	return fs
+}
+```
+
+
+
+在Notify的pipeline中调用流程：
+
+- 首先，先进行GossipSettle、inhibitor、silencer等操作；
+  - 这里面的每个Stage，若其中一个失败，则直接返回err;
+- 然后，针对每个receiver，再进行Wait、Dedupe、Retry、SetNotifies操作；
+  - 这里面的每个Stage，若其中一个失败，则直接返回err;
+```go
+type RoutingStage map[string]Stage
+
+// Exec implements the Stage interface.
+func (rs RoutingStage) Exec(ctx context.Context, l log.Logger, alerts ...*types.Alert) (context.Context, []*types.Alert, error) {
+	receiver, ok := ReceiverName(ctx)
+	if !ok {
+		return ctx, nil, errors.New("receiver missing")
+	}
+
+	s, ok := rs[receiver]
+	if !ok {
+		return ctx, nil, errors.New("stage for receiver missing")
+	}
+
+	// 单个 receiver 租个执行 stage 
+	return s.Exec(ctx, l, alerts...)
+}
+
+```
+
+单个 receiver 处理
+```go
+type MultiStage []Stage
+
+// Exec implements the Stage interface.
+func (ms MultiStage) Exec(ctx context.Context, l log.Logger, alerts ...*types.Alert) (context.Context, []*types.Alert, error) {
+	var err error
+	// 对每个 stage 逐个调用
+	for _, s := range ms {
+		if len(alerts) == 0 {
+			return ctx, nil, nil
+		}
+
+		ctx, alerts, err = s.Exec(ctx, l, alerts...)
+		if err != nil {
+			return ctx, nil, err
+		}
+	}
+	return ctx, alerts, nil
+}
+
+```
+
+## 高可用
+
+因为AlertManager并非是无状态的，它有如下两个关键信息需要同步：
+
+1. 告警静默规则：当存在多个AlertManager实例时，用户依然只会向其中一个实例发起请求，对静默规则进行增删。但是对于静默规则的应用显然应当是全局的，因此各个实例应当广播各自的静默规则，直到全局一致。
+2. Notification Log：既然要保证高可用，即确保告警实例不丢失，而AlertManager实例又是将告警保存在各自的内存中的，因此Prometheus显然不应该在多个AlertManager实例之间做负载均衡而是应该将告警发往所有的AlertManager实例。但是对于同一个Alert Group的通知则只能由一个AlertManager发送，因此我们也应该把Notification Log在全集群范围内进行同步
+
+Notification Log的同步并没有静默规则这么容易。我们可以假设如下场景：由于高可用的要求，Prometheus会向每个AlertManager发送告警实例。如果该告警实例不属于任何之前已有的Alert Group，则会新建一个Group并最终创建一个相应的Notification Log。而Notification Log是在通知完成之后创建的，所以在这种情况下，针对同一个告警发送了多次通知。
+
+为了避免这种情况的发生，社区给出的解决方案是错开各个AlertManager发送通知的时间。如上文的整体架构图所示，Notification Pipeline在进行去重之前其实还有一个Wait阶段。该阶段会将对于告警的通知处理暂停一段时间，不同的AlertManager实例等待的时间会因为该实例在整个集群中的位置有所不同。根据实例名进行排序，排名每靠后一位，默认多等待15秒。
+
+假设集群中有两个AlertManager实例，排名靠前的实例为A0，排名靠后的实例为A1，此时对于上述问题的处理如下：
+
+1. 假设两个AlertManager同时收到告警实例并同时到达Notification Pipeline的Wait阶段。在该阶段A0无需等待而A1需要等待15秒。
+2. A0直接发送通知，生成相应的Notification Log并广播
+3. A1等待15秒之后进入去重阶段，但是由于已经同步到A0广播的Notification Log，通知不再发送
+   可以看到，Gossip协议事实上是一个弱一致性的协议，上述的机制能在绝大多数情况下保证AlertManager集群的高可用并且避免实例间同步的不及时对用户造成的困扰
+
+
 
 
 ## 参考
@@ -461,3 +712,4 @@ func (api *API) postAlertsHandler(params alert_ops.PostAlertsParams) middleware.
 - [alertmanager的使用](https://blog.csdn.net/fu_huo_1993/article/details/114597863)
 - [Prometheus AlertManager讲解与实战操作](https://www.cnblogs.com/liugp/p/16974615.html)
 - [alertmanager源码：整体架构和流程分析](https://segmentfault.com/a/1190000044895864)
+- [Prometheus告警模型分析.md](https://github.com/YaoZengzeng/KubernetesResearch/blob/master/Prometheus%E5%91%8A%E8%AD%A6%E6%A8%A1%E5%9E%8B%E5%88%86%E6%9E%90.md)
