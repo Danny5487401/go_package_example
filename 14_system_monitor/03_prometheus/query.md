@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Prometheus 监控指标查询性能调优](#prometheus-%E7%9B%91%E6%8E%A7%E6%8C%87%E6%A0%87%E6%9F%A5%E8%AF%A2%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98)
+- [Prometheus 性能调优](#prometheus-%E6%80%A7%E8%83%BD%E8%B0%83%E4%BC%98)
   - [基本概念](#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5)
   - [数据存储形式](#%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E5%BD%A2%E5%BC%8F)
     - [写入 WAL 的数据类型](#%E5%86%99%E5%85%A5-wal-%E7%9A%84%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B)
@@ -11,12 +11,14 @@
     - [在内存中的组织](#%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E7%BB%84%E7%BB%87)
     - [在磁盘中的组织](#%E5%9C%A8%E7%A3%81%E7%9B%98%E4%B8%AD%E7%9A%84%E7%BB%84%E7%BB%87)
   - [索引](#%E7%B4%A2%E5%BC%95)
+  - [写入过程](#%E5%86%99%E5%85%A5%E8%BF%87%E7%A8%8B)
   - [查询过程](#%E6%9F%A5%E8%AF%A2%E8%BF%87%E7%A8%8B)
+  - [高基数问题 Cardinality](#%E9%AB%98%E5%9F%BA%E6%95%B0%E9%97%AE%E9%A2%98-cardinality)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# Prometheus 监控指标查询性能调优
+# Prometheus 性能调优
 
 源码基于版本 v2.36.1
 
@@ -24,7 +26,6 @@
 
 ![overview.png](overview.png)
 ## 基本概念
-
 
 
 
@@ -45,8 +46,18 @@ segment 片段: 每一个WAL文件
 Checkpointing 检查点: 检查点被命名为checkpoint.X，其中X是创建检查点的最后一个段号.
 
 
-block: Prometheus 的数据库被划分为基本的存储单元，一般按照两个小时（最少时间）为一个时间窗口，将两小时内产生的数据存储在一个块(Block)中.
+block: Prometheus 的数据库被划分为基本的存储单元， 最近的Block一般是存储了2小时的数据，而较为久远的Block则会通过compactor进行合并，一个Block可能存储了若干小时的信息。
 
+
+tombstones : 由于Prometheus Block的数据一般在写完后就不会变动。
+如果要删除部分数据，就只能记录一下删除数据的范围，由下一次compactor组成新block的时候删除。而记录这些信息的文件即是 tomstones.
+
+
+
+- Metric names 指标名称
+- labels 指标标签，与指标名称一同构成唯一标识项
+- Samples 一个时间点的 Metric names，labels，样本值(value)，
+- Series 由很多相关的samples组成的时间序列
 
 ## 数据存储形式
 
@@ -76,54 +87,6 @@ const (
 
 
 
-```go
-// https://github.com/prometheus/prometheus/blob/40c1efe8bc68f74bd857edd857e1fc442275b56e/tsdb/agent/db.go
-func (a *appender) Commit() error {
-	a.mtx.RLock()
-	defer a.mtx.RUnlock()
-
-	var encoder record.Encoder
-	buf := a.bufPool.Get().([]byte)
-
-	if len(a.pendingSeries) > 0 {
-		buf = encoder.Series(a.pendingSeries, buf)
-		if err := a.wal.Log(buf); err != nil {
-			return err
-		}
-		buf = buf[:0]
-	}
-
-	if len(a.pendingSamples) > 0 {
-		buf = encoder.Samples(a.pendingSamples, buf)
-		if err := a.wal.Log(buf); err != nil {
-			return err
-		}
-		buf = buf[:0]
-	}
-
-	if len(a.pendingExamplars) > 0 {
-		buf = encoder.Exemplars(a.pendingExamplars, buf)
-		if err := a.wal.Log(buf); err != nil {
-			return err
-		}
-		buf = buf[:0]
-	}
-
-	var series *memSeries
-	for i, s := range a.pendingSamples {
-		series = a.sampleSeries[i]
-		if !series.updateTimestamp(s.T) {
-			a.metrics.totalOutOfOrderSamples.Inc()
-		}
-	}
-
-	//nolint:staticcheck
-	a.bufPool.Put(buf)
-	return a.Rollback()
-}
-```
-
-
 ![wal_data_structure.png](wal_data_structure.png)
 
 数据所在文件(segment), 默认大小 128MB, 超过限制切割文件继续.
@@ -143,6 +106,55 @@ records 可能共存在一个 page 中, 比如 record-a 的尾和 record-b 的�
 record 支持压缩, 但是否压缩看数据, 会做尝试, 避免出现压缩后反而大的情况.
 
 record 的 head 中标记压缩与否.
+
+
+写入 wal
+
+```go
+// https://github.com/prometheus/prometheus/blob/af0f6da5cb5bb9736abcfc9e8c7633ee01000ce2/tsdb/head_append.go
+func (a *headAppender) log() error {
+	if a.head.wal == nil {
+		return nil
+	}
+
+	buf := a.head.getBytesBuffer()
+	defer func() { a.head.putBytesBuffer(buf) }()
+
+	var rec []byte
+	var enc record.Encoder
+
+	// series 处理
+	if len(a.series) > 0 {
+		rec = enc.Series(a.series, buf)
+		buf = rec[:0]
+
+		if err := a.head.wal.Log(rec); err != nil {
+			return errors.Wrap(err, "log series")
+		}
+	}
+	// samples 处理
+	if len(a.samples) > 0 {
+		rec = enc.Samples(a.samples, buf)
+		buf = rec[:0]
+
+		if err := a.head.wal.Log(rec); err != nil {
+			return errors.Wrap(err, "log samples")
+		}
+	}
+	// exemplars 处理
+	if len(a.exemplars) > 0 {
+		rec = enc.Exemplars(exemplarsForEncoding(a.exemplars), buf)
+		buf = rec[:0]
+
+		if err := a.head.wal.Log(rec); err != nil {
+			return errors.Wrap(err, "log exemplars")
+		}
+	}
+	return nil
+}
+
+```
+
 
 
 
@@ -228,7 +240,7 @@ func (e *Encoder) Samples(samples []RefSample, b []byte) []byte {
 ```
 
 ### 在内存中的组织
-
+![data_in_memChunk.png](data_in_memChunk.png)
 ```go
 // https://github.com/prometheus/prometheus/blob/4cc25c0cb0b96042a7d36a0dd53dc6970ad607fd/tsdb/head.go
 
@@ -284,13 +296,145 @@ mmappedChunks 设计: 由于chunks文件大小基本固定(最大512M),所以我
 // 寻址 memSeries
 type stripeSeries struct {
 	size                    int
-	series                  []map[chunks.HeadSeriesRef]*memSeries // Sharded by ref. A series ref is the value of `size` when the series was being newly added.
-	hashes                  []seriesHashmap                       // Sharded by label hash.
-	locks                   []stripeLock                          // Sharded by ref for series access, by label hash for hashes access.
+	series                  []map[chunks.HeadSeriesRef]*memSeries // 记录refId到memSeries的映射
+	hashes                  []seriesHashmap                       //  记录hash值到memSeries,hash冲突采用拉链法
+	locks                   []stripeLock                          // 分段锁
 	seriesLifecycleCallback SeriesLifecycleCallback
 }
 
 ```
+
+写入 
+
+```go
+func (s *memSeries) append(t int64, v float64, appendID uint64, chunkDiskMapper *chunks.ChunkDiskMapper) (sampleInOrder, chunkCreated bool) {
+	// Based on Gorilla white papers this offers near-optimal compression ratio
+	// so anything bigger that this has diminishing returns and increases
+	// the time range within which we have to decompress all samples.
+	const samplesPerChunk = 120
+
+	// 获取 headChunk
+	c := s.head()
+
+	if c == nil {
+		if len(s.mmappedChunks) > 0 && s.mmappedChunks[len(s.mmappedChunks)-1].maxTime >= t {
+			// Out of order sample. Sample timestamp is already in the mmapped chunks, so ignore it.
+			return false, false
+		}
+		// 默认 2 小时的 chunkRange
+		// There is no chunk in this series yet, create the first chunk for the sample.
+		c = s.cutNewHeadChunk(t, chunkDiskMapper)
+		chunkCreated = true
+	}
+
+	// Out of order sample.
+	if c.maxTime >= t {
+		return false, chunkCreated
+	}
+
+	numSamples := c.chunk.NumSamples()
+	if numSamples == 0 { // 代表新的chunk 
+		// It could be the new chunk created after reading the chunk snapshot,
+		// hence we fix the minTime of the chunk here.
+		c.minTime = t
+		s.nextAt = rangeForTimestamp(c.minTime, s.chunkRange)
+	}
+
+	// If we reach 25% of a chunk's desired sample count, predict an end time
+	// for this chunk that will try to make samples equally distributed within
+	// the remaining chunks in the current chunk range.
+	// At latest it must happen at the timestamp set when the chunk was cut.
+	if numSamples == samplesPerChunk/4 {
+		s.nextAt = computeChunkEndTime(c.minTime, c.maxTime, s.nextAt)
+	}
+	// If numSamples > samplesPerChunk*2 then our previous prediction was invalid,
+	// most likely because samples rate has changed and now they are arriving more frequently.
+	// Since we assume that the rate is higher, we're being conservative and cutting at 2*samplesPerChunk
+	// as we expect more chunks to come.
+	// Note that next chunk will have its nextAt recalculated for the new rate.
+	if t >= s.nextAt || numSamples >= samplesPerChunk*2 {
+		c = s.cutNewHeadChunk(t, chunkDiskMapper)
+		chunkCreated = true
+	}
+	s.app.Append(t, v)
+
+	c.maxTime = t
+
+	s.sampleBuf[0] = s.sampleBuf[1]
+	s.sampleBuf[1] = s.sampleBuf[2]
+	s.sampleBuf[2] = s.sampleBuf[3]
+	s.sampleBuf[3] = sample{t: t, v: v}
+
+	if appendID > 0 && s.txs != nil {
+		s.txs.add(appendID)
+	}
+
+	return true, chunkCreated
+}
+
+```
+
+
+数据点的存储
+![data_xor.png](data_xor.png)
+
+memChunk 在内存中保存的正是采用 XOR 算法压缩过的数据。
+```go
+func (a *xorAppender) Append(t int64, v float64) {
+	var tDelta uint64
+	num := binary.BigEndian.Uint16(a.b.bytes())
+
+	if num == 0 {
+		buf := make([]byte, binary.MaxVarintLen64)
+		for _, b := range buf[:binary.PutVarint(buf, t)] {
+			a.b.writeByte(b)
+		}
+		a.b.writeBits(math.Float64bits(v), 64)
+
+	} else if num == 1 {
+		tDelta = uint64(t - a.t)
+
+		buf := make([]byte, binary.MaxVarintLen64)
+		for _, b := range buf[:binary.PutUvarint(buf, tDelta)] {
+			a.b.writeByte(b)
+		}
+
+		a.writeVDelta(v)
+
+	} else {
+		tDelta = uint64(t - a.t)
+		dod := int64(tDelta - a.tDelta)
+
+		// Gorilla has a max resolution of seconds, Prometheus milliseconds.
+		// Thus we use higher value range steps with larger bit size.
+		switch {
+		case dod == 0:
+			a.b.writeBit(zero)
+		case bitRange(dod, 14):
+			a.b.writeBits(0b10, 2)
+			a.b.writeBits(uint64(dod), 14)
+		case bitRange(dod, 17):
+			a.b.writeBits(0b110, 3)
+			a.b.writeBits(uint64(dod), 17)
+		case bitRange(dod, 20):
+			a.b.writeBits(0b1110, 4)
+			a.b.writeBits(uint64(dod), 20)
+		default:
+			a.b.writeBits(0b1111, 4)
+			a.b.writeBits(uint64(dod), 64)
+		}
+
+		a.writeVDelta(v)
+	}
+
+	a.t = t
+	a.v = v
+	binary.BigEndian.PutUint16(a.b.bytes(), num+1)
+	a.tDelta = tDelta
+}
+```
+
+使用了 XOR 算法后，平均每个数据点能从 16bytes 压缩到 1.37bytes，也就是说所用空间直接降为原来的 1/12
 
 
 ### 在磁盘中的组织
@@ -310,10 +454,13 @@ prometheus-data
     |-chunks_head
 ```
 
+
+
 ## 索引
 
 https://github.com/prometheus/prometheus/blob/v3.3.0/tsdb/docs/format/index.md
 
+![Table_Of_Content.png](Table_Of_Content.png)
 
 假设你在监控两个服务器的 CPU 使用率，并且你有如下数据：
 ```css
@@ -528,6 +675,314 @@ type IndexReader interface {
 
 block 中还包含了一个 meta.json 文件（保存 block 的元数据信息）和 一个 tombstones 文件（保存已经删除的序列以及关于它们的信息）。
 
+## 写入过程
+
+![prometheus_write_process.png](prometheus_write_process.png)
+
+
+
+```go
+func (sp *scrapePool) sync(targets []*Target) {
+	var (
+		uniqueLoops   = make(map[uint64]loop)
+        // ..
+	)
+
+	sp.targetMtx.Lock()
+	for _, t := range targets {
+		hash := t.hash()
+
+		if _, ok := sp.activeTargets[hash]; !ok {
+            
+			// 初始化 ScrapeLoop
+			l := sp.newLoop(scrapeLoopOptions{
+				target:          t,
+				scraper:         s,
+				sampleLimit:     sampleLimit,
+				labelLimits:     labelLimits,
+				honorLabels:     honorLabels,
+				honorTimestamps: honorTimestamps,
+				mrc:             mrc,
+				interval:        interval,
+				timeout:         timeout,
+			})
+			if err != nil {
+				l.setForcedError(err)
+			}
+
+			sp.activeTargets[hash] = t
+			sp.loops[hash] = l
+
+			uniqueLoops[hash] = l
+		} else {
+            // ... 
+		}
+	}
+
+    // ...
+	for _, l := range uniqueLoops {
+		if l != nil {
+			// 运行
+			go l.run(nil)
+		}
+	}
+	// Wait for all potentially stopped scrapers to terminate.
+	// This covers the case of flapping targets. If the server is under high load, a new scraper
+	// may be active and tries to insert. The old scraper that didn't terminate yet could still
+	// be inserting a previous sample set.
+	wg.Wait()
+}
+
+```
+
+
+开始运行
+```go
+func (sl *scrapeLoop) run(errc chan<- error) {
+    // ...
+
+mainLoop:
+	for {
+        // ...
+
+		last = sl.scrapeAndReport(last, scrapeTime, errc)
+
+        // ...
+	}
+    // ...
+}
+```
+
+
+
+```go
+func (sl *scrapeLoop) scrapeAndReport(last, appendTime time.Time, errc chan<- error) time.Time {
+	start := time.Now()
+
+    // ...
+
+	b := sl.buffers.Get(sl.lastScrapeSize).([]byte)
+	defer sl.buffers.Put(b)
+	buf := bytes.NewBuffer(b)
+
+	var total, added, seriesAdded, bytes int
+	var err, appErr, scrapeErr error
+    // 获取 Appender: fanoutAppender
+	app := sl.appender(sl.appenderCtx)
+	defer func() {
+		if err != nil {
+			app.Rollback() //  rollback回滚
+			return
+		}
+		err = app.Commit()  //commit提交
+		if err != nil {
+			level.Error(sl.l).Log("msg", "Scrape commit failed", "err", err)
+		}
+	}()
+
+	defer func() {
+		if err = sl.report(app, appendTime, time.Since(start), total, added, seriesAdded, bytes, scrapeErr); err != nil {
+			level.Warn(sl.l).Log("msg", "Appending scrape report failed", "err", err)
+		}
+	}()
+
+	if forcedErr := sl.getForcedError(); forcedErr != nil {
+        // ...
+	}
+
+	var contentType string
+	scrapeCtx, cancel := context.WithTimeout(sl.parentCtx, sl.timeout)
+	
+	// 抓取数据
+	contentType, scrapeErr = sl.scraper.scrape(scrapeCtx, buf)
+	cancel()
+
+	if scrapeErr == nil {
+		b = buf.Bytes()
+		// NOTE: There were issues with misbehaving clients in the past
+		// that occasionally returned empty results. We don't want those
+		// to falsely reset our buffer size.
+		if len(b) > 0 {
+			sl.lastScrapeSize = len(b)
+		}
+		bytes = len(b)
+	} else {
+        // ...
+	}
+
+	// 利用app.add/addFast写入
+	// A failed scrape is the same as an empty scrape,
+	// we still call sl.append to trigger stale markers.
+	total, added, seriesAdded, appErr = sl.append(app, b, contentType, appendTime)
+	if appErr != nil {
+        // ...
+	}
+
+	if scrapeErr == nil {
+		scrapeErr = appErr
+	}
+
+	return start
+}
+```
+
+
+```go
+func (sl *scrapeLoop) append(app storage.Appender, b []byte, contentType string, ts time.Time) (total, added, seriesAdded int, err error) {
+	p, err := textparse.New(b, contentType)
+    // ...
+
+	// appender 增加 limit 限制 
+    app = appender(app, sl.sampleLimit)
+
+loop:
+	for {
+		var (
+			et          textparse.Entry
+			sampleAdded bool
+		)
+		// 解析数据
+		if et, err = p.Next(); err != nil {
+			if err == io.EOF {
+				err = nil
+			}
+			break
+		}
+
+        var (
+            ref  storage.SeriesRef
+            lset labels.Labels
+            mets string
+            hash uint64
+        )
+
+        // ... 
+        
+		// 这里执行 primary 和 secondaries append  
+		ref, err = app.Append(ref, lset, t, v)
+        // ...
+
+	}
+    // ...
+	return
+}
+```
+这里 appender 的 primary 拿 localStorage  = &readyStorage{stats: tsdb.NewDBStats()} 的 Appender 作为案例, 也就是 DBStats
+
+
+仅将时序数据缓存在headAppender.samples/series中，直到调用commit才真正的提交(写wal + 写headChunk)
+```go
+func (a *headAppender) Append(ref storage.SeriesRef, lset labels.Labels, t int64, v float64) (storage.SeriesRef, error) {
+	if t < a.minValidTime {
+		a.head.metrics.outOfBoundSamples.Inc()
+		return 0, storage.ErrOutOfBounds
+	}
+
+	s := a.head.series.getByID(chunks.HeadSeriesRef(ref))
+	if s == nil {
+		// Ensure no empty labels have gotten through.
+		lset = lset.WithoutEmpty()
+		if len(lset) == 0 {
+			return 0, errors.Wrap(ErrInvalidSample, "empty labelset")
+		}
+
+		if l, dup := lset.HasDuplicateLabelNames(); dup {
+			return 0, errors.Wrap(ErrInvalidSample, fmt.Sprintf(`label name "%s" is not unique`, l))
+		}
+
+		var created bool
+		var err error
+		// 创建新的 ref 
+		s, created, err = a.head.getOrCreate(lset.Hash(), lset)
+		if err != nil {
+			return 0, err
+		}
+		if created {
+			a.series = append(a.series, record.RefSeries{
+				Ref:    s.ref,
+				Labels: lset,
+			})
+		}
+	}
+
+	s.Lock()
+	if err := s.appendable(t, v); err != nil {
+		s.Unlock()
+		if err == storage.ErrOutOfOrderSample {
+			a.head.metrics.outOfOrderSamples.Inc()
+		}
+		return 0, err
+	}
+	s.pendingCommit = true
+	s.Unlock()
+
+	if t < a.mint {
+		a.mint = t
+	}
+	if t > a.maxt {
+		a.maxt = t
+	}
+
+	a.samples = append(a.samples, record.RefSample{
+		Ref: s.ref,
+		T:   t,
+		V:   v,
+	})
+	a.sampleSeries = append(a.sampleSeries, s)
+	return storage.SeriesRef(s.ref), nil
+}
+
+
+func (a *headAppender) Commit() (err error) {
+	if a.closed {
+		return ErrAppenderClosed
+	}
+	defer func() { a.closed = true }()
+
+	// 写入 wal 
+	if err :=c err != nil {
+        // ...
+	}
+
+	// No errors logging to WAL, so pass the exemplars along to the in memory storage.
+	for _, e := range a.exemplars {
+		s := a.head.series.getByID(chunks.HeadSeriesRef(e.ref))
+		// We don't instrument exemplar appends here, all is instrumented by storage.
+		if err := a.head.exemplars.AddExemplar(s.lset, e.exemplar); err != nil {
+			if err == storage.ErrOutOfOrderExemplar {
+				continue
+			}
+			level.Debug(a.head.logger).Log("msg", "Unknown error while adding exemplar", "err", err)
+		}
+	}
+
+	defer a.head.metrics.activeAppenders.Dec()
+	defer a.head.putAppendBuffer(a.samples)
+	defer a.head.putSeriesBuffer(a.sampleSeries)
+	defer a.head.putExemplarBuffer(a.exemplars)
+	defer a.head.iso.closeAppend(a.appendID)
+
+	total := len(a.samples)
+	var series *memSeries
+	for i, s := range a.samples {
+		series = a.sampleSeries[i]
+		series.Lock()
+		ok, chunkCreated := series.append(s.T, s.V, a.appendID, a.head.chunkDiskMapper)
+		series.cleanupAppendIDsBelow(a.cleanupAppendIDsBelow)
+		series.pendingCommit = false
+		series.Unlock()
+
+        // ...
+	}
+
+	a.head.metrics.samplesAppended.Add(float64(total))
+	a.head.updateMinMaxTime(a.mint, a.maxt)
+
+	return nil
+}
+
+```
+
 
 ## 查询过程
 
@@ -611,6 +1066,11 @@ func (db *DB) Querier(_ context.Context, mint, maxt int64) (storage.Querier, err
 ```
 
 
+## 高基数问题 Cardinality
+比如 prometheus 中如果有一个指标 http_request_count{method="get",path="/abc",originIP="1.1.1.1"}表示访问量，method 表示请求方法，originIP是客户端 IP，method的枚举值是有限的，
+但originIP却是无限的，加上其他 label 的排列组合就无穷大了，也没有任何关联特征，
+因此这种高基数不适合作为metric 的 label，真要的提取originIP，应该用日志的方式，而不是 metric 监控.
+
 
 ## 参考
 - [Prometheus TSDB (Part 1): The Head Block](https://ganeshvernekar.com/blog/prometheus-tsdb-the-head-block/)
@@ -621,3 +1081,4 @@ func (db *DB) Querier(_ context.Context, mint, maxt int64) (storage.Querier, err
 - [Prometheus监控指标查询性能调优](https://www.cnblogs.com/88223100/p/Prometheus-monitoring-metrics-query-performance-tuning.html)
 - [index倒排索引](https://segmentfault.com/a/1190000041210003)
 - [1 分钟了解 Prometheus 的 WAL 机制](https://xie.infoq.cn/article/997c64393ed3c2c96ba443f2e)
+- [prometheus源码分析：从scrape到tsdb写入](https://segmentfault.com/a/1190000043525007)
