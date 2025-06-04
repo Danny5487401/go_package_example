@@ -6,6 +6,7 @@
   - [接口](#%E6%8E%A5%E5%8F%A3)
   - [适合用于测试以下场景](#%E9%80%82%E5%90%88%E7%94%A8%E4%BA%8E%E6%B5%8B%E8%AF%95%E4%BB%A5%E4%B8%8B%E5%9C%BA%E6%99%AF)
   - [第三方使用-->etcd](#%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BD%BF%E7%94%A8--etcd)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -170,3 +171,5 @@ func TestWaitNodes(t *testing.T) {
 	}
 }
 ```
+
+## 参考

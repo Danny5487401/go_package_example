@@ -1,4 +1,4 @@
-package _2_clockwork
+package _1_clockwork
 
 import (
 	"github.com/jonboulle/clockwork"
