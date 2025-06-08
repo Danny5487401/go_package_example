@@ -3,15 +3,13 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Zookeeper](#zookeeper)
-  - [Zab协议(Zookeeper Atomic Broadcast)](#zab%E5%8D%8F%E8%AE%AEzookeeper-atomic-broadcast)
-  - [Zookeeper角色：](#zookeeper%E8%A7%92%E8%89%B2)
-  - [node节点](#node%E8%8A%82%E7%82%B9)
+  - [ZooKeeper 基础知识基本分为三大模块：](#zookeeper-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%9F%BA%E6%9C%AC%E5%88%86%E4%B8%BA%E4%B8%89%E5%A4%A7%E6%A8%A1%E5%9D%97)
+    - [Zookeeper的数据模型](#zookeeper%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B)
     - [节点类型](#%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8B)
       - [1 PERSISTENT（持久节点)](#1-persistent%E6%8C%81%E4%B9%85%E8%8A%82%E7%82%B9)
       - [2 EPHEMERAL](#2-ephemeral)
       - [3 PERSISTENT_SEQUENTIAL](#3-persistent_sequential)
       - [4 EPHEMERAL_SEQUENTIAL](#4-ephemeral_sequential)
-  - [Zookeeper的数据模型](#zookeeper%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B)
   - [客户端基本使用](#%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
   - [github.com/go-zookeeper/zk](#githubcomgo-zookeeperzk)
   - [参考](#%E5%8F%82%E8%80%83)
@@ -19,31 +17,29 @@
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # Zookeeper
-ZooKeeper 是一个分布式的，开放源码的分布式应用程序协调服务，是 Google 的 Chubby 一个开源的实现，是 Hadoop 和 Hbase 的重要组件。它是一个为分布式应用提供一致性服务的软件，提供的功能包括：配置维护、域名服务、分布式同步、组服务等.
+ZooKeeper 是一个分布式的，开放源码的分布式应用程序协调服务，是 Google 的 Chubby 一个开源的实现，是 Hadoop 和 Hbase 的重要组件。
+它是一个为分布式应用提供一致性服务的软件，提供的功能包括：配置维护、域名服务、分布式同步、组服务等.
 
 - 配置中心:发布者将数据发布到ZK节点上，供订阅者动态获取数据，实现配置信息的集中式管理和动态更新。例如全局的配置信息、服务式服务框架的服务地址列表等就非常适合使用
 - 负载均衡: 消息中间件中发布者和订阅者的负载均衡linkedin开源的Kafka和阿里开源的metaq（RocketMQ的前身）都是通过zookeeper来做到生产者、消费者的负载均衡。
 - 分布式通知/协调
 
 
-## Zab协议(Zookeeper Atomic Broadcast)
-
-Zab协议是为分布式协调服务Zookeeper专门设计的一种 支持崩溃恢复 的 原子广播协议 ，是Zookeeper保证数据一致性的核心算法。Zab借鉴了Paxos算法，但又不像Paxos那样，是一种通用的分布式一致性算法。
 
 
-## Zookeeper角色：
-leader领导者、follower跟随者、observer观察者、client客户端
 
-（1）leader：负责投票的发起和决议，更新系统状态，处理事务请求。
+## ZooKeeper 基础知识基本分为三大模块：
 
-（2）follower跟随者：参与投票，接收客户端请求，处理非事务请求并返回结果，转发事务请求给leader。
+- 数据模型
+- ACL 权限控制
+- Watch 监控
 
-（3）observer观察者：不参与投票过程，只同步leader状态，为了扩展系统，提高读写速度。也接收客户端请求，处理非事务请求并返回结果，转发事务请求给leader。
+### Zookeeper的数据模型
+![](.zookeeper_images/zookeeper_data_structure.png)
+Zookeeper数据模型的结构与Unix文件系统很类似，整体上可以看作是一颗树，每一个节点称做一个ZNode。
+每一个 Znode 默认能够存储1MB的数据，每个ZNode都可以通过其路径唯一标识。
 
-（4）client客户端：请求发起方。
 
-
-## node节点
 ![](.zookeeper_images/zookeeper_node.png)
 zookeeper 中数据基本单元叫节点，节点之下可包含子节点，最后以树级方式程现。每个节点拥有唯一的路径path。客户端基于PATH上传节点数据，zookeeper 收到后会实时通知对该路径进行监听的客户端。
 
@@ -71,10 +67,22 @@ zookeeper 中节点叫znode存储结构上跟文件系统类似，以树级结�
 #### 4 EPHEMERAL_SEQUENTIAL
 临时顺序节点基本特性同临时节点，增加了顺序属性，节点名后边会追加一个由父节点维护的自增整型数字。
 
-## Zookeeper的数据模型
-![](.zookeeper_images/zookeeper_data_structure.png)
-Zookeeper数据模型的结构与Unix文件系统很类似，整体上可以看作是一颗树，每一个节点称做一个ZNode。
-每一个 Znode 默认能够存储1MB的数据，每个ZNode都可以通过其路径唯一标识。
+
+```shell
+# 节点状态信息
+[zk: localhost:2181(CONNECTED) 9] stat /china
+cZxid = 0x2
+ctime = Sun Jun 08 11:15:06 CST 2025
+mZxid = 0x2
+mtime = Sun Jun 08 11:15:06 CST 2025
+pZxid = 0x2
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x0
+dataLength = 3
+numChildren = 0
+```
 
 
 ## 客户端基本使用
@@ -82,10 +90,11 @@ Zookeeper数据模型的结构与Unix文件系统很类似，整体上可以看�
 ```shell
 # 部署命令
 $ mkdir data
-$ docker run -d -e TZ="Asia/Shanghai" -p 2181:2181 -v $PWD/data:/data --name zookeeper --restart always zookeeper
+$ docker run -d -e TZ="Asia/Shanghai" -p 2181:2181 -v $PWD/data:/data --name zookeeper --restart always zookeeper:3.8.4
 ```
 
 ```shell
+$ docker exec -it zookeeper  /bin/bash
 # 连接 zk 服务器
 zkCli.sh -server ip:port
 
@@ -124,7 +133,6 @@ get /china
 
 
 连接
-
 ```go
 // github.com/go-zookeeper/zk@v1.0.4/conn.go
 func Connect(servers []string, sessionTimeout time.Duration, options ...connOption) (*Conn, <-chan Event, error) {

@@ -14,9 +14,9 @@
       - [与redis通信](#%E4%B8%8Eredis%E9%80%9A%E4%BF%A1)
       - [获取锁](#%E8%8E%B7%E5%8F%96%E9%94%81)
       - [释放锁](#%E9%87%8A%E6%94%BE%E9%94%81)
-      - [multierror库](#multierror%E5%BA%93)
+      - [multierror 库](#multierror-%E5%BA%93)
   - [2. ZooKeeper 分布式锁](#2-zookeeper-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
-  - [3. ectd分布式锁](#3-ectd%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
+  - [3. ectd 分布式锁](#3-ectd-%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81)
       - [etcd 自带的 concurrency 包](#etcd-%E8%87%AA%E5%B8%A6%E7%9A%84-concurrency-%E5%8C%85)
       - [源码](#%E6%BA%90%E7%A0%81)
 
@@ -203,9 +203,8 @@ func (m *Mutex) UnlockContext(ctx context.Context) (bool, error) {
 
 需要注意的是，在分布式锁场景中，无论获取还是释放锁，与操作系统的锁相比，执行失败会是常态，所以一定要检查Lock、Unlock的返回值。
 
-#### multierror库
+#### multierror 库
 在actOnPoolsAsync方法中，在处理所有redis节点的返回时，引用了multierror库，这个库自定义了Error结构，用于保存多个error，当你的处理过程中在多个位置可能会返回不同error信息，但是返回值又只有一个error时，可以通过multierror.Append方法将这些error合成一个返回。内部创建了一个[]error来保存这些error，保留了层层弹栈返回时，各层的错误信息。代码很少但却很实用
-
 
 
 ## 2. ZooKeeper 分布式锁
@@ -215,21 +214,150 @@ ZooKeeper 也是一个典型的分布式元数据存储服务，它的分布式�
 
 ZooKeeper 也提供了 Watch 特性可监听 key 的数据变化
 
-使用 Zookeeper 加锁的伪代码如下
-```shell
+```go
+// github.com/go-zookeeper/zk@v1.0.4/lock.go
 
-Lock
-1 n = create(l + “/lock-”, EPHEMERAL|SEQUENTIAL)
-2 C = getChildren(l, false)
-3 if n is lowest znode in C, exit
-4 p = znode in C ordered just before n
-5 if exists(p, true) wait for watch event
-6 goto 2
-Unlock
-1 delete(n)
+func (l *Lock) LockWithData(data []byte) error {
+	if l.lockPath != "" {
+		return ErrDeadlock
+	}
+
+	prefix := fmt.Sprintf("%s/lock-", l.path)
+
+	path := ""
+	var err error
+	for i := 0; i < 3; i++ { // 重试3次
+		
+		// 创建临时顺序节点，同名节点会加序列号
+		path, err = l.c.CreateProtectedEphemeralSequential(prefix, data, l.acl)
+		if err == ErrNoNode {
+			// Create parent node.
+			parts := strings.Split(l.path, "/")
+			pth := ""
+			for _, p := range parts[1:] {
+				var exists bool
+				pth += "/" + p
+				// 父路径不存在，创建父节点
+				exists, _, err = l.c.Exists(pth)
+				if err != nil {
+					return err
+				}
+				if exists == true {
+					continue
+				}
+				_, err = l.c.Create(pth, []byte{}, 0, l.acl)
+				if err != nil && err != ErrNodeExists {
+					return err
+				}
+			}
+		} else if err == nil {
+			break
+		} else {
+			return err
+		}
+	}
+	if err != nil {
+		return err
+	}
+	
+    //  解析序列号 ,案例数据 /distributed_lock/_c_7cb2c17195b52d48749d336695c954b0-lock-0000000003
+	seq, err := parseSeq(path)
+	if err != nil {
+		return err
+	}
+
+	for {
+		children, _, err := l.c.Children(l.path)
+		if err != nil {
+			return err
+		}
+
+		lowestSeq := seq
+		prevSeq := -1
+		prevSeqPath := ""
+		for _, p := range children {
+			s, err := parseSeq(p)
+			if err != nil {
+				return err
+			}
+			if s < lowestSeq {
+				lowestSeq = s
+			}
+			if s < seq && s > prevSeq {
+				prevSeq = s
+				prevSeqPath = p
+			}
+		}
+        // 如果当前节点序列号最低，则获取到锁
+		if seq == lowestSeq {
+			// Acquired the lock
+			break
+		}
+
+		// 否则等待节点删除
+		// Wait on the node next in line for the lock
+		_, _, ch, err := l.c.GetW(l.path + "/" + prevSeqPath)
+		if err != nil && err != ErrNoNode {
+			return err
+		} else if err != nil && err == ErrNoNode {
+			// try again
+			continue
+		}
+
+		ev := <-ch
+		if ev.Err != nil {
+			return ev.Err
+		}
+	}
+
+	l.seq = seq
+	l.lockPath = path
+	return nil
+}
+
 ```
 
-## 3. ectd分布式锁
+加锁机制
+![zookeeper_lock_process.png](zookeeper_lock_process.png)
+- 客户端向 Zookeeper 发起请求，在指定节点（例如/lock）下创建一个临时顺序节点（连接断开就会自动删除，解决死锁问题）；
+- 客户端获取 Zookeeper 节点/lock下的所有子节点，并且判断刚刚创建的节点是不是最小子节点；
+- 如果是最小子节点，加锁成功，返回；
+- 如果不是最小子节点，则获取它的前一个子节点（正向排序），并且注册监听；
+- 当前一个子节点被删除后（锁被其他进程释放了），Zookeeper 会通知客户端，此时客户端需要再次判断自己创建的节点是不是最小节点，如果是，加锁超过，否则继续2~5步骤。
+
+
+```go
+func (l *Lock) Unlock() error {
+	if l.lockPath == "" {
+		return ErrNotLocked
+	}
+	//   删除自己创建的有序临时节点
+	if err := l.c.Delete(l.lockPath, -1); err != nil {
+		return err
+	}
+	l.lockPath = ""
+	l.seq = 0
+	return nil
+}
+
+```
+
+
+优点
+
+- 可靠性高
+- 实现较为容易
+- 没有惊群效应：没有获取到锁时只监听前一个节点
+
+缺点
+
+- 性能不是最好：每次在创建锁和释放锁的过程中，都要动态创建、销毁瞬时节点来实现锁功能，而 Zookeeper 中创建和删除节点只能通过 Leader 服务器来执行，然后 Leader 服务器还需要将数据同步到所有的 Follower 机器上，这样频繁的网络通信，性能的短板是非常突出的。
+- ZooKeeper 是一个 CP 系统，即在网络分区的情况下，系统优先保证一致性，而可能牺牲可用性。
+
+
+在高性能，高并发的场景下，不建议使用 ZooKeepe r的分布式锁。而由于 ZooKeeper 的高可用特性，所以在并发量不是太高的场景，推荐使用 ZooKeeper 的分布式锁
+
+## 3. ectd 分布式锁
 相比 Redis 基于主备异步复制导致锁的安全性问题，etcd 是基于 Raft 共识算法实现的，一个写请求需要经过集群多数节点确认。
 因此一旦分布式锁申请返回给 client 成功后，它一定是持久化到了集群多数节点上，不会出现 Redis 主备异步复制可能导致丢数据的问题，具备更高的安全性。
 

@@ -55,11 +55,13 @@ func listNode() {
 
 	defer conn.Close()
 
-	children, _, err := conn.Children("/go_servers")
+	children, stat, err := conn.Children("/go_servers")
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
-	fmt.Printf("%v \n", children)
+	fmt.Printf("stat: %+v \n", stat)
+	fmt.Printf("children: %v \n", children)
 }
 
 func main() {

@@ -359,10 +359,13 @@
 
 ## [第二十九章 分布式锁及源码分析](29_distributed_lock/distributed_lock.md)
 - [1 redsync(RedLock 算法官方实现)](29_distributed_lock/01_redis_distributed_lock/main.go)
-- [2 etcd实现分布式锁](29_distributed_lock/02_etcd_distributed_lock/main.go)
+- [2 etcd 实现分布式锁](29_distributed_lock/02_etcd_distributed_lock/main.go)
+- [3 zookeeper 实现分布式锁](29_distributed_lock/03_zookeeper_distributed_lock/main.go)
 
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
-- [1 github.com/go-zookeeper/zk 使用](30_zookeeper/zookeeper.go)
+- [Zab协议(Zookeeper Atomic Broadcast 原子广播协议)](30_zookeeper/zab.md)
+- [1 节点管理](30_zookeeper/01_node/node.go)
+- [2 基于 zookeer watch 实现注册于发现](30_zookeeper/02_discovery/main.go)
 
 ## [第三十一章 分布式 Id](31_distributed_Id/distribued_id.md)
 - 1 UUID( Universally Unique Identifier 通用唯一标识码)
