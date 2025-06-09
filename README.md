@@ -104,6 +104,8 @@
 - [2 kafka](03_amqp/02_kafka/kafka_intro.md)
   - [2.1 客户端 sarama](03_amqp/02_kafka/01_sarama/sarama.md)
     - 2.1.1 生产者
+      - 同步
+      - 异步
     - 2.1.2 消费者
   - [2.2 客户端 confluent-kafka-go](03_amqp/02_kafka/02_confluent-kafka/confluent_kafka.md)
     - 2.2.1 生产者

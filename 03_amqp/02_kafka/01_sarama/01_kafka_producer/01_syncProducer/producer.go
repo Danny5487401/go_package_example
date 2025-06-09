@@ -18,7 +18,7 @@ func main() {
 	config := sarama.NewConfig()
 
 	// 生产者配置
-	config.Producer.RequiredAcks = sarama.WaitForAll // 发送完数据需要leader和follower确认
+	config.Producer.RequiredAcks = sarama.WaitForAll // 默认WaitForLocal, WaitForAll 要求发送完数据需要leader和follower确认
 	config.Producer.Return.Successes = true          // 成功交付的消息将在 success channel 返回
 	config.Producer.Timeout = 5 * time.Second
 
@@ -45,11 +45,11 @@ func main() {
 	defer producer.Close()
 
 	// 发送信息
-	pid, offset, err := producer.SendMessage(msg)
+	partition, offset, err := producer.SendMessage(msg)
 	if err != nil {
 		fmt.Println("send msg failed ,err: ", err)
 		return
 	}
-	fmt.Printf("pid:%v offset:%v\n", pid, offset)
+	fmt.Printf("partId:%v offset:%v\n", partition, offset)
 
 }
