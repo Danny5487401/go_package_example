@@ -3,8 +3,7 @@ package main
 import (
 	"fmt"
 	"github.com/IBM/sarama"
-	"log"
-	"os"
+	"go.uber.org/zap"
 	"time"
 )
 
@@ -24,11 +23,16 @@ func main() {
 
 	config.Net.SASL.Enable = true
 	config.Net.SASL.User = "user1"
-	config.Net.SASL.Password = "qwl2pTlW6e"
+	config.Net.SASL.Password = "Pnw5pgUQUp"
 	config.Net.SASL.Mechanism = sarama.SASLTypePlaintext
 	config.ClientID = "producer-1"
 
-	sarama.Logger = log.New(os.Stdout, "[Sarama] ", log.Lshortfile|log.Lmsgprefix) // 重定向日志,默认io.Discard
+	logger, _ := zap.NewProduction()
+
+	sarama.Logger = &zapLogger{logger: logger}
+
+	// 测试日志
+	sarama.Logger.Printf("Sarama log with zap: %s", "test")
 
 	// 构建一个消息
 	msg := &sarama.ProducerMessage{}
@@ -53,3 +57,22 @@ func main() {
 	fmt.Printf("partId:%v offset:%v\n", partition, offset)
 
 }
+
+type zapLogger struct {
+	logger *zap.Logger
+}
+
+func (z *zapLogger) Print(v ...interface{}) {
+	z.logger.Sugar().Info(v...)
+}
+
+func (z *zapLogger) Printf(format string, v ...interface{}) {
+	z.logger.Sugar().Infof(format, v...)
+}
+
+func (z *zapLogger) Println(v ...interface{}) {
+	z.logger.Sugar().Info(v...)
+}
+
+// 	这么会不知道调用者是谁,需要 skip
+//	sarama.Logger = log.New(os.Stdout, "[Sarama] ", log.Lshortfile|log.Lmsgprefix) // 重定向日志,默认io.Discard

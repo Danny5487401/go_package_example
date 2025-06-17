@@ -25,6 +25,11 @@
 
 
 ![overview.png](overview.png)
+
+Björn Rabenstein 将称其为：Vertical writes, horizontal(-ish) reads（垂直写，水平读）
+
+
+
 ## 基本概念
 
 
@@ -380,46 +385,61 @@ func (s *memSeries) append(t int64, v float64, appendID uint64, chunkDiskMapper 
 
 memChunk 在内存中保存的正是采用 XOR 算法压缩过的数据。
 ```go
+type xorAppender struct {
+	b *bstream
+
+	t      int64
+	v      float64
+	tDelta uint64
+
+	leading  uint8
+	trailing uint8
+}
+```
+
+
+
+```go
 func (a *xorAppender) Append(t int64, v float64) {
 	var tDelta uint64
 	num := binary.BigEndian.Uint16(a.b.bytes())
-
-	if num == 0 {
+        
+	if num == 0 { //  第一个点，完整记录t1和v1的值
 		buf := make([]byte, binary.MaxVarintLen64)
 		for _, b := range buf[:binary.PutVarint(buf, t)] {
-			a.b.writeByte(b)
+			a.b.writeByte(b)  // 写入t1的值
 		}
-		a.b.writeBits(math.Float64bits(v), 64)
+		a.b.writeBits(math.Float64bits(v), 64) // 写入v1的值
 
-	} else if num == 1 {
+	} else if num == 1 { // 第二个点
 		tDelta = uint64(t - a.t)
 
 		buf := make([]byte, binary.MaxVarintLen64)
 		for _, b := range buf[:binary.PutUvarint(buf, tDelta)] {
-			a.b.writeByte(b)
+			a.b.writeByte(b) // 写入tDeleta=t2-t1
 		}
 
-		a.writeVDelta(v)
+		a.writeVDelta(v)  // 写入v2^v1的值
 
-	} else {
+	} else {  //  第三个点及以后的点
 		tDelta = uint64(t - a.t)
-		dod := int64(tDelta - a.tDelta)
+		dod := int64(tDelta - a.tDelta)  //计算dod
 
 		// Gorilla has a max resolution of seconds, Prometheus milliseconds.
 		// Thus we use higher value range steps with larger bit size.
 		switch {
-		case dod == 0:
+		case dod == 0: // 如果是0，则只需要存0这一个bit
 			a.b.writeBit(zero)
-		case bitRange(dod, 14):
+		case bitRange(dod, 14): // dod=[-8191,8192],先存入10作为标识，再用14bit存储dod的值
 			a.b.writeBits(0b10, 2)
 			a.b.writeBits(uint64(dod), 14)
-		case bitRange(dod, 17):
+		case bitRange(dod, 17): // dod=[-65535,65536],先存入110作为标识，再用17bit存储该dod的值
 			a.b.writeBits(0b110, 3)
 			a.b.writeBits(uint64(dod), 17)
-		case bitRange(dod, 20):
+		case bitRange(dod, 20): // 如果在-2047到2048区间，则加上前缀1110进行存储，一共存储4+12bit
 			a.b.writeBits(0b1110, 4)
 			a.b.writeBits(uint64(dod), 20)
-		default:
+		default: //  dod>524288,先存入1111作为标识，再用64bit存储该dod的值
 			a.b.writeBits(0b1111, 4)
 			a.b.writeBits(uint64(dod), 64)
 		}
@@ -434,7 +454,102 @@ func (a *xorAppender) Append(t int64, v float64) {
 }
 ```
 
-使用了 XOR 算法后，平均每个数据点能从 16bytes 压缩到 1.37bytes，也就是说所用空间直接降为原来的 1/12
+对于t/v数据，prometheus采用Facebook Gorilla论文的压缩方式：
+
+- timestamp: delta-of-delta方式压缩时序点的时间值；
+- value: xor方式压缩时序点的value值
+
+
+按照上述压缩方式，可以将一个16byte的时序点压缩成1.37byte，压缩率非常高。
+
+#### delta of delta -- 时间戳压缩方式
+对于一个监控系统而言，我们的采样间隔总是固定的，因此采样的时间戳是很有规律的，比如第0s，第15s,第30s,第45s,只有少量的特殊情况会有较小的误差.
+因此，如果我们存储的数据是和前一个时间的差值，那么我们就只需要存第一个完整的时间戳，后续的时间只需存和前一个的差值，即15，15，15，15，如果有部分误差的时间戳，则可能存的是16/14。这样就可以减少用于存储的bit。
+
+在时序上，相邻两个点的时间戳的差值一般是固定的，若隔60s pull一次，那么timestamp差值一般都是60s，比如
+
+- p1: 10:00:00，p2: 10:01:00，p3: 10:01:59，p4：10:03:00，p5：10:04:00，p6：10:05:00
+- 时间戳的差值为：60s，59s，61s，60s，60s；
+
+Gorilla论文采用delta-of-delta方式压缩timestamp：
+
+* 第一个时序点的时间戳t0，被完整存储起来；
+* 第二个时序点的时间戳t1，存储delta=t1-t0；
+* 对后续的时间戳tn，首先计算dod值：delta=(tn - tn-1) - (tn-1 - tn-2)；
+
+  - 如果dod=0，则使用1bit=“0”存储该时间戳；
+  - 如果dod=[-8191, 8192]，则先存入“10”作为标识，再用14bit存储该dod值；
+  - 如果dod=[-65535, 65536]，则先存入“110”作为标识，再用17bit存储该dod值；
+  - 如果dod=[-524287, 524288]，则先存入“1110”作为标识，再用20bit存储该dod值；
+  - 如果dod>524288，则先存入“1111”作为标识，再用64bit存储该dod值；
+在实践中发现，95%的timestamp能够按照dod=0的情形进行存储
+
+#### XOR -- 值压缩方式
+```go
+
+// 写入值
+func (a *xorAppender) writeVDelta(v float64) {
+	vDelta := math.Float64bits(v) ^ math.Float64bits(a.v)
+
+	if vDelta == 0 { // 若XOR运算结果为“0”，则表示前后两个value相同，仅存入1bit的“0”值即可；
+		a.b.writeBit(zero)
+		return
+	}
+	a.b.writeBit(one) // 否则，存入1bit值“1”；
+
+	leading := uint8(bits.LeadingZeros64(vDelta)) // 计算vdelta前置0的个数
+	trailing := uint8(bits.TrailingZeros64(vDelta)) // 计算vdelta后置0的个数
+
+	// Clamp number of leading zeros to avoid overflow when encoding.
+	if leading >= 32 {
+		leading = 31
+	}
+
+	if a.leading != 0xff && leading >= a.leading && trailing >= a.trailing {
+		a.b.writeBit(zero)
+		a.b.writeBits(vDelta>>a.trailing, 64-int(a.leading)-int(a.trailing))
+	} else {
+		a.leading, a.trailing = leading, trailing
+        
+		// 否则，写入1bit值“1”，用5bit存入XOR中前值0的个数，6bit存入中间非0的长度，最后再存入中间的非0位；
+		a.b.writeBit(one)
+		a.b.writeBits(uint64(leading), 5)
+
+		// Note that if leading == trailing == 0, then sigbits == 64.  But that value doesn't actually fit into the 6 bits we have.
+		// Luckily, we never need to encode 0 significant bits, since that would put us in the other case (vdelta == 0).
+		// So instead we write out a 0 and adjust it back to 64 on unpacking.
+		sigbits := 64 - leading - trailing
+		a.b.writeBits(uint64(sigbits), 6)
+		a.b.writeBits(vDelta>>trailing, int(sigbits))
+	}
+}
+
+```
+
+Gorilla论文对时序点value的压缩基于：
+
+- 相邻时序点的value值不会发生明显变化；
+- value大多是浮点数，当两个value非常接近的时候，这两个浮点数的符号位、指数位和尾数部分的前几bit都是相同的
+
+
+
+
+```
+// 输入时序序列值
+10:00:00    3.1
+10:01:01    3.2
+10:02:00    3.0
+10:02:59    3.2
+10:03:00    3.1
+    
+
+// 那么将存入
+10:00:00     3.1
+61           3.2 xor 3.1
+-2(59-61)    3.0 xor 3.2
+0(59-59)     3.2 xor 3.0
+2(61-59)     3.1 xor 3.2
+```
 
 
 ### 在磁盘中的组织
@@ -454,9 +569,13 @@ prometheus-data
     |-chunks_head
 ```
 
+chunk文件的文件格式相对来说比较简单，只是一系列按照时间区间进行切分的压缩块chunk，每个chunk块在文件中的索引通过一个64位的无符号数来索引，高32位为chunk文件的文件名fileId，低32位为chunk块在文件内的偏移量offset。
 
 
-## 索引
+
+
+
+## index 索引
 
 https://github.com/prometheus/prometheus/blob/v3.3.0/tsdb/docs/format/index.md
 
@@ -678,8 +797,6 @@ block 中还包含了一个 meta.json 文件（保存 block 的元数据信息�
 ## 写入过程
 
 ![prometheus_write_process.png](prometheus_write_process.png)
-
-
 
 ```go
 func (sp *scrapePool) sync(targets []*Target) {
@@ -1082,3 +1199,6 @@ func (db *DB) Querier(_ context.Context, mint, maxt int64) (storage.Querier, err
 - [index倒排索引](https://segmentfault.com/a/1190000041210003)
 - [1 分钟了解 Prometheus 的 WAL 机制](https://xie.infoq.cn/article/997c64393ed3c2c96ba443f2e)
 - [prometheus源码分析：从scrape到tsdb写入](https://segmentfault.com/a/1190000043525007)
+- [深入理解Gorilla压缩原理 -- Prometheus系统参考的TSDB](https://juejin.cn/post/7176909060871520316)
+- [prometheus源码分析：t/v数据的压缩、写入和读取](https://segmentfault.com/a/1190000041236148#item-2)
+- [Prometheus：存储层的演进](https://zhuanlan.zhihu.com/p/469198593)

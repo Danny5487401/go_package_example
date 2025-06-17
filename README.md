@@ -385,7 +385,7 @@
 - [3 gossip 协议](32_consensus_algorithm/03_gossip/gossip.md)
   - [3.1 github.com/hashicorp/memberlist 使用](32_consensus_algorithm/03_gossip/main.go)
 
-## [第三十三章 压缩](33_compress/compress.md)
+## [第三十三章 压缩算法及实现](33_compress/compress.md)
 - [1 snappy 压缩库-->prometheus 使用](33_compress/01_snappy/snappy.md)
 
 

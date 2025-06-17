@@ -340,10 +340,53 @@ Kafka中的位移主题会在第一个消费者被创建的时候创建，默认
 
 ## 八. 安全认证
 SASL(Simple Authentication and Security Layer 简单验证和安全层):用来认证 C/S 模式也就是服务器与客户端的一种认证机制,通俗的话来讲就是让服务器知道连接进来的客户端的身份是谁。
-而 SASL 只是一种模式，需要依赖于具体的连接媒介，比如 JAAS(java Authentication Authorization Service)客户端、GSSAPI(Kerberos)、PLAIN、SCRAM-SHA-256、SCRAM-SHA-512、OAuthBearer 等等 
+而 SASL 只是一种模式，需要依赖于具体的连接媒介，比如 JAAS(java Authentication Authorization Service)客户端、GSSAPI(Kerberos)、PLAIN、SCRAM-SHA-256、SCRAM-SHA-512、OAuthBearer 等等.
+```go
+// github.com/!i!b!m/sarama@v1.43.3/broker.go
+const (
+	// SASLTypeOAuth represents the SASL/OAUTHBEARER mechanism (Kafka 2.0.0+)
+	SASLTypeOAuth = "OAUTHBEARER"
+	// SASLTypePlaintext represents the SASL/PLAIN mechanism
+	SASLTypePlaintext = "PLAIN"
+	// SASLTypeSCRAMSHA256 represents the SCRAM-SHA-256 mechanism.
+	SASLTypeSCRAMSHA256 = "SCRAM-SHA-256"
+	// SASLTypeSCRAMSHA512 represents the SCRAM-SHA-512 mechanism.
+	SASLTypeSCRAMSHA512 = "SCRAM-SHA-512"
+	SASLTypeGSSAPI      = "GSSAPI"
+	// SASLHandshakeV0 is v0 of the Kafka SASL handshake protocol. Client and
+	// server negotiate SASL auth using opaque packets.
+	SASLHandshakeV0 = int16(0)
+	// SASLHandshakeV1 is v1 of the Kafka SASL handshake protocol. Client and
+	// server negotiate SASL by wrapping tokens with Kafka protocol headers.
+	SASLHandshakeV1 = int16(1)
+	// SASLExtKeyAuth is the reserved extension key name sent as part of the
+	// SASL/OAUTHBEARER initial client response
+	SASLExtKeyAuth = "auth"
+)
+
+```
+
 1. GSSAPI： 使用的Kerberos认证，可以集成目录服务，比如AD。从Kafka0.9版本开始支持
-2. PLAIN： 使用简单用户名和密码形式。从Kafka0.10版本开始支持
-3. SCRAM(Salted Challenge Response Authentication Mechanism)： 主要解决PLAIN动态更新问题以及安全机制，从Kafka0.10.2开始支持
+2. PLAIN： 使用简单用户名和密码形式。从Kafka0.10版本开始支持. 
+3. SCRAM(Salted Challenge Response Authentication Mechanism)： 一种基于密码的质询响应协议,主要解决PLAIN动态新增和删除用户问题以及安全机制，从Kafka0.10.2开始支持
+```go
+// github.com/!i!b!m/sarama@v1.43.3/broker.go
+
+// SCRAMClient is a an interface to a SCRAM
+// client implementation.
+type SCRAMClient interface {
+	// Begin prepares the client for the SCRAM exchange
+	// with the server with a user name and a password
+	Begin(userName, password, authzID string) error
+	// Step steps client through the SCRAM exchange. It is
+	// called repeatedly until it errors or `Done` returns true.
+	Step(challenge string) (response string, err error)
+	// Done should return true when the SCRAM conversation
+	// is over.
+	Done() bool
+}
+
+```
 4. OAUTHBEARER：基于OAuth 2认证框架，从Kafka2.0版本开始支持
 
 ## 九. 消息重复和消费幂等
@@ -445,3 +488,4 @@ TransactionCoordinator 在收到 EndTxnRequest 请求后会执行如下操作：
 ## 参考
 
 - [Kafka 核心技术与实战](https://time.geekbang.org/column/intro/191?tab=catalog)
+- [详解SCRAM安全认证协议](https://juejin.cn/post/7405147677543530522)
