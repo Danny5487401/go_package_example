@@ -1,8 +1,30 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [VictoriaMetrics](#victoriametrics)
+  - [架构](#%E6%9E%B6%E6%9E%84)
+    - [vmui](#vmui)
+    - [vmagent](#vmagent)
+    - [vmalert](#vmalert)
+  - [特点](#%E7%89%B9%E7%82%B9)
+  - [部署](#%E9%83%A8%E7%BD%B2)
+  - [VictoriaMetrics 对比 prometheus](#victoriametrics-%E5%AF%B9%E6%AF%94-prometheus)
+  - [数据格式](#%E6%95%B0%E6%8D%AE%E6%A0%BC%E5%BC%8F)
+    - [数据目录 data](#%E6%95%B0%E6%8D%AE%E7%9B%AE%E5%BD%95-data)
+    - [索引目录 indexdb](#%E7%B4%A2%E5%BC%95%E7%9B%AE%E5%BD%95-indexdb)
+  - [prometheus 迁移到 VictoriaMetrics](#prometheus-%E8%BF%81%E7%A7%BB%E5%88%B0-victoriametrics)
+    - [常见问题:](#%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98)
+    - [prometheus 存在的问题](#prometheus-%E5%AD%98%E5%9C%A8%E7%9A%84%E9%97%AE%E9%A2%98)
+  - [参考](#%E5%8F%82%E8%80%83)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 
 # VictoriaMetrics 
 
 
-
+VictoriaMetrics 主要是一个可水平扩容的本地全量持久化存储方案
 
 ## 架构
 ![vms_structure.png](vms_structure.png)
@@ -14,8 +36,9 @@ VictoriaMetrics在保持更简单的架构的同时，还包括几个核心组�
 - vminsert：数据录入，可实现类似分片、副本功能，默认端口 8480
 - vmselect：数据查询，汇总和数据去重，默认端口 8481
 - vmagent：数据指标抓取，支持多种后端存储，会占用本地磁盘缓存，默认端口 8429
-- vmalert：报警相关组件，不如果不需要告警功能可以不使用该组件，默认端口为 8880
+- vmalert：报警相关组件，默认端口为 8880
 
+![vmalert-with-alert-manager.png](vmalert-with-alert-manager.png)
 
 ### vmui 
 
@@ -45,12 +68,16 @@ vmstorage-vmcluster          ClusterIP   None            <none>        8482/TCP,
 
 
 
+### vmalert
+
+vmalert 会针对 -datasource.url 地址执行配置的报警或记录规则，然后可以将报警发送给 -notifier.url 配置的 Alertmanager，记录规则结果会通过远程写入的协议进行保存，所以需要配置 -remoteWrite.url
 
 ## 特点
 
-- 解决高基数问题 high cardinality: up to 7x less RAM than Prometheus
-- 高流失率 high churn rate(time series 频繁被替代) 优化:  
+- 高基数问题 high cardinality 优化: up to 7x less RAM than Prometheus
+- 高流失率 high churn rate(time series 频繁被替代) 优化
 - 存储空间降低:7x less storage space is required compared to Prometheus
+- 存储支持 nfs
 
 
 ## 部署
@@ -65,14 +92,12 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMCluster
 metadata:
   name: vmcluster
-  namespace: victoria
+  namespace: monitoring
 spec:
-  retentionPeriod: "7"
-  requestsLoadBalancer:
-    enabled: true
-    spec:
-      replicaCount: 1
+  retentionPeriod: "14"
   vmstorage:
+    extraArgs:
+      dedup.minScrapeInterval: 30s
     replicaCount: 2
     image:
       repository: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/victoriametrics/vmstorage
@@ -95,10 +120,13 @@ spec:
       requests:
         cpu: "0.5"
         memory: "500Mi"
-              
+
   vmselect:
+    extraArgs:
+      dedup.minScrapeInterval: 30s
     replicaCount: 1
     cacheMountPath: "/select-cache"
+    logLevel: INFO
     image:
       repository: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/victoriametrics/vmselect
       tag: v1.115.0-cluster
@@ -117,7 +145,7 @@ spec:
       requests:
         cpu: "0.5"
         memory: "500Mi"
-        
+
   vminsert:
     replicaCount: 1
     image:
@@ -141,7 +169,7 @@ apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAgent
 metadata:
   name: vmagent
-  namespace: victoria
+  namespace: monitoring
 spec:
   image:
     repository: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/victoriametrics/vmagent
@@ -156,9 +184,37 @@ spec:
   staticScrapeNamespaceSelector: {}
   replicaCount: 1
   remoteWrite:
-    - url: "http://vminsert-vmcluster.victoria.svc.cluster.local:8480/insert/0/prometheus/api/v1/write"
+    - url: "http://vminsert-vmcluster.monitoring.svc.cluster.local:8480/insert/0/prometheus/api/v1/write"
 #  secrets:
 #    - etcd-client-cert
+
+```
+
+
+vmalert 部署
+```yaml
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMAlert
+metadata:
+  name: vmalert-ha
+  namespace: monitoring
+spec:
+  image:
+    repository: swr.cn-north-4.myhuaweicloud.com/ddn-k8s/docker.io/victoriametrics/vmalert
+    tag: v1.116.0
+  replicaCount: 2
+  # prometheus 兼容查询数据源
+  datasource:
+    url: http://vmselect-vmcluster.monitoring.svc:8481/select/0/prometheus
+  #  AlertManager URL
+  notifiers:
+    - url: http://alertmanager-main.monitoring.svc:9093
+  remoteWrite:
+    url: http://vminsert-vmcluster.monitoring.svc:8480/insert/0/prometheus
+  remoteRead:
+    url: http://vmselect-vmcluster.monitoring.svc:8481/select/0/prometheus
+  evaluationInterval: "10s"
+  ruleSelector: {}
 ```
 
 ## VictoriaMetrics 对比 prometheus 
@@ -242,6 +298,21 @@ VictoriaMetrics每次内存Flush或者后台Merge时生成的索引part，主要
 会自动将 Prometheus ServiceMonitor, PodMonitor, PrometheusRule, Probe and ScrapeConfig objects 转换成  VictoriaMetrics Operator objects.
 
 
+### 常见问题:
+1.  duplicate time series on the right side of `* on(cluster,instance) group_left(node)`
+```
+ERROR: 422, error when executing query="histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{job=\"kubelet\", metrics_path=\"/metrics\"}[5m])) by (cluster, instance, le)) * on(cluster, instance) group_left(node) kubelet_node_name{job=\"kubelet\", metrics_path=\"/metrics\"}\n" on the time range (start=1750211640085, end=1750213440085, step=5000): 
+cannot evaluate "histogram_quantile(0.99, sum(rate(kubelet_pod_worker_duration_seconds_bucket{job=\"kubelet\",metrics_path=\"/metrics\"}[5m])) by(cluster,instance,le)) * on(cluster,instance) group_left(node) kubelet_node_name{job=\"kubelet\",metrics_path=\"/metrics\"}": 
+duplicate time series on the right side of `* on(cluster,instance) group_left(node)`: 
+{endpoint="https-metrics", instance="172.16.7.33:10250", job="kubelet", metrics_path="/metrics", namespace="kube-system", node="node4", prometheus="monitoring/k8s", prometheus_replica="prometheus-k8s-0", service="kubelet"} and {endpoint="https-metrics", instance="172.16.7.33:10250", job="kubelet", metrics_path="/metrics", namespace="kube-system", node="node4", prometheus="monitoring/vmagent", service="kubelet"}
+```
+重复数据
+{endpoint="https-metrics", instance="172.16.7.31:10250", job="kubelet", metrics_path="/metrics", namespace="kube-system", node="node2", prometheus="monitoring/k8s", prometheus_replica="prometheus-k8s-0", service="kubelet"} 
+and 
+{endpoint="https-metrics", instance="172.16.7.31:10250", job="kubelet", metrics_path="/metrics", namespace="kube-system", node="node2", prometheus="monitoring/vmagent", service="kubelet"}
+
+因为部署还有一个prometheus使用远程写到 vmstorage,  prometheus="monitoring/vmagent" 和 prometheus="monitoring/k8s" 指标重复冲突
+
 
 ### prometheus 存在的问题
 https://zetablogs.medium.com/supercharge-your-monitoring-migrate-from-prometheus-to-victoriametrics-for-scalability-and-speed-e1e9df786145
@@ -253,5 +324,6 @@ https://zetablogs.medium.com/supercharge-your-monitoring-migrate-from-prometheus
 ## 参考
 
 - [浅析下开源时序数据库VictoriaMetrics的存储机制](https://zhuanlan.zhihu.com/p/368912946)
+- [一文搞懂 VictoriaMetrics 的使用](https://www.qikqiak.com/post/victoriametrics-usage/)
 
 

@@ -36,7 +36,7 @@
   - [第三十章 Zookeeper](#%E7%AC%AC%E4%B8%89%E5%8D%81%E7%AB%A0-zookeeper)
   - [第三十一章 分布式 Id](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%80%E7%AB%A0-%E5%88%86%E5%B8%83%E5%BC%8F-id)
   - [第三十二章 Consensus algorithm 共识算法](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%BA%8C%E7%AB%A0-consensus-algorithm-%E5%85%B1%E8%AF%86%E7%AE%97%E6%B3%95)
-  - [第三十三章 压缩](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%8E%8B%E7%BC%A9)
+  - [第三十三章 压缩算法及实现](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%8E%8B%E7%BC%A9%E7%AE%97%E6%B3%95%E5%8F%8A%E5%AE%9E%E7%8E%B0)
   - [第三十四章 本地缓存](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%9B%9B%E7%AB%A0-%E6%9C%AC%E5%9C%B0%E7%BC%93%E5%AD%98)
   - [第三十五章 sonar静态代码质量分析-涉及与golangci-lint对比使用](#%E7%AC%AC%E4%B8%89%E5%8D%81%E4%BA%94%E7%AB%A0-sonar%E9%9D%99%E6%80%81%E4%BB%A3%E7%A0%81%E8%B4%A8%E9%87%8F%E5%88%86%E6%9E%90-%E6%B6%89%E5%8F%8A%E4%B8%8Egolangci-lint%E5%AF%B9%E6%AF%94%E4%BD%BF%E7%94%A8)
   - [第三十六章 Proto管理工具 Buf](#%E7%AC%AC%E4%B8%89%E5%8D%81%E5%85%AD%E7%AB%A0-proto%E7%AE%A1%E7%90%86%E5%B7%A5%E5%85%B7-buf)
@@ -272,6 +272,7 @@
   - [3.4 PromQL(Prometheus Query Language)](14_system_monitor/03_prometheus/PromQL.md)
   - [3.5 存储模型及监控指标查询性能调优](14_system_monitor/03_prometheus/query.md)
 - [4 AlertManager](14_system_monitor/04_alertmanager/alert_manager.md)
+- [5 VictoriaMetrics](14_system_monitor/05_victoriametrics/victoriametrics.md)
 
 ## [第十五章 分布式事务](15_distributed_transaction/distributed_transaction.md)
 - Note: 使用DTM的代码作为案例 
@@ -387,6 +388,8 @@
 
 ## [第三十三章 压缩算法及实现](33_compress/compress.md)
 - [1 snappy 压缩库-->prometheus 使用](33_compress/01_snappy/snappy.md)
+- 2 zstd 
+- 3 zlib 
 
 
 ## [第三十四章 本地缓存](34_local_cache/cache.md)

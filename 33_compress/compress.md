@@ -6,8 +6,8 @@
   - [常见算法](#%E5%B8%B8%E8%A7%81%E7%AE%97%E6%B3%95)
     - [1 霍夫曼编码](#1-%E9%9C%8D%E5%A4%AB%E6%9B%BC%E7%BC%96%E7%A0%81)
     - [2 LZ77及其变种LZ78](#2-lz77%E5%8F%8A%E5%85%B6%E5%8F%98%E7%A7%8Dlz78)
-      - [LZ77压缩算法的核心思想](#lz77%E5%8E%8B%E7%BC%A9%E7%AE%97%E6%B3%95%E7%9A%84%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3)
-      - [LZ77算法的步骤](#lz77%E7%AE%97%E6%B3%95%E7%9A%84%E6%AD%A5%E9%AA%A4)
+      - [LZ77 压缩算法的核心思想](#lz77-%E5%8E%8B%E7%BC%A9%E7%AE%97%E6%B3%95%E7%9A%84%E6%A0%B8%E5%BF%83%E6%80%9D%E6%83%B3)
+      - [LZ77 算法的步骤](#lz77-%E7%AE%97%E6%B3%95%E7%9A%84%E6%AD%A5%E9%AA%A4)
     - [3 DEFLATE](#3-deflate)
     - [4 Lempel-Ziv-Welch（LZW）](#4-lempel-ziv-welchlzw)
     - [5 5BROTLI](#5-5brotli)
@@ -15,6 +15,7 @@
   - [压缩库](#%E5%8E%8B%E7%BC%A9%E5%BA%93)
     - [zlib](#zlib)
     - [gzip](#gzip)
+  - [go 压缩库](#go-%E5%8E%8B%E7%BC%A9%E5%BA%93)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -99,17 +100,19 @@ Zstd已经被应用于多种场景，包括数据库压缩、日志文件压缩�
 
 
 ## 压缩库
+性能报告: https://facebook.github.io/zstd/
 
-|  压缩库  |压缩速度 | 解压缩速度 |压缩比 |
-|:--:| :--: | :--: |:--:|
-| Snappy | 非常快 | 非常快 | 中等 |
-| gzip | 中等| 中等 | 高  |
-| zlib | 中等| 较快 |  较高  |
+| Compressor name |Ratio | 压缩	 |   解压	    |
+| :--: |:----:| :--: |:--------:|
+| zstd 1.5.7 -1 |   2.896   | 510 MB/s|1550 MB/s |
+| zlib 1.3.1 -1 |  2.743  | 105 MB/s | 390 MB/s |
+| lz4 1.10.0 |  	2.101  | 675 MB/s |3850 MB/s |
+| snappy 1.2.1|  	2.089  | 520 MB/s|     1500 MB/s     |
 
 
 ### zlib
 
-zlib压缩是一种无损压缩，底层使用deflate数据流压缩算法
+zlib压缩是一种无损压缩，底层使用deflate数据流压缩算法.
 
 
 ### gzip

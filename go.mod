@@ -58,6 +58,7 @@ require (
 	github.com/hibiken/asynq v0.23.0
 	github.com/hpcloud/tail v1.0.0
 	github.com/iancoleman/strcase v0.3.0
+	github.com/iimos/saramaprom v1.0.0
 	github.com/imdario/mergo v0.3.8
 	github.com/jinzhu/copier v0.3.5
 	github.com/jinzhu/gorm v1.9.16
