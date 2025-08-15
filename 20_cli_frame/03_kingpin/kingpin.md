@@ -3,10 +3,12 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [github.com/alecthomas/kingpin](#githubcomalecthomaskingpin)
+  - [特点](#%E7%89%B9%E7%82%B9)
   - [源码](#%E6%BA%90%E7%A0%81)
     - [初始化](#%E5%88%9D%E5%A7%8B%E5%8C%96)
     - [解析](#%E8%A7%A3%E6%9E%90)
   - [第三方使用](#%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BD%BF%E7%94%A8)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -15,10 +17,30 @@
 当前项目主要靠其他人提 PR.
 
 
+
+## 特点
+
+如果用flag实现的话应该是下面这种使用方法：
+```shell
+./cli --method A
+./cli --method B
+./cli --method C
+```
+
+每次都需要输入"–method"，然而用kingpin库实现的话就可以达到下面这种效果：
+```shell
+./cli A
+./cli B
+./cli C
+```
+
 特点包括：
 - 命令行参数定义：Kingpin 支持以链式调用的方式定义命令行参数，可以指定其名称、类型、默认值、描述等。
 - 子命令和嵌套命令：Kingpin 允许创建多级的命令行结构，使得命令行工具可以有更好的组织结构。
 - 命令行参数校验：Kingpin 提供了校验器，可以验证命令行参数的有效性。你可以指定自定义的校验函数，以确保用户输入的数据符合要求。
+- 参数类型转换：支持常见的基本类型（int、string、float 等），以及复杂类型（如 []string、map[string]int）。
+- 命令行错误处理：内置错误处理，帮助生成有用的错误信息。
+
 
 
 ## 源码
@@ -34,7 +56,7 @@ type Application struct {
 	Name string
 	Help string
 
-    // ..
+    // ...
 	
 	// 帮助信息模版
 	usageTemplate  string
@@ -59,9 +81,10 @@ type cmdMixin struct {
 ### 初始化
 
 ```go
+// github.com/alecthomas/kingpin/v2@v2.4.0/app.go
 func New(name, help string) *Application {
 	a := &Application{
-		Name:          name,
+		Name:          name, // 应用名
 		Help:          help,
 		errorWriter:   os.Stderr, // Left for backwards compatibility purposes.
 		usageWriter:   os.Stderr,
@@ -297,7 +320,6 @@ func (p *ParseContext) Next() *Token {
 func main() {
 	// 使用 kingpin 定义了众多 flag
 	var (
-		
 		metricsPath = kingpin.Flag(
 			"web.telemetry-path",
 			"Path under which to expose metrics.",
@@ -336,10 +358,6 @@ func main() {
 	if user, err := user.Current(); err == nil && user.Uid == "0" {
 		logger.Warn("Node Exporter is running as root user. This exporter is designed to run as unprivileged user, root is not required.")
 	}
-	runtime.GOMAXPROCS(*maxProcs)
-	logger.Debug("Go MAXPROCS", "procs", runtime.GOMAXPROCS(0))
-
-	http.Handle(*metricsPath, newHandler(!*disableExporterMetrics, *maxRequests, logger))
     // ..
 
 	server := &http.Server{}
@@ -349,3 +367,30 @@ func main() {
 	}
 }
 ```
+
+
+
+默认 parse
+```go
+// github.com/alecthomas/kingpin/v2@v2.4.0/global.go
+
+func Parse() string {
+	selected := MustParse(CommandLine.Parse(os.Args[1:]))
+	if selected == "" && CommandLine.cmdGroup.have() {
+		Usage()
+		CommandLine.terminate(0)
+	}
+	return selected
+}
+
+
+var (
+	// CommandLine 默认使用命令行应用名为 app name
+	CommandLine = New(filepath.Base(os.Args[0]), "")
+)
+```
+
+
+
+
+## 参考

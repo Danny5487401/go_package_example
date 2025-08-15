@@ -1,0 +1,2 @@
+time="2025-08-08T11:30:35+08:00" level=info msg="info msg"
+{"level":"trace","msg":"trace msg","time":"2025-08-08T11:30:35+08:00"}

@@ -35,7 +35,7 @@ func main() {
 
 	config.Net.SASL.Enable = true
 	config.Net.SASL.User = "user1"
-	config.Net.SASL.Password = "Pnw5pgUQUp"
+	config.Net.SASL.Password = "1kxZdtVVyH"
 	config.Net.SASL.Mechanism = sarama.SASLTypePlaintext
 	config.ClientID = clientId
 

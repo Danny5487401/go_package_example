@@ -3,10 +3,10 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/Danny5487401/go_package_example/30_zookeeper/02_discovery/group"
 	"log"
 	"time"
 
+	"github.com/Danny5487401/go_package_example/30_zookeeper/02_discovery/group"
 	"github.com/Danny5487401/go_package_example/30_zookeeper/02_discovery/zkdiscovery"
 )
 

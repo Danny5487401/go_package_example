@@ -4,7 +4,7 @@
 
 - [Zab协议(Zookeeper Atomic Broadcast 原子广播协议)](#zab%E5%8D%8F%E8%AE%AEzookeeper-atomic-broadcast-%E5%8E%9F%E5%AD%90%E5%B9%BF%E6%92%AD%E5%8D%8F%E8%AE%AE)
   - [基本概念](#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5)
-    - [zxid](#zxid)
+    - [zxid (ZooKeeper Transaction Id)](#zxid-zookeeper-transaction-id)
   - [Zookeeper角色](#zookeeper%E8%A7%92%E8%89%B2)
   - [Zab 节点有三种状态](#zab-%E8%8A%82%E7%82%B9%E6%9C%89%E4%B8%89%E7%A7%8D%E7%8A%B6%E6%80%81)
   - [流程](#%E6%B5%81%E7%A8%8B)
@@ -26,14 +26,17 @@ Zab借鉴了Paxos算法，但又不像Paxos那样，是一种通用的分布式�
 
 ## 基本概念
 
-### zxid
-一个 zxid 是64位，高 32 是纪元（epoch）编号，每经过一次 leader 选举产生一个新的 leader，新 leader 会将 epoch 号 +1。低 32 位是消息计数器，每接收到一条消息这个值 +1，新 leader 选举后这个值重置为 0。
+### zxid (ZooKeeper Transaction Id)
+一个 zxid 是64位,
+高 32 是纪元（epoch）编号，每经过一次 leader 选举产生一个新的 leader，新 leader 会将 epoch 号 +1。
+低 32 位是消息计数器，每接收到一条消息这个值 +1，新 leader 选举后这个值重置为 0。
 
-这样设计的好处是旧的 leader 挂了后重启，它不会被选举为 leader，因为此时它的 zxid 肯定小于当前的新 leader。当旧的 leader 作为 follower 接入新的 leader 后，新的 leader 会让它将所有的拥有旧的 epoch 号的未被 COMMIT 的 proposal 清除。
+这样设计的好处是旧的 leader 挂了后重启，它不会被选举为 leader，因为此时它的 zxid 肯定小于当前的新 leader。
+当旧的 leader 作为 follower 接入新的 leader 后，新的 leader 会让它将所有的拥有旧的 epoch 号的未被 COMMIT 的 proposal 清除。
 
 
 ## Zookeeper角色
-![zookeeper_role.png](zookeeper_role.png)
+![zookeeper_role.png](.zookeeper_images/zookeeper_role.png)
 leader领导者、follower跟随者、observer观察者、client客户端
 
 （1）leader：负责投票的发起和决议，更新系统状态，处理事务请求。
@@ -81,7 +84,8 @@ Election/Looking：节点处于选举状态，正在寻找 Leader
 在集群中的投票信息还没有达到超过半数原则的情况下，再进行新一轮的投票，最终当整个 ZooKeeper 集群中的 Follow 服务器超过半数投出的结果相同的时候，就会产生新的 Leader 服务器
 
 一个选票的整体结果可以分为一下六个部分：
-![vote_structure.png](vote_structure.png)
+![vote_structure.png](.zookeeper_images/vote_structure.png)
+
 - logicClock：用来记录服务器的投票轮次。logicClock 会从 1 开始计数，每当该台服务经过一轮投票后，logicClock 的数值就会加 1 。
 - state：用来标记当前服务器的状态。在 ZooKeeper 集群中一台服务器具有 LOOKING、FOLLOWING、LEADERING、OBSERVING 这四种状态。
 - self_id：用来表示当前服务器的 ID 信息，该字段在 ZooKeeper 集群中主要用来作为服务器的身份标识符。

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"strings"
 
@@ -10,7 +11,7 @@ import (
 var (
 	app = kingpin.New("chat", "A command-line chat application.")
 	//bool类型参数，可以通过 --debug使该值为true
-	debug = app.Flag("debug", "Enable debug mode.").Bool()
+	debug = app.Flag("debug", "Enable debug mode.").Default("true").Bool()
 	//识别 ./cli register
 	register = app.Command("register", "Register a new user.")
 	// ./cli register之后的参数，可通过./cli register danny 123456 传入name为danny pwd为123456 参数类型为字符串
@@ -28,14 +29,14 @@ func main() {
 	//从os接收参数传给kingpin处理
 	switch kingpin.MustParse(app.Parse(os.Args[1:])) {
 	case register.FullCommand():
-		println("name:" + *registerName)
-		println("pwd:" + *registerPwd)
+		fmt.Println("name:" + *registerName)
+		fmt.Println("pwd:" + *registerPwd)
 	case post.FullCommand():
-		println((*postImage))
+		fmt.Println(*postImage)
 		text := strings.Join(*postText, " ")
-		println("Post:", text)
+		fmt.Println("Post:", text)
 	}
 	if *debug == true {
-		println("debug")
+		fmt.Println("debug")
 	}
 }

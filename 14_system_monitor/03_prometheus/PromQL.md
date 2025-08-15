@@ -159,9 +159,11 @@ method_code:http_errors:rate5m{code="500"} / ignoring(code) method:http_requests
 
 ##### 2. 多对一和一对多
 多对一和一对多两种匹配模式指的是“一”侧的每一个向量元素可以与"多"侧的多个元素匹配的情况。
-在这种情况下，必须使用group修饰符：group_left或者group_right来确定哪一个向量具有更高的基数（充当“多”的角色)
+PromQL中的group_left和group_right的操作函数，分别提供了Many2One和One2Many的语义
 
 多对一和一对多两种模式一定是出现在操作符两侧表达式返回的向量标签不一致的情况。因此需要使用ignoring和on修饰符来排除或者限定匹配的标签列表。
+
+
 
 
 ```css
@@ -178,6 +180,9 @@ method_code:http_errors:rate5m / ignoring(code) group_left method:http_requests:
 {method="post", code="500"} 0.05            //   6 / 120
 {method="post", code="404"} 0.175           //  21 / 120
 ```
+
+
+
 
 ### 聚合操作
 内置的聚合操作符，这些操作符作用域瞬时向量。可以将瞬时表达式返回的样本数据进行聚合，形成一个新的时间序列。
@@ -210,6 +215,7 @@ sum(http_requests_total) without (instance)
 ```css
 sum(http_requests_total) by (code,handler,job,method)
 ```
+
 
 
 ### 函数
