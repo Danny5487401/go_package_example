@@ -8,7 +8,7 @@ import (
 func main() {
 	flag.Parse()
 	defer glog.Flush()
-
+	glog.Infof("no level message")
 	glog.V(3).Info("LEVEL 3 message") // 使用日志级别 3
 	glog.V(4).Info("LEVEL 4 message") // 使用日志级别 4
 	glog.V(5).Info("LEVEL 5 message") // 使用日志级别 5

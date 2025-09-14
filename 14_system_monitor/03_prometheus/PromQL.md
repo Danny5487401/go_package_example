@@ -229,7 +229,7 @@ increase(node_cpu[2m]) / 120
 
 rate函数可以直接计算区间向量v在时间窗口内平均增长速率。因此，通过以下表达式可以得到与increase函数相同的结果：
 ```shell
-# 最后一个点  -  第一个点  = vulue
+# 最后一个点  -  第一个点  = value
 # 最后一个时间戳  -  第一个时间戳 = time
 # resultValue = value / time
 rate(node_cpu[2m])

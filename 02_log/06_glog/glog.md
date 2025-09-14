@@ -4,6 +4,7 @@
 
 - [github.com/golang/glog](#githubcomgolangglog)
   - [特点](#%E7%89%B9%E7%82%B9)
+  - [使用](#%E4%BD%BF%E7%94%A8)
   - [Flush Daemon](#flush-daemon)
   - [参考](#%E5%8F%82%E8%80%83)
 
@@ -15,7 +16,7 @@ Glog是著名google开源C++日志库glog的golang版本，具有轻量级、简
 
 
 
-##  特点
+## 特点
 
 - 支持四种日志等级INFO < WARING < ERROR < FATAL，不支持DEBUG等级。
 - 每个日志等级对应一个日志文件，低等级的日志文件中除了包含该等级的日志，还会包含高等级的日志。
@@ -30,6 +31,48 @@ Glog的代码主要分两个文件：
 - glog.go：主要实现log等级定义、输出以及vlog。
 - glog_file.go：主要实现日志文件目录和各等级日志文件的创建
 
+## 使用
+
+参数控制
+
+* -logtostderr=true ：日志直接输出到标准错误（stderr），屏幕可见。
+
+* -alsologtostderr=true ：既写文件，又打印到屏幕
+
+默认 info 打印
+
+```go
+func Infof(format string, args ...any) {
+	logf(1, logsink.Info, false, noStack, format, args...)
+}
+
+func logf(depth int, severity logsink.Severity, verbose bool, stack stack, format string, args ...any) {
+	ctxlogf(nil, depth+1, severity, verbose, stack, format, args...)
+}
+
+
+func ctxlogf(ctx context.Context, depth int, severity logsink.Severity, verbose bool, stack stack, format string, args ...any) {
+    // ...
+
+	metai, meta := metaPoolGet()
+	*meta = logsink.Meta{
+		Context:  ctx,
+		Time:     now,
+		File:     file,
+		Line:     line,
+		Depth:    depth + 1,
+		Severity: severity,
+		Verbose:  verbose,
+		Thread:   int64(pid),
+	}
+	// 写入数据
+	sinkf(meta, format, args...)
+	// Clear pointer fields so they can be garbage collected early.
+	meta.Context = nil
+	meta.Stack = nil
+	metaPool.Put(metai)
+}
+```
 
 ## Flush Daemon
 
@@ -88,6 +131,9 @@ func (s *fileSink) flush(threshold logsink.Severity) error {
 }
 
 ```
+
+
+
 
 ## 参考
 

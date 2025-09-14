@@ -47,6 +47,7 @@
   - [第四十一章 hashicorp/go-plugin 插件使用-->httprunner 4.0 使用](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%B8%80%E7%AB%A0-hashicorpgo-plugin-%E6%8F%92%E4%BB%B6%E4%BD%BF%E7%94%A8--httprunner-40-%E4%BD%BF%E7%94%A8)
   - [第四十二章 open-api](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%BA%8C%E7%AB%A0-open-api)
   - [第四十三章 go-systemd-->k8s 中使用](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%B8%89%E7%AB%A0-go-systemd--k8s-%E4%B8%AD%E4%BD%BF%E7%94%A8)
+  - [第四十四章 godotenv 处理 env 文件-->flannel 中使用](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E5%9B%9B%E7%AB%A0-godotenv-%E5%A4%84%E7%90%86-env-%E6%96%87%E4%BB%B6--flannel-%E4%B8%AD%E4%BD%BF%E7%94%A8)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -427,6 +428,7 @@
 ## [第四十二章 open-api](42_go-openapi/open-api.md)
 
 ## [第四十三章 go-systemd-->k8s 中使用](43_systemd/systemd.md)
+## [第四十四章 godotenv 处理 env 文件-->flannel 中使用](44_godotenv/godotenv.md)
 
 ## 参考
 - [awesome-go](https://github.com/avelino/awesome-go)

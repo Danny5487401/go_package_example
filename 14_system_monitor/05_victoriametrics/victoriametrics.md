@@ -6,9 +6,13 @@
   - [架构](#%E6%9E%B6%E6%9E%84)
     - [vmui](#vmui)
     - [vmagent](#vmagent)
+      - [流模式和一次性处理模式](#%E6%B5%81%E6%A8%A1%E5%BC%8F%E5%92%8C%E4%B8%80%E6%AC%A1%E6%80%A7%E5%A4%84%E7%90%86%E6%A8%A1%E5%BC%8F)
+      - [FastQueue](#fastqueue)
     - [vmalert](#vmalert)
     - [vminsert](#vminsert)
     - [vmselect](#vmselect)
+      - [Rollup Result Cache](#rollup-result-cache)
+      - [FastCache](#fastcache)
     - [vmstorage](#vmstorage)
   - [特点](#%E7%89%B9%E7%82%B9)
   - [部署](#%E9%83%A8%E7%BD%B2)
@@ -78,6 +82,47 @@ vmagent是一个轻量级工具，用于采集不同源的指标。vmagent可以
 在这种情况下，抓取目标可以在多个 vmagent 实例之间进行拆分。集群中的每个 vmagent 实例必须使用具有不同 -promscrape.cluster.memberNum 值的相同 -promscrape.config 配置文件，该参数值必须在 0 ... N-1 范围内，其中 N 是集群中 vmagent 实例的数量。
 集群中 vmagent 实例的数量必须传递给 -promscrape.cluster.membersCount 命令行标志。
 
+#### 流模式和一次性处理模式
+
+![stream_mode.png](stream_mode.png)
+这两种方式都各有优缺点。对于较小的数据，一次性处理更加高效；
+而对于较大的数据，使用流模式，以64 KB为单位处理数据，对资源来说更加友好。
+```go
+func (sw *scrapeWork) scrapeInternal(scrapeTimestamp, realTimestamp int64) error {
+    // ...
+
+	bodyLen := len(body.B)
+	sw.prevBodyLen = bodyLen
+	scrapeResponseSize.Update(float64(bodyLen))
+
+	/// 判断是否需要流模式
+	if err == nil && sw.needStreamParseMode(bodyLen) {
+		// Process response body from scrape target in streaming manner.
+		// This case is optimized for targets exposing more than ten thousand of metrics per target,
+		// such as kube-state-metrics.
+		err = sw.processDataInStreamMode(scrapeTimestamp, realTimestamp, body, scrapeDurationSeconds)
+	} else {
+		// Process response body from scrape target at once.
+		// This case should work more optimally than stream parse for common case when scrape target exposes
+		// up to a few thousand metrics.
+		err = sw.processDataOneShot(scrapeTimestamp, realTimestamp, body.B, scrapeDurationSeconds, err)
+	}
+
+	leveledbytebufferpool.Put(body)
+
+	<-processScrapedDataConcurrencyLimitCh
+
+	return err
+}
+
+```
+
+默认情况下，当数据超过1MB(-promscrape.minResponseSizeForStreamParse)时，vmagent会自动转换为流模式
+
+
+#### FastQueue
+它是一个混合系统，包含内存队列和基于文件的队列(持久队列)。fast queue用于保存由于远端存储跟不上采样速率而累积的样本。
+
 
 ### vmalert
 
@@ -118,14 +163,93 @@ func (ctx *InsertCtx) GetStorageNodeIdx(at *auth.Token, labels []prompbmarshal.L
 
 ### vmselect 
 
-vmselect：通过从所有配置的 vmstorage 节点获取所需数据来执行查询
+vmselect：通过从所有配置的 vmstorage 节点获取所需数据来执行查询.
+
 
 ```go
+func processBlocks(qt *querytracer.Tracer, sns []*storageNode, denyPartialResponse bool, sq *storage.SearchQuery,
+	processBlock func(mb *storage.MetricBlock, workerID uint) error, deadline searchutil.Deadline,
+) (bool, error) {
+	// Make sure that processBlock is no longer called after the exit from processBlocks() function.
+	// Use per-worker WaitGroup instead of a shared WaitGroup in order to avoid inter-CPU contention,
+	// which may significantly slow down the rate of processBlock calls on multi-CPU systems.
+	type wgStruct struct {
+		// mu prevents from calling processBlock when stop is set to true
+		mu sync.Mutex
+
+		// wg is used for waiting until currently executed processBlock calls are finished.
+		wg sync.WaitGroup
+
+		// stop must be set to true when no more processBlocks calls should be made.
+		stop bool
+	}
+	type wgWithPadding struct {
+		wgStruct
+		// The padding prevents false sharing on widespread platforms with
+		// 128 mod (cache line size) = 0 .
+		_ [128 - unsafe.Sizeof(wgStruct{})%128]byte
+	}
+	wgs := make([]wgWithPadding, len(sns))
+	f := func(mb *storage.MetricBlock, workerID uint) error {
+		muwg := &wgs[workerID]
+		muwg.mu.Lock()
+		if muwg.stop {
+			muwg.mu.Unlock()
+			return nil
+		}
+		muwg.wg.Add(1)
+		muwg.mu.Unlock()
+		err := processBlock(mb, workerID)
+		muwg.wg.Done()
+		return err
+	}
+
+	err := populateSqTenantTokensIfNeeded(sq)
+	if err != nil {
+		return false, err
+	}
+	// 并发向存储节点发送请求
+	snr := startStorageNodesRequest(qt, sns, denyPartialResponse, func(qt *querytracer.Tracer, workerID uint, sn *storageNode) any {
+		// 执行请求
+		if err := execSearchQueryRequest(qt, sq, workerID, sn, f, deadline); err != nil {
+			return err
+		}
+		return nil
+	})
+
+	// Collect results.
+	isPartial, err := snr.collectResults(partialSearchResults, func(result any) error {
+		if result != nil {
+			return result.(error)
+		}
+		return nil
+	})
+	// Make sure that processBlock is no longer called after the exit from processBlocks() function.
+	for i := range wgs {
+		muwg := &wgs[i]
+		muwg.mu.Lock()
+		muwg.stop = true
+		muwg.mu.Unlock()
+	}
+	for i := range wgs {
+		wgs[i].wg.Wait()
+	}
+	if err != nil {
+		return isPartial, fmt.Errorf("cannot fetch query results from vmstorage nodes: %w", err)
+	}
+	return isPartial, nil
+}
+
+```
+
+```go
+// 发送请求
 func startStorageNodesRequest(qt *querytracer.Tracer, sns []*storageNode, denyPartialResponse bool,
 	f func(qt *querytracer.Tracer, workerID uint, sn *storageNode) any,
 ) *storageNodesRequest {
 	resultsCh := make(chan rpcResult, len(sns))
 	qts := make(map[*querytracer.Tracer]string, len(sns))
+	// 遍历存储节点
 	for idx, sn := range sns {
 		// Do not use qt.NewChild.
 		// StorageNodesRequest may be finished before goroutine returns.
@@ -136,6 +260,7 @@ func startStorageNodesRequest(qt *querytracer.Tracer, sns []*storageNode, denyPa
 		qtOrphan := querytracer.NewOrphan(qt, "rpc at vmstorage %s", sn.connPool.Addr())
 		qts[qtOrphan] = sn.connPool.Addr()
 		go func(workerID uint, sn *storageNode) {
+			// 执行搜索返回数据
 			data := f(qtOrphan, workerID, sn)
 			resultsCh <- rpcResult{
 				data:  data,
@@ -154,7 +279,38 @@ func startStorageNodesRequest(qt *querytracer.Tracer, sns []*storageNode, denyPa
 }
 ```
 
+```go
+// execSearchQueryRequest executes processSearchQuery for each searchQuery tenant.
+func execSearchQueryRequest(qt *querytracer.Tracer, sq *storage.SearchQuery, workerID uint, sn *storageNode, f func(mb *storage.MetricBlock, workerID uint) error, deadline searchutil.Deadline) error {
+	var requestData []byte
 
+	for i := range sq.TenantTokens {
+        // 实际调用 storage search_v7 函数
+		if err := sn.processSearchQuery(qtL, requestData, f, workerID, deadline); err != nil {
+            // ...
+		} 
+		// ...
+	}
+
+	return nil
+}
+
+```
+
+#### Rollup Result Cache
+
+在一次时序数据库的查询中，通常会涉及许多时间序列和大量数据点，这些数据点必须先聚合才能展示。Rollup 通常指的是一个按照时间维度聚合好的时间序列，形成一个 Rollup 除了数据点，还需要 Interval 和 Aggregation 方法，例如 sum、max。
+
+在 vmselect 中，Rollup Result 会被缓存到 RollupResultCache 中。以查询时间范围 [a, b] 的 PromQL 为例，如果在 [a+5, b+5] 的时间范围上再次查询相同的 PromQL：
+
+1. RollupResultCache 可以用于填充部分时间范围（[a+5, b]）上的结果；
+2. 时间不重叠的部分（[b+1, b+5]）继续向 vmstorage 查询。
+
+vmselect 会收集、聚合多个 vmstorage 返回的结果，并将结果与 RollupResultCache 进行合并，最终形成新的 Rollup Result 返回，并更新 RollupResultCache。
+
+
+#### FastCache
+如果 vmselect 需要退出，RollupCacheResult 中的热数据会被持久化到磁盘中。代表热数据的 Key-Value 数据结构名叫 FastCache， 
 
 ### vmstorage
 
@@ -176,6 +332,44 @@ func (s *Storage) registerSeriesCardinality(metricID uint64, metricNameRaw []byt
 }
 ```
 
+
+函数处理
+```go
+func (s *Server) processRPC(ctx *vmselectRequestCtx, rpcName string) error {
+	switch rpcName {
+	case "search_v7":
+		// 搜索
+		return s.processSearch(ctx)
+	case "searchMetricNames_v3":
+		return s.processSearchMetricNames(ctx)
+	case "labelValues_v5":
+		return s.processLabelValues(ctx)
+	case "tagValueSuffixes_v4":
+		return s.processTagValueSuffixes(ctx)
+	case "labelNames_v5":
+		return s.processLabelNames(ctx)
+	case "seriesCount_v4":
+		return s.processSeriesCount(ctx)
+	case "tsdbStatus_v6":
+		return s.processTSDBStatus(ctx)
+	case "deleteSeries_v5":
+		return s.processDeleteSeries(ctx)
+	case "registerMetricNames_v3":
+		return s.processRegisterMetricNames(ctx)
+	case "tenants_v1":
+		return s.processTenants(ctx)
+	case "metricNamesUsageStats_v1":
+		return s.processMetricNamesUsageStats(ctx)
+	case "resetMetricNamesStats_v1":
+		return s.processResetMetricUsageStats(ctx)
+	default:
+		return fmt.Errorf("unsupported rpcName: %q", rpcName)
+	}
+}
+```
+
+
+
 ## 特点
 
 - 高基数问题 high cardinality 优化: up to 7x less RAM than Prometheus
@@ -185,7 +379,9 @@ func (s *Storage) registerSeriesCardinality(metricID uint64, metricNameRaw []byt
 
 
 ## 部署
+
 使用 operator 的方式:https://docs.victoriametrics.com/guides/getting-started-with-vm-operator/
+
 ```shell
 helm install victoria-operator vm/victoria-metrics-operator --version 0.47.0
 ```
@@ -569,9 +765,9 @@ spec:
 
 ## 参考
 
+- https://victoriametrics.com/blog/vmstorage-how-indexdb-works/
 - [浅析下开源时序数据库VictoriaMetrics的存储机制](https://zhuanlan.zhihu.com/p/368912946)
 - [一文搞懂 VictoriaMetrics 的使用](https://www.qikqiak.com/post/victoriametrics-usage/)
-- [vmagent如何快速采集和转发Metrics](https://www.cnblogs.com/charlieroro/p/18614022)
+- [vmagent 如何快速采集和转发Metrics](https://www.cnblogs.com/charlieroro/p/18614022)
 - [云原生监控-- VictoriaMetrics -源码解析数据写入过程篇](https://zhuanlan.zhihu.com/p/680593453)
-- https://victoriametrics.com/blog/vmstorage-how-indexdb-works/
 
