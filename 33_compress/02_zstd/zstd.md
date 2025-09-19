@@ -5,7 +5,7 @@
 - [ZSTANDARD（ZSTD）](#zstandardzstd)
   - [第三方实现](#%E7%AC%AC%E4%B8%89%E6%96%B9%E5%AE%9E%E7%8E%B0)
     - [gozstd-->基于cgo的封装](#gozstd--%E5%9F%BA%E4%BA%8Ecgo%E7%9A%84%E5%B0%81%E8%A3%85)
-    - [klauspost/compress/zstd, pure go的实现](#klauspostcompresszstd-pure-go%E7%9A%84%E5%AE%9E%E7%8E%B0)
+    - [klauspost/compress/zstd -->pure go的实现](#klauspostcompresszstd---pure-go%E7%9A%84%E5%AE%9E%E7%8E%B0)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -46,7 +46,7 @@ func CompressLevel(dst, src []byte, compressionLevel int) []byte {
 
 ```
 
-### klauspost/compress/zstd, pure go的实现
+### klauspost/compress/zstd -->pure go的实现
 
 
 

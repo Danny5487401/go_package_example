@@ -2,7 +2,7 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [CI持续集成（Continuous Integration）](#ci%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90continuous-integration)
+- [CI（Continuous Integration 持续集成）](#cicontinuous-integration-%E6%8C%81%E7%BB%AD%E9%9B%86%E6%88%90)
   - [gitlab CI](#gitlab-ci)
     - [Gitlab Runner](#gitlab-runner)
       - [GitLab Runner特点](#gitlab-runner%E7%89%B9%E7%82%B9)
@@ -24,7 +24,7 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# CI持续集成（Continuous Integration）
+# CI（Continuous Integration 持续集成）
 
 持续集成（Continuous Integration）是一种软件开发实践，即团队开发成员经常集成它们的工作，通过每个成员每天至少集成一次，也就意味着每天可能会发生多次集成。
 每次集成都通过自动化的构建（包括编译，发布，自动化测试）来验证，从而尽早地发现集成错误。
