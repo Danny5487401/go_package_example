@@ -212,12 +212,13 @@
   - 跨服务组合tracer代码展示:需开启svc1和svc2两个http服务(url可以是zipkin或则jaeger)
 
 ## [第十一章 依赖注入容器(Dependency Injection Container)](11_dependency_injection/dependency_injection.md)
-- [1 dig依赖注入及http服务分层->不推荐](11_dependency_injection/00_dig/dig.go)
-- 2 wire依赖注入->推荐
+- [1 dig 依赖注入](11_dependency_injection/00_dig/dig.md)
+- [2 wire 依赖注入](11_dependency_injection/01_wire/wire.md)
   - [2.1 不使用wire现状](11_dependency_injection/01_wire/01_without_wire/main.go)
   - [2.2 使用wire优化](11_dependency_injection/01_wire/02_wire)
   - [2.3 wire使用-带err返回](11_dependency_injection/01_wire/03_wire_return_err/wire)
   - [2.4 wire使用-带参数初始化](11_dependency_injection/01_wire/04_wire_pass_params/wire)
+- [3 fx 依赖注入框架](11_dependency_injection/02_fx/fx.md)
 
 
 ## 第十二章 time 时间

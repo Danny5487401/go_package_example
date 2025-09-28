@@ -1,10 +1,11 @@
-//+build wireinject
+//go:build wireinject
+// +build wireinject
 
 // 注意以上需要空一行
 /*
 初始化对象带error返回
 */
-package wire
+package usewire
 
 import (
 	"errors"
@@ -31,7 +32,7 @@ type Event struct {
 	Greeter Greeter // <- adding a Greeter field
 }
 
-//创建消息
+// 创建消息
 func NewMessage() Message {
 	return Message("Hi there!")
 }

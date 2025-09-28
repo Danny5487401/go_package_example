@@ -1,12 +1,15 @@
 package main
 
 import (
+	"bytes"
 	"database/sql"
 	"encoding/json"
-	"net/http"
-
 	_ "github.com/mattn/go-sqlite3"
 	"go.uber.org/dig"
+	"io/fs"
+	"log"
+	"net/http"
+	"os"
 )
 
 /*
@@ -23,7 +26,7 @@ type Person struct {
 }
 
 // 2. 服务器配置
-//Enabled告诉我们我们的应用程序是否应该返回实际数 DatabasePath告诉我们数据库在哪里（我们正在使用sqlite）。Port告诉我们将运行我们的服务器的端口
+// Enabled告诉我们我们的应用程序是否应该返回实际数 DatabasePath告诉我们数据库在哪里（我们正在使用sqlite）。Port告诉我们将运行我们的服务器的端口
 type Config struct {
 	Enabled      bool
 	DatabasePath string
@@ -100,7 +103,7 @@ func NewPersonService(config *Config, repository *PersonRepository) *PersonServi
 	return &PersonService{config: config, repository: repository}
 }
 
-//6. 这是负责运行一个HTTP服务器并委托给我们的合适的请求PersonService
+// 6. 这是负责运行一个HTTP服务器并委托给我们的合适的请求PersonService
 type Server struct {
 	config        *Config
 	personService *PersonService
@@ -140,28 +143,30 @@ func NewServer(config *Config, service *PersonService) *Server {
 }
 
 // 修改前：可怕的初始化
-//func main() {
-//	config := NewConfig()
-//
-//	db, err := ConnectDatabase(config)
-//
-//	if err != nil {
-//		panic(err)
-//	}
-//
-//	personRepository := NewPersonRepository(db)
-//
-//	personService := NewPersonService(config, personRepository)
-//
-//	server := NewServer(config, personService)
-//
-//	server.Run()
-//}
+func withoutDig() {
+	config := NewConfig()
 
-//2。修改后
+	db, err := ConnectDatabase(config)
+
+	if err != nil {
+		panic(err)
+	}
+
+	personRepository := NewPersonRepository(db)
+
+	personService := NewPersonService(config, personRepository)
+
+	server := NewServer(config, personService)
+
+	server.Run()
+}
+
+// 修改后
 func BuildContainer() *dig.Container {
+	// 创建 dig 对象
 	container := dig.New()
 
+	// 利用 Provide 注入依赖
 	container.Provide(NewConfig)
 	container.Provide(ConnectDatabase)
 	container.Provide(NewPersonRepository)
@@ -171,16 +176,31 @@ func BuildContainer() *dig.Container {
 	return container
 }
 
-func main() {
+func useDig() {
 	container := BuildContainer()
 
+	// 依赖可视化
+	b := &bytes.Buffer{}
+	if err := dig.Visualize(container, b); err != nil {
+		log.Fatal(err)
+
+	}
+	_ = os.WriteFile("11_dependency_injection/00_dig/dig.dot", b.Bytes(), fs.ModePerm) // 可以生成图片: dot -T png dig.dot -o dig.dot.png
+
+	// 根据提前注入的依赖来生成对象
 	err := container.Invoke(func(server *Server) {
 		server.Run()
 	})
 
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
+}
+
+func main() {
+
+	//withoutDig()
+	useDig()
 }
 
 /*

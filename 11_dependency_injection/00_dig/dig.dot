@@ -1,0 +1,35 @@
+digraph {
+	rankdir=RL;
+	graph [compound=true];
+	subgraph cluster_0 {
+		label = "main";
+		constructor_0 [shape=plaintext label="NewConfig"];
+		"*main.Config" [label=<*main.Config>];
+	}
+	subgraph cluster_1 {
+		label = "main";
+		constructor_1 [shape=plaintext label="ConnectDatabase"];
+		"*sql.DB" [label=<*sql.DB>];
+	}
+	constructor_1 -> "*main.Config" [ltail=cluster_1];
+	subgraph cluster_2 {
+		label = "main";
+		constructor_2 [shape=plaintext label="NewPersonRepository"];
+		"*main.PersonRepository" [label=<*main.PersonRepository>];
+	}
+	constructor_2 -> "*sql.DB" [ltail=cluster_2];
+	subgraph cluster_3 {
+		label = "main";
+		constructor_3 [shape=plaintext label="NewPersonService"];
+		"*main.PersonService" [label=<*main.PersonService>];
+	}
+	constructor_3 -> "*main.Config" [ltail=cluster_3];
+	constructor_3 -> "*main.PersonRepository" [ltail=cluster_3];
+	subgraph cluster_4 {
+		label = "main";
+		constructor_4 [shape=plaintext label="NewServer"];
+		"*main.Server" [label=<*main.Server>];
+	}
+	constructor_4 -> "*main.Config" [ltail=cluster_4];
+	constructor_4 -> "*main.PersonService" [ltail=cluster_4];
+}

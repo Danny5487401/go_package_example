@@ -1,6 +1,8 @@
 package main
 
-import "github.com/Danny5487401/go_package_example/11_dependency_injection/01_wire/02_wire/wire"
+import (
+	"github.com/Danny5487401/go_package_example/11_dependency_injection/01_wire/02_wire/usewire"
+)
 
 /*
 安装工具go get github.com/google/wire/cmd/wire
@@ -8,7 +10,7 @@ import "github.com/Danny5487401/go_package_example/11_dependency_injection/01_wi
 */
 func main() {
 	// 简单初始化
-	e := wire.InitializeEvent()
+	e := usewire.InitializeEvent()
 
 	e.Start()
 }

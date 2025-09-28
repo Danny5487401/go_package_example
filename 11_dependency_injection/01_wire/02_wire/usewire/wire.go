@@ -1,8 +1,9 @@
-//+build wireinject
+//go:build wireinject
+// +build wireinject
 
 // 注意以上需要空一行
 
-package wire
+package usewire
 
 import (
 	"fmt"
@@ -38,7 +39,7 @@ type Event struct {
 }
 
 // 2.实现各个 Provider
-//创建消息
+// 创建消息
 func NewMessage() Message {
 	return Message("Hi there!")
 }
