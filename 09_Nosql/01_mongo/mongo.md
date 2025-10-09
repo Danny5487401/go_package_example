@@ -38,7 +38,7 @@ mongodb集群搭建有三种方式。
 
 第一种方式基本没什么意义，官方也不推荐这种方式搭建。另外两种分别就是副本集和分片的方式。
 
-###  Replica-Set方式
+### Replica-Set方式
 ![](.mongo_images/replica_set.png)
 
 Mongodb(M)表示主节点Primary server，Mongo db(S)表示备节点Secondary，Mongodb(A)表示仲裁节点arbiter。主备节点存储数据，仲裁节点不存储数据。客户端同时连接主节点与备节点，不连接仲裁节点.
@@ -208,7 +208,12 @@ readPreference 主要控制客户端 Driver 从复制集的哪个节点读取数
 - secondaryPreferred （先从后主）优先从 secondary 读取，没有 secondary 成员时，从 primary 读取
 - nearest （就近）根据网络距离就近读取，根据客户端与服务端的PingTime实现
 
+
+## mongo go driver 
+
+v2 版本说明: https://www.mongodb.com/zh-cn/docs/drivers/go/upcoming/reference/release-notes/#what-s-new-in-2.0
+
 ## 参考资料
-1. [mongo 4.2 官方文档](https://www.mongodb.com/docs/v4.2/introduction/)
+- [mongo 4.2 官方文档](https://www.mongodb.com/docs/v4.2/introduction/)
 
 

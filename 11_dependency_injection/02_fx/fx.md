@@ -11,7 +11,7 @@
 
 # go.uber.org/fx
 
-Fx是Uber开发并开源的Go语言模块组合框架，它提供了一种模块化、插拔、可组合的方式来构建Go应用。
+Fx 是 Uber 开发并开源的Go语言模块组合框架，它提供了一种模块化、插拔、可组合的方式来构建Go应用。
 
 
 ## 源码分析
@@ -107,17 +107,7 @@ func New(opts ...Option) *App {
 	}
 
 	if err := app.root.invokeAll(); err != nil {
-		app.err = err
-
-		if dig.CanVisualizeError(err) {
-			var b bytes.Buffer
-			dig.Visualize(app.container, &b, dig.VisualizeError(err))
-			err = errorWithGraph{
-				graph: b.String(),
-				err:   err,
-			}
-		}
-		errorHandlerList(app.errorHooks).HandleError(err)
+        // 错误处理
 	}
 
 	return app
@@ -126,6 +116,8 @@ func New(opts ...Option) *App {
 ## 生命周期管理
 
 
+
+## modules 模块
 
 ## 参考
 

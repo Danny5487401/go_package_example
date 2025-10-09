@@ -13,7 +13,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/x/bsonx"
 )
 
 /*
@@ -230,18 +229,6 @@ func DeleteData(collection *mongo.Collection) {
 }
 
 func CreateTTLData(collection *mongo.Collection) {
-	//ttl
-	// mongo-go-driver v0.3.0 使用如下代码
 
-	indexModel := mongo.IndexModel{
-		Keys:    bsonx.Doc{{"expire_date", bsonx.Int32(20)}}, // 设置TTL索引列"expire_date"
-		Options: options.Index().SetExpireAfterSeconds(30),   // 设置过期时间1天，即，条目过期一天过自动删除
-	}
-
-	resp, err := collection.Indexes().CreateOne(context.Background(), indexModel) // 创建TTL
-	if err != nil {
-		// 出错处理
-		fmt.Println("创建ttl数据错误", err.Error())
-	}
-	fmt.Println("创建ttl数据结果", resp)
+	// pass
 }

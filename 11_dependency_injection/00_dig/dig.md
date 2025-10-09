@@ -17,6 +17,7 @@
 通过反射的方式来实现运行时的依赖注入.
 
 
+
 ## 源码分析
 
 ### 初始化
@@ -242,13 +243,27 @@ func newConstructorNode(ctor interface{}, s *Scope, origS *Scope, opts construct
 StudentList []*Student `group:"stu"`
 ```
 
-- paramObject 嵌入dig.In的结构体类型.paramObject可以包含 paramSingle和paramGroupedSlice类型
+- paramObject 嵌入dig.In 的结构体类型.paramObject可以包含 paramSingle和paramGroupedSlice类型. 针对函数多个参数,可以使用结构体增加可读性
 
 ```go
-type DBInfo struct {
-    dig.In
-    PrimaryDSN   *DSN `name:"primary"`
-    SecondaryDSN *DSN `name:"secondary"`
+func NewHandler(users *UserGateway, comments *CommentGateway, posts *PostGateway, votes *VoteGateway, authz *AuthZGateway) *Handler {
+  // ...
+}
+```
+配合 dig.In 优化
+```go
+type HandlerParams struct {
+  dig.In
+
+  Users    *UserGateway
+  Comments *CommentGateway
+  Posts    *PostGateway
+  Votes    *VoteGateway
+  AuthZ    *AuthZGateway
+}
+
+func NewHandler(p HandlerParams) *Handler {
+  // ...
 }
 ```
 
