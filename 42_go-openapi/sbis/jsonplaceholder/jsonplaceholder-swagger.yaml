@@ -1,0 +1,105 @@
+# swagger generate client -f sbis/jsonplaceholder/jsonplaceholder-swagger.yaml -t sbis/jsonplaceholder/gen -A jsonplaceholder
+swagger: "2.0"
+
+# For the whole specification of the OpenAPI v2.0 format see:
+# https://swagger.io/docs/specification/2-0/basic-structure/
+
+info:
+  title: JSONPlaceholder partial API
+  description: |
+    Partial implementation of the API of the site:
+    https://jsonplaceholder.typicode.com/
+
+    See also: https://github.com/typicode/jsonplaceholder
+
+    This site offers fixed GET responses and generates fake POST replies
+    to allow testing of REST clients.
+
+    Thank you to typicode (https://github.com/typicode) for this tool.
+
+    This swagger file was built by hand by examining the data from the above site.
+    The main purpose of this file is to demonstrate how to implement a REST client for GET and POST of json payload.
+  version: "0.0"
+
+schemes:
+  - http
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+# A path prefix that is used in front of all the paths in `paths`
+# this server uses no prefix
+basePath: "/"
+
+paths:
+  "/posts":
+    get:
+      description: |
+        Get the list of user posts.
+        Do not confuse the retrieved object (a post) with the HTTP operation used here GET."
+
+      # operationId affect various names in the generated code
+      operationId: "GetPosts"
+
+      # parameters:
+
+      responses:
+        # Normal success case. The site does not document the other cases.
+        '200':
+          description: Returns TODO UPDATE.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/JSONPlaceholderPost'
+
+    post:
+      description: |
+        Post a post object, and see it in the response.
+        You post without a post id, and get an id, 101, in the response.
+        The POST operation is simulated on the server. You cannot retrieve the object you just posted.
+
+      operationId: "PostPost"
+
+      parameters:
+        # The JSONPlaceholder documentation indicate this is a body parameters.
+        - in: body
+          # The name of the body parameter is ignored. It is used for documentation purposes only.
+          name: post-object
+          description: "A new JSONPlaceholderPost to be created."
+          schema:
+            $ref: '#/definitions/NewJSONPlaceholderPost'
+          required: true
+
+      responses:
+        # Normal success case. The site does not document the other cases.
+        '201':
+          description: Returns the object just added plus a ID for it.
+          schema:
+            $ref: '#/definitions/JSONPlaceholderPost'
+
+definitions:
+  JSONPlaceholderPost:
+    description: "A post made by a user."
+    type: object
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      body:
+        type: string
+      userId:
+        type: integer
+  NewJSONPlaceholderPost:
+    description: "Used to create a new post object. Same as JSONPlaceholderPost but without the id attribute."
+    type: object
+    properties:
+      title:
+        type: string
+      body:
+        type: string
+      userId:
+        type: integer
+

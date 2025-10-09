@@ -1,0 +1,293 @@
+# swagger generate server -f nbi/nbi-swagger.yaml -t nbi/gen/server -A openapidemo
+swagger: "2.0"
+
+# For the whole specification of the OpenAPI v2.0 format see:
+# https://swagger.io/docs/specification/2-0/basic-structure/
+
+info:
+  title: OpenApi/Swagger simple demo application
+  description: |
+    A simple application that demonstrates how to generate NBI and SBI(s) using go-swagger.
+  version: "0.0"
+
+schemes:
+  - http
+
+consumes:
+  - application/json
+produces:
+  - application/json
+
+# A path prefix that will be expected in all the URL handled by the application NBI
+basePath: "/openapidemo"
+
+paths:
+  "/host-info":
+    get:
+      description: Return the host name, CPU architecture, OS name, and number of CPUs of the host running this server
+      # operationId affect various names in the generated code
+      operationId: "GetHostInfo"
+
+      # parameters:
+
+      responses:
+        # Normal success case. Other success code 2xx could also be added if needed
+        '200':
+          description: Returns the host name and the number of CPUs of the server host.
+          schema:
+            $ref: '#/definitions/HostInfo'
+
+        # to keep things simple we will only support a server error
+        # It could also be a 4xx if this is deemed to be a user error (e.g. invalid path or data)
+        # The swagger generated code will also add its own errors (e.g. 404)
+        '500':
+          description: Returns a string indicating what went wrong.
+          schema:
+            type: string
+
+  "/phonebook":
+    get:
+      description: Retrieve whole phone book
+        See "/phonebook/{name}" to retrieve an individual entry
+      operationId: "GetPhoneBook"
+
+      responses:
+        # Normal success case.
+        '200':
+          description: Returns an array of PhoneBookEntry.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PhoneBookEntry'
+
+        '500':
+          description: Returns a string indicating what went wrong.
+          schema:
+            type: string
+
+    put:
+      description: Add a phone entry to the phone book
+      operationId: "AddPhoneBookEntry"
+      parameters:
+        # Since our entry is a complex type it has to use the "in: body"
+        # "in: formData" can only be used for primitives (strings, numbers, booleans) or
+        # arrays of primitives (meaning you cannot use a $ref as the items value).
+        - in: body
+          # The name of the body parameter is ignored. It is used for documentation purposes only.
+          name: entry
+          description: "The PhoneBook entry to add to the PhoneBook"
+          schema:
+            $ref: '#/definitions/PhoneBookEntry'
+          required: true
+
+      responses:
+        # Normal success case. Other success code 2xx cold also be added if needed
+        '200':
+          description: "Returns the entry that was added (i.e the data in 'body')."
+          schema:
+            $ref: '#/definitions/PhoneBookEntry'
+
+        # to keep things simple we will only support a server error
+        # It could also be a 4xx if this is deemed to be a user error (e.g. invalid path or data)
+        '500':
+          description: Returns a string indicating what went wrong.
+          schema:
+            type: string
+
+  "/phonebook/{first}/{last}":
+    get:
+      description: Retrieve a single phone book entry
+      operationId: "GetPhoneBookEntry"
+      parameters:
+        - in: path
+          name: first
+          description: "The first name of the entry we want"
+          type: string
+          required: true
+        - in: path
+          name: last
+          description: "The last name of the entry we want"
+          type: string
+          required: true
+
+      responses:
+        # Normal success case.
+        '200':
+          description: Returns a single PhoneBookEntry.
+          schema:
+            $ref: '#/definitions/PhoneBookEntry'
+        '404':
+          description: Returns a string indicating that there is no entry for the first-last.
+          schema:
+            type: string
+        '500':
+          description: Returns a string indicating what went wrong.
+          schema:
+            type: string
+
+
+  "/place-holder-posts":
+    post:
+      description: Post a post object to the placholder service
+      operationId: "AddPostObject"
+      parameters:
+        - in: body
+          name: post
+          description: "The post object to add to the placeholder service"
+          schema:
+            $ref: '#/definitions/NewPostObject'
+          required: true
+
+      responses:
+        '200':
+          description: "Returns the object that was added."
+          schema:
+            $ref: '#/definitions/PostObject'
+
+        '500':
+          description: Returns a string indicating what went wrong.
+          schema:
+            type: string
+
+  "/place-holder-posts/titles":
+    get:
+      description: Retrieve the list of post titles (and id) on the placeholder service
+      operationId: "GetPostTitles"
+
+      responses:
+        '200':
+          description: Returns an array of PostTitle.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PostTitle'
+
+        '500':
+          description: Returns a string indicating what went wrong.
+          schema:
+            type: string
+
+  "/place-holder-posts/byuser/{user}":
+    get:
+      description: Retrieve the list of post made by a specific user on the  placeholder service
+      operationId: "GetPostsByUser"
+      parameters:
+        - in: path
+          name: user
+          description: "The userId of the author of the posts we want"
+          type: integer
+          required: true
+
+      responses:
+        '200':
+          description: Returns an array of UserPost.
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserPost'
+
+        '500':
+          description: Returns a string indicating what went wrong.
+          schema:
+            type: string
+
+definitions:
+  #-------------------------------
+  # HostInfo service
+  #-------------------------------
+  HostInfo:
+    type: object
+    properties:
+      host-name:
+        type: string
+      architecture:
+        type: string
+      os-name:
+        type: string
+      num-cpus:
+        type: integer
+
+
+  #-------------------------------
+  # PhoneBook service
+  #-------------------------------
+  PhoneBookEntry:
+    type: object
+    properties:
+      FirstName:
+        type: string
+      LastName:
+        type: string
+      PhoneNumber:
+        type: string
+      Address:
+        $ref: '#/definitions/AddressEntry'
+
+  AddressEntry:
+    type: object
+    properties:
+      CivicNumber:
+        type: integer
+      Street:
+        type: string
+      City:
+        type: string
+      State:
+        type: string
+      # Depending on country populate the numerical zip or the string post code
+      Zip:
+        type: integer
+      PostalCode:
+        type: string
+
+  #-------------------------------
+  # Json PlaceHolder service
+  #-------------------------------
+  PostObject:
+    # An object similar to the JSONPlaceholderPost in the jsonplaceholder SBI
+    description: "A post made by a user."
+    type: object
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      body:
+        type: string
+      userId:
+        type: integer
+
+  NewPostObject:
+    # An object similar to the NewJSONPlaceholderPost in the jsonplaceholder SBI
+    description: "Used to create a new post object. Same as PostObject but without the id attribute."
+    type: object
+    properties:
+      title:
+        type: string
+      body:
+        type: string
+      userId:
+        type: integer
+
+  PostTitle:
+    description: "An object that is a subset of PostObject. Only the title and Id are returned."
+    type: object
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+
+  UserPost:
+    description: |
+      An object that is a subset of PostObject.
+      It is a PostObject minus the userId since it is already known in the byuser query.
+    type: object
+    properties:
+      id:
+        type: integer
+      title:
+        type: string
+      body:
+        type: string
+
