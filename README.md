@@ -372,7 +372,7 @@
 ## [第三十章 Zookeeper](30_zookeeper/zookeeper.md)
 - [Zab协议(Zookeeper Atomic Broadcast 原子广播协议)](30_zookeeper/zab.md)
 - [1 节点管理](30_zookeeper/01_znode/node.go)
-- [2 基于 zookeer watch 实现注册于发现](30_zookeeper/02_discovery/main.go)
+- [2 基于 zookeeper watch 实现注册于发现](30_zookeeper/02_discovery/main.go)
 
 ## [第三十一章 分布式 Id](31_distributed_Id/distribued_id.md)
 - 1 UUID( Universally Unique Identifier 通用唯一标识码)

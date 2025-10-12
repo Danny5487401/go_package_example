@@ -4,24 +4,24 @@
 
 - [Zookeeper](#zookeeper)
   - [ZooKeeper 基础知识基本分为三大模块](#zookeeper-%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86%E5%9F%BA%E6%9C%AC%E5%88%86%E4%B8%BA%E4%B8%89%E5%A4%A7%E6%A8%A1%E5%9D%97)
-    - [Zookeeper的数据模型](#zookeeper%E7%9A%84%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B)
+    - [Zookeeper 数据模型](#zookeeper-%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B)
       - [1 PERSISTENT（持久节点)](#1-persistent%E6%8C%81%E4%B9%85%E8%8A%82%E7%82%B9)
       - [2 EPHEMERAL](#2-ephemeral)
       - [3 PERSISTENT_SEQUENTIAL](#3-persistent_sequential)
       - [4 EPHEMERAL_SEQUENTIAL](#4-ephemeral_sequential)
-    - [watch](#watch)
-      - [客户端](#%E5%AE%A2%E6%88%B7%E7%AB%AF)
+    - [Watch 监听](#watch-%E7%9B%91%E5%90%AC)
       - [服务端](#%E6%9C%8D%E5%8A%A1%E7%AB%AF)
-    - [ACL](#acl)
+    - [ACL 权限控制](#acl-%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6)
       - [权限模式：Scheme](#%E6%9D%83%E9%99%90%E6%A8%A1%E5%BC%8Fscheme)
       - [授权对象（ID）](#%E6%8E%88%E6%9D%83%E5%AF%B9%E8%B1%A1id)
       - [权限信息（Permission）](#%E6%9D%83%E9%99%90%E4%BF%A1%E6%81%AFpermission)
   - [数据存储底层实现](#%E6%95%B0%E6%8D%AE%E5%AD%98%E5%82%A8%E5%BA%95%E5%B1%82%E5%AE%9E%E7%8E%B0)
     - [数据日志](#%E6%95%B0%E6%8D%AE%E6%97%A5%E5%BF%97)
     - [快照日志](#%E5%BF%AB%E7%85%A7%E6%97%A5%E5%BF%97)
-  - [客户端基本使用](#%E5%AE%A2%E6%88%B7%E7%AB%AF%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
+  - [客户端 cli 基本使用](#%E5%AE%A2%E6%88%B7%E7%AB%AF-cli-%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8)
   - [github.com/go-zookeeper/zk](#githubcomgo-zookeeperzk)
     - [获取数据](#%E8%8E%B7%E5%8F%96%E6%95%B0%E6%8D%AE)
+    - [通信协议](#%E9%80%9A%E4%BF%A1%E5%8D%8F%E8%AE%AE)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -41,9 +41,9 @@ ZooKeeper 是一个分布式的，开放源码的分布式应用程序协调服�
 
 - 数据模型
 - ACL 权限控制
-- Watch 监控
+- Watch 监听
 
-### Zookeeper的数据模型
+### Zookeeper 数据模型
 ![](.zookeeper_images/zookeeper_data_structure.png)
 Zookeeper数据模型的结构与Unix文件系统很类似，整体上可以看作是一颗树，每一个节点称做一个ZNode。
 每一个 Znode 默认能够存储1MB的数据，每个ZNode都可以通过其路径唯一标识。
@@ -105,25 +105,7 @@ numChildren = 0
 * dataLength The length of the data field of this znode.
 * numChildren The number of children of this znode.
 
-### watch
-
-
-#### 客户端
-
-```go
-// 添加 watcher
-func (c *Conn) addWatcher(path string, watchType watchType) <-chan Event {
-	c.watchersLock.Lock()
-	defer c.watchersLock.Unlock()
-
-	ch := make(chan Event, 1)
-	wpt := watchPathType{path, watchType}
-	c.watchers[wpt] = append(c.watchers[wpt], ch)
-	return ch
-}
-
-```
-
+### Watch 监听
 
 #### 服务端
 
@@ -238,7 +220,7 @@ public class DataTree {
 }
 ```
 
-### ACL 
+### ACL 权限控制
 
 一个 ACL 权限设置通常可以分为 3 部分，分别是：权限模式（Scheme）、授权对象（ID）、权限信息（Permission）。最终组成一条例如“scheme:id:permission”格式的 ACL 请求信息。
 
@@ -288,7 +270,7 @@ ZooKeeper 中的数据存储，可以分为两种类型：数据日志文件和�
 存储到本地磁盘中的数据快照文件，是经过 ZooKeeper 序列化后的二进制格式文件，通常我们无法直接查看，但如果想要查看，也可以通过 ZooKeeper 自带的 SnapshotFormatter 类来实现。
 
 
-## 客户端基本使用
+## 客户端 cli 基本使用
 https://zookeeper.apache.org/doc/r3.9.3/zookeeperCLI.html
 
 ```shell
@@ -334,6 +316,53 @@ get /china
 
 ## github.com/go-zookeeper/zk
 
+连接状态
+```go
+const (
+	// StateUnknown means the session state is unknown.
+	StateUnknown           State = -1
+	StateDisconnected      State = 0 // 刚开始未连接
+	StateConnecting        State = 1 // 连接中
+	StateAuthFailed        State = 4  
+	StateConnectedReadOnly State = 5 
+	StateSaslAuthenticated State = 6
+	StateExpired           State = -112
+
+	StateConnected  = State(100)  // 连接成功
+	StateHasSession = State(101)
+)
+
+```
+
+结构体说明
+
+```go
+type Conn struct {
+	lastZxid         int64
+	sessionID        int64
+	state            State // 连接状态
+	xid              uint32
+	sessionTimeoutMs int32 // session timeout in milliseconds
+	passwd           []byte
+
+	dialer         Dialer
+	hostProvider   HostProvider
+	serverMu       sync.Mutex // protects server
+	server         string     // remember the address/port of the current server
+	conn           net.Conn  // 连接
+    eventChan      chan Event // 事件, 包括  EventSession, EventNodeCreated 等事件
+    eventCallback  EventCallback // 事件回掉处理
+
+    // ...
+    sendChan     chan *request // 发送请求
+    requests     map[int32]*request // Xid -> pending request 请求映射关系
+    watchers     map[watchPathType][]chan Event // 记录监听
+}   
+
+
+
+```
+
 
 连接
 ```go
@@ -353,7 +382,7 @@ func Connect(servers []string, sessionTimeout time.Duration, options ...connOpti
 	ec := make(chan Event, eventChanSize)
 	conn := &Conn{
 		dialer:         net.DialTimeout,
-		hostProvider:   NewDNSHostProvider(),
+		hostProvider:   NewDNSHostProvider(), // 默认 dns 解析
 		conn:           nil,
 		state:          StateDisconnected,
 		eventChan:      ec,
@@ -374,6 +403,7 @@ func Connect(servers []string, sessionTimeout time.Duration, options ...connOpti
 		option(conn)
 	}
 
+	// 如果是 dns 解析出 主机信息
 	if err := conn.hostProvider.Init(srvs); err != nil {
 		return nil, nil, err
 	}
@@ -395,6 +425,7 @@ func Connect(servers []string, sessionTimeout time.Duration, options ...connOpti
 
 
 ```go
+// 循环
 func (c *Conn) loop(ctx context.Context) {
 	for {
 		// 创建连接
@@ -402,7 +433,7 @@ func (c *Conn) loop(ctx context.Context) {
 			// c.Close() was called
 			return
 		}
-
+		// 连接建立成功 
 		// 认证
 		err := c.authenticate()
 		switch {
@@ -486,7 +517,143 @@ func (c *Conn) loop(ctx context.Context) {
 	}
 }
 
+
+func (c *Conn) connect() error {
+	var retryStart bool
+	for {
+		c.serverMu.Lock()
+		// 获取主机信息
+		c.server, retryStart = c.hostProvider.Next()
+		c.serverMu.Unlock()
+		
+        // 连接中
+		c.setState(StateConnecting)
+
+		if retryStart { // 从头开始
+			c.flushUnsentRequests(ErrNoServer)
+			select {
+			case <-time.After(time.Second):
+				// pass
+			case <-c.shouldQuit:
+				c.setState(StateDisconnected)
+				c.flushUnsentRequests(ErrClosing)
+				return ErrClosing
+			}
+		}
+        
+		// 建立连接
+		zkConn, err := c.dialer("tcp", c.Server(), c.connectTimeout)
+		if err == nil {
+			c.conn = zkConn
+			c.setState(StateConnected) // 连接成功
+			if c.logInfo {
+				c.logger.Printf("connected to %s", c.Server())
+			}
+			return nil
+		}
+
+		c.logger.Printf("failed to connect to %s: %v", c.Server(), err)
+	}
+}
+
 ```
+
+
+接收 recvLoop 
+
+```go
+func (c *Conn) recvLoop(conn net.Conn) error {
+	sz := bufferSize
+	if c.maxBufferSize > 0 && sz > c.maxBufferSize {
+		sz = c.maxBufferSize
+	}
+	buf := make([]byte, sz)
+	for {
+		// package length
+		if err := conn.SetReadDeadline(time.Now().Add(c.recvTimeout)); err != nil {
+			c.logger.Printf("failed to set connection deadline: %v", err)
+		}
+		_, err := io.ReadFull(conn, buf[:4])
+		if err != nil {
+			return fmt.Errorf("failed to read from connection: %v", err)
+		}
+
+		blen := int(binary.BigEndian.Uint32(buf[:4]))
+		if cap(buf) < blen {
+			if c.maxBufferSize > 0 && blen > c.maxBufferSize {
+				return fmt.Errorf("received packet from server with length %d, which exceeds max buffer size %d", blen, c.maxBufferSize)
+			}
+			buf = make([]byte, blen)
+		}
+
+		_, err = io.ReadFull(conn, buf[:blen])
+		conn.SetReadDeadline(time.Time{})
+		if err != nil {
+			return err
+		}
+
+		res := responseHeader{}
+		_, err = decodePacket(buf[:16], &res)
+		if err != nil {
+			return err
+		}
+
+		if res.Xid == -1 {
+            // 监听事件
+			res := &watcherEvent{}
+			_, err = decodePacket(buf[16:blen], res)
+			if err != nil {
+				return err
+			}
+			ev := Event{
+				Type:  res.Type,
+				State: res.State,
+				Path:  res.Path,
+				Err:   nil,
+			}
+			c.sendEvent(ev)
+			c.notifyWatches(ev)
+		} else if res.Xid == -2 {
+			// Ping response. Ignore.
+		} else if res.Xid < 0 {
+			c.logger.Printf("Xid < 0 (%d) but not ping or watcher event", res.Xid)
+		} else {
+			if res.Zxid > 0 {
+				c.lastZxid = res.Zxid
+			}
+
+			c.requestsLock.Lock()
+			// 根据 xid 匹配请求
+			req, ok := c.requests[res.Xid]
+			if ok {
+				delete(c.requests, res.Xid)
+			}
+			c.requestsLock.Unlock()
+
+			if !ok {
+				c.logger.Printf("Response for unknown request with xid %d", res.Xid)
+			} else {
+				if res.Err != 0 {
+					err = res.Err.toError()
+				} else {
+					// 数据解析到返回结构体中
+					_, err = decodePacket(buf[16:blen], req.recvStruct)
+				}
+                // 额外数据处理, 如添加监听处理
+				if req.recvFunc != nil {
+					req.recvFunc(req, &res, err)
+				}
+				req.recvChan <- response{res.Zxid, err}
+				if req.opcode == opClose {
+					return io.EOF
+				}
+			}
+		}
+	}
+}
+
+```
+
 
 ### 获取数据
 
@@ -498,6 +665,8 @@ func (c *Conn) Get(path string) ([]byte, *Stat, error) {
 	}
 
 	res := &getDataResponse{}
+	
+	// opcode: opGetData 获取数据
 	_, err := c.request(opGetData, &getDataRequest{Path: path, Watch: false}, res, nil)
 	if err == ErrConnectionClosed {
 		return nil, nil, err
@@ -515,6 +684,7 @@ func (c *Conn) GetW(path string) ([]byte, *Stat, <-chan Event, error) {
 	res := &getDataResponse{}
 	_, err := c.request(opGetData, &getDataRequest{Path: path, Watch: true}, res, func(req *request, res *responseHeader, err error) {
 		if err == nil {
+			// 添加监听
 			ech = c.addWatcher(path, watchTypeData)
 		}
 	})
@@ -524,6 +694,136 @@ func (c *Conn) GetW(path string) ([]byte, *Stat, <-chan Event, error) {
 	return res.Data, &res.Stat, ech, err
 }
 ```
+
+```go
+// 添加 watcher
+func (c *Conn) addWatcher(path string, watchType watchType) <-chan Event {
+	c.watchersLock.Lock()
+	defer c.watchersLock.Unlock()
+
+	ch := make(chan Event, 1)
+	wpt := watchPathType{path, watchType}
+	c.watchers[wpt] = append(c.watchers[wpt], ch)
+	return ch
+}
+
+```
+
+
+构建请求
+
+```go
+func (c *Conn) request(opcode int32, req interface{}, res interface{}, recvFunc func(*request, *responseHeader, error)) (int64, error) {
+	recv := c.queueRequest(opcode, req, res, recvFunc)
+	select {
+	case r := <-recv:
+		return r.zxid, r.err
+	case <-c.shouldQuit:
+		// queueRequest() can be racy, double-check for the race here and avoid
+		// a potential data-race. otherwise the client of this func may try to
+		// access `res` fields concurrently w/ the async response processor.
+		// NOTE: callers of this func should check for (at least) ErrConnectionClosed
+		// and avoid accessing fields of the response object if such error is present.
+		return -1, ErrConnectionClosed
+	}
+}
+
+func (c *Conn) queueRequest(opcode int32, req interface{}, res interface{}, recvFunc func(*request, *responseHeader, error)) <-chan response {
+	// 请求
+	rq := &request{
+		xid:        c.nextXid(), // xid 用于记录
+		opcode:     opcode,
+		pkt:        req,
+		recvStruct: res,
+		recvChan:   make(chan response, 2), // 接收数据
+		recvFunc:   recvFunc, // 数据处理函数
+	}
+
+	switch opcode {
+	case opClose:
+		// always attempt to send close ops.
+		select {
+		case c.sendChan <- rq:
+		case <-time.After(c.connectTimeout * 2):
+			c.logger.Printf("gave up trying to send opClose to server")
+			rq.recvChan <- response{-1, ErrConnectionClosed}
+		}
+	default:
+		// otherwise avoid deadlocks for dumb clients who aren't aware that
+		// the ZK connection is closed yet.
+		select {
+		case <-c.shouldQuit:
+			rq.recvChan <- response{-1, ErrConnectionClosed}
+		case c.sendChan <- rq: // 发送数据
+			// check for a tie
+			select {
+			case <-c.shouldQuit:
+				// maybe the caller gets this, maybe not- we tried.
+				rq.recvChan <- response{-1, ErrConnectionClosed}
+			default:
+			}
+		}
+	}
+	return rq.recvChan
+}
+```
+
+### 通信协议
+
+客户端
+```go
+func (c *Conn) sendData(req *request) error {
+	// 头部 两个属性字段分别是 xid 和 type,分别代表客户端序号用于记录客户端请求的发起顺序以及请求操作的类型。
+	header := &requestHeader{req.xid, req.opcode}
+	n, err := encodePacket(c.buf[4:], header)
+	if err != nil {
+		req.recvChan <- response{-1, err}
+		return nil
+	}
+
+	// 请求体
+	n2, err := encodePacket(c.buf[4+n:], req.pkt)
+	if err != nil {
+		req.recvChan <- response{-1, err}
+		return nil
+	}
+
+	n += n2
+
+	binary.BigEndian.PutUint32(c.buf[:4], uint32(n))
+
+	c.requestsLock.Lock()
+	select {
+	case <-c.closeChan:
+		req.recvChan <- response{-1, ErrConnectionClosed}
+		c.requestsLock.Unlock()
+		return ErrConnectionClosed
+	default:
+	}
+	c.requests[req.xid] = req
+	c.requestsLock.Unlock()
+
+	c.conn.SetWriteDeadline(time.Now().Add(c.recvTimeout))
+	_, err = c.conn.Write(c.buf[:n+4])
+	c.conn.SetWriteDeadline(time.Time{})
+	if err != nil {
+		req.recvChan <- response{-1, err}
+		c.conn.Close()
+		return err
+	}
+
+	return nil
+}
+```
+
+节点查询请求体查询
+```go
+type pathWatchRequest struct {
+	Path  string
+	Watch bool
+}
+```
+
 
 
 ## 参考

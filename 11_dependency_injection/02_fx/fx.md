@@ -5,6 +5,7 @@
 - [go.uber.org/fx](#gouberorgfx)
   - [源码分析](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
   - [生命周期管理](#%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F%E7%AE%A1%E7%90%86)
+  - [modules 模块](#modules-%E6%A8%A1%E5%9D%97)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->

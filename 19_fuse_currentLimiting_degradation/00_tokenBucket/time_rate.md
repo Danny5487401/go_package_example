@@ -4,13 +4,13 @@
 
 - [官方扩展库 Token Bucket(令牌桶)限流算法 golang.org/x/time/rate](#%E5%AE%98%E6%96%B9%E6%89%A9%E5%B1%95%E5%BA%93-token-bucket%E4%BB%A4%E7%89%8C%E6%A1%B6%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95-golangorgxtimerate)
   - [适用场景](#%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF)
-  - [golang.org/x/time/rate源码分析](#golangorgxtimerate%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-    - [常量结构](#%E5%B8%B8%E9%87%8F%E7%BB%93%E6%9E%84)
+  - [golang.org/x/time/rate 源码分析](#golangorgxtimerate-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
     - [方法](#%E6%96%B9%E6%B3%95)
-    - [Reservation结构体](#reservation%E7%BB%93%E6%9E%84%E4%BD%93)
-    - [初始化](#%E5%88%9D%E5%A7%8B%E5%8C%96)
-    - [获取](#%E8%8E%B7%E5%8F%96)
+    - [Reservation 结构体](#reservation-%E7%BB%93%E6%9E%84%E4%BD%93)
+    - [创建限流器](#%E5%88%9B%E5%BB%BA%E9%99%90%E6%B5%81%E5%99%A8)
+    - [限流判定](#%E9%99%90%E6%B5%81%E5%88%A4%E5%AE%9A)
     - [CancelAt](#cancelat)
+  - [第三方使用-->cilium](#%E7%AC%AC%E4%B8%89%E6%96%B9%E4%BD%BF%E7%94%A8--cilium)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -23,16 +23,25 @@
 在发生热点时间的时候，会造成大量的用户无法访问，对用户体验的损害比较大。
 
 
-## golang.org/x/time/rate源码分析
+## golang.org/x/time/rate 源码分析
 time/rate包的Limiter类型对限流器进行了定义，所有限流功能都是通过基于Limiter类型实现的
 ```go
+// golang.org/x/time@v0.0.0-20220210224613-90d013bbcef8/rate/rate.go
+
+//定义某个时间的最大频率
+//表示每秒的事件数
+type Limit float64
+
+//Inf表示无速率限制
+const Inf = Limit(math.MaxFloat64)
+
 type Limiter struct {
     mu     sync.Mutex 
-    limit  Limit  
-    burst  int //令牌桶的最大数量， 如果burst为0，则除非limit == Inf，否则不允许处理任何事件
-    tokens float64  //令牌桶中可用的令牌数量
+    limit  Limit   // // 每秒中生产 token 的个数
+    burst  int // 令牌桶的最大数量， 如果burst为0，则除非limit == Inf，否则不允许处理任何事件
+    tokens float64  // 令牌桶中可用的令牌数量
     last time.Time // 上次更新tokens的时间
-    lastEvent time.Time //lastEvent记录速率受限制(桶中没有令牌)的时间点，该时间点可能是过去的，也可能是将来的(Reservation预定的结束时间点)
+    lastEvent time.Time // lastEvent记录速率受限制(桶中没有令牌)的时间点，该时间点可能是过去的，也可能是将来的(Reservation预定的结束时间点)
 
 }
 ```
@@ -52,7 +61,7 @@ Limiter是限流器中最核心的结构体，用于限流(控制事件发生的
 
 
 
-tokens更新的策略：
+tokens 更新的策略：
 
 1. 成功获取到令牌或成功预约(Reserve)到令牌
 
@@ -62,15 +71,7 @@ tokens更新的策略：
 
 4. 重新设置限流器的容量时(SetBurst)
 
-### 常量结构
-```go
-//定义某个时间的最大频率
-//表示每秒的事件数
-type Limit float64
- 
-//Inf表示无速率限制
-const Inf = Limit(math.MaxFloat64)
-```
+
 
 ### 方法
 - Allow： 如果没有令牌，则直接返回false
@@ -79,7 +80,7 @@ const Inf = Limit(math.MaxFloat64)
 
 - Wait：如果没有令牌，则等待直到获取一个令牌或者其上下文被取消。
 
-### Reservation结构体
+### Reservation 结构体
 ```go
 type Reservation struct {
 	ok        bool //到截至时间是否可以获取足够的令牌
@@ -94,17 +95,7 @@ type Reservation struct {
 Reservation可以理解成预定令牌的操作，timeToAct是本次预约需要等待到的指定时间点才有足够预约的令牌。
 
 
-### 初始化
-```go
-// 初始化Limiter，指定每秒允许处理事件的上限为r，允许令牌桶的最大容量为b
-func NewLimiter(r Limit, b int) *Limiter {
-	return &Limiter{
-		limit: r,
-		burst: b,
-	}
-}
-
-```
+### 创建限流器
 ```go
 func Every(interval time.Duration) Limit {
 	if interval <= 0 {
@@ -116,7 +107,24 @@ func Every(interval time.Duration) Limit {
 Every将事件的最小时间间隔转换为限制
 
 
-### 获取
+```go
+// 初始化 Limiter，令牌桶容量为 b。初始化状态下桶是满的，即桶里装有 b 个令牌，以后再以每秒往里面填充 r 个令牌。
+func NewLimiter(r Limit, b int) *Limiter {
+	return &Limiter{
+		limit: r, //  r == Inf 时，此时 b 参数将被忽略
+		burst: b,
+	}
+}
+
+```
+
+
+
+
+### 限流判定
+
+time/rate 库提供了三类方法（其中 AllowN、ReserveN 和 WaitN 允许消费 n 个令牌）：
+
 ```go
 
 func (lim *Limiter) Allow() bool {
@@ -130,6 +138,8 @@ func (lim *Limiter) AllowN(now time.Time, n int) bool {
 }
 ```
 从令牌桶中获取n个令牌，成功获取到则返回true
+
+
 
 ```go
 func (lim *Limiter) Wait(ctx context.Context) (err error) {
@@ -165,13 +175,13 @@ func (lim *Limiter) WaitN(ctx context.Context, n int) (err error) {
 	}
  
 	// Reserve
-	//调用reserveN获取Reversation
+	// 调用reserveN获取Reversation
 	r := lim.reserveN(now, n, waitLimit)
 	if !r.ok { //没有足够的时间获取令牌，则返回error
 		return fmt.Errorf("rate: Wait(n=%d) would exceed context deadline", n)
 	}
 	// Wait if necessary
-	//需要等待的时间
+	// 需要等待的时间
 	delay := r.DelayFrom(now)
 	if delay == 0 {
 		return nil
@@ -201,10 +211,13 @@ WaitN方法获取n个令牌，直到成功获取或者ctx取消
 无论是Wait、Allow或者Reserve其实都会调用advance和reserveN方法，所以这两个方法是整个限流器rate实现的核心。
 
 ```go
+// @param now 当前消费的时间
+// @param n 要消费的 token 数量
+// @param maxFutureReserve 愿意等待的最长时间
 func (lim *Limiter) reserveN(now time.Time, n int, maxFutureReserve time.Duration) Reservation {
 	lim.mu.Lock()
  
-	//如果没有限流则直接返回
+	// 如果没有限流则直接返回
 	if lim.limit == Inf {
 		lim.mu.Unlock()
 		return Reservation{
@@ -215,18 +228,17 @@ func (lim *Limiter) reserveN(now time.Time, n int, maxFutureReserve time.Duratio
 		}
 	}
  
-	//更新令牌桶的状态，tokens为目前可用的令牌数量
+	// 通过 advance 拿到 now 到 lim.last 之间跨度一共可用的 token 数（<= 令牌桶个数）
 	now, last, tokens := lim.advance(now)
  
-	// Calculate the remaining number of tokens resulting from the request.
 	//可用的令牌数tokens减去需要获取的令牌数(n)
 	tokens -= float64(n)
  
-	// Calculate the wait duration
 	//如果tokens小于0，则说明桶中没有足够的令牌，计算出产生这些缺数的令牌需要多久(waitDuration)
 	//计算出产生出缺数的令牌(即-tokens)需要多长时间
 	var waitDuration time.Duration
 	if tokens < 0 {
+		// 计算生成 N 个新的 Token 一共需要的时间
 		waitDuration = lim.limit.durationFromTokens(-tokens)
 	}
  
@@ -245,12 +257,13 @@ func (lim *Limiter) reserveN(now time.Time, n int, maxFutureReserve time.Duratio
 		r.timeToAct = now.Add(waitDuration)  //计算获取到足够令牌的结束时间点
 	}
  
-	// Update state
+	// 更新状态
 	if ok {
 		lim.last = now  //更新tokens的时间
 		lim.tokens = tokens  //更新令牌桶目前可用的令牌数tokens
 		lim.lastEvent = r.timeToAct  //下次事件时间(即获取到足够令牌的时刻)
 	} else {
+        // 不满足，只更新 last，last 的规则在 advance 方法中
 		lim.last = last
 	}
  
@@ -260,24 +273,25 @@ func (lim *Limiter) reserveN(now time.Time, n int, maxFutureReserve time.Duratio
  
 ```
 
+advance 方法：传入参数 now 为当前时间，该方法是获取到 now 为止，可用的 Token 的令牌个数（根据上面两个基础方法计算得到）
 ```go
 func (lim *Limiter) advance(now time.Time) (newNow time.Time, newLast time.Time, newTokens float64) {
-	//last不能在当前时间now之后，否则计算出来的elapsed为负数，会导致令牌桶数量减少
+	// last 代表上一个取的时候的时间
 	last := lim.last
-	if now.Before(last) {
+	if now.Before(last) { //last不能在当前时间now之后，否则计算出来的elapsed为负数，会导致令牌桶数量减少
 		last = now
 	}
  
-	// Avoid making delta overflow below when last is very old.
-	//根据令牌桶的缺数计算出令牌桶未进行更新的最大时间
+	// maxElapsed 表示：将 Token 桶填满需要多久
+    // 为什么要拆分两步做，是为了防止后面的 delta 溢出
+    // 因为默认情况下，last 为 0，此时 delta 算出来的，会非常大
 	maxElapsed := lim.limit.durationFromTokens(float64(lim.burst) - lim.tokens)
 	elapsed := now.Sub(last)  //令牌桶未进行更新的时间段
 	if elapsed > maxElapsed {
 		elapsed = maxElapsed
 	}
  
-	// Calculate the new number of tokens, due to time that passed.
-	//根据未更新的时间(未向桶中加入令牌的时间段)计算出产生的令牌数。
+	// 用于计算给定一段时长 time.Duration，这段时长内一共可以生成多少个令牌 Token
 	delta := lim.limit.tokensFromDuration(elapsed)
 	tokens := lim.tokens + delta  //计算出可用的令牌数
 	if burst := float64(lim.burst); tokens > burst {
@@ -287,7 +301,6 @@ func (lim *Limiter) advance(now time.Time) (newNow time.Time, newLast time.Time,
 	return now, last, tokens
 }
 ```
-advance方法的作用是更新令牌桶的状态，计算出令牌桶未更新的时间(elapsed)，根据elapsed算出需要向桶中加入的令牌数delta，然后算出桶中可用的令牌数newTokens
 
 ### CancelAt
 有用户预约到了一个时间，但是他又取消了
@@ -352,4 +365,186 @@ func (r *Reservation) CancelAt(now time.Time) {
 }
 ```
 
+## 第三方使用-->cilium
+
+api 限流初始化
+```go
+// cilium/pkg/rate/api_limiter.go
+func NewAPILimiter(logger *slog.Logger, name string, p APILimiterParameters, metrics MetricsObserver) *APILimiter {
+	if p.MeanOver == 0 {
+		p.MeanOver = defaultMeanOver
+	}
+
+	if p.MinParallelRequests == 0 {
+		p.MinParallelRequests = 1
+	}
+
+	if p.RateBurst == 0 {
+		p.RateBurst = 1
+	}
+
+	if p.DelayedAdjustmentFactor == 0.0 {
+		p.DelayedAdjustmentFactor = defaultDelayedAdjustmentFactor
+	}
+
+	if p.MaxAdjustmentFactor == 0.0 {
+		p.MaxAdjustmentFactor = defaultMaxAdjustmentFactor
+	}
+
+	l := &APILimiter{
+		logger:                logger,
+		name:                  name,
+		params:                p,
+		parallelRequests:      p.ParallelRequests,
+		parallelWaitSemaphore: semaphore.NewWeighted(waitSemaphoreResolution),
+		metrics:               metrics,
+	}
+
+	if p.RateLimit != 0 {
+		l.limiter = rate.NewLimiter(p.RateLimit, p.RateBurst)
+	}
+
+	return l
+}
+
+```
+
+
+```go
+func (l *APILimiter) wait(ctx context.Context) (req *limitedRequest, err error) {
+	var (
+		limitWaitDuration time.Duration
+		r                 *rate.Reservation
+	)
+
+	req = &limitedRequest{
+		limiter:      l,
+		scheduleTime: time.Now(),
+		uuid:         uuid.New().String(),
+	}
+
+	l.mutex.Lock()
+
+	l.requestsScheduled++
+
+    // ....
+
+	skip := l.params.SkipInitial > 0 && l.requestsScheduled <= int64(l.params.SkipInitial)
+	if skip {
+		scopedLog = scopedLog.With(logSkipped, skip)
+	}
+
+	parallelRequests := l.parallelRequests
+	meanProcessingDuration := l.meanProcessingDuration
+	l.mutex.Unlock()
+
+	if l.params.Log {
+		scopedLog.Info("Processing API request with rate limiter")
+	} else {
+		scopedLog.Debug("Processing API request with rate limiter")
+	}
+
+	if skip {
+		goto skipRateLimiter
+	}
+
+	if parallelRequests > 0 {
+		waitCtx := ctx
+		if l.params.MaxWaitDuration > 0 {
+			ctx2, cancel := context.WithTimeout(ctx, l.params.MaxWaitDuration)
+			defer cancel()
+			waitCtx = ctx2
+		}
+		w := int64(waitSemaphoreResolution / parallelRequests)
+		err2 := l.parallelWaitSemaphore.Acquire(waitCtx, w)
+		if err2 != nil {
+            // ...
+		}
+		req.waitSemaphoreWeight = w
+	}
+	req.waitDuration = time.Since(req.scheduleTime)
+
+	l.mutex.Lock()
+	if l.limiter != nil {
+		// 获取一个请求
+		r = l.limiter.Reserve()
+		// 返回需要等待的时间
+		limitWaitDuration = r.Delay()
+
+		scopedLog = scopedLog.With(
+			logLimit, fmt.Sprintf("%.2f/s", l.limiter.Limit()),
+			logBurst, l.limiter.Burst(),
+			logWaitDurationLimit, limitWaitDuration,
+			logMaxWaitDurationLimiter, l.params.MaxWaitDuration-req.waitDuration,
+		)
+	}
+	l.mutex.Unlock()
+
+	if l.params.MinWaitDuration > 0 && limitWaitDuration < l.params.MinWaitDuration {
+		limitWaitDuration = l.params.MinWaitDuration
+	}
+
+	if (l.params.MaxWaitDuration > 0 && (limitWaitDuration+req.waitDuration) > l.params.MaxWaitDuration) || limitWaitDuration == rate.InfDuration {
+		if l.params.Log {
+			scopedLog.Warn("Not processing API request. Wait duration exceeds maximum")
+		}
+
+		// The rate limiter should only consider a reservation valid if
+		// the request is actually processed. Cancellation of the
+		// reservation should happen before we sleep below.
+		if r != nil {
+			r.Cancel()
+		}
+
+		// Instead of returning immediately, pace the caller by
+		// sleeping for the mean processing duration. This helps
+		// against callers who disrespect 429 error codes and retry
+		// immediately.
+		if meanProcessingDuration > 0.0 {
+			time.Sleep(time.Duration(meanProcessingDuration * float64(time.Second)))
+		}
+
+		req.outcome = outcomeLimitMaxWait
+		err = fmt.Errorf("request would have to wait %v to be served (maximum wait duration: %v)",
+			limitWaitDuration, l.params.MaxWaitDuration-req.waitDuration)
+		return
+	}
+
+	if limitWaitDuration != 0 {
+		select {
+		// 等待 limitWaitDuration 
+		case <-time.After(limitWaitDuration):
+		case <-ctx.Done():
+			if l.params.Log {
+				scopedLog.Warn("Not processing API request due to cancelled context while waiting")
+			}
+			// The rate limiter should only consider a reservation
+			// valid if the request is actually processed.
+			if r != nil {
+				r.Cancel()
+			}
+
+			req.outcome = outcomeReqCancelled
+			err = fmt.Errorf("%w: %w", ErrWaitCancelled, ctx.Err())
+			return
+		}
+	}
+
+	req.waitDuration = time.Since(req.scheduleTime)
+
+skipRateLimiter:
+
+    // 跳过限流
+
+	req.startTime = time.Now()
+	return req, nil
+
+}
+
+```
+
+
+
 ## 参考
+
+- [Golang-time/rate 限速算法实现分析](https://pandaychen.github.io/2020/04/05/GOLANG-X-RATELIMIT-ANALYSIS/)

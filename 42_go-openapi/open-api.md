@@ -133,17 +133,31 @@ paths:
 # ....
 ```
 
-go generate 生成配置
-```go
-// cilium/api/v1/server/configure_cilium_api.go
 
-//go:generate swagger generate server --target ../../v1 --name CiliumAPI --spec ../openapi.yaml --api-package restapi --server-package server --principal interface{} --default-scheme unix
-
+makefile 配置
+```makefile
+# cilium/Makefile
+generate-api: api/v1/openapi.yaml ## Generate cilium-agent client, model and server code from openapi spec.
+	@$(ECHO_GEN)api/v1/openapi.yaml
+	$(QUIET)$(SWAGGER) generate server -s server -a restapi \
+		-t api/v1 \
+		-f api/v1/openapi.yaml \
+		--default-scheme=unix \
+		-C api/v1/cilium-server.yml \
+		-r hack/spdx-copyright-header.txt
+	$(QUIET)$(SWAGGER) generate client -a restapi \
+		-t api/v1 \
+		-f api/v1/openapi.yaml \
+		-C api/v1/cilium-client.yml \
+		-r hack/spdx-copyright-header.txt
+	@# sort goimports automatically
+	$(QUIET)$(GO) run golang.org/x/tools/cmd/goimports -w ./api/v1/client ./api/v1/models ./api/v1/server
 ```
 * --target ../../v1 指定代码输出的 目标目录
 * --name CiliumAPI 名字为 CiliumAPI,不用默认是 info.title
 * --server-package server 使用 server 作为目录,不用默认restapi
 * --default-scheme unix 使用 unix 协议
+* --config-file  api/v1/cilium-server.yml 指定模版配置文件
 
 
 解析配置
