@@ -12,6 +12,7 @@
   - [初始化](#%E5%88%9D%E5%A7%8B%E5%8C%96)
   - [事件](#%E4%BA%8B%E4%BB%B6)
   - [添加文件或则目录监听](#%E6%B7%BB%E5%8A%A0%E6%96%87%E4%BB%B6%E6%88%96%E5%88%99%E7%9B%AE%E5%BD%95%E7%9B%91%E5%90%AC)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -55,7 +56,8 @@ fsnotify 本质上就是对系统能力的一个浅层封装，主要封装了�
 
 这是一个内核用于通知用户空间程序文件系统变化的机制。
 
-其实 inotify 机制的诞生源于一个通用的需求，由于IO/硬件管理都在内核，但用户态是有获悉内核事件的强烈需求，比如磁盘的热插拔，文件的增删改。这里就诞生了三个异曲同工的机制：hotplug 机制、udev 管理机制、inotify 机制.
+其实 inotify 机制的诞生源于一个通用的需求，由于IO/硬件管理都在内核，但用户态是有获悉内核事件的强烈需求，比如磁盘的热插拔，文件的增删改。
+这里就诞生了三个异曲同工的机制：hotplug 机制、udev 管理机制、inotify 机制.
 
 ### inotify 的三个接口
 ```C
@@ -140,7 +142,7 @@ type Watcher struct {
 ```
 
 ## 初始化
-- linux: inoyify.go
+- linux: inotify.go
 - darwin: kqueue.go
 
 ```go
@@ -519,3 +521,5 @@ func InotifyAddWatch(fd int, pathname string, mask uint32) (watchdesc int, err e
 	return
 }
 ```
+
+## 参考

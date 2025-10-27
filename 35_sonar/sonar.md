@@ -224,5 +224,4 @@ golangci-lint run -c .golangci.yaml ./...
 
 
 ## 参考
-1. 官网：https://docs.sonarqube.org/latest/user-guide/concepts/
-2. 服务器搭建：https://icode9.com/content-4-1117481.html
+- https://docs.sonarqube.org/latest/user-guide/concepts/

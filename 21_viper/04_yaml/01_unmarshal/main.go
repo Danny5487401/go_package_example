@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"gopkg.in/yaml.v3"
-	"io/ioutil"
 	"log"
+	"os"
 )
 
 type Users struct {
@@ -16,7 +16,7 @@ type Users struct {
 
 func main() {
 
-	file, err := ioutil.ReadFile("21_viper/04_yaml/test.yaml")
+	file, err := os.ReadFile("21_viper/04_yaml/test.yaml")
 	if err != nil {
 		log.Fatal(err)
 	}

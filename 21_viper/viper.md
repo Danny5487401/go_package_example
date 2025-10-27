@@ -5,6 +5,7 @@
 - [Viper](#viper)
   - [支持](#%E6%94%AF%E6%8C%81)
   - [监听文件变化](#%E7%9B%91%E5%90%AC%E6%96%87%E4%BB%B6%E5%8F%98%E5%8C%96)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -20,7 +21,7 @@ Viper是Go应用程序的完整配置解决方案，包括12-Factor应用程序�
 - 从缓冲区读取
 - 设置显式值
 
-Note: 目前Viper支持的Remote远程读取配置如 etcd, consul；目前还没有对Nacos进行支持，参考第三方https://github.com/yoyofxteam/nacos-viper-remote
+Note: 目前Viper支持的Remote远程读取配置如 etcd, consul；目前还没有对 Nacos 进行支持，参考第三方 https://github.com/yoyofxteam/nacos-viper-remote
 ## 监听文件变化
 ```go
 func (v *Viper) WatchConfig() {
@@ -97,3 +98,6 @@ func (v *Viper) WatchConfig() {
 	initWG.Wait() // make sure that the go routine above fully ended before returning
 }
 ```
+
+
+## 参考

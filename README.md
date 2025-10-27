@@ -50,6 +50,7 @@
   - [第四十四章 godotenv 处理 env 文件-->flannel 中使用](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E5%9B%9B%E7%AB%A0-godotenv-%E5%A4%84%E7%90%86-env-%E6%96%87%E4%BB%B6--flannel-%E4%B8%AD%E4%BD%BF%E7%94%A8)
   - [第四十五章 netlink-->flannel 中使用](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%BA%94%E7%AB%A0-netlink--flannel-%E4%B8%AD%E4%BD%BF%E7%94%A8)
   - [第四十六章 go-bindata-->ecapture嵌入 ebpf 字节码](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E5%85%AD%E7%AB%A0-go-bindata--ecapture%E5%B5%8C%E5%85%A5-ebpf-%E5%AD%97%E8%8A%82%E7%A0%81)
+  - [第四十七章 消息通知](#%E7%AC%AC%E5%9B%9B%E5%8D%81%E4%B8%83%E7%AB%A0-%E6%B6%88%E6%81%AF%E9%80%9A%E7%9F%A5)
   - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
@@ -437,6 +438,11 @@
 ## [第四十五章 netlink-->flannel 中使用](45_netlink/netlink.md)
 
 ## [第四十六章 go-bindata-->ecapture嵌入 ebpf 字节码](46_go_bindata/go-bindata.md)
+
+## 第四十七章 消息通知
+
+- [1 websocket](47_notification/01_websocket/websocket.md)
+- [2 sse](47_notification/02_sse/sse.md)
 
 ## 参考
 - [awesome-go](https://github.com/avelino/awesome-go)
