@@ -3,13 +3,14 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [converter](#converter)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
 # converter 
 
 
-ValueConverter接口定义了如何把一个普通的值转化成driver.Value的接口
+ValueConverter 接口定义了如何把一个普通的值转化成driver.Value的接口
 
 
 ```go
@@ -67,6 +68,7 @@ var _ ValueConverter = boolType{}
 
 func (boolType) String() string { return "Bool" }
 
+// 类型转换
 func (boolType) ConvertValue(src any) (Value, error) {
 	switch s := src.(type) {
 	case bool:
@@ -105,3 +107,5 @@ func (boolType) ConvertValue(src any) (Value, error) {
 }
 
 ```
+
+## 参考

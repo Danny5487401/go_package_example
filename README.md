@@ -122,14 +122,12 @@
   - [4.2 消费者](03_amqp/04_asynq/server)
 
 ## [第四章 服务注册及配置文件中心 Nacos](04_nacos/nacos.md)
-- 1 [获取配置及监听文件变化](04_nacos/config_center/main.go)
-- 2 服务注册，监听，获取
-  - [V1版本](04_nacos/service_center/v1/main.go)
-  - [V2版本](04_nacos/service_center/v2/main.go)
+- [4.1 获取配置及监听文件变化](04_nacos/01_config_center/main.go)
+- 4.2 服务注册，监听，获取
+  - [V2版本](04_nacos/02_service_center/main.go)
 
 ## 第五章 关系型数据库
-- [MySQL的主流驱动 go-mysql-driver插件源码分析](05_rds/go_mysql_driver.md)
-- 1 GORM
+- [1 GORM](05_rds/01_gorm/gorm.md)
   - 1.1 GORM原理及实现
   - 1.2 连接池使用
 - [2 XORM](05_rds/02_xorm/xorm.md)
@@ -141,9 +139,13 @@
     - 原生 sql
     - 获取 retrieve
     - 更新 update
-- 3 database/sql 源码分析
+- 3 database/sql 
   - [3.1 converter 把普通的值转化成 driver.Value的接口](05_rds/03_database_sql/01_converter/converter.md)
 - [4 SQL生成库 Squirrel](05_rds/04_squirrel/quirrel.md)
+- 5 postgresql
+  - [5.1 jackc/pgx](05_rds/05_postgresql/01_pgx/pgx.md) 
+- 6 mysql
+  - [6.1 MySQL的主流驱动 go-mysql-driver插件源码分析](05_rds/06_mysql/go_mysql_driver.md)
 
 ## 第六章 获取对外可用IP和端口
 - [1 通过google, 国内移动、电信和联通通用的DNS获取对外 Ip 和 port ](06_get_available_ip_port/get_ip/outboundIp_test.go)

@@ -7,7 +7,7 @@
     - [反熵传播](#%E5%8F%8D%E7%86%B5%E4%BC%A0%E6%92%AD)
     - [谣言传播](#%E8%B0%A3%E8%A8%80%E4%BC%A0%E6%92%AD)
   - [通信方式](#%E9%80%9A%E4%BF%A1%E6%96%B9%E5%BC%8F)
-    - [Push-based 的 Gossip 协议：](#push-based-%E7%9A%84-gossip-%E5%8D%8F%E8%AE%AE)
+    - [Push-based 的 Gossip 协议](#push-based-%E7%9A%84-gossip-%E5%8D%8F%E8%AE%AE)
     - [Pull-based 的 Gossip 协议，正好相反：](#pull-based-%E7%9A%84-gossip-%E5%8D%8F%E8%AE%AE%E6%AD%A3%E5%A5%BD%E7%9B%B8%E5%8F%8D)
   - [golang 库: github.com/hashicorp/memberlist](#golang-%E5%BA%93-githubcomhashicorpmemberlist)
     - [节点状态分为4种](#%E8%8A%82%E7%82%B9%E7%8A%B6%E6%80%81%E5%88%86%E4%B8%BA4%E7%A7%8D)
@@ -32,6 +32,7 @@ Gossip 协议的消息传播方式主要有两种：Anti-Entropy(反熵传播)�
 ###  反熵传播
 
 ![img.png](Anti-Entropy.png)
+
 定义：反熵（指消除不同节点中数据的差异，提升节点间数据的相似度，降低熵值）。反熵传播：以固定的概率传播所有的数据，可用来避免因为UDP数据包丢失或者新节点的加入而导致的集群元数据不一致问题。
 
 过程：集群中的节点，每隔段时间就随机选择某个其他节点，然后通过互相交换自己的所有数据来消除两者之间的差异，实现数据的最终一致性。
@@ -44,6 +45,7 @@ Gossip 协议的消息传播方式主要有两种：Anti-Entropy(反熵传播)�
 
 ### 谣言传播
 ![img.png](Rumor-Mongering.png)
+
 定义：当一个节点有了新数据后，这个节点变成活跃状态，并周期性地联系其他节点向其发送新数据，直到所有的节点都存储了该新数据。
 
 过程：消息只包含最新 update，谣言消息在某个时间点之后会被标记为 removed，并且不再被传播。
@@ -61,8 +63,9 @@ Gossip 协议最终目的是将数据分发到网络中的每一个节点。根�
 
 Gossip 协议分为 Push-based 和 Pull-based 两种模式，具体工作流程如下：
 
-### Push-based 的 Gossip 协议：
+### Push-based 的 Gossip 协议
 ![img.png](Push-based.png)
+
 - 网络中的某个节点随机选择N个节点作为数据接收对象
 - 该节点向其选中的N个节点传输相应数据
 - 接收到数据的节点对数据进行存储
@@ -198,8 +201,7 @@ func (m *Memberlist) suspectNode(s *suspect) {
 
 消息类型
 ```go
-// WARNING: ONLY APPEND TO THIS LIST! The numeric values are part of the
-// protocol itself.
+
 const (
 	pingMsg messageType = iota
 	indirectPingMsg
@@ -243,7 +245,7 @@ newMemberlist()：初始化 Memberlist 对象，根据配置监听 TCP/UDP 端�
 
 
 ```go
-// /Users/python/go/pkg/mod/github.com/hashicorp/memberlist@v0.3.0/state.go
+// github.com/hashicorp/memberlist@v0.3.0/state.go
 
 // Schedule函数开启probe协程、pushpull协程、gossip协程
 func (m *Memberlist) schedule() {
@@ -364,7 +366,6 @@ func (m *Memberlist) pushPullTrigger(stop <-chan struct{}) {
 }
 
 func (m *Memberlist) pushPull() {
-	// Get a random live node
 	// 随机选择 1 个节点
 	m.nodeLock.RLock()
 	nodes := kRandomNodes(1, m.nodes, func(n *nodeState) bool {
@@ -389,8 +390,7 @@ func (m *Memberlist) pushPull() {
 
 - gossip协程：进行 udp 广播发送消息。
 ```go
-// gossip is invoked every GossipInterval period to broadcast our gossip
-// messages to a few random nodes.
+// 定期 GossipInterval 发送数据给随机节点
 func (m *Memberlist) gossip() {
 	defer metrics.MeasureSince([]string{"memberlist", "gossip"}, time.Now())
 
@@ -430,12 +430,12 @@ func (m *Memberlist) gossip() {
 
 		addr := node.Address()
 		if len(msgs) == 1 {
-			// Send single message as is
+			// 发送单个数据
 			if err := m.rawSendMsgPacket(node.FullAddress(), &node, msgs[0]); err != nil {
 				m.logger.Printf("[ERR] memberlist: Failed to send gossip to %s: %s", addr, err)
 			}
 		} else {
-			// Otherwise create and send a compound message
+			// 消息组合
 			compound := makeCompoundMessage(msgs)
 			if err := m.rawSendMsgPacket(node.FullAddress(), &node, compound.Bytes()); err != nil {
 				m.logger.Printf("[ERR] memberlist: Failed to send gossip to %s: %s", addr, err)
@@ -450,13 +450,8 @@ func (m *Memberlist) gossip() {
 如果要使用 memberlist 的gossip协议，则必须实现该接口。所有这些方法都必须是线程安全的。
 
 ```go
-// Delegate is the interface that clients must implement if they want to hook
-// into the gossip layer of Memberlist. All the methods must be thread-safe,
-// as they can and generally will be called concurrently.
 type Delegate interface {
-	// NodeMeta is used to retrieve meta-data about the current node
-	// when broadcasting an alive message. It's length is limited to
-	// the given byte size. This metadata is available in the Node structure.
+	//  广播 alive message 获取当前节点元数据
 	NodeMeta(limit int) []byte
 
 	// 用于接收用户消息(userMsg)。注意不能阻塞该方法，否则会阻塞整个UDP/TCP报文接收循环。此外由于数据可能在方法调用时被修改，因此应该事先拷贝数据。
@@ -482,11 +477,11 @@ type Delegate interface {
 
 
 ```go
-//使用UDP方式将用户消息传输到给定节点，消息大小受限于memberlist的UDPBufferSize配置。没有使用gossip机制
+// 使用UDP方式将用户消息传输到给定节点，消息大小受限于memberlist的UDPBufferSize配置。没有使用gossip机制
 func (m *Memberlist) SendBestEffort(to *Node, msg []byte) error
-//与SendBestEffort机制相同，只不过一个指定了Node，一个指定了Node地址
+// 与SendBestEffort机制相同，只不过一个指定了Node，一个指定了Node地址
 func (m *Memberlist) SendToAddress(a Address, msg []byte) error
-//使用TCP方式将用户消息传输到给定节点，消息没有大小限制。没有使用gossip机制
+// 使用TCP方式将用户消息传输到给定节点，消息没有大小限制。没有使用gossip机制
 func (m *Memberlist) SendReliable(to *Node, msg []byte) error
 ```
 
@@ -495,22 +490,50 @@ func (m *Memberlist) SendReliable(to *Node, msg []byte) error
 
 ```go
 type EventDelegate interface {
-	// NotifyJoin is invoked when a node is detected to have joined.
-	// The Node argument must not be modified.
+	// 成员加入
 	NotifyJoin(*Node)
 
-	// NotifyLeave is invoked when a node is detected to have left.
-	// The Node argument must not be modified.
+	// 成员离开
 	NotifyLeave(*Node)
 
-	// NotifyUpdate is invoked when a node is detected to have
-	// updated, usually involving the meta data. The Node argument
-	// must not be modified.
+	// 成员更新
 	NotifyUpdate(*Node)
 }
 
 
 ```
+
+实现
+
+```go
+// https://github.com/prometheus/alertmanager/blob/b2a4cacb95dfcf1cc2622c59983de620162f360b/cluster/delegate.go
+
+// NotifyJoin is called if a peer joins the cluster.
+func (d *delegate) NotifyJoin(n *memberlist.Node) {
+	level.Debug(d.logger).Log("received", "NotifyJoin", "node", n.Name, "addr", n.Address())
+	d.Peer.peerJoin(n)
+}
+
+// NotifyLeave is called if a peer leaves the cluster.
+func (d *delegate) NotifyLeave(n *memberlist.Node) {
+	level.Debug(d.logger).Log("received", "NotifyLeave", "node", n.Name, "addr", n.Address())
+	d.Peer.peerLeave(n)
+}
+
+// NotifyUpdate is called if a cluster peer gets updated.
+func (d *delegate) NotifyUpdate(n *memberlist.Node) {
+	level.Debug(d.logger).Log("received", "NotifyUpdate", "node", n.Name, "addr", n.Address())
+	d.Peer.peerUpdate(n)
+}
+
+
+```
+
+join 为例
+
+
+
+
 
 ### MergeDelegate
 在集群执行merge操作时调用。NotifyMerge方法的参数peers提供了对端成员信息。可以不实现该接口。
@@ -558,6 +581,8 @@ type AliveDelegate interface {
 
 ```go
 // https://github.com/prometheus/alertmanager/blob/fad796931b792fc30f35bb18a580ae7323ef0241/cluster/cluster.go
+
+// 创建 peer
 func Create(
 	l log.Logger,
 	reg prometheus.Registerer,
@@ -575,7 +600,6 @@ func Create(
 ) (*Peer, error) {
     // ... 
 
-	// TODO(fabxc): generate human-readable but random names?
 	name, err := ulid.New(ulid.Now(), rand.New(rand.NewSource(time.Now().UnixNano())))
 	if err != nil {
 		return nil, err
@@ -632,6 +656,7 @@ func Create(
 		}
 	}
 
+	// 创建 memberlist 
 	ml, err := memberlist.Create(cfg)
 	if err != nil {
 		return nil, errors.Wrap(err, "create memberlist")
@@ -641,19 +666,74 @@ func Create(
 }
 ```
 
+
+
+alert-manager 实现 delegate 的接口
+
+```go
+func (d *delegate) NotifyMsg(b []byte) {
+    // ...
+
+	var p clusterpb.Part
+	if err := proto.Unmarshal(b, &p); err != nil {
+		level.Warn(d.logger).Log("msg", "decode broadcast", "err", err)
+		return
+	}
+
+	d.mtx.RLock()
+	s, ok := d.states[p.Key]
+	d.mtx.RUnlock()
+
+	if !ok {
+		return
+	}
+	if err := s.Merge(p.Data); err != nil {
+		level.Warn(d.logger).Log("msg", "merge broadcast", "err", err, "key", p.Key)
+		return
+	}
+}
+
+```
+通知log 为例
+```go
+func (l *Log) Merge(b []byte) error {
+	st, err := decodeState(bytes.NewReader(b))
+	if err != nil {
+		return err
+	}
+	l.mtx.Lock()
+	defer l.mtx.Unlock()
+	now := l.now()
+
+	for _, e := range st {
+		if merged := l.st.merge(e, now); merged && !cluster.OversizedMessage(b) {
+			// If this is the first we've seen the message and it's
+			// not oversized, gossip it to other nodes. We don't
+			// propagate oversized messages because they're sent to
+			// all nodes already.
+			l.broadcast(b)
+			l.metrics.propagatedMessagesTotal.Inc()
+			level.Debug(l.logger).Log("msg", "gossiping new entry", "entry", e)
+		}
+	}
+	return nil
+}
+```
 alertmanager通过两种方式发送用户消息，即UDP方式和TCP方式。在alertmanager中，当要发送的数据大于MaxGossipPacketSize/2将采用TCP方式(SendReliable方法)，否则使用UDP方式(Broadcast接口)。
 ```go
 // https://github.com/prometheus/alertmanager/blob/b2a4cacb95dfcf1cc2622c59983de620162f360b/cluster/channel.go
+
 func (c *Channel) Broadcast(b []byte) {
 	b, err := proto.Marshal(&clusterpb.Part{Key: c.key, Data: b})
 	if err != nil {
 		return
 	}
 
-	if OversizedMessage(b) {
+	if OversizedMessage(b) { // 超过 axGossipPacketSize/2 使用 tcp 
 		select {
 		case c.msgc <- b:
 		default:
+			// channel 消息满了 
 			level.Debug(c.logger).Log("msg", "oversized gossip channel full")
 			c.oversizeGossipMessageDroppedTotal.Inc()
 		}
@@ -673,6 +753,5 @@ func OversizedMessage(b []byte) bool {
 
 
 ## 参考
-
 - [数据同步gossip协议原理与应用场景介绍](https://juejin.cn/post/7198212585959096378)
 - [通过memberlist库实现gossip管理集群以及集群数据交互](https://www.cnblogs.com/charlieroro/p/16466547.html)

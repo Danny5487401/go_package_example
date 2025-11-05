@@ -6,7 +6,7 @@
   - [架构](#%E6%9E%B6%E6%9E%84)
   - [操作](#%E6%93%8D%E4%BD%9C)
   - [流程](#%E6%B5%81%E7%A8%8B)
-  - [Alertmanager的配置](#alertmanager%E7%9A%84%E9%85%8D%E7%BD%AE)
+  - [Alertmanager 配置](#alertmanager-%E9%85%8D%E7%BD%AE)
     - [global](#global)
     - [route](#route)
     - [接收人（receivers)](#%E6%8E%A5%E6%94%B6%E4%BA%BAreceivers)
@@ -16,9 +16,9 @@
     - [2. 告警抑制 Inhibition](#2-%E5%91%8A%E8%AD%A6%E6%8A%91%E5%88%B6-inhibition)
     - [3. silences 告警静默](#3-silences-%E5%91%8A%E8%AD%A6%E9%9D%99%E9%BB%98)
   - [核心代码分析](#%E6%A0%B8%E5%BF%83%E4%BB%A3%E7%A0%81%E5%88%86%E6%9E%90)
+    - [API 接收 alert](#api-%E6%8E%A5%E6%94%B6-alert)
     - [Alerts 接口](#alerts-%E6%8E%A5%E5%8F%A3)
-    - [API接收alert](#api%E6%8E%A5%E6%94%B6alert)
-    - [Dispatcher](#dispatcher)
+    - [Dispatcher 告警流程的执行者](#dispatcher-%E5%91%8A%E8%AD%A6%E6%B5%81%E7%A8%8B%E7%9A%84%E6%89%A7%E8%A1%8C%E8%80%85)
   - [高可用](#%E9%AB%98%E5%8F%AF%E7%94%A8)
   - [参考](#%E5%8F%82%E8%80%83)
 
@@ -56,7 +56,7 @@ Alertmanager由以下6部分组成：
 
 
 
-## Alertmanager的配置
+## Alertmanager 配置
 ```yaml
 global:
   resolve_timeout: 5m
@@ -341,6 +341,38 @@ inhibit_rules:
 - Dispatcher
 
 
+
+
+### API 接收 alert
+```go
+func (api *API) postAlertsHandler(params alert_ops.PostAlertsParams) middleware.Responder {
+	logger := api.requestLogger(params.HTTPRequest)
+
+	alerts := OpenAPIAlertsToAlerts(params.Alerts)
+	now := time.Now()
+
+	api.mtx.RLock()
+	resolveTimeout := time.Duration(api.alertmanagerConfig.Global.ResolveTimeout)
+	api.mtx.RUnlock()
+
+    // ...
+	
+	// 放入 alerts 信息
+	if err := api.alerts.Put(validAlerts...); err != nil {
+		level.Error(logger).Log("msg", "Failed to create alerts", "err", err)
+		return alert_ops.NewPostAlertsInternalServerError().WithPayload(err.Error())
+	}
+
+	if validationErrs.Len() > 0 {
+		// 错误返回
+		level.Error(logger).Log("msg", "Failed to validate alerts", "err", validationErrs.Error())
+		return alert_ops.NewPostAlertsBadRequest().WithPayload(validationErrs.Error())
+	}
+
+	return alert_ops.NewPostAlertsOK()
+}
+```
+
 ### Alerts 接口
 ```go
 type Alerts interface {
@@ -443,38 +475,9 @@ func (a *Alerts) Set(alert *types.Alert) error {
 
 ```
 
-### API接收alert
-```go
-func (api *API) postAlertsHandler(params alert_ops.PostAlertsParams) middleware.Responder {
-	logger := api.requestLogger(params.HTTPRequest)
 
-	alerts := OpenAPIAlertsToAlerts(params.Alerts)
-	now := time.Now()
+### Dispatcher 告警流程的执行者
 
-	api.mtx.RLock()
-	resolveTimeout := time.Duration(api.alertmanagerConfig.Global.ResolveTimeout)
-	api.mtx.RUnlock()
-
-    // ...
-	
-	// 放入 alerts 信息
-	if err := api.alerts.Put(validAlerts...); err != nil {
-		level.Error(logger).Log("msg", "Failed to create alerts", "err", err)
-		return alert_ops.NewPostAlertsInternalServerError().WithPayload(err.Error())
-	}
-
-	if validationErrs.Len() > 0 {
-		// 错误返回
-		level.Error(logger).Log("msg", "Failed to validate alerts", "err", validationErrs.Error())
-		return alert_ops.NewPostAlertsBadRequest().WithPayload(validationErrs.Error())
-	}
-
-	return alert_ops.NewPostAlertsOK()
-}
-```
-
-
-### Dispatcher
 ```go
 func (d *Dispatcher) run(it provider.AlertIterator) {
 	cleanup := time.NewTicker(30 * time.Second)
@@ -512,7 +515,7 @@ func (d *Dispatcher) processAlert(alert *types.Alert, route *Route) {
 	defer d.mtx.Unlock()
 
 	routeGroups, ok := d.aggrGroupsPerRoute[route]
-	if !ok {
+	if !ok { // 不存在则创建路由组
 		routeGroups = map[model.Fingerprint]*aggrGroup{}
 		d.aggrGroupsPerRoute[route] = routeGroups
 	}
@@ -544,14 +547,7 @@ func (d *Dispatcher) processAlert(alert *types.Alert, route *Route) {
 		// 告警分发给notify模块
 		_, _, err := d.stage.Exec(ctx, d.logger, alerts...)
 		if err != nil {
-			lvl := level.Error(d.logger)
-			if ctx.Err() == context.Canceled {
-				// It is expected for the context to be canceled on
-				// configuration reload or shutdown. In this case, the
-				// message should only be logged at the debug level.
-				lvl = level.Debug(d.logger)
-			}
-			lvl.Log("msg", "Notify for alerts failed", "num_alerts", len(alerts), "err", err)
+            // ...
 		}
 		return err == nil
 	})
@@ -589,7 +585,8 @@ func (pb *PipelineBuilder) New(
 	peer Peer,
 ) RoutingStage {
 	rs := make(RoutingStage, len(receivers))
-
+	    
+	// GossipSettle是第一个阶段, 主要作用就是执行 n.peer.WaitReady方法，这个方法与alertmanager的高可用有关
 	ms := NewGossipSettleStage(peer)
 	is := NewMuteStage(inhibitor)
 	ss := NewMuteStage(silencer)
@@ -684,22 +681,26 @@ func (ms MultiStage) Exec(ctx context.Context, l log.Logger, alerts ...*types.Al
 ```
 
 ## 高可用
-
+![gossip_alert_manager.png](gossip_alert_manager.png)
 因为AlertManager并非是无状态的，它有如下两个关键信息需要同步：
 
 1. 告警静默规则：当存在多个AlertManager实例时，用户依然只会向其中一个实例发起请求，对静默规则进行增删。但是对于静默规则的应用显然应当是全局的，因此各个实例应当广播各自的静默规则，直到全局一致。
-2. Notification Log：既然要保证高可用，即确保告警实例不丢失，而AlertManager实例又是将告警保存在各自的内存中的，因此Prometheus显然不应该在多个AlertManager实例之间做负载均衡而是应该将告警发往所有的AlertManager实例。但是对于同一个Alert Group的通知则只能由一个AlertManager发送，因此我们也应该把Notification Log在全集群范围内进行同步
+2. Notification Log：既然要保证高可用，即确保告警实例不丢失，而AlertManager实例又是将告警保存在各自的内存中的，因此Prometheus显然不应该在多个AlertManager实例之间做负载均衡而是应该将告警发往所有的AlertManager实例。但是对于同一个Alert Group的通知则只能由一个AlertManager发送，因此我们也应该把Notification Log在全集群范围内进行同步.
 
-Notification Log的同步并没有静默规则这么容易。我们可以假设如下场景：由于高可用的要求，Prometheus会向每个AlertManager发送告警实例。如果该告警实例不属于任何之前已有的Alert Group，则会新建一个Group并最终创建一个相应的Notification Log。而Notification Log是在通知完成之后创建的，所以在这种情况下，针对同一个告警发送了多次通知。
+Notification Log的同步并没有静默规则这么容易。
+我们可以假设如下场景：由于高可用的要求，Prometheus会向每个AlertManager发送告警实例。如果该告警实例不属于任何之前已有的Alert Group，则会新建一个Group并最终创建一个相应的Notification Log。
+而Notification Log是在通知完成之后创建的，所以在这种情况下，针对同一个告警发送了多次通知。
 
-为了避免这种情况的发生，社区给出的解决方案是错开各个AlertManager发送通知的时间。如上文的整体架构图所示，Notification Pipeline在进行去重之前其实还有一个Wait阶段。该阶段会将对于告警的通知处理暂停一段时间，不同的AlertManager实例等待的时间会因为该实例在整个集群中的位置有所不同。根据实例名进行排序，排名每靠后一位，默认多等待15秒。
+为了避免这种情况的发生，社区给出的解决方案是错开各个AlertManager发送通知的时间。如上文的整体架构图所示，Notification Pipeline在进行去重之前其实还有一个Wait阶段。
+该阶段会将对于告警的通知处理暂停一段时间，不同的AlertManager实例等待的时间会因为该实例在整个集群中的位置有所不同。根据实例名进行排序，排名每靠后一位，默认多等待15秒。
 
 假设集群中有两个AlertManager实例，排名靠前的实例为A0，排名靠后的实例为A1，此时对于上述问题的处理如下：
 
 1. 假设两个AlertManager同时收到告警实例并同时到达Notification Pipeline的Wait阶段。在该阶段A0无需等待而A1需要等待15秒。
 2. A0直接发送通知，生成相应的Notification Log并广播
 3. A1等待15秒之后进入去重阶段，但是由于已经同步到A0广播的Notification Log，通知不再发送
-   可以看到，Gossip协议事实上是一个弱一致性的协议，上述的机制能在绝大多数情况下保证AlertManager集群的高可用并且避免实例间同步的不及时对用户造成的困扰
+
+可以看到，Gossip协议事实上是一个弱一致性的协议，上述的机制能在绝大多数情况下保证AlertManager集群的高可用并且避免实例间同步的不及时对用户造成的困扰
 
 
 

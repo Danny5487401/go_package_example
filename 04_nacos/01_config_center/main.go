@@ -3,33 +3,30 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/Danny5487401/go_package_example/04_nacos/01_config_center/config"
 	"time"
 
-	"github.com/Danny5487401/go_package_example/04_nacos/config_center/config"
-
-	"github.com/nacos-group/nacos-sdk-go/clients"
-	"github.com/nacos-group/nacos-sdk-go/common/constant"
-	"github.com/nacos-group/nacos-sdk-go/vo"
+	"github.com/nacos-group/nacos-sdk-go/v2/clients"
+	"github.com/nacos-group/nacos-sdk-go/v2/common/constant"
+	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 )
 
 func main() {
 	// 1.服务端信息 ，至少一个
 	serverConfigs := []constant.ServerConfig{
 		{
-			IpAddr: "tencent.danny.games",
+			IpAddr: "127.0.0.1",
 			Port:   8848,
 		},
 	}
 	// 2.客户端信息
 	clientConfig := constant.ClientConfig{
-		NamespaceId:         "84f5c407-5661-4306-abda-b51a9f02fba1", //we can retrieve multiple clients with different namespaceId to support multiple namespace.When namespace is public, fill in the blank string here.
+		NamespaceId:         "0f83848b-3ce7-41f6-bd45-f21145bbd44a", // we can retrieve multiple clients with different namespaceId to support multiple namespace.When namespace is public, fill in the blank string here.
 		TimeoutMs:           5000,
 		NotLoadCacheAtStart: true,
-		LogDir:              "tmp/nacos/log",   //当前项目目录
-		CacheDir:            "tmp/nacos/cache", // 当下次请求不到，可以从缓冲中获取
-		RotateTime:          "1h",
-		MaxAge:              3,
-		LogLevel:            "debug",
+		//LogDir:              "tmp/nacos/log",   // 当前项目目录
+		//CacheDir:            "tmp/nacos/cache", // 当下次请求不到，可以从缓冲中获取
+		LogLevel: "debug",
 	}
 
 	//  3.创建动态配置客户端
@@ -51,8 +48,6 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(content) // yaml格式的字符串
-	// go语言本身直接json字符串反射成struct
 
 	// 映射成struct
 	srvCfg := config.ServerConfig{}
@@ -75,5 +70,5 @@ func main() {
 	}); err != nil {
 		panic(err)
 	}
-	time.Sleep(time.Second * 3000)
+	time.Sleep(time.Second * 30)
 }

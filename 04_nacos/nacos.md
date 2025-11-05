@@ -2,13 +2,14 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Nacos](#nacos)
-  - [nacos版本](#nacos%E7%89%88%E6%9C%AC)
+- [Nacos (Dynamic Naming and Configuration Service )](#nacos-dynamic-naming-and-configuration-service-)
+  - [架构](#%E6%9E%B6%E6%9E%84)
+  - [nacos 版本](#nacos-%E7%89%88%E6%9C%AC)
   - [关键特性](#%E5%85%B3%E9%94%AE%E7%89%B9%E6%80%A7)
-  - [Nacos概念](#nacos%E6%A6%82%E5%BF%B5)
+  - [Nacos 概念](#nacos-%E6%A6%82%E5%BF%B5)
     - [命名空间](#%E5%91%BD%E5%90%8D%E7%A9%BA%E9%97%B4)
     - [1. 配置管理](#1-%E9%85%8D%E7%BD%AE%E7%AE%A1%E7%90%86)
-      - [配置集 ID](#%E9%85%8D%E7%BD%AE%E9%9B%86-id)
+      - [Data ID](#data-id)
     - [2. 服务管理](#2-%E6%9C%8D%E5%8A%A1%E7%AE%A1%E7%90%86)
       - [元信息](#%E5%85%83%E4%BF%A1%E6%81%AF)
       - [服务分组](#%E6%9C%8D%E5%8A%A1%E5%88%86%E7%BB%84)
@@ -19,14 +20,24 @@
     - [数据模型](#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B)
     - [服务领域模型](#%E6%9C%8D%E5%8A%A1%E9%A2%86%E5%9F%9F%E6%A8%A1%E5%9E%8B)
     - [配置领域模型](#%E9%85%8D%E7%BD%AE%E9%A2%86%E5%9F%9F%E6%A8%A1%E5%9E%8B)
-  - [go-nacos源码分析](#go-nacos%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [环境初始化](#%E7%8E%AF%E5%A2%83%E5%88%9D%E5%A7%8B%E5%8C%96)
+  - [golang sdk: go-nacos](#golang-sdk-go-nacos)
+    - [配置说明](#%E9%85%8D%E7%BD%AE%E8%AF%B4%E6%98%8E)
+    - [配置客户端](#%E9%85%8D%E7%BD%AE%E5%AE%A2%E6%88%B7%E7%AB%AF)
+    - [服务发现客户端](#%E6%9C%8D%E5%8A%A1%E5%8F%91%E7%8E%B0%E5%AE%A2%E6%88%B7%E7%AB%AF)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# Nacos
-官方参考文档： https://nacos.io/zh-cn/docs/2.0.0-compatibility.html
+# Nacos (Dynamic Naming and Configuration Service )
+Nacos 是阿里巴巴推出来的一个开源项目，这是一个易于构建 AI Agent 应用的动态服务发现、配置管理和AI智能体管理平台。
+
+
+## 架构
 ![](.nacos_images/nacos_structure.png)
+
 ![](.nacos_images/nacos_logic_structure.png)
+
 - 服务管理：实现服务CRUD，域名CRUD，服务健康状态检查，服务权重管理等功能
 - 配置管理：实现配置管CRUD，版本管理，灰度管理，监听管理，推送轨迹，聚合数据等功能
 - 元数据管理：提供元数据CURD 和打标能力
@@ -57,11 +68,18 @@
 - Agent：dns-f类似模式，或者与mesh等方案集成
 - CLI：命令行对产品进行轻量化管理，像git一样好用
 
-Nacos 是阿里巴巴推出来的一个新开源项目，这是一个更易于构建云原生应用的动态服务发现、配置管理和服务管理平台。
 
-## nacos版本
+
+## nacos 版本
+![nacos_route.png](.nacos_images/nacos_route.png)
+
 ![](.nacos_images/nacos2.png)
-Nacos2.0版本相比1.X新增了gRPC的通信方式，因此需要增加2个端口。新增端口是在配置的主端口(server.port)基础上，进行一定偏移量自动生成。
+
+在nacos 1.X的版本中使用http方式来做服务注册和发现，配置主端口(默认8848)；
+在2.0版本支持了grpc 服务发现：9848 是客户端gRPC请求服务端端口，用于客户端向服务端发起连接和请求9849是服务端gRPC请求服务端端口，用于服务间同步等
+
+
+Nacos 3.0 最主要的能力就是作为MCP Registry，支持了MCP服务的注册，管理，和发现的能力。
 
 ## 关键特性
 1. 服务发现和服务健康监测
@@ -94,35 +112,43 @@ Nacos2.0版本相比1.X新增了gRPC的通信方式，因此需要增加2个端�
     Nacos 能让您从微服务平台建设的视角管理数据中心的所有服务及元数据，包括管理服务的描述、生命周期、服务的静态依赖分析、服务的健康状态、服务的流量管理、路由及安全策略、服务的 SLA 以及最首要的 metrics 统计数据。
 
 
-## Nacos概念
+## Nacos 概念
 
 ### 命名空间
-用于进行租户粒度的配置隔离。不同的命名空间下，可以存在相同的 Group 或 Data ID 的配置。Namespace 的常用场景之一是不同环境的配置的区分隔离，例如开发测试环境和生产环境的资源（如配置、服务）隔离等
+用于进行租户粒度的配置隔离。不同的命名空间下，可以存在相同的 Group 或 Data ID 的配置。
+Namespace 的常用场景之一是不同环境的配置的区分隔离，例如开发测试环境和生产环境的资源（如配置、服务）隔离等
 
 ### 1. 配置管理
-#### 配置集 ID
+
+#### Data ID
 Nacos 中的某个配置集的 ID。配置集 ID 是组织划分配置的维度之一。
 Data ID 通常用于组织划分系统的配置集。一个系统或者应用可以包含多个配置集，每个配置集都可以被一个有意义的名称标识。
 Data ID 通常采用类 Java 包（如 com.taobao.tc.refund.log.level）的命名规则保证全局唯一性
+
 ### 2. 服务管理
+
 #### 元信息
 Nacos数据（如配置和服务）描述信息，如服务版本、权重、容灾策略、负载均衡策略、鉴权配置、各种自定义标签 (label)，从作用范围来看，分为服务级别的元信息、集群的元信息及实例的元信息。
+
 #### 服务分组
 不同的服务可以归类到同一分组。
+
 #### 实例
 提供一个或多个服务的具有可访问网络地址（IP:Port）的进程。
+
 #### 权重
 实例级别的配置。权重为浮点数。权重越大，分配给该实例的流量越大。
 
 #### 健康保护阈值
-为了防止因过多实例 (Instance) 不健康导致流量全部流向健康实例 (Instance) ，继而造成流量压力把健康实例 (Instance) 压垮并形成雪崩效应，应将健康保护阈值定义为一个 0 到 1 之间的浮点数。当域名健康实例数 (Instance) 占总服务实例数 (Instance) 的比例小于该值时，无论实例 (Instance) 是否健康，都会将这个实例 (Instance) 返回给客户端。这样做虽然损失了一部分流量，但是保证了集群中剩余健康实例 (Instance) 能正常工作
+为了防止因过多实例 (Instance) 不健康导致流量全部流向健康实例 (Instance) ，继而造成流量压力把健康实例 (Instance) 压垮并形成雪崩效应，应将健康保护阈值定义为一个 0 到 1 之间的浮点数。
+当域名健康实例数 (Instance) 占总服务实例数 (Instance) 的比例小于该值时，无论实例 (Instance) 是否健康，都会将这个实例 (Instance) 返回给客户端。这样做虽然损失了一部分流量，但是保证了集群中剩余健康实例 (Instance) 能正常工作
 
 ## 领域模型
 
 ### 数据模型
 ![](.nacos_images/nacos_data_model.png)
-Nacos 数据模型 Key 由三元组唯一确定, Namespace默认是空串，公共命名空间（public），分组默认是 DEFAULT_GROUP
 
+Nacos 数据模型 由三元组唯一确定, 分别是命名空间（Namespace），分组（Group）和资源名；其中 资源名按照功能模块的不同，可以分为服务名（ServiceName），配置名（DataId）和MCP服务（McpName）
 ### 服务领域模型
 ![](.nacos_images/service_domain_model.png)
 
@@ -131,12 +157,31 @@ Nacos 数据模型 Key 由三元组唯一确定, Namespace默认是空串，公�
 围绕配置，主要有两个关联的实体，一个是配置变更历史，一个是服务标签（用于打标分类，方便索引），由 ID 关联。
 
 
-## go-nacos源码分析
+## 环境初始化
+
+docker 方式: https://nacos.io/docs/v3.0/quickstart/quick-start-docker/
+```shell
+docker run --rm --name nacos-standalone-derby \
+    -e MODE=standalone \
+    -e NACOS_AUTH_TOKEN=SecretKey012345678901234567890123456789012345678901234567890123456789 \
+    -e NACOS_AUTH_IDENTITY_KEY=serverIdentity \
+    -e NACOS_AUTH_IDENTITY_VALUE=security \
+    -p 8080:8080 \
+    -p 8848:8848 \
+    -p 9848:9848 \
+    nacos/nacos-server:v3.1.0
+```
+
+
+## golang sdk: go-nacos 
+https://nacos.io/docs/v3.0/manual/user/go-sdk/usage/
+
 应用配置管理（Application Configuration Management，简称 ACM）
 
 企业级分布式应用服务（Enterprise Distributed Application Service,简称EDAS）
 
-客户端配置
+### 配置说明 
+配置 Nacos 客户端的选项
 ```go
 constant.ClientConfig{
 	TimeoutMs            uint64 // 请求Nacos服务端的超时时间，默认是10000ms
@@ -169,3 +214,39 @@ constant.ServerConfig{
 }
 ```
 Note：我们可以配置多个ServerConfig，客户端会对这些服务端做轮询请求
+
+
+### 配置客户端
+
+```go
+// github.com/nacos-group/nacos-sdk-go/v2@v2.0.1/clients/client_factory.go
+
+
+func CreateConfigClient(properties map[string]interface{}) (iClient config_client.IConfigClient, err error) {
+	param := getConfigParam(properties)
+	return NewConfigClient(param)
+}
+
+```
+
+### 服务发现客户端
+
+```go
+func NewNamingClient(param vo.NacosClientParam) (iClient naming_client.INamingClient, err error) {
+	nacosClient, err := setConfig(param)
+	if err != nil {
+		return
+	}
+	naming, err := naming_client.NewNamingClient(nacosClient)
+	if err != nil {
+		return
+	}
+	iClient = naming
+	return
+}
+
+```
+
+## 参考
+- https://github.com/alibaba/nacos
+- https://nacos.io/docs/v3.0/overview/

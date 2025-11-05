@@ -2,16 +2,16 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [xorm源码分析](#xorm%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+- [xorm](#xorm)
   - [初始化](#%E5%88%9D%E5%A7%8B%E5%8C%96)
   - [设置最大空闲idle连接数和和最大连接数](#%E8%AE%BE%E7%BD%AE%E6%9C%80%E5%A4%A7%E7%A9%BA%E9%97%B2idle%E8%BF%9E%E6%8E%A5%E6%95%B0%E5%92%8C%E5%92%8C%E6%9C%80%E5%A4%A7%E8%BF%9E%E6%8E%A5%E6%95%B0)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# xorm源码分析
+# xorm 
 
 ## 初始化
-
 
 集群结构体
 ```go
@@ -504,3 +504,7 @@ func (db *DB) SetMaxOpenConns(n int) {
 	}
 }
 ```
+
+## 参考
+
+- https://xorm.io/docs/chapter-01/readme/

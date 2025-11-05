@@ -26,13 +26,13 @@ import (
 	"github.com/nacos-group/nacos-sdk-go/v2/util"
 	"github.com/nacos-group/nacos-sdk-go/v2/vo"
 
-	"github.com/Danny5487401/go_package_example/04_nacos/service_center/v2/server"
+	"github.com/Danny5487401/go_package_example/04_nacos/02_service_center/server"
 )
 
 func main() {
 	//create ServerConfig
 	sc := []constant.ServerConfig{
-		*constant.NewServerConfig("tencent.danny.games", 8848, constant.WithContextPath("/nacos")),
+		*constant.NewServerConfig("127.0.0.1", 8848, constant.WithContextPath("/nacos")),
 	}
 
 	//create ClientConfig
@@ -42,8 +42,6 @@ func main() {
 		constant.WithNotLoadCacheAtStart(true),
 		constant.WithLogDir("/tmp/nacos/log"),
 		constant.WithCacheDir("/tmp/nacos/cache"),
-		constant.WithRotateTime("1h"),
-		constant.WithMaxAge(3),
 		constant.WithLogLevel("debug"),
 	)
 
