@@ -19,7 +19,7 @@
       - [代码实现](#%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0)
       - [优点](#%E4%BC%98%E7%82%B9-1)
       - [缺点](#%E7%BC%BA%E7%82%B9-1)
-    - [3. 漏桶（Leaky Bucket）](#3-%E6%BC%8F%E6%A1%B6leaky-bucket)
+    - [3. 漏桶( Leaky Bucket）](#3-%E6%BC%8F%E6%A1%B6-leaky-bucket)
       - [工作原理](#%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86-1)
       - [优点](#%E4%BC%98%E7%82%B9-2)
       - [缺点](#%E7%BC%BA%E7%82%B9-2)
@@ -50,7 +50,6 @@
 - 同步等待：资源隔离、MQ解耦、不可用服务调用快速失败等。资源隔离通常指不同服务调用采用不同的线程池；不可用服务调用快速失败一般通过熔断器模式结合超时机制实现
 
 
-
 ## 业务限频 和 服务限频
 业务限频则是动态的uid、ip、cookie值、甚至地区等，服务限频只能起到保证整体的后端服务可用，不能防止恶意用户刷频，比如某接口限频100次/分钟，用户A访问刷频了99次，那么其他所有用户该分钟內只能访问1次了，
 
@@ -69,7 +68,6 @@
 
 
 ![](.rate_limit_images/hystrix_vs_sentinel.png)
-
 
 ### 1. 计数器
 
@@ -303,7 +301,8 @@ func (h *PeriodLimit) calcExpireSeconds() int {
 - 空间占用：随着窗口粒度的细化，需要存储的数据结构（如队列或哈希表）所占用的内存空间也会相应增大。特别是在高并发和长时间跨度的情况下，可能需要更大的内存来支持多窗口的计数。
 - 处理突发流量局限性：虽然相比固定窗口有所改善，但如果突发流量非常猛烈且持续时间超过一个窗口的长度，滑动窗口限流仍可能无法完全消除流量尖峰对系统的影响。
 
-### 3. 漏桶（Leaky Bucket）
+### 3. 漏桶( Leaky Bucket）
+
 ![](.rate_limit_images/leaky_bucket.png)
 
 基于漏桶（Leaky Bucket）的限流算法是一种在网络传输和系统资源管理中广泛应用的流量整形和控制技术。
@@ -363,7 +362,7 @@ func (h *PeriodLimit) calcExpireSeconds() int {
 
 ## 参考
 
+- https://konghq.com/blog/engineering/how-to-design-a-scalable-rate-limiting-algorithm
 - [常见限流算法及其实现](https://developer.aliyun.com/article/1451838)
 - [对限频限流的思考](http://thomaslau.xyz/2020/05/10/2020-05-10-on_ratelimiter/)
-- https://konghq.com/blog/engineering/how-to-design-a-scalable-rate-limiting-algorithm 
 - [Sentinel 与 Hystrix 的对比](https://github.com/alibaba/Sentinel/wiki/Sentinel-%E4%B8%8E-Hystrix-%E7%9A%84%E5%AF%B9%E6%AF%94)

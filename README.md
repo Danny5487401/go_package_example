@@ -19,7 +19,7 @@
   - [第十三章 序列化反序列化-涉及多种协议](#%E7%AC%AC%E5%8D%81%E4%B8%89%E7%AB%A0-%E5%BA%8F%E5%88%97%E5%8C%96%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96-%E6%B6%89%E5%8F%8A%E5%A4%9A%E7%A7%8D%E5%8D%8F%E8%AE%AE)
   - [第十四章 系统监控](#%E7%AC%AC%E5%8D%81%E5%9B%9B%E7%AB%A0-%E7%B3%BB%E7%BB%9F%E7%9B%91%E6%8E%A7)
   - [第十五章 分布式事务](#%E7%AC%AC%E5%8D%81%E4%BA%94%E7%AB%A0-%E5%88%86%E5%B8%83%E5%BC%8F%E4%BA%8B%E5%8A%A1)
-  - [第十六章 copier(不同类型数据复制)](#%E7%AC%AC%E5%8D%81%E5%85%AD%E7%AB%A0-copier%E4%B8%8D%E5%90%8C%E7%B1%BB%E5%9E%8B%E6%95%B0%E6%8D%AE%E5%A4%8D%E5%88%B6)
+  - [第十六章 copier 复制数据](#%E7%AC%AC%E5%8D%81%E5%85%AD%E7%AB%A0-copier-%E5%A4%8D%E5%88%B6%E6%95%B0%E6%8D%AE)
   - [第十七章 数据加解密](#%E7%AC%AC%E5%8D%81%E4%B8%83%E7%AB%A0-%E6%95%B0%E6%8D%AE%E5%8A%A0%E8%A7%A3%E5%AF%86)
   - [第十八章 日志收集项目 log_collect](#%E7%AC%AC%E5%8D%81%E5%85%AB%E7%AB%A0-%E6%97%A5%E5%BF%97%E6%94%B6%E9%9B%86%E9%A1%B9%E7%9B%AE-log_collect)
   - [第十九章 熔断,限流及降级](#%E7%AC%AC%E5%8D%81%E4%B9%9D%E7%AB%A0-%E7%86%94%E6%96%AD%E9%99%90%E6%B5%81%E5%8F%8A%E9%99%8D%E7%BA%A7)
@@ -288,7 +288,11 @@
 - [3 TCC事务](15_distributed_transaction/03_tcc/tcc.md)
 - [4 etcd的STM](15_distributed_transaction/04_stm/stm.md)
 
-## [第十六章 copier(不同类型数据复制)](16_dataCopy/copier.md)
+## [第十六章 copier 复制数据](16_dataCopy/copier.md)
+- [1 基本使用](16_dataCopy/01_basic/main.go)
+- [2 方法赋值: 目标对象中的一些字段，源对象中没有，但是源对象有目标对象字段同名的方法](16_dataCopy/02_method_from/main.go)
+- [3 调用目标方法: 目标对象中的一些字段，源对象中没有，但是目标对象有一个源对象字段同名的方法](16_dataCopy/03_method_to/main.go)
+- [4 切片拷贝](16_dataCopy/04_copy_slice/main.go)
 
 ## 第十七章 数据加解密
 - 1 phpserialize(不推荐)
@@ -299,8 +303,8 @@
 
 ## [第十九章 熔断,限流及降级](19_fuse_currentLimiting_degradation/rate_limit.md)
 - [0 令牌桶官方包 x/time/rate](19_fuse_currentLimiting_degradation/00_tokenBucket/time_rate.md)
-- 1 Sentinel-->滑动窗口
-  - 1.1 基于流量QPS控制
+- [1 Sentinel-->滑动窗口](19_fuse_currentLimiting_degradation/01_sentinel/sentinel.md)
+  - 1.1 基于流量 QPS 控制
     - [流量控制器的Token计算策略:direct](19_fuse_currentLimiting_degradation/01_sentinel/01_flow/direct/main.go)
     - [流量控制器的Token计算策略:warmUp](19_fuse_currentLimiting_degradation/01_sentinel/01_flow/warm_up/main.go)
   - 1.2 熔断

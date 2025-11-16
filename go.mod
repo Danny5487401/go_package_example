@@ -113,7 +113,7 @@ require (
 	go.opentelemetry.io/otel/trace v1.38.0
 	go.uber.org/dig v1.19.0
 	go.uber.org/fx v1.24.0
-	go.uber.org/ratelimit v0.0.0-20180316092928-c15da0234277
+	go.uber.org/ratelimit v0.3.1
 	go.uber.org/zap v1.27.0
 	golang.org/x/net v0.44.0
 	golang.org/x/sys v0.36.0
@@ -139,6 +139,7 @@ require (
 	github.com/antlr/antlr4 v0.0.0-20210105192202-5c2b686f95e1 // indirect
 	github.com/armon/go-metrics v0.4.0 // indirect
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2 // indirect
+	github.com/benbjohnson/clock v1.3.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bitly/go-simplejson v0.5.0 // indirect
 	github.com/boltdb/bolt v1.3.1 // indirect

@@ -2,47 +2,67 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [copier源码分析](#copier%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
-  - [静态参数](#%E9%9D%99%E6%80%81%E5%8F%82%E6%95%B0)
+- [jinzhu/copier](#jinzhucopier)
+  - [功能](#%E5%8A%9F%E8%83%BD)
+  - [选项](#%E9%80%89%E9%A1%B9)
   - [整体设计思路](#%E6%95%B4%E4%BD%93%E8%AE%BE%E8%AE%A1%E6%80%9D%E8%B7%AF)
   - [辅助方法说明](#%E8%BE%85%E5%8A%A9%E6%96%B9%E6%B3%95%E8%AF%B4%E6%98%8E)
-    - [1.获取实际的Type和Value](#1%E8%8E%B7%E5%8F%96%E5%AE%9E%E9%99%85%E7%9A%84type%E5%92%8Cvalue)
-    - [2.Tag处理](#2tag%E5%A4%84%E7%90%86)
+    - [1. 获取实际的Type和Value](#1-%E8%8E%B7%E5%8F%96%E5%AE%9E%E9%99%85%E7%9A%84type%E5%92%8Cvalue)
+    - [2. Tag 处理](#2-tag-%E5%A4%84%E7%90%86)
   - [copy主方法copier(toValue, fromValue, opt)说明](#copy%E4%B8%BB%E6%96%B9%E6%B3%95copiertovalue-fromvalue-opt%E8%AF%B4%E6%98%8E)
     - [参数说明](#%E5%8F%82%E6%95%B0%E8%AF%B4%E6%98%8E)
     - [两个类型都是map的处理](#%E4%B8%A4%E4%B8%AA%E7%B1%BB%E5%9E%8B%E9%83%BD%E6%98%AFmap%E7%9A%84%E5%A4%84%E7%90%86)
     - [只有一个类型是结构体的处理](#%E5%8F%AA%E6%9C%89%E4%B8%80%E4%B8%AA%E7%B1%BB%E5%9E%8B%E6%98%AF%E7%BB%93%E6%9E%84%E4%BD%93%E7%9A%84%E5%A4%84%E7%90%86)
     - [判断数组设置标识](#%E5%88%A4%E6%96%AD%E6%95%B0%E7%BB%84%E8%AE%BE%E7%BD%AE%E6%A0%87%E8%AF%86)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# copier源码分析
+# jinzhu/copier
 
-## 静态参数
+当处理复杂的数据结构或嵌套结构时，手动复制数据可能会是一个繁琐且容易出错的任务。
+
+## 功能
+
+- 从相同名称的字段复制到字段
+- 从具有相同名称的方法复制到字段
+- 从字段复制到具有相同名称的方法
+- 从切片复制到切片
+- 从结构体复制到切片
+- 从 map 复制到 map
+- 强制复制带有标记的字段
+- 忽略带有标记的字段
+- 深度复制
+
+
+## 选项
+
 ```go
-// These flags define options for tag handling
-const (
-	//结构体中标注了“must”标签的字段，必须被复制值，否则视为error
-	tagMust uint8 = 1 << iota
+type Option struct {
+	// 忽略空值
+	IgnoreEmpty bool
+	DeepCopy    bool
+	Converters  []TypeConverter
+}
 
-	// 和tagMust配套使用，如果设置标签“nopanic”，则如果不满足must的条件，不直接报错，而是返回error代替
-	tagNoPanic
-
-	// 标签为“-”,设置该标签的字段直接忽略复制
-	tagIgnore
-
-	// 这个不是标签标识，而是字段复制的标识，在结构体复制结束之后，设置flag为已经复制.依据这个字段来判断是否复制成功
-	hasCopied
-)
 ```
+
 
 ## 整体设计思路
 
-1.不可寻址和Invalid的数据直接报错或者返回
+```go
+// github.com/jinzhu/copier@v0.3.5/copier.go
 
-2.判断两个数据结构是不是map，进行map的处理
+func copier(toValue interface{}, fromValue interface{}, opt Option) (err error) {
+	// ....
+}
+```
 
-3.数组与结构体的处理，按照类型进行数据遍历
+1. 不可寻址和Invalid的数据直接报错或者返回
+
+2. 判断两个数据结构是不是map，进行map的处理
+
+3. 数组与结构体的处理，按照类型进行数据遍历
 
 - 1. 循环所有字段，解析tag
 
@@ -57,18 +77,20 @@ const (
 - 6. 循环所有标签，判断不满足“must”标签的情况，进行相应处理
 
 ## 辅助方法说明
-### 1.获取实际的Type和Value
+
+### 1. 获取实际的Type和Value
 在go中，如果一个参数是 *Struct类型的，也就是指针类型，当用这个方法去调用方法获取结构体属性的时候会报错，
 比如我这边通过一个指针类型去调用FieldByName方法，就会出现下面的错误：
-```go
+```shell
 --- FAIL: TestIndirect (0.00s)
 panic: reflect: FieldByName of non-struct type [recovered]
 	panic: reflect: FieldByName of non-struct type
 ```
 在Go当中，如果是指针类型，可以通过【.Elem】方法获取对应的实际值。所以这边需要两个方法：
 
-    1、通过type判断是否指针类型，返回具体的结构体类型
-    2、通过value判断是否指针类型，发挥具体的结构体数据
+1、 通过type判断是否指针类型，返回具体的结构体类型
+
+2、 通过value判断是否指针类型，返回具体的结构体数据
 ```go
 
 func indirect(reflectValue reflect.Value) reflect.Value {
@@ -85,7 +107,48 @@ func indirectType(reflectType reflect.Type) reflect.Type {
 	return reflectType
 
 ```
-### 2.Tag处理
+### 2. Tag 处理
+
+```go
+// tag 标签处理
+const (
+	//结构体中标注了“must”标签的字段，必须被复制值，否则视为error
+	tagMust uint8 = 1 << iota
+
+	// 和tagMust配套使用，如果设置标签“nopanic”，则如果不满足must的条件，不直接报错，而是返回error代替
+	tagNoPanic
+
+	// 标签为“-”,设置该标签的字段直接忽略复制
+	tagIgnore
+
+	// 这个不是标签标识，而是字段复制的标识，在结构体复制结束之后，设置flag为已经复制.依据这个字段来判断是否复制成功
+	hasCopied
+)
+
+
+// 解析 tags 
+func parseTags(tag string) (flg uint8, name string, err error) {
+	for _, t := range strings.Split(tag, ",") {
+		switch t {
+		case "-":
+			flg = tagIgnore
+			return
+		case "must":
+			flg = flg | tagMust
+		case "nopanic":
+			flg = flg | tagNoPanic
+		default:
+			if unicode.IsUpper([]rune(t)[0]) {
+				name = strings.TrimSpace(t)
+			} else {
+				err = errors.New("copier field name tag must be start upper case")
+			}
+		}
+	}
+	return
+}
+```
+
 1. 解析tag字符串
 ```go
 // parseTags Parses struct tags and returns uint8 bit flags.
@@ -290,7 +353,7 @@ func set(to, from reflect.Value) bool {
 	}
 ```
 ### 只有一个类型是结构体的处理
-    如果被复制的结构或者复制的结构有一个不是struct，则直接返回，不进行处理
+如果被复制的结构或者复制的结构有一个不是struct，则直接返回，不进行处理
 ```go
 	if fromType.Kind() != reflect.Struct || toType.Kind() != reflect.Struct {
 		// skip not supported type
@@ -537,3 +600,8 @@ func set(to, from reflect.Value) bool {
     //read note 这边是不是会有一个问题，就是err是不是会被覆盖，前面的字段有错误，最后一个没有错误则会覆盖之前的error
 		err = checkBitFlags(tagBitFlags)
 ```
+
+
+## 参考
+
+- [Go每日一库之20：copier](https://juejin.cn/post/7289256102766755859)

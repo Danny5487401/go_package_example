@@ -1,10 +1,11 @@
 package main
 
-// 发送简单消息
+// 发送普通消息
 
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"strconv"
 
@@ -13,16 +14,19 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/producer"
 )
 
-// Package main implements a simple producer to send message.
 func main() {
 
+	srvs := []string{"http://rocketmq-nameserver.rocketmq:9876"}
 	// 生成生产者对象
-	p, _ := rocketmq.NewProducer(
-		// broker环境注意是外网，broker.conf：brokerIP1=服务器外网IP
-		producer.WithNameServer([]string{"106.14.35.115:9876"}),
+	p, err := rocketmq.NewProducer(
+		// 这里使用域名解析
+		producer.WithNsResolver(primitive.NewPassthroughResolver(srvs)),
 		producer.WithRetry(2),
 	)
-	err := p.Start()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = p.Start()
 	if err != nil {
 		fmt.Printf("start producer error: %s", err.Error())
 		os.Exit(1)

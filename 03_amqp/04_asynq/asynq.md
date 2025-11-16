@@ -11,6 +11,7 @@
     - [状态转移](#%E7%8A%B6%E6%80%81%E8%BD%AC%E7%A7%BB)
     - [处理](#%E5%A4%84%E7%90%86)
       - [ProcessTask处理函数查找：type与方法的匹配-->参考go官方的http server的路由匹配](#processtask%E5%A4%84%E7%90%86%E5%87%BD%E6%95%B0%E6%9F%A5%E6%89%BEtype%E4%B8%8E%E6%96%B9%E6%B3%95%E7%9A%84%E5%8C%B9%E9%85%8D--%E5%8F%82%E8%80%83go%E5%AE%98%E6%96%B9%E7%9A%84http-server%E7%9A%84%E8%B7%AF%E7%94%B1%E5%8C%B9%E9%85%8D)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -290,3 +291,5 @@ func (mux *ServeMux) Handler(t *Task) (h Handler, pattern string) {
 	return h, pattern
 }
 ```
+
+## 参考

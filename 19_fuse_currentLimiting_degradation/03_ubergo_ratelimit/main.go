@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	rl := ratelimit.New(100) // per second
+	rl := ratelimit.New(100, ratelimit.WithoutSlack) // 给定限流器每秒可以通过 100 个请求，也就是平均每个请求间隔 10ms
 
 	prev := time.Now()
 	for i := 0; i < 10; i++ {

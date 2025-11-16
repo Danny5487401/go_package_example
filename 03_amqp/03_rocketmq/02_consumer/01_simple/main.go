@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"time"
 
@@ -12,13 +13,17 @@ import (
 )
 
 func main() {
-	c, _ := rocketmq.NewPushConsumer(
+	srvs := []string{"http://rocketmq-nameserver.rocketmq:9876"}
+	topic := "rocketmq_topic"
+	c, err := rocketmq.NewPushConsumer(
 		// 消费组名称
 		consumer.WithGroupName("go_testGroup"),
-		consumer.WithNsResolver(primitive.NewPassthroughResolver([]string{"106.14.35.115:9876"})),
+		consumer.WithNsResolver(primitive.NewPassthroughResolver(srvs)),
 	)
-	topic := "rocketmq_topic"
-	err := c.Subscribe(topic, consumer.MessageSelector{}, func(ctx context.Context,
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = c.Subscribe(topic, consumer.MessageSelector{}, func(ctx context.Context,
 		msgs ...*primitive.MessageExt) (consumer.ConsumeResult, error) {
 		for i := range msgs {
 			fmt.Printf("subscribe callback: %v \n", msgs[i])
@@ -35,7 +40,7 @@ func main() {
 		fmt.Println(err.Error())
 		os.Exit(-1)
 	}
-	time.Sleep(time.Hour)
+	time.Sleep(time.Minute)
 	err = c.Shutdown()
 	if err != nil {
 		fmt.Printf("shutdown Consumer error: %s", err.Error())

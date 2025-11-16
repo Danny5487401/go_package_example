@@ -19,6 +19,7 @@
   - [Go-hystrix源码](#go-hystrix%E6%BA%90%E7%A0%81)
     - [流量控制](#%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6)
     - [流量控制上报状态](#%E6%B5%81%E9%87%8F%E6%8E%A7%E5%88%B6%E4%B8%8A%E6%8A%A5%E7%8A%B6%E6%80%81)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -590,3 +591,8 @@ func (p *executorPool) ActiveCount() int {
     return p.Max - len(p.Tickets)
 }
 ```
+
+
+## 参考
+
+

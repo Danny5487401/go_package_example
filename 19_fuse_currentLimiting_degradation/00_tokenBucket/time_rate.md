@@ -2,9 +2,9 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [官方扩展库 Token Bucket(令牌桶)限流算法 golang.org/x/time/rate](#%E5%AE%98%E6%96%B9%E6%89%A9%E5%B1%95%E5%BA%93-token-bucket%E4%BB%A4%E7%89%8C%E6%A1%B6%E9%99%90%E6%B5%81%E7%AE%97%E6%B3%95-golangorgxtimerate)
+- [golang.org/x/time/rate](#golangorgxtimerate)
   - [适用场景](#%E9%80%82%E7%94%A8%E5%9C%BA%E6%99%AF)
-  - [golang.org/x/time/rate 源码分析](#golangorgxtimerate-%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
+  - [源码分析](#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90)
     - [方法](#%E6%96%B9%E6%B3%95)
     - [Reservation 结构体](#reservation-%E7%BB%93%E6%9E%84%E4%BD%93)
     - [创建限流器](#%E5%88%9B%E5%BB%BA%E9%99%90%E6%B5%81%E5%99%A8)
@@ -15,15 +15,16 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# 官方扩展库 Token Bucket(令牌桶)限流算法 golang.org/x/time/rate
-该限流器也是基于 Token Bucket(令牌桶) 实现的
+# golang.org/x/time/rate
+
+官方扩展库 Token Bucket(令牌桶)限流器基于 Token Bucket(令牌桶) 实现的
 
 ## 适用场景
 适合电商抢购或者微博出现热点事件这种场景，因为在限流的同时可以应对一定的突发流量。如果采用漏桶那样的均匀速度处理请求的算法，
 在发生热点时间的时候，会造成大量的用户无法访问，对用户体验的损害比较大。
 
 
-## golang.org/x/time/rate 源码分析
+## 源码分析
 time/rate包的Limiter类型对限流器进行了定义，所有限流功能都是通过基于Limiter类型实现的
 ```go
 // golang.org/x/time@v0.0.0-20220210224613-90d013bbcef8/rate/rate.go
@@ -542,7 +543,6 @@ skipRateLimiter:
 }
 
 ```
-
 
 
 ## 参考
