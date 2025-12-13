@@ -80,17 +80,20 @@ func NewWithConfig(ctx context.Context, config *Config) (*Pool, error) {
 					connConfig.ConnectTimeout = 2 * time.Minute
 				}
 
+				// 连接前
 				if p.beforeConnect != nil {
 					if err := p.beforeConnect(ctx, connConfig); err != nil {
 						return nil, err
 					}
 				}
 
+				// 实际建立连接
 				conn, err := pgx.ConnectConfig(ctx, connConfig)
 				if err != nil {
 					return nil, err
 				}
 
+				// 连接后
 				if p.afterConnect != nil {
 					err = p.afterConnect(ctx, conn)
 					if err != nil {
@@ -140,6 +143,92 @@ func NewWithConfig(ctx context.Context, config *Config) (*Pool, error) {
 	}()
 
 	return p, nil
+}
+```
+
+
+```go
+// ithub.com/jackc/pgx/v5@v5.7.6/pgxpool/pool.go
+
+func (p *Pool) createIdleResources(parentCtx context.Context, targetResources int) error {
+	ctx, cancel := context.WithCancel(parentCtx)
+	defer cancel()
+
+	errs := make(chan error, targetResources)
+
+	for i := 0; i < targetResources; i++ {
+		go func() {
+			// 创建资源
+			err := p.p.CreateResource(ctx)
+			// Ignore ErrNotAvailable since it means that the pool has become full since we started creating resource.
+			if err == puddle.ErrNotAvailable {
+				err = nil
+			}
+			errs <- err
+		}()
+	}
+
+	var firstError error
+	for i := 0; i < targetResources; i++ {
+		err := <-errs
+		if err != nil && firstError == nil {
+			cancel()
+			firstError = err
+		}
+	}
+
+	return firstError
+}
+```
+
+```go
+// github.com/jackc/puddle/v2@v2.2.2/pool.go
+
+func (p *Pool[T]) CreateResource(ctx context.Context) error {
+    // 校验 ...
+
+	res := p.createNewResource()
+	p.mux.Unlock()
+
+	// 调用初始化方法
+	value, err := p.constructor(ctx)
+	p.mux.Lock()
+	defer p.mux.Unlock()
+	defer p.acquireSem.Release(1)
+	if err != nil {
+		p.allResources.remove(res)
+		p.destructWG.Done()
+		return err
+	}
+
+	res.value = value
+	res.status = resourceStatusIdle
+
+	// If closed while constructing resource then destroy it and return an error
+	if p.closed {
+		go p.destructResourceValue(res.value)
+		return ErrClosedPool
+	}
+
+	p.idleResources.Push(res)
+
+	return nil
+}
+
+
+func (p *Pool[T]) createNewResource() *Resource[T] {
+	res := &Resource[T]{
+		pool:           p,
+		creationTime:   time.Now(),
+		lastUsedNano:   nanotime(),
+		poolResetCount: p.resetCount,
+		status:         resourceStatusConstructing,
+	}
+
+	p.allResources.append(res)
+	p.destructWG.Add(1)
+
+	return res
 }
 ```
 

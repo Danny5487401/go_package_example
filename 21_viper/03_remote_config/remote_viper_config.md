@@ -2,72 +2,28 @@
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
-- [Viper远程配置](#viper%E8%BF%9C%E7%A8%8B%E9%85%8D%E7%BD%AE)
+- [Viper 远程配置](#viper-%E8%BF%9C%E7%A8%8B%E9%85%8D%E7%BD%AE)
   - [默认支持的插件](#%E9%BB%98%E8%AE%A4%E6%94%AF%E6%8C%81%E7%9A%84%E6%8F%92%E4%BB%B6)
-  - [viper结构](#viper%E7%BB%93%E6%9E%84)
-  - [需要实现的RemoteProvider接口](#%E9%9C%80%E8%A6%81%E5%AE%9E%E7%8E%B0%E7%9A%84remoteprovider%E6%8E%A5%E5%8F%A3)
-    - [nacos-viper插件中实现](#nacos-viper%E6%8F%92%E4%BB%B6%E4%B8%AD%E5%AE%9E%E7%8E%B0)
+  - [RemoteProvider 接口](#remoteprovider-%E6%8E%A5%E5%8F%A3)
+    - [nacos-viper 插件](#nacos-viper-%E6%8F%92%E4%BB%B6)
   - [加载远程配置](#%E5%8A%A0%E8%BD%BD%E8%BF%9C%E7%A8%8B%E9%85%8D%E7%BD%AE)
+  - [参考](#%E5%8F%82%E8%80%83)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-# Viper远程配置
+# Viper 远程配置
 
 ## 默认支持的插件
 ```go
-// /Users/xiaxin/go/pkg/mod/github.com/spf13/viper@v1.8.1/viper.go
-// SupportedRemoteProviders are universally supported remote providers.
+// github.com/spf13/viper@v1.8.1/viper.go
+
+// 默认支持的远程插件
 var SupportedRemoteProviders = []string{"etcd", "consul", "firestore"}
 ```
 
-## viper结构
-```go
-type Viper struct {
-	// Delimiter that separates a list of keys
-	// used to access a nested value in one go
-	keyDelim string
 
-	// A set of paths to look for the config file in
-	configPaths []string
 
-	// The filesystem to read config from.
-	fs afero.Fs
-
-	// A set of remote providers to search for the configuration
-	remoteProviders []*defaultRemoteProvider
-
-	// Name of file to look for inside the path
-	configName        string
-	configFile        string
-	configType        string
-	configPermissions os.FileMode
-	envPrefix         string
-
-	// Specific commands for ini parsing
-	iniLoadOptions ini.LoadOptions
-
-	automaticEnvApplied bool
-	envKeyReplacer      StringReplacer
-	allowEmptyEnv       bool
-
-	config         map[string]interface{}
-	override       map[string]interface{}
-	defaults       map[string]interface{}
-	kvstore        map[string]interface{}
-	pflags         map[string]FlagValue
-	env            map[string][]string
-	aliases        map[string]string
-	typeByDefValue bool
-
-	// Store read properties on the object so that we can write back in order with comments.
-	// This will only be used if the configuration read is a properties file.
-	properties *properties.Properties
-
-	onConfigChange func(fsnotify.Event)
-}
-```
-
-## 需要实现的RemoteProvider接口
+## RemoteProvider 接口
 ```go
 type RemoteProvider interface {
 	Provider() string
@@ -77,9 +33,10 @@ type RemoteProvider interface {
 }
 ```
 
-### nacos-viper插件中实现
+### nacos-viper 插件
+
 ```go
-// /Users/xiaxin/go/pkg/mod/github.com/yoyofxteam/nacos-viper-remote@v0.4.0/nacosprovider.go
+// github.com/yoyofxteam/nacos-viper-remote@v0.4.0/nacosprovider.go
 type nacosRemoteProvider struct {
 	provider      string
 	endpoint      string
@@ -109,6 +66,18 @@ func (rp nacosRemoteProvider) SecretKeyring() string {
 
 ```
 
+```go
+func SetOptions(option *Option) {
+	manager, _ := NewNacosConfigManager(option)
+	// 覆盖默认支持的远程插件
+	viper.SupportedRemoteProviders = []string{"nacos"}
+	viper.RemoteConfig = &remoteConfigProvider{ConfigManager: manager}
+}
+
+```
+
+
+
 
 ## 加载远程配置
 ```go
@@ -117,11 +86,10 @@ func (v *Viper) ReadRemoteConfig() error {
 }
 
 func (v *Viper) getKeyValueConfig() error {
-	if RemoteConfig == nil {
-		return RemoteConfigError("Enable the remote features by doing a blank import of the viper/remote package: '_ github.com/spf13/viper/remote'")
-	}
+    // 校验
 
 	for _, rp := range v.remoteProviders {
+		// 拿到一个远程配置即可 
 		val, err := v.getRemoteConfig(rp)
 		if err != nil {
 			jww.ERROR.Printf("get remote config: %s", err)
@@ -149,9 +117,10 @@ func (v *Viper) getRemoteConfig(provider RemoteProvider) (map[string]interface{}
 }
 ```
 从注册工厂中获取nacos服务
+
 注册工厂需要实现的方法
 ```go
-// /Users/xiaxin/go/pkg/mod/github.com/spf13/viper@v1.8.1/viper.go
+// github.com/spf13/viper@v1.8.1/viper.go
 type remoteConfigFactory interface {
 	Get(rp RemoteProvider) (io.Reader, error)
 	Watch(rp RemoteProvider) (io.Reader, error)
@@ -160,9 +129,11 @@ type remoteConfigFactory interface {
 // RemoteConfig is optional, see the remote package
 var RemoteConfig remoteConfigFactory
 ```
+
+
 默认工厂
 ```go
-// /Users/xiaxin/go/pkg/mod/github.com/spf13/viper@v1.8.1/remote/remote.go
+// github.com/spf13/viper@v1.8.1/remote/remote.go
 func init() {
     viper.RemoteConfig = &remoteConfigProvider{}
 }
@@ -195,7 +166,7 @@ remote.SetOptions(&remote.Option{
 ```
 
 ```go
-// /Users/xiaxin/go/pkg/mod/github.com/yoyofxteam/nacos-viper-remote@v0.4.0/viper_remote.go
+// github.com/yoyofxteam/nacos-viper-remote@v0.4.0/viper_remote.go
 func SetOptions(option *Option) {
 	manager, _ := NewNacosConfigManager(option)
 	viper.SupportedRemoteProviders = []string{"nacos"}
@@ -410,4 +381,8 @@ func (v *Viper) find(lcaseKey string, flagDefault bool) interface{} {
 	return nil
 }
 ```
+
+## 参考
+
+
 

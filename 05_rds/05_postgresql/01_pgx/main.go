@@ -53,12 +53,12 @@ func printPoolStats(pool *pgxpool.Pool) {
 	idleRatio := float64(stat.IdleConns()) / float64(stat.TotalConns())
 
 	fmt.Printf("[%s] 连接池状态:\n", now)
-	fmt.Printf("  活跃连接: %d/%d (使用率: %.0f%%)\n",
+	fmt.Printf(" 活跃连接: %d/%d (使用率: %.0f%%)\n",
 		stat.AcquiredConns(), stat.MaxConns(),
 		float64(stat.AcquiredConns())/float64(stat.MaxConns())*100)
 	fmt.Printf("  空闲连接: %d (占比: %.0f%%)\n",
 		stat.IdleConns(), idleRatio*100)
-	fmt.Printf("  累计创建连接: %d (复用率: %.2f)\n",
+	fmt.Printf("累计创建连接: %d (复用率: %.2f)\n",
 		stat.NewConnsCount(),
 		float64(stat.AcquireCount())/float64(stat.NewConnsCount()))
 	fmt.Printf("  平均获取耗时: %.2fms\n",

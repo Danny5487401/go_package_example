@@ -2,30 +2,33 @@ package main
 
 import (
 	"fmt"
-	"github.com/spf13/viper"
-	remote "github.com/yoyofxteam/nacos-viper-remote"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
+
+	"github.com/spf13/viper"
+	remote "github.com/yoyofxteam/nacos-viper-remote"
 )
 
 var appName string
 
 func main() {
-	config_viper := viper.New()
+	configViper := viper.New()
 
-	// 注册nacos配置
+	// 注册 nacos 配置
 	remote.SetOptions(&remote.Option{
 		Url:         "tencent.danny.games",
 		Port:        8848,
 		NamespaceId: "public",
 		GroupName:   "DEFAULT_GROUP",
 		Config:      remote.Config{DataId: "config_dev.yaml"},
-		Auth: &remote.Auth{User: "nacos",
+		Auth: &remote.Auth{
+			User:     "nacos",
 			Password: "nacos"},
 	})
 
+	// 初始化远程 viper
 	remoteViper := viper.New()
 	err := remoteViper.AddRemoteProvider("nacos", "tencent.danny.games", "")
 	remoteViper.SetConfigType("yaml")
@@ -33,15 +36,15 @@ func main() {
 	err = remoteViper.ReadRemoteConfig() //sync get remote configs to remoteViper instance memory . for example , remoteViper.GetString(key)
 
 	if err == nil {
-		config_viper = remoteViper
+		configViper = remoteViper
 		fmt.Println("监听远程配置")
 		provider := remote.NewRemoteProvider("yaml")
-		respChan := provider.WatchRemoteConfigOnChannel(config_viper)
+		respChan := provider.WatchRemoteConfigOnChannel(configViper)
 
 		go func(rc <-chan bool) {
 			for {
 				<-rc
-				fmt.Printf("监听到配置: %s\n", config_viper.GetString("app.age"))
+				fmt.Printf("监听到配置: %s\n", configViper.GetString("app.age"))
 			}
 		}(respChan)
 	}
@@ -49,7 +52,7 @@ func main() {
 	go func() {
 		for {
 			time.Sleep(time.Second * 30) // delay after each request
-			appName = config_viper.GetString("app.age")
+			appName = configViper.GetString("app.age")
 			fmt.Println("每次拉取配置:" + appName)
 		}
 	}()
