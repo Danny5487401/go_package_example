@@ -33,8 +33,11 @@ OpenCensus 则是由 Google 内部实践而来，结合了 Tracing 和 Metrics �
 由于两大开源社区各自的影响力都不小，而存在两个或多个 Tracing 的标准这个事情本身跟社区组建的主旨相违背。于是两大开源社区一拍即合，成立了 OpenTelemetry。
 
 
-### openTelemetry架构
+### openTelemetry 架构
+https://opentelemetry.io/docs/demo/architecture/
+
 ![](../.introduction_images/opentelemetry_structure.png)
+
 ![](.openTelemetry_images/otel_structure.png)
 
 组成： 
@@ -62,13 +65,23 @@ Collector：负责收集观测数据，处理观测数据，导出观测数据�
   目前社区的已经集成的厂商非常多，除了上述的开源的，常见的厂商包括 AWS，阿里，Azure，Datadog，Dynatrace，Google，Splunk，VMWare 等都实现了 Collector 的 exporter 能力。
   
 
-### 1. 收集、转换、转发遥测数据的工具 Collector
+#### 1 收集、转换、转发遥测数据的工具 Collector
+
+https://opentelemetry.io/docs/collector/
 
 从架构层面来说，Collector 有两种模式。
 
+```shell
+#  OpenTelemetry Operator 管理 
+~ kubectl get OpenTelemetryCollector -n openobserve-collector
+NAME                                MODE          VERSION   READY   AGE     IMAGE                                                                                             MANAGEMENT
+o2c-openobserve-collector-agent     daemonset     0.136.0   5/5     6d21h   ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.138.0   managed
+o2c-openobserve-collector-gateway   statefulset   0.136.0   1/1     6d21h   ghcr.io/open-telemetry/opentelemetry-collector-releases/opentelemetry-collector-contrib:0.138.0   managed
+```
 1. 一种是把 Collector 部署在应用相同的主机内（如 K8S 的 DaemonSet）， 或者部署在应用相同的 Pod 里面 （如 K8S 中的 Sidecar），应用采集到的遥测数据，直接通过回环网络传递给 Collector。这种模式统称为 Agent 模式。
 
 2. 另一种模式是把 Collector 当作一个独立的中间件，应用把采集到的遥测数据往这个中间件里面传递。这种模式称之为 Gateway 模式。
+
 
 ![](../.introduction_images/collector_pipeline.png)
 在 Collector 内部设计中，一套数据的流入、处理、流出的过程称为 pipeline。一个 pipeline 有三部分组件组合而成，它们分别是 receiver/ processor/ exporter。
@@ -80,7 +93,7 @@ Collector：负责收集观测数据，处理观测数据，导出观测数据�
 - exporter:
   负责把数据往下一个接收端发送（一般是遥测后端），exporter 可以定义同时从多个不同的 processor 中获取遥测数据
 
-### 2. 自动监测客户端与第三方库 Instrumentation & Contrib
+#### 2 自动监测客户端与第三方库 Instrumentation & Contrib
 如果单纯使用监测客户端 API & SDK 包，许多的操作是需要修改应用代码的。
 如添加 Tracing 监测点，记录字段信息，元数据在进程/服务间传递的装箱拆箱等。这种方式具有代码侵入性，不易解耦，而且操作成本高，增加用户使用门槛。
 这个时候就可以利用公共组件的设计模式或语言特性等来降低用户使用门槛。
@@ -197,7 +210,7 @@ OpenTelemetry的标准协议实现库提供了常用的TextMapPropagator，用�
 ### Baggage
 除了Trace传播之外，OpenTelemetry还提供了一个简单的机制来传播键值对，这一机制被称为Baggage。
 
-Baggage可以为一个服务查看可观测事件提供索引， 其属性则是由同一个事务的前一个服务提供。这有助于在各个事件之间建立因果关系
+Baggage可以为一个服务查看可观测事件提供索引， 其属性则是由同一个事务的前一个服务提供。这有助于在各个事件之间建立因果关系.
 
 OpenTelemetry Baggage 是一个简单但通用的键值系统。一旦数据被添加为 Baggage，它就可以被所有下游服务访问。
 这允许有用的信息，如账户和项目 ID，在事务的后期变得可用，而不需要从数据库中重新获取它们。
@@ -209,7 +222,8 @@ OpenTelemetry Baggage 是一个简单但通用的键值系统。一旦数据被�
 Resource记录当前发生采集的实体的信息(虚拟机、容器等)，例如，Metrics如果是通过Kubernetes容器导出的，那么resource可以记录 Kubernetes集群、命名空间、Pod和容器名称等信息。
 
 
-## 代码案例 :svc1和svc2整合
+## 代码案例: svc1和svc2整合
+
 ### 链路描述
 ![](.openTelemetry_images/chain_process.png)
 1. C代表客户端，S代表服务端，F代表方法
@@ -218,7 +232,22 @@ Resource记录当前发生采集的实体的信息(虚拟机、容器等)，例�
 4. Fb会去跨服务请求S’的接口
 5. S’收到请求后执行Fc
 
-## 参考文档
-1. [官网文档](https://opentelemetry.io/docs/concepts/what-is-opentelemetry/)
-1. [opentelemetry 官方 github 文档](https://opentelemetry.io/docs/concepts/what-is-opentelemetry/)
-1. [opentelemetry 官方 github 中文文档](https://github.com/open-telemetry/docs-cn/blob/main/specification/Readme.md)
+## 应用无感注入
+https://opentelemetry.io/docs/zero-code/
+
+
+## 链路透传协议
+
+W3C Trace Context 是 W3C 组织所推出的一个规范，旨在规范分布式追踪中跟踪信息的传播格式，除了 HTTP 场景以外，也支持二进制、以及消息等场
+
+### W3C Trace Context（HTTP Protocol）
+Trace Context 规范主要定义了两个 HTTP 头部字段：traceparent 和 tracestate。
+
+traceparent：采用扩展的巴科斯范式（ABNF）定义，由四个部分组成：
+
+tracestate：是对 traceparent 字段的扩展，用于携带额外的、服务间可能需要的追踪状态信息，并且是 traceparent 字段的伴随标头。
+
+
+## 参考
+- https://opentelemetry.io/docs/concepts/what-is-opentelemetry/
+- https://github.com/open-telemetry/docs-cn/blob/main/specification/Readme.md

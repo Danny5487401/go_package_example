@@ -1,6 +1,3 @@
-# 待详细介绍补充
-
-
 run:
   # The default concurrency value is the number of available CPU.
   concurrency: 4

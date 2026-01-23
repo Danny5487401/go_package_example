@@ -25,6 +25,14 @@
 * Naver pinpoint：韩国人开源的基于字节码注入的调用链分析，以及应用监控分析工具。特点是支持多种插件，UI功能强大，接入端无代码侵入
 * Uber Jaeger
 
+
+主流的链路追踪项目，比如：OpenTelemetry、Zipkin、Jaeger、Skywalking 等，都有定义各自的链路传播协议：
+
+- OpenTelemetry：w3c 透传协议
+- Skywalking：sw8（v3）透传协议
+- ZipKin：b3/b3multi 透传协议
+- Jaeger：jaeger 透传协议
+
 ## 链路监控组件要求
 - 探针的性能消耗
 

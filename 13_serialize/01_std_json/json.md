@@ -3,6 +3,7 @@
 **Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
 
 - [Go 原生 encoding/json](#go-%E5%8E%9F%E7%94%9F-encodingjson)
+  - [json 协议](#json-%E5%8D%8F%E8%AE%AE)
   - [接口](#%E6%8E%A5%E5%8F%A3)
   - [标签](#%E6%A0%87%E7%AD%BE)
   - [序列化](#%E5%BA%8F%E5%88%97%E5%8C%96)
@@ -19,8 +20,45 @@
 而对于未知结构或不确定结构的数据，则支持将二进制反序列化到 map[string]interface{} 类型中，使用 KV 的模式进行数据的存取
 
 
-
 序列化和反序列化的开销完全不同，JSON 反序列化的开销是序列化开销的好几倍。
+
+
+## json 协议
+
+协议结构包括要素
+- 对象（Object）：由一对大括号{}包围，内部是零个或多个键值对，每个键值对由冒号:分隔，键（key）是一个字符串，值（value）可以是字符串、数字、布尔值、对象、数组或null。
+- 数组（Array）：由一对方括号[]包围，内部是零个或多个值，值可以是字符串、数字、布尔值、对象、数组或null，多个值之间用逗号,分隔。
+- 字符串（String）：由双引号""包围的Unicode字符序列，可以包含任意字符，使用转义字符\来表示特殊字符。
+- 数字（Number）：整数或浮点数。
+- 布尔值（Boolean）：true或false。
+- null：表示空值。
+
+
+
+JSON语法规则
+- 数据由键值对组成，键和值之间使用冒号（:）分隔。
+- 键必须是字符串，使用双引号（"）括起来。
+- 值可以是字符串、数字、布尔值、数组、对象或null。
+- 多个键值对之间使用逗号（,）分隔。
+- 对象使用花括号（{}）表示，键值对之间没有顺序。
+- 数组使用方括号（[]）表示，值之间使用逗号分隔。
+
+```json
+
+{
+  "name": "John",
+  "age": 30,
+  "isStudent": true,
+  "address": {
+    "street": "123 Main St",
+    "city": "New York"
+  },
+  "hobbies": ["reading", "music", "sports"],
+  "scores": [98, 85, 92, 76],
+  "isMarried": null
+}
+
+```
 
 
 ## 接口
@@ -702,6 +740,5 @@ func (d *decodeState) object(v reflect.Value) error {
 ```
 
 ## 参考
-
 
 - [你需要知道的那些go语言json技巧](https://www.liwenzhou.com/posts/Go/json_tricks_in_go/)

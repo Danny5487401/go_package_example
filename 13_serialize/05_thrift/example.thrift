@@ -1,5 +1,6 @@
-// thrift --gen go example.thrift 
-namespace go com.example   // 定义所使用的命名空间
+// thrift --gen go example.thrift
+// thrift version 0.22.0
+namespace go thrift.example   // 定义所使用的命名空间
 
 struct Person {             // 定义一个结构体
   1: required string name,  // 姓名字段

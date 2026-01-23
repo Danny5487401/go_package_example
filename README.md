@@ -259,6 +259,7 @@
   - [3.10 time 类型 DecodeHookFunc ](13_serialize/03_mapstructure/10_time_decode_hook/main.go)
 - [4 json patch 两种标准](13_serialize/04_json_patch/json_patch.md)
   - [4.1 github.com/evanphx/json-patch/v5 使用](13_serialize/04_json_patch/main.go)
+- [5 thrift](13_serialize/05_thrift/thrift.md) 
 
 ## 第十四章 系统监控
 - [1 systemstat包(适合linux系统，已断更)](14_system_monitor/01_systemstat/main.go)
